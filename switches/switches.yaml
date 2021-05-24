@@ -1,0 +1,93 @@
+####################################################
+#                                                                                                    #
+#                    Momentary Switches                                                    #
+#                                                                                                    #
+####################################################
+
+  - platform: momentary
+    name: Activate Guest
+    mode: on
+    toggle_for: 5
+    cancellable: True
+
+  - platform: momentary
+    name: Switchbot Status
+    mode: on
+    toggle_for: 3
+    cancellable: True
+
+####################################################
+#                                                                                                    #
+#                    Customize Switches                                                     #
+#                                                                                                    #
+####################################################
+
+# Christmas Light Switch
+  - platform: template
+    switches:
+     christmas_lights:
+       friendly_name: 'Christmas Lights'
+       value_template: "{{ states('input_boolean.christmas_lights') }}"
+       turn_on:
+         - service: switch.turn_on
+           entity_id: group.christmas_lights
+         - service: input_boolean.turn_on
+           entity_id: input_boolean.christmas_lights
+       turn_off:
+         - service: switch.turn_off
+           entity_id: group.christmas_lights
+         - service: input_boolean.turn_off
+           entity_id: input_boolean.christmas_lights
+       icon_template: >-
+         {% if is_state('input_boolean.christmas_lights', 'on') %}
+            mdi:string-lights
+         {% else %}
+            mdi:string-lights-off
+         {% endif %}
+
+# Desktop Switch
+  - platform: template
+    switches:
+     desktop:
+       friendly_name: 'Desktop'
+       value_template: "{{ states('input_boolean.desktop') }}"
+       turn_on:
+         - service: script.desktop_wol
+       turn_off:
+         - service: script.desktop_shutdown
+       icon_template: >-
+         {% if is_state('input_boolean.desktop', 'on') %}
+            mdi:desktop-mac-dashboard
+         {% else %}
+            mdi:desktop-mac
+         {% endif %}
+
+# Tv Lock Switch
+  - platform: template
+    switches:
+     tv_lock:
+       friendly_name: 'Tv Lock'
+       value_template: "{{ states('input_boolean.tv_lock') }}"
+       turn_on:
+         - service: switch.turn_off
+           entity_id: switch.sp4_0
+         - service: input_boolean.turn_on
+           entity_id: input_boolean.tv_lock
+       turn_off:
+         - service: switch.turn_on
+           entity_id: switch.sp4_0
+         - service: input_boolean.turn_off
+           entity_id: input_boolean.tv_lock
+       icon_template: >-
+         {% if is_state('input_boolean.tv_lock', 'on') %}
+            mdi:monitor-lock
+         {% else %}
+            mdi:monitor
+         {% endif %}
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

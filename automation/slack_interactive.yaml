@@ -1,0 +1,61 @@
+#########################################################
+#                                                                                                              #
+#             Slack Webhook                                                                             #
+#                                                                                                              #
+#########################################################
+
+- alias: slack_webhook
+  trigger:
+    - platform: webhook
+      webhook_id: koohbew_kcals
+  condition:
+    - condition: template
+      value_template: >
+        {% set payload = trigger.data.payload | from_json %}
+        {{ (payload.token == states('input_text.slack_app_verification_token')) and (payload.type == 'interactive_message') }}
+  action:
+    - service_template: >
+        {%- set payload = trigger.data.payload | from_json -%}
+        script.{{ payload.callback_id }}
+      data_template:
+        payload: '{{ trigger.data.payload }}'
+
+#########################################################
+#                                                                                                              #
+#             Slack Actionable Notifications                                                          #
+#                                                                                                              #
+#########################################################
+
+- alias: Slack - PC is on
+  trigger:
+    platform: state
+    entity_id: binary_sensor.duc_presence
+    to: 'off'
+  condition:
+    - condition: template # PC left on
+      value_template: "{{ is_state('binary_sensor.desktop_connected', 'on') }}"
+  action:
+    - service: script.notify_slack
+      data_template:
+        channel: !secret slack_channel_id
+        message: "The PC was left on and no one is home."
+        attachments:
+          - title: Turn off the PC?
+            callback_id: turn_off_pc_callback
+            color: '#03a9f4'
+            attachment_type: default
+            actions:
+              - text: Turn off
+                value: Turn off
+                name: 'script.desktop_shutdown'
+                type: button
+              - text: Leave it
+                value: Leave it
+                name: 'dismiss'
+                type: button
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

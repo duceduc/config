@@ -1,0 +1,118 @@
+####################################################
+#                                                                                                    #
+#            Misc                                                                                  #
+#                                                                                                    #
+####################################################
+
+  - platform: season
+
+  - platform: moon
+
+# Can be deleted
+  - platform: template
+    sensors:
+      all_home:
+        friendly_name: Number of people home
+        unit_of_measurement: 'ppl'
+        value_template: >-
+         {{ [states.binary_sensor.duc_home, states.binary_sensor.eri_home, states.binary_sensor.shion_home]
+              | selectattr('state', 'eq', 'on')
+              | list | count }}
+
+  - platform: template
+    sensors:
+      last_alexa:
+        value_template: >
+          {{ expand(states.group.echos) | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+
+  - platform: template
+    sensors:
+      sleeping:
+        value_template: >-
+         {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}
+        icon_template: >-
+         {% if is_state("group.bed_sensors", "on") %}mdi:bed{% else %}mdi:bed-outline{% endif %}
+
+  - platform: template
+    sensors:
+      washroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}Unoccupied{% else %}Occupied{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}mdi:shower{% else %}mdi:hot-tub{% endif %}
+
+  - platform: template
+    sensors:
+      kitchen:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_k1_occupancy", "off") %}Closed{% else %}Open{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_k1_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
+
+  - platform: template
+    sensors:
+      hallway:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_hallway_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_hallway_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+
+  - platform: template
+    sensors:
+      genkan:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_g1_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_g1_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+
+  - platform: template
+    sensors:
+      toilet:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_t1_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_t1_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+
+  - platform: template
+    sensors:
+      24hr_fan:
+        value_template: >-
+         {% if is_state("input_boolean.washroom_fan", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("input_boolean.washroom_fan", "off") %}mdi:fan-off{% else %}mdi:fan{% endif %}
+
+
+####################################################
+#                                                                                                    #
+#            Day of Week                                                                       #
+#                                                                                                    #
+####################################################
+
+
+  - platform: template
+    sensors:
+      date_dayoftheweek:
+        value_template: >
+          {% set ct = states('sensor.date_time') %}
+          {% set ct = as_timestamp(strptime(ct,'%Y-%m-%d, %H:%M')) %}
+          {{ ct | timestamp_custom("%A") }}
+
+      date_weekend:
+        value_template: >
+          {% if is_state('sensor.date_dayoftheweek', 'Saturday') %} weekend
+          {% elif is_state('sensor.date_dayoftheweek', 'Sunday') %} weekend
+          {% else %} weekday
+          {% endif %}
+
+      date_weekday:
+        value_template: >
+          {% if is_state('sensor.date_weekend', 'weekday') %} on
+          {% else %} off
+          {% endif %}
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

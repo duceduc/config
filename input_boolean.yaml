@@ -1,0 +1,97 @@
+
+  wakeup:
+    name: 'Enable wakeup light'
+    icon: mdi:power
+    initial: off
+  wakeup_weekends:
+    name: 'Wakeup weekends'
+    icon: mdi:power
+    initial: off
+
+  lights_flash:
+    name: Lights Flash
+    icon: mdi:alarm-light
+    initial: off
+  guest_mode:
+    name: Guest Mode
+    icon: mdi:home-account
+    initial: off
+  vacation_mode:
+    name: Vacation Mode
+    icon: mdi:beach
+    initial: off
+  appletv_netflix:
+    name: AppleTV Netflix
+    icon: si:netflix
+    initial: off
+  appletv_plex:
+    name: Appletv Plex
+    icon: mdi:plex
+    initial: off
+  child_mode:
+    name: Child Mode
+    icon: mdi:account-key
+    initial: off
+
+  tv_lock:
+    name: Tv Lock
+    icon: mdi:monitor-lock
+    initial: on
+
+  desktop:
+    name: Desktop
+    icon: mdi:monitor
+
+  jcom_tv:
+    name: Jcom Tv Box
+    icon: mdi:power
+
+  floor_heat:
+    name: Floor Heat
+    icon: mdi:radiator
+
+  washroom_fan:
+    name: Washroom Fan
+    icon: mdi:fan
+
+  cr_curtains:
+    name: Computer Room Curtains
+    icon: mdi:toggle-switch
+
+  lr_curtains:
+    name: Living Room Curtains
+    icon: mdi:toggle-switch
+
+  ceiling_fan_lights:
+    name: Ceiling Fan Lights
+    icon: mdi:light
+
+  christmas_lights:
+    name: Christmas Lights
+    icon: mdi:string-lights
+
+# HomeKit
+  duc_home:
+    name: Duck
+    icon: mdi:account
+  eri_home:
+    name: Erie
+    icon: mdi:account
+  shion_home:
+    name: Shion_
+    icon: mdi:account
+
+# PRESENCE DETECTION
+  duc_presence:
+    name: Duc
+    icon: mdi:account
+  eri_presence:
+    name: Eri
+    icon: mdi:account
+  shion_presence:
+    name: Shion
+    icon: mdi:account
+
+  sachiko_presence:
+    name: Sachiko
+    icon: mdi:account

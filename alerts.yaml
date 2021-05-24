@@ -1,0 +1,44 @@
+#########################################################
+#                                                                                                              #
+#             Low Battery Notification                                                                 #
+#                                                                                                              #
+#########################################################
+
+
+  low_battery_devices:
+    name: Devices have low battery
+    entity_id: binary_sensor.devices_with_low_battery
+    title: "{{ states('sensor.devices_with_low_battery') }} devices in house with low battery"
+    message: "There are {{ states('sensor.devices_with_low_battery') }} devices  showing 10% or less battery life, you should change them"
+    state: 'on'
+    can_acknowledge: true
+    repeat: 720
+    notifiers:
+    - 'notify_events'
+
+
+#########################################################
+#                                                                                                              #
+#             Raspberry Pi Update Available Notification                                          #
+#                                                                                                              #
+#########################################################
+
+
+  rpi_updates:
+    name: Raspberry Pi Updates Available
+    entity_id: binary_sensor.sb1_updates
+    title: "{{ states('sensor.sb1_updates') }} Raspberry Pi Updates Available"
+    message: "There are {{ states('sensor.sb1_updates') }} updates available for the Raspberry Pi servers"
+    state: 'on'
+    can_acknowledge: true
+    repeat: 720
+    notifiers:
+    - 'notify_events'
+
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

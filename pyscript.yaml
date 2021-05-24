@@ -1,0 +1,20 @@
+
+  allow_all_imports: true
+  hass_is_global: true
+  meross:
+    - name: sp1
+      id: 2009221460240251802948e1e934ad13
+      channels: 1
+      model: mss110
+    - name: sp2
+      id: 2009224970321851802948e1e934b628
+      channels: 1
+      model: mss110
+    - name: sp3
+      id: 2009228897861651802948e1e934c745
+      channels: 1
+      model: mss110
+    - name: sp4
+      id: 2009228823079551802948e1e934c753
+      channels: 1
+      model: mss110

@@ -1,0 +1,98 @@
+#########################################################
+#                                                                                                              #
+#             AppleTV                                                                                         #
+#                                                                                                              #
+#########################################################
+
+# Turn on Netflix via AppleTV
+  appletv_netflix:
+      alias: Appletv Netflix
+      sequence:
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:08
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - down
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - select
+
+# Turn on Plex via AppleTV
+  appletv_plex:
+      alias: Appletv Plex
+      sequence:
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:08
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - down
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - down
+              - down
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - select
+
+#########################################################
+#                                                                                                              #
+#             TV                                                                                             #
+#                                                                                                              #
+#########################################################
+
+# Volume Up
+  tv_volume_up:
+    alias: Tv Volume Up
+    sequence:
+      - service: switch.turn_on
+        entity_id: switch.tv_volume
+      - service: switch.turn_on
+        entity_id: switch.tv_volume
+
+# Volume Up
+  tv_volume_down:
+    alias: Tv Volume Down
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.tv_volume
+      - service: switch.turn_off
+        entity_id: switch.tv_volume
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

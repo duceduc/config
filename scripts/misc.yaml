@@ -1,0 +1,61 @@
+#########################################################
+#                                                                                                              #
+#             Testing Script                                                                               #
+#                                                                                                              #
+#########################################################
+
+
+# Alexa chimes
+  door_bell_alexa:
+    sequence:
+      - service: media_player.play_media
+        data:
+          entity_id: media_player.ai_1
+          media_content_type: sound
+          media_content_id: amzn_sfx_doorbell_chime_01
+
+  play_debbie:
+    alias: Plex Play Debbie
+    sequence:
+      - service: media_player.play_media
+        data_template:
+          entity_id: media_player.plex_plex_for_ios_id
+          media_content_type: 'music'  
+          media_content_id: '{ "library_name": "Music", "artist_name": "Debbie Gibson", "album_name": "Electric Youth" }'
+
+
+#########################################################
+#                                                                                                              #
+#             Backup to Github                                                                          #
+#                                                                                                              #
+#########################################################
+
+  gitupdate: 
+    alias: Gitupdate
+    sequence:
+      - service: shell_command.gitupdate
+
+#########################################################
+#                                                                                                              #
+#             Shelly EM                                                                                    #
+#                                                                                                              #
+#########################################################
+
+  reset_cumulative_cost:
+    sequence:
+    - service: input_number.set_value
+      data:
+        entity_id: input_number.cumulative_energy_cost
+        value: 0
+    - service: input_datetime.set_datetime
+      entity_id: input_datetime.last_reset
+      data_template:
+        date: "{{ as_timestamp(now())|timestamp_custom('%Y-%m-%d') }}"
+
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

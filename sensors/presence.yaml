@@ -1,0 +1,203 @@
+####################################################
+#                                                                                                    #
+#            PRESENCE - GENKAN                                                             #
+#                                                                                                    #
+####################################################
+
+
+# Duc
+  - platform: mqtt
+    name: 'iD Genkan'
+    state_topic: 'monitor/genkan/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - platform: mqtt
+    name: 'iE Genkan'
+    state_topic: 'monitor/genkan/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - platform: mqtt
+    name: 'iS Genkan'
+    state_topic: 'monitor/genkan/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - platform: mqtt
+    name: 'iSp Genkan'
+    state_topic: 'monitor/genkan/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - platform: mqtt
+    name: 'tms Genkan'
+    state_topic: 'monitor/genkan/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Sachiko
+  - platform: mqtt
+    name: 'Sachiko Genkan'
+    state_topic: 'monitor/genkan/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+
+####################################################
+#                                                                                                    #
+#            PRESENCE - LIVINGROOM                                                       #
+#                                                                                                    #
+####################################################
+
+
+# Duc
+  - platform: mqtt
+    name: 'iD Livingroom'
+    state_topic: 'monitor/livingroom/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - platform: mqtt
+    name: 'iE Livingroom'
+    state_topic: 'monitor/livingroom/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - platform: mqtt
+    name: 'iS Livingroom'
+    state_topic: 'monitor/livingroom/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - platform: mqtt
+    name: 'iSp Livingroom'
+    state_topic: 'monitor/livingroom/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - platform: mqtt
+    name: 'tms Livingroom'
+    state_topic: 'monitor/livingroom/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Sachiko
+  - platform: mqtt
+    name: 'Sachiko Livingroom'
+    state_topic: 'monitor/livingroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+
+####################################################
+#                                                                                                    #
+#            PRESENCE - MIN/MAX                                                           #
+#                                                                                                    #
+####################################################
+
+
+  - platform: min_max
+    name: 'iD Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.id_genkan
+      - sensor.id_livingroom
+
+  - platform: min_max
+    name: 'iE Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.ie_genkan
+      - sensor.ie_livingroom
+
+  - platform: min_max
+    name: 'iS Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.is_genkan
+      - sensor.is_livingroom
+
+  - platform: min_max
+    name: 'iSp Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.isp_genkan
+      - sensor.isp_livingroom
+
+  - platform: min_max
+    name: 'tms Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.tms_genkan
+      - sensor.tms_livingroom
+
+# Guests
+  - platform: min_max
+    name: 'Sachiko Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.sachiko_genkan
+      - sensor.sachiko_livingroom
+
+####################################################
+#                                                                                                    #
+#            Number of People Home                                                         #
+#                                                                                                    #
+####################################################
+
+  - platform: template
+    sensors:
+      n_people_home:
+        friendly_name: Number of People Home
+        value_template: >-
+          {{ states|selectattr('entity_id','in',
+                      state_attr('group.family_presence','entity_id'))
+                   |selectattr('state','eq','on')|list|count +
+             (1 if is_state('input_boolean.guest_mode','on') else 0) }}
+
+####################################################
+#                                                                                                    #
+#            Have Guest Status                                                               #
+#                                                                                                    #
+####################################################
+
+  - platform: template
+    sensors:
+      guest_mode:
+        value_template: >-
+         {% if is_state("input_boolean.guest_mode", "off") %}No{% else %}Yes{% endif %}
+        icon_template: >-
+         {% if is_state("input_boolean.guest_mode", "off") %}mdi:account-off{% else %}mdi:account-plus{% endif %}
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

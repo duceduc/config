@@ -1,0 +1,205 @@
+#########################################################
+#                                                                                                              #
+#             Main Configuration Settings                                                            #
+#                                                                                                              #
+#########################################################
+
+default_config:
+python_script:
+momentary:
+wake_on_lan:
+
+tts:
+  - platform: google_translate
+    service_name: google_say
+
+group: !include groups.yaml
+scene: !include scenes.yaml
+timer: !include timers.yaml
+light: !include lights.yaml
+binary_sensor: !include binary_sensor.yaml
+input_number: !include input_number.yaml
+input_datetime: !include input_datetime.yaml
+input_select: !include input_select.yaml
+cover: !include cover.yaml
+input_boolean: !include input_boolean.yaml
+emulated_hue: !include emulated_hue.yaml
+garbage_collection: !include garbage_collection.yaml
+shell_command: !include shell_commands.yaml
+pyscript: !include pyscript.yaml
+alert: !include alerts.yaml
+frontend: !include frontend.yaml
+lovelace: !include lovelace.yaml
+
+automation: !include_dir_merge_list automation/
+sensor: !include_dir_merge_list sensors/
+switch: !include_dir_merge_list switches/
+notify: !include_dir_merge_list notify/
+script: !include_dir_merge_named scripts/
+
+homeassistant:
+  name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: 20
+  unit_system: metric
+  time_zone: Asia/Tokyo
+  internal_url: !secret internal_url
+  customize: !include customize.yaml
+  packages: !include_dir_named integrations
+
+recorder:
+  db_url: !secret MySQL_login
+  purge_keep_days: 5
+  exclude:
+    domains:
+     - group
+     - automation
+     - camera
+     - media_player
+     - scene
+     - script
+    entities:
+     - sun.sun
+     - sensor.date_time
+
+#hacs:
+#  token: !secret HACS_github
+#  appdaemon: true
+#  sidepanel_icon: mdi:alpha-c-box
+
+alexa_media:
+  accounts:
+    - email: !secret amazon_user
+      password: !secret amazon_password
+      url: amazon.com
+      include_devices:
+       - Ai.1
+       - Ai.2
+       - Ai.3
+# Find Amazon dot name
+# https://alexa.amazon.com/api/devices-v2/device
+
+person:
+  - name: Shion
+    id: shion0614
+    device_trackers:
+      - device_tracker.is
+  - name: Eri
+    id: eri1118
+    device_trackers:
+      - device_tracker.ie
+  - name: Kiki
+    id: kiki2005
+    device_trackers:
+      - device_tracker.isp
+    
+homekit:
+  name: Home-Assistant
+  filter:
+    include_entities:
+     - input_boolean.duc_home
+     - input_boolean.eri_home
+     - input_boolean.shion_home
+
+notify_events:
+  token: !secret notify_token
+
+zigbee2mqtt_networkmap:
+
+# Integrations
+panel_iframe:
+  networkmap:
+    title: 'Zigbee Map'
+    url: '/local/community/zigbee2mqtt_networkmap/map.html'
+    icon: 'mdi:graphql'
+
+
+#########################################################
+#                                                                                                              #
+#             Intergrations                                                                                #
+#                                                                                                              #
+#########################################################
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_apikey
+    allowed_chat_ids:
+     - !secret telegram_chatid
+     - !secret telegram_userid
+
+utility_meter:
+  energy_t31_light_and_power_monthly:
+    source: sensor.shelly_t31_total_energy
+    cycle: monthly
+    offset:
+      days: 2
+  energy_t31_light_and_power:
+    source: sensor.shelly_t31_total_energy
+    cycle: daily
+    tariffs:
+      - day
+      - night
+  energy_t41_heating:
+    source: sensor.shelly_t41_total_energy
+    cycle: daily
+    tariffs:
+      - day
+      - night
+
+  energy_washer_power_monthly:
+    source: sensor.shelly_washer_total_energy
+    cycle: monthly
+    offset:
+      days: 2
+
+  energy_washer_daily_power:
+    source: sensor.shelly_washer_total_energy
+    cycle: daily
+
+counter:
+  dining_lights_toggle:
+    initial: 1
+    step: 1
+
+input_text:
+  slack_app_verification_token:
+    initial: !secret slack_app_verification_token
+    mode: password
+
+  alexa_actionable_notification:
+    name: Alexa Actionable Notification Holder
+    max: 255
+    initial: '{"text": "This is a test of the alexa actions custom skill. Did it work?", "event": "actionable.skill.test"}'
+
+rest_command:
+  slack_api:
+    url: https://slack.com/api/{{ api }}
+    content_type: 'application/json; charset=utf-8'
+    verify_ssl: true
+    method: 'post'
+    timeout: 20
+    headers:
+      Authorization: !secret slackbot_token
+    payload: '{{ payload }}'
+
+# Slack URL '***-ga64322.slack.com'
+  slack_response:
+    url: '{{ response_url }}'
+    content_type: 'application/json; charset-utf-8'
+    verify_ssl: true
+    method: 'post'
+    timeout: 20
+    payload: >
+      {
+         "replace_original": '{{ replace_original if (replace_original is defined) else 'true' }}',
+        "text": "{{ message | default('') }}",
+        "attachments": {{ attachments if (attachments is defined) else '[]' }}
+      }
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

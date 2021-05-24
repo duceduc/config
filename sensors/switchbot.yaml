@@ -1,0 +1,266 @@
+####################################################
+#                                                                                                    #
+#                      Switchbot Node.js                                                      #
+#                                                                                                    #
+####################################################
+# c289d47408fd -T
+# c5c6df9448bc - CR Left *
+# e2b3c5c10dcc - LR Left *
+# e3459c3842fe - CR Right
+# e746bd93112f - LR Right
+# e79341ccf8ea - Floor Heater
+# f4f839cd40fd - Jcom
+# fab6527b504e - 24 Fan
+
+# Node.js Error Check
+  - platform: mqtt
+    name: 'Switchbot Status'
+    state_topic: 'switchbot/status/msg'
+    value_template: '{{ value }}'
+
+# Hallway Temperature Switchbot Meter [c2:89:d4:74:08:fd] Backup
+  - platform: mqtt
+    name: 'Hallway Temperature'
+    state_topic: 'switchbot/meter/c2:89:d4:74:08:fd'
+    value_template: '{{ value_json.temperature }}'
+    unit_of_measurement: '°C'
+  - platform: mqtt
+    name: 'Hallway Humidity'
+    state_topic: 'switchbot/meter/c2:89:d4:74:08:fd'
+    value_template: '{{ value_json.humidity }}'
+    unit_of_measurement: '%'
+    icon: mdi:water-percent
+  - platform: mqtt
+    name: 'Hallway Battery'
+    state_topic: 'switchbot/meter/c2:89:d4:74:08:fd'
+    value_template: '{{ value_json.battery }}'
+    unit_of_measurement: '%'
+    icon: mdi:battery
+
+# Genkan Switchbot Meter [c2:89:d4:74:08:fd]
+  - platform: mqtt
+    name: 'Genkan Temperature'
+    state_topic: 'switchbot/meter/c289d47408fd'
+    value_template: '{{ value_json.serviceData.temperature.c }}'
+    unit_of_measurement: '°C'
+  - platform: mqtt
+    name: 'Genkan Humidity'
+    state_topic: 'switchbot/meter/c289d47408fd'
+    value_template: '{{ value_json.serviceData.humidity }}'
+    unit_of_measurement: '%'
+    icon: mdi:water-percent
+  - platform: mqtt
+    name: 'Genkan Battery'
+    state_topic: 'switchbot/meter/c289d47408fd'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: '%'
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'Genkan BLE Signal'
+    state_topic: 'switchbot/meter/c289d47408fd'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
+  - platform: mqtt
+    name: "Jcom Tv Box Battery"
+    state_topic: 'switchbot/bot/f4f839cd40fd'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'Jcom Tv Box BLE Signal'
+    state_topic: 'switchbot/bot/f4f839cd40fd'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
+  - platform: mqtt
+    name: "Floor Heater Battery"
+    state_topic: 'switchbot/bot/e79341ccf8ea'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'Floor Heater BLE Signal'
+    state_topic: 'switchbot/bot/e79341ccf8ea'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
+
+
+  - platform: mqtt
+    name: "Washroom Fan Battery"
+    state_topic: 'switchbot/bot/fab6527b504e'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'Washroom Fan BLE Signal'
+    state_topic: 'switchbot/bot/fab6527b504e'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
+
+
+# Pair Used
+  - platform: mqtt
+    name: "CR Curtain Left Battery"
+    state_topic: 'switchbot/curtain/c5c6df9448bc'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'CR Curtain Left BLE Signal'
+    state_topic: 'switchbot/curtain/c5c6df9448bc'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+  - platform: mqtt
+    name: "CR Curtain Right Battery"
+    state_topic: 'switchbot/curtain/e3459c3842fe'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'CR Curtain Right BLE Signal'
+    state_topic: 'switchbot/curtain/e3459c3842fe'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+  - platform: template
+    sensors:
+      cr_curtain_batteries:
+        friendly_name: "CR Curtain Batteries"
+        unit_of_measurement: '%'
+        device_class: battery
+        value_template: "{{ ((states('sensor.cr_curtain_left_battery')|int + states('sensor.cr_curtain_right_battery')|int) /2)|int }}"
+
+## NODE.JS SENSOR FOR POSITION STATE ##
+  - platform: mqtt
+    name: "CR Curtain Left Position"
+    state_topic: 'switchbot/curtain/c5c6df9448bc'
+    value_template: '{{ value_json.serviceData.position }}'
+    unit_of_measurement: "%"
+    icon: mdi:format-list-numbered
+
+# Pair Used
+  - platform: mqtt
+    name: "LR Curtain Left Battery"
+    state_topic: 'switchbot/curtain/e2b3c5c10dcc'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'LR Curtain Left BLE Signal'
+    state_topic: 'switchbot/curtain/e2b3c5c10dcc'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+  - platform: mqtt
+    name: "LR Curtain Right Battery"
+    state_topic: 'switchbot/curtain/e746bd93112f'
+    value_template: '{{ value_json.serviceData.battery }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+  - platform: mqtt
+    name: 'LR Curtain Right BLE Signal'
+    state_topic: 'switchbot/curtain/e746bd93112f'
+    value_template: '{{ value_json.rssi }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+  - platform: template
+    sensors:
+      lr_curtain_batteries:
+        friendly_name: "LR Curtain Batteries"
+        unit_of_measurement: '%'
+        device_class: battery
+        value_template: "{{ ((states('sensor.lr_curtain_left_battery')|int + states('sensor.lr_curtain_right_battery')|int) /2)|int }}"
+  - platform: mqtt
+    name: "LR Curtain Left Position"
+    state_topic: 'switchbot/curtain/e2b3c5c10dcc'
+    value_template: '{{ value_json.serviceData.position }}'
+    unit_of_measurement: "%"
+    icon: mdi:format-list-numbered
+
+##### Group curtain sensor ####
+  - platform: template
+    sensors:
+      fr_curtains:
+        value_template: >-
+          {% if is_state('cover.computer_room_curtains', 'open') %}
+            open
+          {% elif is_state('cover.living_room_curtains', 'open') %}
+            open
+          {% else %}
+            closed
+          {% endif %}
+
+####################################################
+#                                                                                                    #
+#                      Switchbot MQTT                                                        #
+#                                                                                                    #
+####################################################
+# c289d47408fd -meter
+# c5c6df9448bc - cr_curtain_lt *
+# e3459c3842fe - cr_curtain_rt
+# e2b3c5c10dcc - lr_curtain_lt *
+# e746bd93112f - lr_curtain_rt
+# e79341ccf8ea - floor_heat
+# f4f839cd40fd - jcom_tv_box
+# fab6527b504e - 24hr_fan
+
+  - platform: mqtt
+    name: "Genkan Batt"
+    state_topic: 'switchbotmqtt/meter/meter'
+    value_template: '{{ value_json.batt }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+    qos: 0
+
+  - platform: mqtt
+    name: "Jcom Tv Box Batt"
+    state_topic: 'switchbotmqtt/bot/jcom_tv_box'
+    value_template: '{{ value_json.batt }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+    qos: 0
+
+  - platform: mqtt
+    name: "Washroom Fan Batt"
+    state_topic: 'switchbotmqtt/bot/24hr_fan'
+    value_template: '{{ value_json.batt }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+    qos: 0
+
+  - platform: mqtt
+    name: "Floor Heater Batt"
+    state_topic: 'switchbotmqtt/bot/floor_heat'
+    value_template: '{{ value_json.batt }}'
+    unit_of_measurement: "%"
+    icon: mdi:battery
+    qos: 0
+
+# MQTT SENSOR FOR POSITION STATE
+  - platform: mqtt
+    name: "CR Curtains Left Position"
+    state_topic: 'switchbotmqtt/curtain/cr_curtain_lt'
+    value_template: '{{ value_json.pos }}'
+    unit_of_measurement: "%"
+    icon: mdi:format-list-numbered
+
+  - platform: mqtt
+    name: "LR Curtains Left Position"
+    state_topic: 'switchbotmqtt/curtain/lr_curtain_lt'
+    value_template: '{{ value_json.pos }}'
+    unit_of_measurement: "%"
+    icon: mdi:format-list-numbered
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

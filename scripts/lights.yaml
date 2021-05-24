@@ -1,0 +1,301 @@
+#########################################################
+#                                                                                                              #
+#             Lights On Upon Arrival after Sunset                                                  #
+#                                                                                                              #
+#########################################################
+
+  turn_on_lr_lights:
+    alias: Turn on LR lights
+    sequence:
+      - service: light.turn_on
+        data:
+          entity_id: light.living_room
+#      - service: switch.turn_on
+#        data:
+#          entity_id: group.christmas_lights
+      - condition: template # Duc is home
+        value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
+      - service: script.desktop_wol
+#      - delay: 40 
+#      - condition: template # PC is On
+#        value_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"
+      - wait_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"
+        timeout: 60
+        continue_on_timeout: false
+
+      - service: switch.turn_on
+        data:
+          entity_id: switch.jcom_tv
+      - delay: 10
+      - service: script.tv_volume_down
+
+
+#########################################################
+#                                                                                                              #
+#             Shion Room Alarm Lights                                                                 #
+#                                                                                                              #
+#########################################################
+
+  wakeup_bedroom:
+    alias: 'Wakeup lighting, smooth transition'
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: '{{ states("sensor.wakeup_map") }}'
+          brightness: 1
+          kelvin: 1000
+      - delay:
+          seconds: 1
+      - service: light.turn_on
+        data_template:
+          entity_id: '{{ states("sensor.wakeup_map") }}'
+          brightness: 64
+          kelvin: 2000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: '{{ states("sensor.wakeup_map") }}'
+          brightness: 128
+          kelvin: 3000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: '{{ states("sensor.wakeup_map") }}'
+          brightness: 191
+          kelvin: 4000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: '{{ states("sensor.wakeup_map") }}'
+          brightness: 254
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+
+#########################################################
+#                                                                                                              #
+#             Excercise Light Flash                                                                      #
+#                                                                                                              #
+#########################################################
+
+  light_flash:
+    alias: Light flash on
+    sequence:
+      - service: light.turn_on
+        data:
+          entity_id: '{{ states("sensor.exercise_map") }}'
+      - delay:
+          # time for flash light on
+          seconds: 32
+      - service: light.turn_off
+        data:
+          entity_id: '{{ states("sensor.exercise_map") }}'
+      - service: script.turn_on
+        data:
+          entity_id: script.light_loop
+  light_loop:
+    alias: Light flash loop
+    sequence:
+      - delay:
+          # time for flash light off
+          seconds: 1
+      - service: script.turn_on
+        data:
+          entity_id: script.light_flash
+
+#########################################################
+#                                                                                                              #
+#             Dining Room Lights Toggle                                                               #
+#                                                                                                              #
+#########################################################
+
+
+  dining_lights_toggle:
+    sequence:
+      - service: script.dining_lights_mode
+        data:
+          entity: remote.rm4_remote
+          device: Ceiling Fan
+
+  dining_lights_mode:
+    sequence:
+      - service_template: >
+           script.dining_lights_mode_{{ 'off' if is_state('counter.dining_lights_toggle', '3' ) else 'on' }}           
+        data_template:
+          entity: '{{ entity }}'
+          device: '{{ device }}'
+
+  dining_lights_mode_on:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: '{{ entity }}'
+          device: '{{ device }}'
+          command: toggle lights
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.ceiling_fan_lights
+      - service: counter.increment
+        target:
+          entity_id: counter.dining_lights_toggle
+
+  dining_lights_mode_off:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: '{{ entity }}'
+          device: '{{ device }}'
+          command: turn off lights
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.ceiling_fan_lights
+      - service: counter.reset
+        target:
+          entity_id: counter.dining_lights_toggle
+
+
+#########################################################
+#                                                                                                              #
+#             Fade Out Light                                                                             #
+#                                                                                                              #
+#########################################################
+
+  fadebedlightoff:
+    sequence:
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 25.5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+      - delay: '00:02:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 25.5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+      - delay: '00:02:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 25.5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+      - delay: '00:02:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 25.5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+      - delay: '00:02:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 25.5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+      - delay: '00:02:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 25.5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+      - delay: '00:02:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:01:00'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 10 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 10 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 10 | round(0) }} {% endif %}'
+      - delay: '00:00:30'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 5| round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 5 | round(0) }} {% endif %}'
+      - delay: '00:00:30'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data_template:
+          brightness: '{%if (states.light.computer_room.attributes.brightness - 5 | round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.brightness - 5 | round(0) }} {% endif %}'
+          color_temp: '{%if (states.light.computer_room.attributes.color_temp - 5| round(0)) <0 %} 0 {%else%} {{ states.light.computer_room.attributes.color_temp - 5 | round(0) }} {% endif %}'
+      - service: light.turn_on
+        entity_id: light.computer_room
+        data:
+          color_temp: 0
+      - service: light.turn_off
+        entity_id: light.computer_room
+
+
+#########################################################
+#                                                                                                              #
+#             Return to Normal                                                                           #
+#                                                                                                              #
+#########################################################
+
+  normallight:
+    sequence:
+      - service: light.turn_on
+        entity_id: light.ntl_1
+        data:
+          brightness: 254
+          kelvin: 5000
+
+  returntonormal:
+    sequence:
+      - service: script.normallight
+      - delay: '00:00:01'
+      - service: light.turn_off
+        entity_id: light.ntl_1
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

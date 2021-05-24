@@ -1,0 +1,12 @@
+
+  - platform: template
+    lights:
+      alexa_virtual:
+        friendly_name: "Alexa Dummy Light"
+        turn_on:
+        turn_off:
+        set_level:
+
+  - platform: switch
+    name: Ceiling Fan Lights
+    entity_id: switch.ceiling_fan_lights

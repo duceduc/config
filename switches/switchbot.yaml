@@ -1,0 +1,228 @@
+####################################################
+#                                                                                                    #
+#                    SWITCHBOT DEVICES                                                   #
+#                                                                                                    #
+####################################################
+
+
+# External Integration Due to BT out of range
+# Restart BLE is not responding. Path /etc/systemd/system
+# Restart: sudo systemctl restart bots.service
+  - platform: command_line
+    switches:
+      computer_room_curtains:
+        friendly_name: Computer Room Curtains
+        command_on: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=open"'
+        command_off: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=close"'
+
+      living_room_curtains:
+        friendly_name: Living Room Curtains
+        command_on: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=open"'
+        command_off: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=close"'
+
+
+
+### switchbotMQTT TEST##############
+  - platform: template
+    switches:
+     24h_fan:
+       friendly_name: '24h Fan'
+       value_template: "{{ states('input_boolean.washroom_fan') }}"
+       turn_on:
+         - service: script.enable_bots_tpl
+           data:
+             bot: '24hr_fan'
+         - service: input_boolean.turn_on
+           entity_id: input_boolean.washroom_fan
+       turn_off:
+         - service: script.enable_bots_tpl
+           data:
+             bot: '24hr_fan'
+         - service: input_boolean.turn_off
+           entity_id: input_boolean.washroom_fan
+       icon_template: >-
+         {% if is_state('input_boolean.washroom_fan', 'on') %}
+            mdi:fan
+         {% else %}
+            mdi:fan-off
+         {% endif %}
+
+     floor_heater:
+       friendly_name: 'Floor Heater'
+       value_template: "{{ states('input_boolean.floor_heat') }}"
+       turn_on:
+         - service: script.enable_bots_tpl
+           data:
+             bot: 'floor_heat'
+         - service: input_boolean.turn_on
+           entity_id: input_boolean.floor_heat
+       turn_off:
+         - service: script.enable_bots_tpl
+           data:
+             bot: 'floor_heat'
+         - service: input_boolean.turn_off
+           entity_id: input_boolean.floor_heat
+       icon_template: >-
+         {% if is_state('input_boolean.floor_heat', 'on') %}
+            mdi:radiator
+         {% else %}
+            mdi:radiator-off
+         {% endif %}
+
+     jcom_tv_box:
+       friendly_name: 'Jcom Tv Box'
+       value_template: "{{ states('input_boolean.jcom_tv') }}"
+       turn_on:
+         - service: script.enable_bots_tpl
+           data:
+             bot: 'jcom_tv_box'
+         - service: input_boolean.turn_on
+           entity_id: input_boolean.jcom_tv
+       turn_off:
+         - service: script.enable_bots_tpl
+           data:
+             bot: 'jcom_tv_box'
+         - service: input_boolean.turn_off
+           entity_id: input_boolean.jcom_tv
+       icon_template: >-
+         {% if is_state('input_boolean.jcom_tv', 'on') %}
+            mdi:monitor
+         {% else %}
+            mdi:monitor-off
+         {% endif %}
+
+
+########Node.js#########
+
+## CR Curtains
+  - platform: template
+    switches:
+     computer_room_curtain:
+       friendly_name: 'Computer Room Curtain'
+       value_template: >-
+         {% if states('sensor.cr_curtain_left_position')|float < 90 %}
+           on
+         {% else %}
+           off
+         {% endif %}
+       turn_on:
+         - service: script.enable_cr_curtain_tpl
+           data:
+             modus: 'open' 
+       turn_off:
+         - service: script.enable_cr_curtain_tpl
+           data:
+             modus: 'close'
+       icon_template: >-
+         {% if is_state('cover.computer_room_curtains', 'open') %}
+           mdi:blinds-open
+         {% else %}
+            mdi:blinds
+         {% endif %}
+## LR Curtains
+  - platform: template
+    switches:
+     living_room_curtain:
+       friendly_name: 'Living Room Curtain'
+       value_template: >-
+         {% if states('sensor.lr_curtain_left_position')|float < 90 %}
+           on
+         {% else %}
+           off
+         {% endif %}
+       turn_on:
+         - service: script.enable_lr_curtain_tpl
+           data:
+             modus: 'open' 
+       turn_off:
+         - service: script.enable_lr_curtain_tpl
+           data:
+             modus: 'close'
+       icon_template: >-
+         {% if is_state('cover.living_room_curtains', 'open') %}
+           mdi:blinds-open
+         {% else %}
+            mdi:blinds
+         {% endif %}
+
+
+
+## Bots
+  - platform: template
+    switches:
+      24hr_fan:
+        friendly_name: '24hr Fan'
+        value_template: "{{ states('input_boolean.washroom_fan') }}"
+        turn_on:
+          - service: script.enable_bot_tpl
+            data:
+              bot: '24hr_fan' 
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.washroom_fan
+        turn_off:
+          - service: script.enable_bot_tpl
+            data:
+              bot: '24hr_fan'
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.washroom_fan
+        icon_template: >-
+          {% if is_state('input_boolean.washroom_fan', 'on') %}
+             mdi:fan
+          {% else %}
+             mdi:fan-off
+          {% endif %}
+
+ #  - platform: template
+ #    switches:
+      floor_heat:
+        friendly_name: 'Floor Heat'
+        value_template: "{{ states('input_boolean.floor_heat') }}"
+        turn_on:
+          - service: script.enable_bot_tpl
+            data:
+              bot: 'floor_heater'
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.floor_heat
+        turn_off:
+          - service: script.enable_bot_tpl
+            data:
+              bot: 'floor_heater'
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.floor_heat
+        icon_template: >-
+          {% if is_state('input_boolean.floor_heat', 'on') %}
+             mdi:radiator
+          {% else %}
+             mdi:radiator-off
+          {% endif %}
+
+      jcom_tv:
+        friendly_name: 'Jcom Tv'
+        value_template: "{{ states('input_boolean.jcom_tv') }}"
+        turn_on:
+          - service: script.enable_bot_tpl
+            data:
+              bot: 'jcom_tv_box'
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.jcom_tv
+        turn_off:
+          - service: script.enable_bot_tpl
+            data:
+              bot: 'jcom_tv_box'
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.jcom_tv
+        icon_template: >-
+          {% if is_state('input_boolean.jcom_tv', 'on') %}
+             mdi:monitor
+          {% else %}
+             mdi:monitor-off
+          {% endif %}
+
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################
+ 

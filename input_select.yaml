@@ -1,0 +1,158 @@
+
+  exercise_select:
+    name: Select a Room
+    icon: mdi:bed-empty
+    options:
+      - Master Room
+      - Computer Room
+      - Shion Room
+      - Living Room
+
+  wakeup_select:
+    name: Select a Room
+    icon: mdi:bed-empty
+    options:
+      - Shion Room
+      - Computer Room
+      - Master Room
+      - Living Room
+      - Hallway
+      - Kitchen
+
+# Alexa Parser..
+  entity_list:
+    name : Entity List
+    options:
+      - switch.ac_lr_unit
+      - switch.ac_mr_unit
+      - switch.ac_sr_unit
+      - sensor.outside_temperature
+      - sensor.livingroom_temperature
+      - group.bed_sensors
+      - sensor.outside_humidity
+      - sensor.livingroom_humidity
+      - sensor.shion_room_temperature
+      - sensor.shion_room_humidity
+      - sensor.master_room_temperature
+      - sensor.master_room_humidity
+      - sensor.genkan_temperature
+      - sensor.genkan_humidity
+      - sensor.mdf_temperature
+      - sensor.mdf_humidity
+      - light.shion_room
+      - sensor.shion_birthday
+      - sensor.genkan_door
+  speak_list:
+    icon: mdi:amazon-alexa 
+    name: Speak List
+    options:
+      - do not use
+      - The current time is (tt)
+      - The current date is (td)
+      - (e16f) light is at (e16B) % brightness with brightness level set at (e16b)
+      - The (e01f) is turned (e01s)
+      - The (e02f) is turned (e02s)
+      - The current (e03f) is (e03$) degrees and the humidity is (e06$) percent # Outside Temp
+      - The current (e04f) is (e04S) and the humidity is (e07S) # Livingroom Temp
+      - The current (e10f) is (e10$) degrees and the humidity is (e11$) # Master Room Temp
+      - The current (e12f) is (e12$) degrees the humidity is (e13$) percent # Hallway Temp
+      - The current (e08f) is (e08$) degrees and the humidity is (e09$) percent # Shion Room Temp
+      - The current (e14f) is (e14$) degrees and the humidity is (e15$) percent # MDF Temp
+      - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
+      - The (e00f) is turned (e00s)
+      - She on is (e05s) sleeping in his bed
+      - She ons birthday is (e15s) from now
+      - The (e02f) is turned (e02s)
+      - The (e18f) is (e18s)
+      - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
+#       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
+
+  lr_ac_mode:
+    name: LR AC Mode
+    icon: mdi:air-conditioner
+    options:
+      - 'Off'
+      - Fan
+      - Ai Auto
+      - Powerful Cool
+      - Normal Cool
+      - Silent Cool
+      - Powerful Heat
+      - Normal Heat
+      - Silent Heat
+      - Normal Humidifier
+
+  mr_ac_mode:
+    name: MR AC Mode
+    icon: mdi:air-conditioner
+    options:
+      - 'Off'
+      - Fan
+      - Ai Auto
+      - Powerful Cool
+      - Normal Cool
+      - Silent Cool
+      - Powerful Heat
+      - Normal Heat
+      - Silent Heat
+      - Normal Humidifier
+
+  sr_ac_mode:
+    name: SR AC Mode
+    icon: mdi:air-conditioner
+    options:
+      - 'Off'
+      - Fan
+      - Ai Auto
+      - Powerful Cool
+      - Normal Cool
+      - Silent Cool
+      - Powerful Heat
+      - Normal Heat
+      - Silent Heat
+      - Normal Humidifier
+
+  shelly_washer_state:
+    name: Washer State
+    icon: mdi:washing-machine
+    options:
+     - 'stop'
+     - 'wash fill'
+     - 'wash'
+     - 'wash spin'
+     - 'wash drain'
+     - 'rinse fill'
+     - 'rinse wait'
+     - 'rinse'
+     - 'rinse spin'
+     - 'rinse drain'
+     - 'unknown'
+     - 'soak'
+
+  home_mode:
+    name: Home Mode
+    options:
+      - Home
+      - Away
+      - Returning
+      - Vacation
+
+  select_theme:
+    name: Select Theme
+    options:
+      - midnight
+      - default_ha
+
+  switchbot_updates:
+    name: Switchbot Update
+    options:
+      - ''
+      - meter
+      - 24hr_fan
+      - floor_heat
+      - jcom_tv_box
+      - lr_curtain_lt
+      - lr_curtain_rt
+      - cr_curtain_lt
+      - cr_curtain_rt
+

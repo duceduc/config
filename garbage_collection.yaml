@@ -1,0 +1,47 @@
+
+  sensors:
+  - name: 'Combustible Waste'
+    frequency: 'weekly'
+    collection_days:
+    - mon
+    - thu
+    verbose_state: true
+    verbose_format: '{days} days'
+    expire_after: '12:00'
+    exclude_dates:
+    - '2020-12-31'
+  - name: 'Plastic Recycle'
+    frequency: 'weekly'
+    collection_days: 'wed'
+    verbose_state: true
+    verbose_format: '{days} days'
+    expire_after: '12:00'
+    exclude_dates:
+    - '2020-12-30'
+  - name: 'Metal Paper Recycle'
+    frequency: 'monthly'
+    collection_days: 'wed'
+    verbose_state: true
+    verbose_format: '{days} days'
+    expire_after: '12:00'
+    weekday_order_number:
+    - 2
+    - 4
+  - name: 'Bottle Can Recycle'
+    frequency: 'monthly'
+    collection_days: 'tue'
+    verbose_state: true
+    verbose_format: '{days} days'
+    expire_after: '12:00'
+    weekday_order_number:
+    - 1
+    - 3
+  - name: 'PET Clothes Recycle'
+    frequency: 'monthly'
+    collection_days: 'tue'
+    verbose_state: true
+    verbose_format: '{days} days'
+    expire_after: '12:00'
+    weekday_order_number:
+    - 2
+    - 4

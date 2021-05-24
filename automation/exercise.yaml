@@ -1,0 +1,33 @@
+#########################################################
+#                                                                                                              #
+#             Exerecise                                                                                     #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'turn on light flash'
+  trigger:
+    platform: state
+    entity_id: input_boolean.lights_flash
+    from: 'off'
+    to: 'on'
+  action:
+    service: script.turn_on
+    entity_id: script.light_loop
+
+- alias: 'turn off light flash'
+  trigger:
+    platform: state
+    entity_id: input_boolean.lights_flash
+    from: 'on'
+    to: 'off'
+  action:
+    service: script.turn_off
+    entity_id: script.light_loop, script.light_flash
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

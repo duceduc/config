@@ -1,0 +1,75 @@
+#########################################################
+#                                                                                                              #
+#             Maintenance Reminders                                                                  #
+#                                                                                                              #
+#########################################################
+
+
+# Clean Aircon Filters Start of Season                                                  
+- alias: 'Clean Nozzle Filters'
+  trigger:
+    platform: state
+    entity_id: sensor.season
+  condition:
+  - condition: template # Not on Vacation
+    value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+  action:
+    - service: switch.turn_on # Aircon Filters
+      entity_id: group.clean_aircon_filter
+    - service: script.turn_on # Toile Nozzle
+      entity_id: script.toilet_nozzle_cleaning
+
+
+#########################################################
+#                                                                                                              #
+#            Turn on Shion Lights During School Days                                             #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'wakeup light bedroom'
+  trigger:
+    platform: template
+    value_template: '{{ states.sensor.time.state == states.sensor.wakeup_start_time_lights.state }}'
+  condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.wakeup
+          state: 'on'
+        - condition: template
+          value_template: "{{ states.sensor.holiday.state | trim == '' }}"
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: input_boolean.wakeup_weekends
+              state: 'on'
+            - condition: template # Is weekday
+              value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+  action:
+    service: script.turn_on
+    entity_id: script.wakeup_bedroom
+
+
+
+#########################################################
+#                                                                                                              #
+#             Update Zigbee Devices Network Map                                                 #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'Update Zigbee Map'
+  trigger:
+    platform: time_pattern
+    minutes: '/10'
+    seconds: 00
+  action:
+    service: zigbee2mqtt_networkmap.update
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

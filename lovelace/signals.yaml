@@ -1,0 +1,181 @@
+####################################################
+#                                                                                                    #
+#                    Link Signals                                                                #
+#                                                                                                    #
+####################################################
+
+title: Signals
+path: signals
+icon: mdi:wifi
+background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+cards:
+  - type: custom:bar-card
+    title: Bluetooth Signals
+    show_header_toggle: false
+    max: -100
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.cr_curtain_left_ble_signal
+        name: Curtain Computer Room Left
+      - entity: sensor.cr_curtain_right_ble_signal
+        name: Curtain Computer Room Right
+      - entity: sensor.lr_curtain_left_ble_signal
+        name: Curtain Living Room Left
+      - entity: sensor.lr_curtain_right_ble_signal
+        name: Curtain Living Room Right
+      - entity: sensor.floor_heater_ble_signal
+        name: Floor Heater
+      - entity: sensor.jcom_tv_box_ble_signal
+        name: Jcom Tv Box
+      - entity: sensor.washroom_fan_ble_signal
+        name: 24hr Fan
+      - entity: sensor.genkan_ble_signal
+        name: Genkan Thermometer
+    severity:
+      - color: var(--label-badge-green)
+        from: -67
+        to: ''
+      - color: orange
+        from: -80
+        to: -67
+      - color: var(--label-badge-red)
+        from: -90
+        to: -80
+
+  - type: custom:bar-card
+    title: Wifi Signals
+    show_header_toggle: false
+    max: -100
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.security_cam_wifi_signal
+        name: ESP32 Camera
+      - entity: sensor.bed_sensor_wifi_signal
+        name: ESP32 Bed Sensor
+      - entity: sensor.dht_sensor_wifi_signal
+        name: ESP8266 DHT Sensor
+      - entity: sensor.ms1_wifi_strength
+        name: MS1 Server
+      - entity: sensor.ms2_wifi_strength
+        name: MS2 Server
+      - entity: sensor.sb1_wifi_strength
+        name: SB1 Server
+    severity:
+      - color: var(--label-badge-green)
+        from: -67
+        to: ''
+      - color: orange
+        from: -80
+        to: -67
+      - color: var(--label-badge-red)
+        from: -90
+        to: -80
+
+  - type: custom:bar-card
+    title: Zigbee Motion Signals
+    show_header_toggle: false
+    max: 125
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.motion_g1_linkquality
+        name: Genkan Hallway Motion Sensor
+      - entity: sensor.motion_t1_linkquality
+        name: Toilet Motion Sensor
+      - entity: sensor.motion_hallway_linkquality
+        name: Hallway Motion Sensor
+      - entity: sensor.motion_washroom_linkquality
+        name: Washroom Motion Sensor
+      - entity: sensor.motion_k1_linkquality
+        name: Kitchen Motion Sensor
+    severity:
+      - color: var(--label-badge-red)
+        from: 0
+        to: 25
+      - color: orange
+        from: 26
+        to: 50
+      - color: var(--label-badge-green)
+        from: 51
+        to: 125
+
+  - type: custom:bar-card
+    title: Zigbee Controller Signals
+    show_header_toggle: false
+    max: 125
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.aio_controller_linkquality
+        name: Aio Controller
+      - entity: sensor.computer_room_linkquality
+        name: Computer Room Controller
+      - entity: sensor.living_room_linkquality
+        name: Living Room Controller      
+      - entity: sensor.shion_room_linkquality
+        name: Shion Room Controller
+    severity:
+      - color: var(--label-badge-red)
+        from: 0
+        to: 25
+      - color: orange
+        from: 26
+        to: 50
+      - color: var(--label-badge-green)
+        from: 51
+        to: 125
+
+  - type: custom:bar-card
+    title: Zigbee Dimmer Signals
+    show_header_toggle: false
+    max: 125
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.shower_room_linkquality
+        name: Shower Room Dimmer
+      - entity: sensor.cr_curtains_linkquality
+        name: Computer Room Curtain Dimmer
+      - entity: sensor.lr_curtains_linkquality
+        name: Living Room Curtain Dimmer
+      - entity: sensor.shion_dimmer_linkquality
+        name: Shion Room Dimmer
+      - entity: sensor.master_dimmer_linkquality
+        name: Master Room Dimmer
+      - entity: sensor.zigbeerpt_1_linkquality
+        name: Zigbee Repeater
+    severity:
+      - color: var(--label-badge-red)
+        from: 0
+        to: 25
+      - color: orange
+        from: 26
+        to: 50
+      - color: var(--label-badge-green)
+        from: 51
+        to: 125
+
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

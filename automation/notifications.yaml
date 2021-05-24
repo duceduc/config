@@ -1,0 +1,86 @@
+#########################################################
+#                                                                                                              #
+#                   VEHICLES                                                                              #
+#                                                                                                              #
+#########################################################
+
+  - alias: "Vehicle Delivery Notification"
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id:
+         - sensor.deliveryin2week
+    condition:
+      - condition: template
+        value_template: "{{ states('sensor.deliveryin2week') != 'unknown' }}"
+      - condition: template
+        value_template: "{{ states.sensor.deliveryin2week.state | trim != '' }}"
+    action:
+      - service: notify.jcb
+        data_template:
+          title: "Vehicle Delivery Notification"
+          message: >
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            <b> List of Containers/Vehicles Arriving Soon </b> <br>
+            {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %} The following units are arriving in about 10 days. Please make arrangement to have BL send to customers.<br><br>{{ states.sensor.deliveryin2week.state}}{% endif %} <br>
+            <br>
+          data:
+            images: []
+
+#########################################################
+#                                                                                                              #
+#      HOLIDAY / BIRTHDAY                                                                            #
+#                                                                                                              #
+#########################################################
+
+  - alias: "Holiday and Birthday Notification"
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.holiday
+    condition:
+      - condition: template
+        value_template: "{{ states('sensor.holiday') != 'unknown' }}"
+      - condition: template
+        value_template: "{{ states.sensor.holiday.state | trim != '' }}"
+    action:
+      - service: notify.mobile_app_id
+        data:
+          message: 'Today is {{ states.sensor.holiday.state }}.'
+          title: '{{ states.sensor.holiday.state }}'
+
+
+#########################################################
+#                                                                                                              #
+#      SSL Certificate Expiry Notification                                                           #
+#                                                                                                              #
+#########################################################
+
+
+  - alias: "SSL Certificate Expiry Notification"
+    initial_state: true
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.vj_ssl_cert_expiry
+        below: 3
+    action:
+      - service: notify.home_assistant
+        data_template:
+          title: "SSL Certificate Expire Notification"
+          message: >
+                    <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+                    <br>
+                    Domain ducsu.com ssl certificates expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
+                    Renew the certificates at gogetssl.com. <br>
+                    <br>
+          data:
+            images: []
+
+
+####################################################
+#                                                                                                    #
+#           END OF CONFIGURATION FILE                                                  #
+#                                                                                                    #
+####################################################

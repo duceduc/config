@@ -1,0 +1,103 @@
+####################################################
+#                                                                                                    #
+#                      REST                                                                       #
+#                                                                                                    #
+####################################################
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/cebe7a76_hassio_google_drive_backup/info
+    name: gdrivebackup
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 60
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/core_mosquitto/info
+    name: mosquitto
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 60
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/core_samba/info
+    name: samba
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 5
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_ssh/info
+    name: ssh
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 60
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json    
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/45df7312_zigbee2mqtt/info
+    name: zigbee2mqtt
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 60
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_appdaemon/info
+    name: appdaemon
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 60
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+  - platform: rest
+    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_esphome/info
+    name: esphome
+    value_template: '{{ value_json.data.state }}'
+    scan_interval: 60
+    headers:
+      Authorization: !secret llt
+      Content-Type: application/json
+    json_attributes_path: "$.data"
+    json_attributes:
+      - version
+      - version_latest
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

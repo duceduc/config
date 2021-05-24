@@ -1,0 +1,129 @@
+#########################################################
+#                                                                                                              #
+#             Automate Light                                                                             #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'motion toilet room light on'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_t1_occupancy
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id: light.t_1
+
+- alias: 'motion toilet room light off'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_t1_occupancy
+    to: 'off'
+    for: '00:00:31'
+  condition:
+    - condition: template # No guest
+      value_template: "{{not is_state('input_boolean.guest_mode', 'on') }}"
+  action:
+    - service: light.turn_off
+      entity_id: light.t_1
+
+#########################################################
+#                                                                                                              #
+#             Automate Heater                                                                          #
+#                                                                                                              #
+#########################################################
+
+- alias: 'Enable Toilet Seat Heater'
+  trigger:
+    - platform: state
+      entity_id: input_select.home_mode
+  condition:
+    - condition: template # Is not summer
+      value_template: "{{ not is_state('sensor.season', 'summer') }}"
+  action:
+    choose:
+      - conditions: "{{ trigger.to_state.state == 'Away' or trigger.to_state.state == 'Vacation' }}"
+        sequence:
+          - service: script.toilet_seat_off_heat
+      - conditions: >
+          {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
+             states('sensor.outside_temperature')|int <= 9}}
+        sequence:
+          - service: script.toilet_seat_high_heat
+      - conditions: >
+          {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
+             states('sensor.outside_temperature')|int <= 14 }}
+        sequence:
+          - service: script.toilet_seat_med_heat
+      - conditions: >
+          {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
+             states('sensor.outside_temperature')|int <= 19 }}
+        sequence:
+          - service: script.toilet_seat_low_heat
+
+#########################################################
+#                                                                                                              #
+#             Adjust Temperature Depending on OST                                             #
+#                                                                                                              #
+#########################################################
+
+- alias: 'Adjust Toilet Seat Heater Temperature'
+  trigger:
+    - platform: state
+      entity_id: sensor.outside_temperature
+  condition:
+    - condition: template # Is not summer
+      value_template: "{{ not is_state('sensor.season', 'summer') }}"
+  action:
+    choose:
+      - conditions: >
+           {{ states.sensor.outside_temperature.state | int <= 9 and
+              states.input_select.home_mode.state == 'Home' }}
+        sequence:
+          - service: script.toilet_seat_high_heat
+      - conditions: >
+           {{ states.sensor.outside_temperature.state | int <= 14 and
+              states.input_select.home_mode.state == 'Home' }}
+        sequence:
+          - service: script.toilet_seat_med_heat
+      - conditions: >
+           {{ states.sensor.outside_temperature.state | int <= 19 and
+              states.input_select.home_mode.state == 'Home' }}
+        sequence:
+          - service: script.toilet_seat_low_heat
+#      - conditions: >
+#           {{ states.sensor.outside_temperature.state | int <= 20 and
+#              states.input_select.home_mode.state == 'Home' }}
+#        sequence:
+#          - service: script.toilet_seat_off_heat
+      - conditions: >
+           {{ states.sensor.outside_temperature.state | int >= 20 and
+              states.input_select.home_mode.state == 'Home' }}
+        sequence:
+          - service: script.toilet_seat_off_heat
+      - conditions: > # default to low if sensor not on
+           {{ not is_state('binary_sensor.outside_dht_status', 'on') and
+              states.input_select.home_mode.state == 'Home' }}
+        sequence:
+          - service: script.toilet_seat_low_heat
+
+#########################################################
+#                                                                                                              #
+#             Hibernate Toilet Seat Heater                                                           #
+#                                                                                                              #
+#########################################################
+
+- alias: 'Hibernate Toilet Seat Heater'
+  trigger:
+    - platform: state
+      entity_id: sensor.season
+      to: 'summer'
+  action:
+    - delay: 2
+    - service: script.toilet_seat_off_heat
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

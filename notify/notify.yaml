@@ -1,0 +1,75 @@
+#########################################################
+#                                                                                                              #
+#             Email                                                                                          #
+#                                                                                                              #
+#########################################################
+
+  - name: home_assistant
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: !secret gmail_email
+    encryption: starttls
+    username: !secret gmail_email
+    password: !secret gmail_pass
+    recipient:
+      - !secret recipient_1
+    sender_name: Home Assistant
+
+  - name: eri
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: !secret gmail_email
+    encryption: starttls
+    username: !secret gmail_email
+    password: !secret gmail_pass
+    recipient:
+      - !secret recipient_2
+    sender_name: Home Assistant
+
+  - name: jcb
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: !secret gmail_email
+    encryption: starttls
+    username: !secret gmail_email
+    password: !secret gmail_pass
+    recipient:
+      - !secret recipient_3
+    sender_name: Duc Su
+
+#########################################################
+#                                                                                                              #
+#             Social Media                                                                                 #
+#                                                                                                              #
+#########################################################
+
+  - name: notify-events # viber
+    platform: notify_events
+
+  - name: amberthebot
+    platform: telegram
+    chat_id: !secret telegram_chatid 
+
+#########################################################
+#                                                                                                              #
+#             Misc                                                                                          #
+#                                                                                                              #
+#########################################################
+
+  - name: energy_log
+    platform: file
+    filename: /config/www/data/csv_logs/energy_log.csv
+    timestamp: false
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

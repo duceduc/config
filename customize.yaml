@@ -1,0 +1,287 @@
+#########################################################
+#                                                                                                              #
+#             Sensor                                                                                        #
+#                                                                                                              #
+#########################################################
+
+sensor.hacs:
+  icon: mdi:alpha-c-box
+  hidden: true
+
+sensor.ai_1_next_alarm:
+  hidden: true
+sensor.ai_1_next_timer:
+  hidden: true
+sensor.ai_1_next_reminder:
+  hidden: true
+sensor.this_device_next_alarm:
+  hidden: true
+sensor.this_device_next_timer:
+  hidden: true
+sensor.this_device_next_reminder:
+  hidden: true
+sun.sun:
+  hidden: true
+sensor.date:
+  hidden: true
+sensor.time:
+  hidden: true
+
+sensor.weatherbit_air_quality:
+  hidden: true
+sensor.weatherbit_apparent_temperature:
+  hidden: true
+sensor.weatherbit_beaufort_text:
+  hidden: true
+sensor.weatherbit_beaufort_value:
+  hidden: true
+sensor.weatherbit_cloud_coverage:
+  hidden: true
+sensor.weatherbit_description:
+  hidden: true
+sensor.weatherbit_dewpoint:
+  hidden: true
+sensor.weatherbit_forecast_day_1:
+  hidden: true
+sensor.weatherbit_forecast_day_2:
+  hidden: true
+sensor.weatherbit_forecast_day_3:
+  hidden: true
+sensor.weatherbit_forecast_day_4:
+  hidden: true
+sensor.weatherbit_forecast_day_5:
+  hidden: true
+sensor.weatherbit_forecast_day_6:
+  hidden: true
+sensor.weatherbit_forecast_day_7:
+  hidden: true
+sensor.weatherbit_humidity:
+  hidden: true
+sensor.weatherbit_icon_code:
+  hidden: true
+sensor.weatherbit_pressure:
+  hidden: true
+sensor.weatherbit_rain_today:
+  hidden: true
+sensor.weatherbit_snow:
+  hidden: true
+sensor.weatherbit_solar_radiation:
+  hidden: true
+sensor.weatherbit_temperature:
+  hidden: true
+sensor.weatherbit_uv_index:
+  hidden: true
+sensor.weatherbit_visibility:
+  hidden: true
+sensor.weatherbit_weather_alerts:
+  hidden: true
+sensor.weatherbit_wind_bearing:
+  hidden: true
+sensor.weatherbit_wind_direction:
+  hidden: true
+sensor.weatherbit_wind_speed:
+  hidden: true
+
+
+sensor.lr_condensation_chance:
+  friendly_name: Living Room Condensation
+  icon: mdi:weather-rainy
+sensor.sr_condensation_chance:
+  friendly_name: Shion Room Condensation
+  icon: mdi:weather-rainy
+sensor.mr_condensation_chance:
+  friendly_name: Master Room Condensation
+  icon: mdi:weather-rainy
+sensor.mdf_condensation_chance:
+  friendly_name: MDF Condensation
+  icon: mdi:weather-rainy
+sensor.genkan_condensation_chance:
+  friendly_name: Genkan Condensation
+  icon: mdi:weather-rainy
+  
+  
+#########################################################
+#                                                                                                              #
+#             Group                                                                                         #
+#                                                                                                              #
+#########################################################
+
+
+group.wakeuplight:
+    name: Wakeup Light
+    control: hidden
+group.lights_flash:
+   name: Switches
+   control: hidden
+group.ir_switches:
+  name: IR Switches
+  control: hidden
+group.garbage_collection:
+  name: Garbage Collection
+  control: hidden
+group.birthdays:
+  name: Birthdays
+  control: hidden
+group.reminders:
+  name: Birthdays
+  control: hidden
+
+group.bed_sensors:
+  device_class: problem
+
+
+#########################################################
+#                                                                                                              #
+#             Switch                                                                                        #
+#                                                                                                              #
+#########################################################
+
+switch.ceiling_fan_summer:
+  friendly_name: Ceiling Fan Summer
+switch.ceiling_fan_winter:
+  friendly_name: Ceiling Fan Winter
+switch.ceiling_fanlight:
+  friendly_name: Ceiling Fan & Lights
+switch.ceiling_fan_lights_only:
+  friendly_name: Ceiling Fan Lights Only
+switch.ceiling_fan_only:
+  friendly_name: Ceiling Fan Only
+#
+switch.yuasa_fan:
+  friendly_name: Fan
+switch.yuasa_fan_spd:
+  friendly_name: Fan Speed
+switch.yuasa_fan_mde:
+  friendly_name: Fan Mode
+switch.yuasa_fan_timer:
+  friendly_name: Fan Timer
+#
+switch.ac_lr_unit:
+  friendly_name: AC Living Room
+switch.ac_ctrl_lr_unit:
+  friendly_name: AC Living Room Ctrl
+switch.heater_lr_unit:
+  friendly_name: Heater Living Room
+  icon: mdi:power
+  assumed_state: false
+switch.heater_ctrl_lr_unit:
+  friendly_name: Heater Living Room Ctrl
+switch.humidifier_lr_unit:
+  friendly_name: Humidifier Living Room
+  icon: mdi:power
+  assumed_state: false
+switch.humidifier_ctrl_lr_unit:
+  friendly_name: Humidifier Living Room Ctrl
+#
+switch.ac_mr_unit:
+  friendly_name: AC Master Room
+  icon: mdi:power
+  assumed_state: false
+switch.heater_mr_unit:
+  friendly_name: Heater Master Room
+  icon: mdi:power
+  assumed_state: false
+switch.humidifier_mr_unit:
+  friendly_name: Humidifier Master Room
+  icon: mdi:power
+  assumed_state: false
+
+#
+switch.ac_sr_unit:
+  friendly_name: AC Shion Room
+switch.heater_sr_unit:
+  friendly_name: Heater Shion Room
+switch.humidifier_sr_unit:
+  friendly_name: Humidifier Shion Room
+  
+#
+switch.tv_power:
+  friendly_name: TV Power
+switch.tv_mute:
+  friendly_name: TV Mute
+switch.tv_volume:
+  friendly_name: TV Volume
+#
+switch.flush_eco:
+  friendly_name: Flush ECO
+switch.flush_small:
+  friendly_name: Flush Small
+switch.flush_big:
+  friendly_name: Flush Big
+switch.heat_seat:
+  friendly_name: Heat Toilet Seat
+switch.heat_water:
+  friendly_name: Heat Toilet Water
+
+switch.computer_room_curtains:
+  icon: mdi:power
+  assumed_state: false
+switch.computer_room_curtains_half:
+  icon: mdi:power
+  assumed_state: false
+
+switch.living_room_curtains:
+  icon: mdi:power
+  assumed_state: false
+switch.living_room_curtains_half:
+  icon: mdi:power
+  assumed_state: false
+
+#switch.momentary_activate_guest:
+#  icon: mdi:toggle-switch-off
+
+##
+#switch.floor_heater:
+#  icon: mdi:radiator
+#  assumed_state: false
+
+#switch.24h_fan:
+#  icon: mdi:fan
+#  assumed_state: false
+
+#switch.jcom_tv_box:
+#  icon: mdi:monitor
+#  assumed_state: false
+
+
+#########################################################
+#                                                                                                              #
+#             Misc                                                                                           #
+#                                                                                                              #
+#########################################################
+
+person.duc:
+  entity_picture: '/local/img/people/avatar-duc.png'
+person.eri:
+  entity_picture: '/local/img/people/avatar-eri.png'
+person.shion:
+  entity_picture: '/local/img/people/avatar-shion.png'
+person.kiki:
+  entity_picture: '/local/img/people/avatar-kiki.png'
+
+
+input_select.home_mode:
+  templates:
+    icon: >-
+      if ( state === 'Home' ) return 'mdi:home';
+      if ( state === 'Away' ) return 'mdi:home-export-outline';
+      if ( state === 'Returning' ) return 'mdi:home-import-outline';
+      return 'mdi:beach';
+
+sensor.n_people_home:
+  templates:
+    icon: >-
+      if ( state ===  '0' ) return 'mdi:account-off';
+      if ( state ===  '1' ) return 'mdi:account';
+      if ( state === '2' ) return 'mdi:account-multiple';
+      if ( state ===  '3' ) return 'mdi:account-group';
+      return 'mdi:account-multiple-plus';
+
+cover.fr_curtains:
+  assumed_state: true
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

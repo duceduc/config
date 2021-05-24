@@ -1,0 +1,183 @@
+####################################################
+#                                                                                                    #
+#                    LOVELACE CONFIG                                                        #
+#                                                                                                    #
+####################################################
+
+
+custom_header:
+  compact_mode: true
+  button_text:
+    options: '{{ hours12LZ }}:{{ minutesLZ }}'
+  hide_help: true
+  hide_config: true
+  shadow: on
+  chevrons: false
+
+title: DS
+icon: mdi:home
+background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+views:
+
+  - !include lovelace/data.yaml
+  - !include lovelace/network.yaml
+  - !include lovelace/switches.yaml
+  - !include lovelace/rooms.yaml
+  - !include lovelace/weather.yaml
+  - !include lovelace/automations.yaml
+  - !include lovelace/energy.yaml
+  - !include lovelace/signals.yaml
+
+
+####################################################
+#                                                                                                    #
+#                    DECLUTTERING TPL                                                       #
+#                                                                                                    #
+####################################################
+
+
+# network.yaml
+decluttering_templates:
+  temperature _tpl:
+    card:
+        type: entities
+        title: '[[title]]'
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity: '[[entity_3]]'
+          detail: 2
+        entities:
+          - entity: '[[entity_1]]'
+            name: '[[name_1]]'
+            icon: mdi:[[icon]]
+          - entity: '[[entity_2]]'
+            name: '[[name_2]]'
+            icon: mdi:water-percent
+          - type: divider
+          - entity: '[[entity_3]]'
+            name: '[[name_3]]'
+            icon: mdi:thermometer-lines
+
+
+# rooms.yaml
+  three_sensors_tpl:
+    card:
+        type: vertical-stack
+        cards:
+          - type: glance
+            title: '[[title]]'
+            state_color: false
+            entities:
+              - entity: '[[entity_1]]'
+                name: '[[name_1]]'
+              - entity: '[[entity_2]]'
+                name: '[[name_2]]'
+              - entity: '[[entity_3]]'
+                name: '[[name_3]]'
+
+  aircon_tpl:
+    card:
+      type: 'custom:vertical-stack-in-card'
+      cards:
+        - type: glance
+          title: '[[title]]'
+          state_color: false
+          show_name: false
+          entities:
+            - entity: '[[entity_1]]'
+              name: Aircon
+            - entity: '[[entity_2]]'
+              name: Temperature
+            - entity: '[[entity_3]]'
+              name: Humidity
+            - entity: '[[entity_4]]'
+              name: Condensation
+        - entities:
+            - head:
+                label: Automation
+                type: section
+              items:
+                - input_datetime.[[room]]_ac_am_on_time
+                - input_datetime.[[room]]_ac_am_off_time
+                - input_datetime.[[room]]_ac_pm_on_time
+                - input_datetime.[[room]]_ac_pm_off_time
+                - input_number.[[room]]_ac_cool_temp_set
+                - input_number.[[room]]_heater_heat_temp_set
+                - input_number.[[room]]_ac_temp_set_heat
+                - input_number.[[room]]_ac_temp_set_cool
+              type: 'custom:fold-entity-row'
+          show_header_toggle: false
+          type: entities
+
+
+# data.yaml
+  four_sensors_tpl:
+    card:
+        type: vertical-stack
+        cards:
+          - type: glance
+            title: '[[title]]'
+            state_color: true
+            entities:
+              - entity: '[[entity_1]]'
+                name: '[[name_1]]'
+              - entity: '[[entity_2]]'
+                name: '[[name_2]]'
+              - entity: '[[entity_3]]'
+                name: '[[name_3]]'
+              - entity: '[[entity_4]]'
+                name: '[[name_4]]'
+
+# data.yaml
+  five_sensors_tpl:
+    card:
+        type: vertical-stack
+        cards:
+          - type: glance
+            title: '[[title]]'
+            state_color: true
+            entities:
+              - entity: '[[entity_1]]'
+                name: '[[name_1]]'
+              - entity: '[[entity_2]]'
+                name: '[[name_2]]'
+              - entity: '[[entity_3]]'
+                name: '[[name_3]]'
+              - entity: '[[entity_4]]'
+                name: '[[name_4]]'
+              - entity: '[[entity_5]]'
+                name: '[[name_5]]'
+
+# data.yaml
+  server_tpl:
+    card:
+        type: entities
+        title: '[[title]]'
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity: '[[entity_4]]'
+          detail: 3
+        entities:
+          - entity: '[[entity_1]]'
+            name: Memory Use
+            icon: mdi:memory
+          - entity: '[[entity_2]]'
+            name: Disk Use
+            icon: mdi:harddisk
+          - entity: '[[entity_3]]'
+            name: Processor Use
+            icon: mdi:memory
+          - type: divider
+          - entity: '[[entity_4]]'
+            name: CPU Temperature
+            icon: mdi:thermometer
+
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

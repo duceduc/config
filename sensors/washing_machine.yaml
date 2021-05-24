@@ -1,0 +1,33 @@
+####################################################
+#                                                                                                    #
+#                      WASHER  MACHINE                                                     #
+#                                                                                                    #
+####################################################
+
+
+  - platform: template
+    sensors:
+      shelly_washer_state:
+        friendly_name: Shelly Washer State
+        value_template: >
+          {% set s = states('sensor.shelly_washer_state') %}
+          {% set p = states('sensor.shelly_washer_power') %}
+          {% if p == 'unavailable' %} unavailable
+          {% else %}
+            {% set p = p | int %}
+            {% if p == 0 %} stop
+            {% elif p < 5 %} wait 
+            {% elif 5 <= p <= 14 %}
+              {{ 'fill' if s in ['stop', 'run'] else s }}
+            {% elif 60 < p < 210 %} run
+            {% elif p > 210 %} pulse
+            {% else %} {{s}}
+            {% endif %}
+          {% endif %}
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

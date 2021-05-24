@@ -1,0 +1,41 @@
+#########################################################
+#                                                                                                              #
+#             Ask to turn on ac if above 32C                                                         #
+#                                                                                                              #
+#########################################################
+
+
+- alias: Skills - Temperature above 32
+  trigger:
+    platform: state
+    entity_id: binary_sensor.duc_presence
+    to: 'on'
+    for: '00:00:30'
+  condition:
+    - condition: template # ost 32c+
+      value_template: "{{ states.sensor.livingroom_temperature.state | int >= 32 }}"
+    - condition: template # LR aircon is off
+      value_template: "{{ is_state('input_select.lr_ac_mode', 'Off') }}"
+  action:
+    - service: script.activate_alexa_actionable_notification
+      data_template:
+        text: 'The Outside temperature is above 32 degree celsius. Would you like me to turn on the livingroom AC?'
+        event_id: 'ask_to_turn_on_ac_temp_above_32'
+        alexa_device: 'media_player.ai_1'
+
+- alias: Skills - Turn on AC
+  trigger:
+    platform: event
+    event_type: alexa_actionable_notification
+    event_data:
+      event_id: 'ask_to_turn_on_ac_temp_above_32'
+      event_response_type: ResponseYes
+  action:
+    - service: script.lr_ac_normal_cool
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

@@ -1,0 +1,94 @@
+#########################################################
+#                                                                                                              #
+#             Hallway Light                                                                                #
+#                                                                                                              #
+#########################################################
+
+- alias: 'motion hallway light on'
+  trigger:
+  - entity_id: binary_sensor.motion_hallway_occupancy
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition:
+    - condition: template # Not on vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+  action:
+  - service: light.turn_on
+    entity_id: light.h_2
+    data_template:
+      brightness: '{% if now().hour > 19 or now().hour < 7 %} 50 {% else %} 200 {% endif %}'
+- alias: 'motion hallway light off'
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_hallway_occupancy
+    to: 'off'
+    for: '00:00:30'
+  action:  
+  - service: light.turn_off
+    data:
+      entity_id: light.h_2
+
+
+#########################################################
+#                                                                                                              #
+#             Turn on Genkan For Eri During Workdays                                            #
+#                                                                                                              #
+#########################################################
+
+- alias: 'turn on genkan for eri'
+  trigger:
+    platform: time
+    at: '06:18:00'
+  condition:
+  - condition: and
+    conditions:
+    - condition: template # Is weekday
+      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+    - condition: state
+      entity_id: binary_sensor.eri_presence
+      state: 'on'
+  action:
+  - service: light.turn_on
+    entity_id: light.h_1
+    data:
+      brightness: 200
+  - delay: 00:13
+  - service: light.turn_off
+    data:
+      entity_id: light.h_1
+
+#########################################################
+#                                                                                                              #
+#             Genkan Light & LR only at night                                                       #
+#                                                                                                              #
+#########################################################
+
+- alias: 'motion genkan light on'
+  trigger:
+   - platform: state
+     entity_id: binary_sensor.motion_g1_occupancy
+     to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id: light.h_1
+      data:
+        brightness: 200
+
+- alias: 'motion genkan light off'
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_g1_occupancy
+    to: 'off'
+    for: '00:00:30'
+  action:  
+  - service: light.turn_off
+    data:
+      entity_id: light.h_1
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################
+

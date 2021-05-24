@@ -1,0 +1,106 @@
+####################################################
+#                                                                                                    #
+#                    SWITCHES VIEW                                                          #
+#                                                                                                    #
+####################################################
+
+title: Switches
+path: switches
+icon: mdi:light-switch
+background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+cards:
+  - type: entities
+    title: Main Area Lights
+    show_header_toggle: false
+    entities:
+      - entity: light.living_room
+        name: Living Room
+      - entity: light.computer_room
+        name: Computer Room
+      - entity: light.ceiling_fan_lights
+        name: Dining Room
+      - type: divider
+#      - entity: switch.floor_heater
+#        name: Floor Heater Mqtt
+#      - entity: switch.jcom_tv_box
+#        name: Jcom Tv Mqtt
+      - entity: switch.floor_heat
+        name: Floor Heater
+      - entity: switch.jcom_tv
+        name: Jcom Tv
+      - entity: switch.desktop
+        name: Desktop
+      - entity: switch.tv_lock
+        name: Tv Lock
+      - entity: switch.christmas_lights
+        name: Christmas Lights
+      - type: divider
+      - entity: cover.computer_room_curtains
+        name: Computer Room Curtains
+      - entity: cover.living_room_curtains
+        name: Living Room Curtains
+      - entity: cover.fr_curtains
+        name: Front Room Curtains
+#      - entity: cover.computer_room_curtain
+#        name: Computer Room Curtain Mqtt
+#      - entity: cover.living_room_curtain
+#        name: Living Room Curtain Mqtt
+
+
+  - type: entities
+    title: Kitchen Island
+    show_header_toggle: false
+    entities:
+      - entity: light.kitchen
+        name: Island
+      - entity: light.cabinet
+        name: Cabinet
+      - entity: light.counter
+        name: Counter
+      - entity: light.storage_room
+        name: Storage
+      - entity: light.ntl_1
+        name: Night Light
+
+  - type: entities
+    title: Wash Area Lights
+    show_header_toggle: false
+    entities:
+      - entity: light.wash_room
+        name: Wash Room
+      - entity: light.shower_room
+        name: Shower Room
+      - entity: light.t_1
+        name: Toilet
+      - type: divider
+      - entity: switch.24hr_fan
+        name: 24hr Fan
+#      - entity: switch.24h_fan
+#        name: 24h Fan Mqtt
+
+  - type: entities
+    title: Front Area Lights
+    show_header_toggle: true
+    entities:
+      - entity: light.h_1
+        name: Genkan
+      - entity: light.h_2
+        name: Hallway
+
+  - type: entities
+    title: Bedroom Lights
+    show_header_toggle: false
+    entities:
+      - entity: light.master_room
+        name: Master Room
+      - entity: light.closet
+        name: Master Closet
+      - entity: light.shion_room
+        name: Shion Room
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

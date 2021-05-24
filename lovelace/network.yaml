@@ -1,0 +1,91 @@
+####################################################
+#                                                                                                    #
+#                    NETWORK VIEW                                                           #
+#                                                                                                    #
+####################################################
+
+
+title: Network
+path: Network
+icon: mdi:home-thermometer-outline
+background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+cards:
+
+  - type: custom:decluttering-card
+    template: temperature _tpl
+    variables:
+      - title: Outside
+      - icon: weather-windy
+      - entity_1: sensor.home_windgust
+      - name_1: Wind Gust
+      - entity_2: sensor.outside_humidity
+      - name_2: Front Humidity
+      - entity_3: sensor.outside_temperature 
+      - name_3: Front Temperature
+
+  - type: custom:decluttering-card
+    template: temperature _tpl
+    variables:
+      - title: MDF
+      - icon: weather-rainy
+      - entity_1: sensor.mdf_condensation_chance
+      - name_1: MDF Condensation
+      - entity_2: sensor.mdf_humidity
+      - name_2: Shoe Closet Humidity
+      - entity_3: sensor.mdf_temperature
+      - name_3: Shoe Closet Temperature
+
+  - type: custom:decluttering-card
+    template: temperature _tpl
+    variables:
+      - title: Genkan
+      - icon: weather-rainy
+      - entity_1: sensor.genkan_condensation_chance
+      - name_1: Genkan Condensation
+      - entity_2: sensor.genkan_humidity
+      - name_2: Genkan Humidity
+      - entity_3: sensor.genkan_temperature
+      - name_3: Genkan Temperature
+
+  - type: custom:decluttering-card
+    template: temperature _tpl
+    variables:
+      - title: Master Room
+      - icon: weather-rainy
+      - entity_1: sensor.mr_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.master_room_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.master_room_temperature
+      - name_3: Room Temperature
+
+  - type: custom:decluttering-card
+    template: temperature _tpl
+    variables:
+      - title: Shion Room
+      - icon: weather-rainy
+      - entity_1: sensor.sr_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.shion_room_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.shion_room_temperature
+      - name_3: Room Temperature
+
+  - type: custom:decluttering-card
+    template: temperature _tpl
+    variables:
+      - title: Livingroom
+      - icon: weather-rainy
+      - entity_1: sensor.lr_condensation_chance 
+      - name_1: Room Condensation
+      - entity_2: sensor.livingroom_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.livingroom_temperature
+      - name_3: Room Temperature
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

@@ -1,0 +1,55 @@
+
+  lr_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '05:00'
+  lr_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '06:00'
+  lr_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '18:30'
+  lr_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '19:00'
+#####
+  mr_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '04:30'
+  mr_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '05:00'
+  mr_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '20:00'
+  mr_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '20:30'
+#####
+  sr_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '05:40'
+  sr_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '06:00'
+  sr_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '21:00'
+  sr_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '21:30'
+
+  last_reset:
+    name: Last Reset
+    has_date: true

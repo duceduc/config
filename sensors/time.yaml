@@ -1,0 +1,44 @@
+####################################################
+#                                                                                                    #
+#                      TIME                                                                       #
+#                                                                                                    #
+####################################################
+
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+      - 'time_utc'
+
+  - platform: template
+    sensors:
+      period_of_the_day:
+        friendly_name: 'Period of the day'
+        value_template: >-
+          {% set elevation = state_attr('sun.sun', 'elevation') %}
+          {% set rising = state_attr('sun.sun', 'rising') %}
+          {%- if elevation <= -7 -%}
+            night
+          {%- elif -7 < elevation <= -1 -%}
+            {{ 'dawn' if rising else 'dusk' }}
+          {%- else -%}
+            day
+          {%- endif -%}light
+        icon_template: >-
+          {% set elevation = state_attr('sun.sun', 'elevation') %}
+          {% set rising = state_attr('sun.sun', 'rising') %}
+          {%- if elevation <= -7 -%}
+            mdi:weather-night
+          {%- elif -7 < elevation <= -1 -%}
+            mdi:weather-sunset-{{ 'up' if rising else 'down' }}
+          {% else %}
+            mdi:weather-sunny
+          {% endif %}
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

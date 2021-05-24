@@ -1,0 +1,43 @@
+####################################################
+#                                                                                                    #
+#                      SYSTEM MONITOR                                                      #
+#                                                                                                    #
+####################################################
+
+  - platform: command_line
+    name: HA CPU Temperature
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    unit_of_measurement: "°C"
+    value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+  - platform: sql
+    db_url: !secret MySQL_login
+    queries:
+      - name: 'ha_db'
+        query: 'SELECT table_schema "database", Round(Sum(data_length + index_length) / 1024 / 1024, 1) "value" FROM information_schema.tables WHERE table_schema="jnzufwmy_hassio" GROUP BY table_schema;'
+        column: 'value'
+        unit_of_measurement: MB
+
+# Pi Servers
+  - platform: systemmonitor
+    resources:
+    - type: disk_use_percent
+      arg: /
+    - type: memory_free
+    - type: memory_use_percent
+    - type: processor_use
+    - type: throughput_network_in
+      arg: eth0
+    - type: throughput_network_out
+      arg: eth0
+    - type: last_boot
+
+  - platform: uptime
+    name: Time Online
+#    unit_of_measurement: hours
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

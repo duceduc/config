@@ -1,0 +1,18 @@
+secrets: /config/secrets.yaml
+
+appdaemon:
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: !secret home_elevation
+  time_zone: Japan
+  plugins:
+    HASS:
+      type: hass
+      ha_url: http://192.168.1.20:8123
+      token: !secret appdaemon_token
+      namespace: default
+http:
+  url: http://127.0.0.1:5050
+hadashboard:
+admin:
+api:

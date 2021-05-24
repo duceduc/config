@@ -1,0 +1,219 @@
+#########################################################
+#                                                                                                              #
+#            PRESENCE - FAMILY                                                                        #
+#                                                                                                              #
+#########################################################
+
+# Duc
+- alias: Presence Duc On
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.id_presence
+      above: 10
+  action:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.duc_presence
+- alias: Presence Duc Off
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.id_presence
+      below: 10
+  action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.duc_presence
+
+# Eri
+- alias: Presence Eri On
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.ie_presence
+      above: 10
+  action:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.eri_presence
+- alias: Presence Eri Off
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.ie_presence
+      below: 10
+  action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.eri_presence
+
+# Shion
+- alias: Presence Shioin On
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.tms_presence
+      above: 10
+  action:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.shion_presence
+- alias: Presence Shioin Off
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.tms_presence
+      below: 10
+  action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.shion_presence
+
+#########################################################
+#                                                                                                              #
+#            PRESENCE - GUESTS                                                                      #
+#                                                                                                              #
+#########################################################
+
+
+# Sachiko
+- alias: Presence Sachiko On
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.sachiko_presence
+      above: 10
+  action:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.sachiko_presence
+- alias: Presence Sachiko Off
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.sachiko_presence
+      below: 10
+  action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.sachiko_presence
+
+
+#########################################################
+#                                                                                                              #
+#            Arrival | Departure Scan                                                                  #
+#                                                                                                              #
+#########################################################
+
+
+- alias: Presence Scan Departure
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.genkan_door
+      to: 'on'
+  action:
+    - delay: '00:02:00'
+    - service: mqtt.publish
+      data_template:
+        topic: monitor/scan/depart
+
+- alias: Presence Scan Arrival
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_g1_occupancy
+      to: 'on'
+  action:
+    - service: mqtt.publish
+      data_template:
+        topic: monitor/scan/arrive
+
+
+#########################################################
+#                                                                                                              #
+#            Away|Home|Returning|Vacation status                                              #
+#                                                                                                              #
+#########################################################
+
+# Home
+- alias: Home Mode - Arriving
+  trigger:
+    - platform: state
+      entity_id: sensor.n_people_home
+  condition:
+    - condition: template
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.state|int > trigger.from_state.state|int }}
+  action:
+    - service: input_select.select_option
+      entity_id: input_select.home_mode
+      data:
+        option: 'Home'
+
+# Away
+- alias: Home Mode - Leaving
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.n_people_home
+      below: 1
+  condition:
+    - condition: template
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: state
+      entity_id: input_select.home_mode
+      state: Home
+  action:
+    - service: input_select.select_option
+      entity_id: input_select.home_mode
+      data:
+        option: 'Away'
+    - service: script.dev_check # turn off any devices that was left on
+
+# Returning
+- alias: Home Mode - Returning
+  trigger:
+    - platform: state
+      entity_id:
+       - binary_sensor.duc_home
+       - binary_sensor.eri_home
+      to: 'on'
+  condition:
+    - condition: template
+      value_template: "{{ is_state('input_select.home_mode', 'Away') or is_state('input_select.home_mode', 'Vacation') }}"
+  action:
+    - service: input_select.select_option
+      entity_id: input_select.home_mode
+      data:
+        option: 'Returning'
+
+# Vacation
+- alias: Home Mode - Vacation
+  trigger:
+  - platform: state
+    entity_id: input_boolean.vacation_mode
+  action:
+    choose:
+      - conditions: >
+           {{ states.input_boolean.vacation_mode.state == 'on' }}
+        sequence:
+          - service: input_select.select_option
+            entity_id: input_select.home_mode
+            data:
+              option: 'Vacation'
+      - conditions: >
+           {{ states.input_boolean.vacation_mode.state == 'off' and
+              states.sensor.n_people_home.state | int  <= 2 }}
+        sequence:
+          - service: input_select.select_option
+            entity_id: input_select.home_mode
+            data:
+              option: 'Away'
+      - conditions: >
+           {{ states.input_boolean.vacation_mode.state == 'off' and
+              states.sensor.n_people_home.state | int  > 2 }}
+        sequence:
+          - service: input_select.select_option
+            entity_id: input_select.home_mode
+            data:
+              option: 'Home'
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

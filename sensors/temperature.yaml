@@ -1,0 +1,35 @@
+####################################################
+#                                                                                                    #
+#                      TEMPERATURE                                                           #
+#                                                                                                    #
+####################################################
+
+# Shoe Closet. DHT Integration
+  - platform: dht
+    sensor: DHT22
+    pin: D4
+    name: mdf
+    scan_interval: 60
+    monitored_conditions:
+     - temperature
+     - humidity
+
+####################################################
+#                                                                                                    #
+#                      Desktop CPU Temperature                                            #
+#                                                                                                    #
+####################################################
+
+  - platform: mqtt
+    name: "Desktop CPU Temperature"
+    state_topic: "iotlink/workgroup/desktop-fddl8i4/windows-monitor/stats/temperatures/intelcpu-0-temperature-4"
+    value_template: '{{ value|round(0) }}'
+    qos: 1
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

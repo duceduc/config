@@ -1,0 +1,70 @@
+#########################################################
+#                                                                                                              #
+#             Kitchen Island                                                                              #
+#                                                                                                              #
+#########################################################
+
+- alias: 'motion kitchen lights on'
+  trigger:
+    platform: state
+    entity_id: 
+     - binary_sensor.motion_k1_occupancy
+    to: 'on'
+  action:
+    - service: light.turn_on
+      data_template:
+        entity_id: >
+         {% if now().hour > 15 or now().hour < 10 %}
+          light.k_1, light.k_3
+         {% else %}
+          light.k_1
+         {% endif %}
+
+#########################################################
+#                                                                                                              #
+#             Turn on All Lights Depend Time of Day                                              #
+#                                                                                                              #
+#########################################################
+
+- alias: 'motion kitchen all lights on'
+  trigger:
+    platform: state
+    entity_id:
+      - binary_sensor.motion_k1_occupancy
+    to: 'on'
+    for: '00:03:00'
+  action:
+  - service: light.turn_on
+    data_template:
+      entity_id: >
+       {% if now().hour > 6 and now().hour < 10 %}
+          light.counter, light.cabinet
+       {% elif  now().hour > 16 and now().hour < 21 %}
+          light.counter, light.cabinet
+       {% else %}
+          light.k_1, light.k_3
+       {% endif %}
+
+#########################################################
+#                                                                                                              #
+#             Turn off All Lights When No Motion                                                   #
+#                                                                                                              #
+#########################################################
+
+- alias: 'motion kitchen lights off'
+  trigger:
+    platform: state
+    entity_id:
+     - binary_sensor.motion_k1_occupancy
+    to: 'off'
+    for: 00:00:30
+  action:
+    service: light.turn_off
+    entity_id:
+      - light.kitchen
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

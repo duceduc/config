@@ -1,0 +1,148 @@
+####################################################
+#                                                                                                    #
+#                    SHELLY EM                                                                 #
+#                                                                                                    #
+####################################################
+
+title: Energy
+path: energy
+icon: mdi:gauge-full
+background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+cards:
+
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Energy Use
+        state_color: true
+        entities:
+          - entity: sensor.t31_cost_today
+            name: T31 Light and Power
+          - entity: sensor.t41_cost_today
+            name: T41 Heating and Hot Water
+          - entity: sensor.total_cost_today
+          - entity: sensor.cumulative_energy_cost
+          - entity: sensor.last_reset
+          - entities:
+              - entity: input_number.t31_daily_cost
+              - entity: input_number.t31_1_energy_cost
+              - entity: input_number.t31_2_energy_cost
+              - entity: input_number.t31_3_energy_cost
+              - entity: input_number.t41_daily_cost
+              - entity: input_number.t41_energy_cost
+              - entity: script.reset_cumulative_cost
+            head:
+              label: Tariff Prices
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: utility_meter.energy_t31_light_and_power
+                name: Metering T31
+              - entity: sensor.energy_t31_light_and_power_day
+                name: Lights and Power (Day)
+              - entity: sensor.energy_t31_light_and_power_night
+                name: Lights and Power (Night)
+              - entity: sensor.energy_t31_light_and_power_total
+                name: Lights and Power (Total)
+              - type: divider
+              - entity: utility_meter.energy_t41_heating
+                name: Metering T41
+              - entity: sensor.energy_t41_heating_day
+                name: Heating and Hot Water (Day)
+              - entity: sensor.energy_t41_heating_night
+                name: Heating and Hot Water (Night)
+              - entity: sensor.energy_t41_heating_total
+                name: Heating and Hot Water (Total)
+              - type: divider
+              - entity: sensor.total_energy_day
+                name: Total Energy (Day)
+              - entity: sensor.total_energy_night
+                name: Total Energy (Night)
+              - entity: sensor.total_energy
+            head:
+              label: Main Energy Meters
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: sensor.energy_washer_daily_power
+                name: Washing Machine
+
+
+            head:
+              label: Monitored Devices
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+        show_header_toggle: false
+        style: |
+          ha-card {
+          }
+
+
+
+  - type: entities
+    title: Power Monitor
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.tariff_31_power
+      detail: 3
+    entities:
+      - entity: sensor.mains_voltage
+        name: Current Voltage
+        icon: mdi:lightning-bolt
+      - entity: sensor.t31_amperage
+        name: Current Amperage
+        icon: mdi:atom
+      - entity: sensor.energy_t31_light_and_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.tariff_31_power
+        name: Lights and Power
+        icon: mdi:lightning-bolt
+
+  - type: vertical-stack
+    cards:
+      - type: glance
+        title: MDF Closet
+        state_color: true
+        entities:
+          - entity: sensor.mdf_temperature
+            name: Temperature
+          - entity: sensor.mdf_humidity
+            name: Humidity
+            icon: mdi:water-percent
+          - entity: sensor.genkan_temperature
+            name: Hallway
+
+  - type: entities
+    title: Washer Machine
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.shelly_washer_power
+      detail: 3
+    entities:
+      - entity: sensor.shelly_washer_state
+        icon: mdi:washing-machine-alert
+#        icon: mdi:picture-in-picture-top-right
+      - entity: input_select.shelly_washer_state
+        name: Washer Stage
+        icon: mdi:washing-machine
+      - entity: sensor.energy_washer_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.shelly_washer_power
+        name: Current Power
+        icon: mdi:lightning-bolt
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

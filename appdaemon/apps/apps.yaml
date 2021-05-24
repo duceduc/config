@@ -1,0 +1,145 @@
+# Add device controller & save. Reboot not required
+
+#########################################################
+#                                                                                                              #
+#             Living Room                                                                                 #
+#                                                                                                              #
+#########################################################
+
+living_room:
+  module: controllerx
+  class: E1810Controller
+  controller: sensor.living_room_action
+  integration: z2m
+  light: light.living_room
+
+living_room_curtains:
+  module: controllerx
+  class: E1743CoverController
+  controller: sensor.lr_curtains_action
+  integration: z2m
+  cover: cover.living_room_curtains
+
+aio_living_room:
+  module: controllerx
+  class: E1810Controller
+  controller: sensor.aio_controller_action
+  integration: z2m
+  light: light.living_room
+  merge_mapping:
+    brightness_up_click:
+      service: script.turn_on
+      data:
+        entity_id: script.dining_lights_toggle
+
+    brightness_down_click:
+      service: light.toggle
+      data:
+        entity_id: light.living_room
+
+    arrow_left_click:
+      service: script.turn_on
+      data:
+        entity_id: script.lr_ac_heat_toggle
+    arrow_right_click:
+      service: script.turn_on
+      data:
+        entity_id: script.lr_ac_cool_toggle
+
+    arrow_left_hold:
+      service: script.turn_on
+      data:
+        entity_id: script.cr_curtain_toggle
+    arrow_right_hold:
+      service: script.turn_on
+      data:
+        entity_id: script.lr_curtain_toggle
+
+    toggle:
+      service: light.turn_off
+      data:
+        entity_id:
+        - light.living_room
+        - light.ceiling_fan_lights
+
+#########################################################
+#                                                                                                              #
+#             Shower Room                                                                                #
+#                                                                                                              #
+#########################################################
+
+shower_room:
+  module: controllerx
+  class: E1743Controller
+  controller: sensor.shower_room_click
+  integration: z2m
+  light: light.shower_room
+
+#########################################################
+#                                                                                                              #
+#             Computer Room                                                                            #
+#                                                                                                              #
+#########################################################
+
+computer_room:
+  module: controllerx
+  class: E1810Controller
+  controller: sensor.computer_room_action
+  integration: z2m
+  light: light.computer_room
+
+computer_room_curtains:
+  module: controllerx
+  class: E1743CoverController
+  controller: sensor.cr_curtains_action
+  integration: z2m
+  cover: cover.computer_room_curtains
+
+#########################################################
+#                                                                                                              #
+#             Shion Room                                                                                  #
+#                                                                                                              #
+#########################################################
+
+shion_room:
+  module: controllerx
+  class: E1810Controller
+  controller: sensor.shion_room_action
+  integration: z2m
+  light: light.shion_room
+
+shion_dimmer:
+  module: controllerx
+  class: E1743Controller
+  controller: sensor.shion_dimmer_click
+  integration: z2m
+  light: light.shion_room
+
+#########################################################
+#                                                                                                              #
+#             Master Room                                                                                #
+#                                                                                                              #
+#########################################################
+
+master_dimmer:
+  module: controllerx
+  class: E1743Controller
+  controller: sensor.master_dimmer_click
+  integration: z2m
+  light: light.m_1
+  merge_mapping:
+    brightness_stop:
+      service: light.turn_on
+      data:
+        entity_id: light.master_room
+    "off":
+      service: light.turn_off
+      data:
+        entity_id:
+         - light.master_room
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

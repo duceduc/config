@@ -1,0 +1,234 @@
+#########################################################
+#                                                                                                              #
+#             Shion Room Air Conditioning                                                            #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'SR  Aircon'
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: input_select.sr_ac_mode
+  action:
+  - service_template: >
+      {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} script.sr_ac_powerful_heat
+      {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} script.sr_ac_normal_heat
+      {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} script.sr_ac_silent_heat
+      {% elif is_state('input_select.sr_ac_mode', 'Powerful Cool') %} script.sr_ac_powerful_cool
+      {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} script.sr_ac_normal_cool
+      {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} script.sr_ac_silent_cool
+      {% elif is_state('input_select.sr_ac_mode', 'Normal Humidifier') %} script.sr_ac_normal_humidifier
+      {% elif is_state('input_select.sr_ac_mode', 'Ai Auto') %} script.sr_ac_ai
+      {% elif is_state('input_select.sr_ac_mode', 'Fan') %} script.sr_ac_fan
+      {% elif is_state('input_select.sr_ac_mode', 'Off') %} script.sr_ac_off
+      {% endif %}
+
+#########################################################
+#                                                                                                              #
+#             AM Schedule Auto Timer                                                                 #
+#                                                                                                              #
+#########################################################
+
+- alias: 'SR Aircon AM Schedule'
+  trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.sr_ac_am_automation_time_active # AM on time trigger (only if temperature condition below is met)
+      - binary_sensor.sr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
+      - binary_sensor.sr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
+    to: 'on'
+    for:
+      seconds: 10 #(prevents start up glitches).
+  - platform: state
+    entity_id: binary_sensor.shion_door # ac turns off when door is open
+    to: 'off'
+  condition:
+  - condition: template # Vacation mode is not On
+    value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+  - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
+    entity_id: input_select.sr_ac_mode
+    state: 'Off'
+  - condition: state # only if shion door is closed
+    entity_id: binary_sensor.shion_door
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.sr_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    state: 'on'
+  - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.sr_ac_heat_required
+      state: 'on'
+    - condition: state
+      entity_id: binary_sensor.sr_ac_cool_required
+      state: 'on'
+  - condition: state # And only if current time is within AM automation time range (for the case of a temperature trigger)
+    entity_id: binary_sensor.sr_ac_am_automation_time_active
+    state: 'on'
+  - condition: template # Someone is home
+    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    service: input_select.select_option
+    data_template:
+      entity_id: input_select.sr_ac_mode
+      option: >
+        {% if is_state('binary_sensor.sr_ac_heat_required', 'on') %}
+          Normal Heat
+        {% elif is_state('binary_sensor.sr_ac_cool_required', 'on') %}
+          Normal Cool
+        {% else %}
+          'Off','Off'
+        {% endif %}
+
+#########################################################
+#                                                                                                              #
+#             PM Schedule Auto Timer                                                                 #
+#                                                                                                              #
+#########################################################
+
+- alias: 'SR Aircon PM Schedule'
+  trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.sr_ac_pm_automation_time_active # PM on time trigger (only if temperature condition below is met)
+      - binary_sensor.sr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
+      - binary_sensor.sr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
+    to: 'on'
+    for:
+      seconds: 10 #(prevents start up glitches).
+  - platform: state
+    entity_id: binary_sensor.shion_door # ac turns off when door is open
+    to: 'off'
+  condition:
+  - condition: template # Vacation mode is not On
+    value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+  - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
+    entity_id: input_select.sr_ac_mode
+    state: 'Off'
+  - condition: state # only if shion door is closed
+    entity_id: binary_sensor.shion_door
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.sr_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    state: 'on'
+  - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.sr_ac_heat_required
+      state: 'on'
+    - condition: state
+      entity_id: binary_sensor.sr_ac_cool_required
+      state: 'on'
+  - condition: state # And only if current time is within PM automation time range (for the case of a temperature trigger)
+    entity_id: binary_sensor.sr_ac_pm_automation_time_active
+    state: 'on'
+  - condition: template # Someone is home
+    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    service: input_select.select_option
+    data_template:
+      entity_id: input_select.sr_ac_mode
+      option: >
+        {% if is_state('binary_sensor.sr_ac_heat_required', 'on') %}
+          Normal Heat
+        {% elif is_state('binary_sensor.sr_ac_cool_required', 'on') %}
+          Normal Cool
+        {% else %}
+          'Off'
+        {% endif %}
+
+#########################################################
+#                                                                                                              #
+#             Turn Aircon Off At Time                                                                  #
+#                                                                                                              #
+#########################################################
+
+- alias: 'SR Aircon AM Off'
+  initial_state: true
+  trigger:
+    platform: state # AM off time trigger
+    entity_id:
+      - binary_sensor.sr_ac_am_automation_time_active
+    to: 'off'
+  condition:
+  - condition: state # Only if AM Automation is enabled
+    entity_id: automation.sr_aircon_am_schedule
+    state: 'on'
+  - condition: template # And only if AC is on
+    value_template: '{{ states("input_select.sr_ac_mode") != "Off" }}'
+  - condition: template # Someone is home
+    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.sr_ac_mode
+      option: 'Off'
+
+- alias: 'SR Aircon PM Off'
+  initial_state: true
+  trigger:
+    platform: state # PM off time trigger
+    entity_id:
+      - binary_sensor.sr_ac_pm_automation_time_active
+    to: 'off'
+  condition:
+  - condition: state # Only if PM Automation is enabled
+    entity_id: automation.sr_aircon_pm_schedule
+    state: 'on'
+  - condition: template # And only if AC is on
+    value_template: '{{ states("input_select.sr_ac_mode") != "Off" }}'
+  - condition: template # Someone is home
+    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.sr_ac_mode
+      option: 'Off'
+
+#########################################################
+#                                                                                                              #
+#             Manual Adjust Temperature                                                             #
+#                                                                                                              #
+#########################################################
+
+- alias: 'SR Aircon Cool Temperature Adjust'
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: input_number.sr_ac_temp_set_cool
+  condition:
+    condition: template # If currently running a cool mode
+    value_template: "{{ 'Cool' in states.input_select.sr_ac_mode.state }}"
+  action:
+    service_template: >
+      {% if is_state('input_select.sr_ac_mode', 'Powerful Cool') %} script.sr_ac_powerful_cool
+      {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} script.sr_ac_normal_cool
+      {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} script.sr_ac_silent_cool
+      {% endif %}
+
+- alias: 'SR Aircon Heat Temperature Adjust'
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: input_number.sr_ac_temp_set_heat
+  condition:
+    condition: template # If currently running a heat mode
+    value_template: "{{ 'Heat' in states.input_select.sr_ac_mode.state }}"
+  action:
+    service_template: >
+      {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} script.sr_ac_powerful_heat
+      {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} script.sr_ac_normal_heat
+      {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} script.sr_ac_silent_heat
+      {% endif %}
+
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################
+
+
+

@@ -1,0 +1,34 @@
+####################################################
+#                                                                                                    #
+#                      BATTERY MONITOR                                                     #
+#                                                                                                    #
+####################################################
+
+  - platform: template
+    sensors:
+      devices_with_low_battery:
+        friendly_name: 'Devices with low battery'
+        unit_of_measurement: devices
+        value_template: >-
+          {% set ignore_entities = ['sensor.id_battery_level', 'sensor.hallway_door_battery',  'sensor.cr_curtains_battery', 'sensor.lr_curtains_battery'] %}
+          {{ states.sensor
+            | selectattr('attributes.device_class', 'eq', 'battery')
+            | rejectattr('entity_id', 'in', ignore_entities)
+            | map(attribute='state')
+            | reject('in', ['unknown', 'unavailable'])
+            | map('int', -1) | select('le', 10)
+            |select('ge', 0)
+            | list | count
+          }}
+        icon_template: >-
+          {% if is_state('sensor.devices_with_low_battery', '0') %}
+            mdi:check-circle
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

@@ -1,0 +1,35 @@
+####################################################
+#                                                                                                    #
+#                      SSL Cert Issued                                                         #
+#                                                                                                    #
+####################################################
+
+
+  - platform: rest
+    name: vj SSL Cert Issued
+    resource: 'https://crt.sh/?q=vj.ducsu.com&exclude=expired&output=json&deduplicate=Y'
+    scan_interval: 14400
+#    json_attributes:
+#     - not_before
+    value_template: '{{ value_json[0].entry_timestamp }}'
+
+
+####################################################
+#                                                                                                    #
+#                      SSL Cert Expires                                                         #
+#                                                                                                    #
+####################################################
+
+
+  - platform: template
+    sensors:
+      vj_ssl_cert_expiry:
+        value_template: '{{ 90 - (( as_timestamp(now()) - as_timestamp(strptime(states.sensor.vj_ssl_cert_issued.state, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}'
+        unit_of_measurement: Days
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

@@ -1,0 +1,182 @@
+#########################################################
+#                                                                                                              #
+#             Family Greetings                                                                            #
+#                                                                                                              #
+#########################################################
+
+  door_family_greeting:
+    alias: Door Family Greetings
+    sequence:
+      - service: notify.alexa_media
+        data_template:
+          data:
+            type: tts
+          target:
+          - media_player.ai_2
+          message: >-
+            {% set alias = {"Duc":"Duck", "Shion":"She-on", "Eri":"Eddie"} %}
+            {% set family = state_attr(('group.family_presence'), 'entity_id') %}
+            {% set t_family = states.binary_sensor | selectattr('entity_id', 'in', family) | list | count %}
+            {% set n_home = states.binary_sensor   | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | list | count %}
+            {% set people_home = states.binary_sensor  | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | map(attribute='name') | list %}
+            {% set ns = namespace(occupants = '') %}
+            {% for i in people_home %}
+              {% set ns.occupants = ns.occupants ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
+            {% endfor %}
+           
+            {% macro p1(person) %}
+            {% set p1 = [
+               "Welcome home " ~ns.occupants~" ",
+                "Guess who's home? It's " ~ns.occupants~" ",
+                ns.occupants~ "is now home.",
+                "Welcome home " ~ns.occupants~". I missed you. ",
+                "Our house is now complete, rest and relax !. Welcome back " ~ns.occupants~" ",
+                "Hey there! " ~ns.occupants~ "Welcome home! ",
+                "Knock knock. Who's here? It's " ~ns.occupants~" ",
+                ns.occupants~ "!. You are home!",
+                "I know a secret! " ~ns.occupants~ " is home!",
+                "I am feeling a disturbance in the strength.. " ~ns.occupants~ " must be home! ",
+                "And the house becomes a home. Welcome back " ~ns.occupants~" ",
+                ns.occupants~ " is here now. Welcome home.",
+                ns.occupants~ " is now here.",
+                "Just a little announcement. " ~ns.occupants~ " is here!",
+                "Forgive the interruption, but " ~ns.occupants~ " is home! ",
+                "My systems are detecting the presence of more humans. " ~ns.occupants~ " is in the house. ",
+                "Welcome back "~ns.occupants~"!. The house is activating! ",
+                "Welcome home "~ns.occupants~"!. It's nice to see you again !. Let me turn the house on. ",
+                "Well, it looks like "~ns.occupants~" is finally home! I will prepare the house for you. ",
+                "It's nice to see you're back safe and sound, "~ns.occupants~". Do you want me to prepare the house? ",
+                "Great, "~ns.occupants~" is back! Let me get the house ready for you. "
+            ] %}
+            {{ p1 | random }}
+            {% endmacro %}
+
+            {% macro p2(persons) %}
+            {% set p2 = [
+               "Welcome home " ~ns.occupants~" ",
+                ns.occupants~ " I'm home now. ",
+                "Welcome home " ~ns.occupants~". I missed you. ",
+                "Our house is now complete, rest and relax !. Welcome back " ~ns.occupants~" ",
+                "Hey there! " ~ns.occupants~ " Welcome home! ",
+                "Knock knock. Who's here? It's " ~ns.occupants~" ",
+                ns.occupants~ "!. You guys are home!",
+                "I know a secret! " ~ns.occupants~ " are home! ",
+                "And the house becomes a home. Welcome back. " ~ns.occupants~" ",
+                ns.occupants~ " are here now. ",
+                "Just a little announcement. " ~ns.occupants~ " have arrived! ",
+                "My systems are detecting the presence of additional humans. " ~ns.occupants~ " are home.",
+                ns.occupants~ " have been identified in the house. ",
+                "Welcome back "~ns.occupants~"!. The house is activating! ",
+                "Welcome home "~ns.occupants~"!. It's good to see you guys again !. Let me turn the house on. ",
+                "Well, it looks like "~ns.occupants~" are finally home! Shall I prepare the house for you guys?"
+            ] %}
+            {{ p2 | random }}
+            {% endmacro %}
+
+            {% if n_home == 0 %}
+             Attention!!!
+             No family members are home at the moment!!
+             
+            {% elif n_home == 1 %}
+             {{ p1(person) }}
+            {% elif  n_home > 1 and n_home < t_family %}
+             {{ p2(persons) }}   
+             
+            {% elif  n_home == t_family  %}
+              {{ user }}. Wow! What an event! The whole {{ ('family,','gang,','crew,') | random }} is at home!
+            {% endif %}
+
+#########################################################
+#                                                                                                              #
+#             Guest Greetings                                                                            #
+#                                                                                                              #
+#########################################################
+
+  door_guest_greeting:
+    alias: Door Guest Greetings
+    sequence:
+      - service: notify.alexa_media
+        data_template:
+          data:
+            type: tts
+          target:
+          - media_player.ai_2
+          message: >-
+            {% set alias = {"Sachiko":"sachickgo", "Tomo":"towmow", "Yuri":"you-d"} %}
+            {% set guest = state_attr(('group.guest_presence'), 'entity_id') %}
+            {% set t_guest = states.binary_sensor | selectattr('entity_id', 'in', guest) | list | count %}
+            {% set n_guest = states.binary_sensor   | selectattr('entity_id', 'in', guest) | selectattr('state','eq','on') | list | count %}
+            {% set guest_home = states.binary_sensor  | selectattr('entity_id', 'in', guest) | selectattr('state','eq','on') | map(attribute='name') | list %}
+            {% set ns = namespace(guests = '') %}
+            {% for i in guest_home %}
+              {% set ns.guests = ns.guests ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
+            {% endfor %}
+            
+            {{ns.guests}}.
+            {{ ( 
+             'Welcome,',
+             'Welcome back,',
+             'Hello,',
+             'Hi,',
+             'Howdy,',
+             'Greetings,'
+             'Long time no see,'
+             'How are things?,'
+             'Hey, What’s up?,',
+             'Salutation,',
+             'Ahoy, matey!,'
+             'Greetings and salutations!,'
+             'Look what the cat dragged in!,'
+             'How have you been?,'
+             'You have made it,',
+             'What’s going on?,',
+             'Great to have you back,',
+             'Nice to see you back,',
+             'You are are here,',
+             'Happy to see you again,',
+             'Good to see you,',
+             'Glad you are here,',
+             'Glad to see you back,'
+             )|random +(
+             'Hope you had a wonderful day today.',
+             'How was your day?',
+             'Enjoy the rest of the day.',
+             'I am glad to see you.'
+             )|random }}
+
+#########################################################
+#                                                                                                              #
+#             Bedtime Annoucement                                                                    #
+#                                                                                                              #
+#########################################################
+
+  bedtime_notify:
+    alias: Bedtime Notify
+    sequence:
+      - service: notify.alexa_media
+        data_template:
+          data:
+            type: tts
+          target:
+          - media_player.ai_1
+          message: "<audio src='https://ha.snailmsg.com/local/alerts/jp/keihin-kawaguchi-tone_02.mp3'/> The time is {{ now().hour }} {{ now().minute }}, she on go to bed."
+# alternative
+#      - service: media_player.play_media
+#        data: 
+#          entity_id: media_player.ai_1
+#          media_content_id: amzn1.ask.skill.2d287396-6f69-4cab-be6e-093568f14ef4
+#          media_content_type: skill 
+    
+      - service: notify.alexa_media
+        data_template:
+          data:
+            type: tts
+          target:
+          - media_player.ai_3
+          message: "<audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>時間は {{ now().hour }} {{ now().minute }}です, シオン、今寝てください."
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

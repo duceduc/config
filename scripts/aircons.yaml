@@ -1,0 +1,260 @@
+#########################################################
+#                                                                                                              #
+#             Livingroom Aircon                                                                          #
+#                                                                                                              #
+#########################################################
+
+  lr_ac_powerful_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - heat
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - temperature heat increase
+        hold_secs: 6
+
+  lr_ac_normal_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.heater_lr_unit
+  lr_ac_silent_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - heat
+        - temperature heat decrease
+        hold_secs: 6
+  lr_ac_powerful_cool:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - cool
+        - temperature increase
+        hold_secs: 6
+  lr_ac_normal_cool:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.ac_lr_unit
+  lr_ac_silent_cool:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - cool
+        - temperature decrease
+        hold_secs: 6
+
+  lr_ac_normal_humidifier:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.humidifier_lr_unit
+  lr_ac_ai:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.ai_lr_unit
+  lr_ac_fan:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.fan_lr_unit
+  lr_ac_off:
+    sequence:
+     - service: switch.turn_off
+       entity_id: switch.ac_lr_unit
+
+# LR Toggle Script
+  lr_ac_heat_toggle:
+    sequence:
+     - service: script.lr_ac_heat_toggle_active
+       data:
+         entity: switch.heater_lr_unit
+
+  lr_ac_heat_toggle_active:
+    sequence:
+     - service_template: >
+            script.lr_ac_heat_toggle_active_{{ 'on' if is_state(entity, 'off') else 'off' }}           
+       data_template:
+         entity: '{{ entity }}'
+
+  lr_ac_heat_toggle_active_on:
+    sequence:
+     - service: switch.turn_on
+       data:
+         entity_id: '{{ entity }}'
+
+  lr_ac_heat_toggle_active_off:
+    sequence:
+     - service: switch.turn_off
+       data: 
+         entity_id: '{{ entity }}'
+         
+  lr_ac_cool_toggle:
+    sequence:
+     - service: script.lr_ac_cool_toggle_active
+       data:
+         entity: switch.ac_lr_unit
+
+  lr_ac_cool_toggle_active:
+    sequence:
+     - service_template: >
+            script.lr_ac_cool_toggle_active_{{ 'on' if is_state(entity, 'off') else 'off' }}           
+       data_template:
+         entity: '{{ entity }}'
+
+  lr_ac_cool_toggle_active_on:
+    sequence:
+     - service: switch.turn_on
+       data:
+         entity_id: '{{ entity }}'
+
+  lr_ac_cool_toggle_active_off:
+    sequence:
+     - service: switch.turn_off
+       data: 
+         entity_id: '{{ entity }}'
+
+#########################################################
+#                                                                                                              #
+#             Master Room Aircon                                                                       #
+#                                                                                                              #
+#########################################################
+
+  mr_ac_powerful_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command:
+        - heat
+        - temperature heat increase
+        hold_secs: 6
+  mr_ac_normal_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.heater_mr_unit
+  mr_ac_silent_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command:
+        - heat
+        - temperature heat decrease
+        hold_secs: 6
+
+  mr_ac_powerful_cool:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command:
+        - cool
+        - temperature increase
+        hold_secs: 6
+  mr_ac_normal_cool:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.ac_mr_unit
+  mr_ac_silent_cool:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command:
+        - cool
+        - temperature decrease
+        hold_secs: 6
+
+  mr_ac_normal_humidifier:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.humidifier_mr_unit
+  mr_ac_ai:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.ai_mr_unit
+  mr_ac_fan:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.fan_mr_unit
+  mr_ac_off:
+    sequence:
+     - service: switch.turn_off
+       entity_id: switch.ac_mr_unit
+
+#########################################################
+#                                                                                                              #
+#             Shion Room Aircon                                                                         #
+#                                                                                                              #
+#########################################################
+
+  sr_ac_powerful_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_heater
+     - service: switch.turn_on
+       entity_id: switch.sr_temperature_heat_ctrl
+  sr_ac_normal_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_heater
+  sr_ac_silent_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_heater
+     - service: switch.turn_off
+       entity_id: switch.sr_temperature_heat_ctrl
+
+  sr_ac_powerful_cool:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_ac
+     - service: switch.turn_on
+       entity_id: switch.sr_temperature_ac_ctrl
+  sr_ac_normal_cool:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_ac
+  sr_ac_silent_cool:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_ac
+     - service: switch.turn_off
+       entity_id: switch.sr_temperature_ac_ctrl
+
+  sr_ac_normal_humidifier:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_humidifier
+  sr_ac_ai:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.sr_ai
+  sr_ac_off:
+    sequence:
+     - service: switch.turn_off
+       entity_id: switch.sr_ac
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

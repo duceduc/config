@@ -1,0 +1,34 @@
+#########################################################
+#                                                                                                              #
+#             Turn Off Lights If Left On                                                                #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'turn off light after timeout'
+  trigger:
+    - platform: state
+      entity_id:
+       - light.storage_room
+       - light.closet
+      to: 'on'
+      for:
+        minutes: 6
+
+    - platform: state
+      entity_id:
+       - light.h_1
+      to: 'on'
+      for:
+        minutes: 10
+  action:
+    - service: light.turn_off
+      data_template:
+        entity_id: "{{ trigger.entity_id }}"
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

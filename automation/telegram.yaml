@@ -1,0 +1,74 @@
+#########################################################
+#                                                                                                              #
+#             Telegram Actionable Notifications                                                     #
+#                                                                                                              #
+#########################################################
+
+- alias: Telegram - PC is on
+  trigger:
+    platform: state
+    entity_id: binary_sensor.duc_presence
+    to: 'off'
+  condition:
+    - condition: template # PC left on
+      value_template: "{{ is_state('binary_sensor.desktop_connected', 'on') }}"
+
+  action:
+    - service: notify.amberthebot
+      data_template:
+        message: "The PC was left {{ states.binary_sensor.desktop_connected.state }} and no one is home."
+        data:
+          inline_keyboard:
+          - 'Turn off pc:/turn_off_pc, Leave it:/donothing'
+
+- alias: Telegram - Turn off PC
+  trigger:
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/turn_off_pc'
+  action:
+    - service: telegram_bot.answer_callback_query
+      data_template:
+        callback_query_id: '{{ trigger.event.data.id }}'
+        message: 'OK, turning off pc now'
+    - service: telegram_bot.edit_replymarkup
+      data_template:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        inline_keyboard: []
+    - service: script.desktop_shutdown
+
+
+#########################################################
+#                                                                                                              #
+#             Global Callback                                                                             #
+#                                                                                                              #
+#########################################################
+
+# Do Nothing
+- alias: Telegram - Do Nothing
+  trigger:
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/donothing'
+  action:
+    - service: telegram_bot.answer_callback_query
+      data_template:
+        callback_query_id: '{{ trigger.event.data.id }}'
+        message: 'OK, no action taken'
+    - service: telegram_bot.edit_replymarkup
+      data_template:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        inline_keyboard: []
+
+
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

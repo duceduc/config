@@ -1,0 +1,251 @@
+#########################################################
+#                                                                                                              #
+#             Ceiling Fan                                                                                   #
+#                                                                                                              #
+#########################################################
+
+# Broadlink Cmd -> Emulated Hue
+  turn_on_all_fans:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Yuasa Fan
+          command:
+          - power
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          num_repeats: 2
+          command:
+          - toggle summer fan
+
+  turn_off_all_fans:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Yuasa Fan
+          command:
+          - power
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - turn off fan
+
+  toggle_winter_fan:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - toggle winter fan
+
+  ceiling_fan_lights:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - lights
+
+#########################################################
+#                                                                                                              #
+#             Turn Off Devices If Left On: No One Home                                          #
+#                                                                                                              #
+#########################################################
+
+  dev_check:
+    sequence:
+      - service: script.dev_check_1
+        data_template:
+          room: 'lr'
+
+  dev_check_1:
+    sequence:
+      - service: script.dev_check_2
+        data_template:
+          room: 'mr'
+      - condition: template
+        value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.{{ room }}_ac_mode
+          option: 'Off'
+
+  dev_check_2:
+    sequence:
+      - service: script.dev_check_3
+        data_template:
+          room: 'sr'
+      - condition: template
+        value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.{{ room }}_ac_mode
+          option: 'Off'
+
+  dev_check_3:
+    sequence:
+#      - service: script.dev_check_4
+      - condition: template
+        value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.{{ room }}_ac_mode
+          option: 'Off'
+
+  dev_check_4:
+    sequence:
+      - condition: template
+        value_template: '{{ states("group.christmas_lights") != "off" }}'
+      - service: switch.turn_off
+        data:
+          entity_id: group.christmas_lights
+
+#########################################################
+#                                                                                                              #
+#             Toilet Seat Heater/Cleaning                                                             #
+#                                                                                                              #
+#########################################################
+
+  toilet_seat_low_heat:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm32_remote
+          device: Toilet
+          command: heat seat low
+
+  toilet_seat_med_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm32_remote
+        device: Toilet
+        command: heat seat med
+  toilet_seat_high_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm32_remote
+        device: Toilet
+        command:
+        - heat seat high
+  toilet_seat_off_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm32_remote
+        device: Toilet
+        command:
+        - heat seat off
+
+  toilet_nozzle_cleaning:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm32_remote
+        device: Toilet
+        command:
+        - nozzle cleaning
+
+# ESP32 Version
+  toilet_seat_esp_low_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.heat_seat_esp_low
+  toilet_seat_esp_med_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.heat_seat_esp_med
+  toilet_seat_esp_high_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.heat_seat_esp_high
+  toilet_seat_esp_off_heat:
+    sequence:
+     - service: switch.turn_off
+       entity_id: switch.heat_seat_esp_off
+
+  toilet_nozzle_esp_cleaning:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.nozzle_esp_cleaning
+
+#########################################################
+#                                                                                                              #
+#             Tv Source                                                                                   #
+#                                                                                                              #
+#########################################################
+
+
+  tv_source:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Tv
+#         num_repeats: 2
+          command: source
+
+
+#########################################################
+#                                                                                                              #
+#             IOT Desktop                                                                                 #
+#                                                                                                              #
+#########################################################
+
+
+  desktop_wol:
+    alias: "Desktop WOL"
+    sequence:
+      - service: wake_on_lan.send_magic_packet
+        data:
+          mac: "B4:4B:D6:27:22:55"
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.desktop
+
+  desktop_shutdown:
+    alias: "Desktop - Shutdown"
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: "iotlink/workgroup/desktop-fddl8i4/commands/shutdown"
+          payload: ""
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.desktop
+
+  desktop_hibernate:
+    alias: "Desktop Hibernate"
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: "iotlink/workgroup/desktop-fddl8i4/commands/hibernate"
+          payload: ""
+
+  desktop_shion_class:
+    alias: "Desktop Shion Class"
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: "iotlink/workgroup/desktop-fddl8i4/commands/run"
+          payload: '{ "command": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe", "args": "https://scratch.mit.edu", "path": "C:\\Program Files (x86)\\Google\\Chrome\\Application", "user": "", "visible": true, "fallback": true }'
+      - service: mqtt.publish
+        data:
+          topic: "iotlink/workgroup/desktop-fddl8i4/commands/run"
+          payload: '{ "command": "C:\\Users\\Duc\\AppData\\Roaming\\Zoom\\bin\\Zoom.exe", "path": "C:\\Users\\Duc\\AppData\\Roaming\\Zoom\\bin\\", "user": "", "visible": true, "fallback": true }'
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

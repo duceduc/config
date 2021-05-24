@@ -1,0 +1,381 @@
+####################################################
+#                                                                                                    #
+#                    AUTOMATIONS VIEW                                                    #
+#                                                                                                    #
+####################################################
+
+title: Automations
+path: automations
+icon: mdi:home-automation
+background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+cards:
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Living Room Aircon
+            state_color: true
+            entities:
+              - entities:
+                  - entity: automation.lr_room_aircon
+                    name: Living Room AC Control
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_aircon_am_schedule
+                    name: Living Room AC AM Schedule
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_aircon_pm_schedule
+                    name: Living Room AC PM Schedule
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_aircon_am_off
+                    name: Living Room AC AM Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_aircon_pm_off
+                    name: Living Room AC PM Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_room_aircon_cool_temperature_adjust
+                    name: Living Room Air Cool Temp Adjust
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_room_aircon_heat_temperature_adjust
+                    name: Living Room Air Heat Temp Adjust
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_powerful_cool_on
+                    name: Living Room Powerful Cool On
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_powerful_cool_off
+                    name: Living Room Powerful Cool Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_powerful_heat_on
+                    name: Living Room Powerful Heat On
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_powerful_heat_off
+                    name: Living Room Powerful Heat Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_heating_seasonal_adjustment_am
+                    name: Living Room Heating Seasonal Adjustment AM
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.lr_heating_seasonal_adjustment_pm
+                    name: Living Room Heating Seasonal Adjustment PM
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                head:
+                  label: Automations
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+            show_header_toggle: false
+            style: |
+              ha-card {
+              }
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Lights
+            state_color: true
+            entities:
+              - entities:
+                  - entity: automation.computer_room_lights
+                    name: Turn on Comouter Room Lights - Sunset
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.turn_on_genkan_for_eri
+                    name: Turn On Genkan Light - Eri Leaving
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.wakeup_light_bedroom
+                    name: Turn On Shion Room - School Day
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.motion_genkan_light_off
+                    name: Turn Off Genkan Light - No Motion
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.motion_hallway_light_off
+                    name: Turn Off Hallway Light - No Motion
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.motion_washroom_light_off
+                    name: Turn Off Wash Room - No Motion
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.motion_kitchen_lights_off
+                    name: Turn Off Kitchen Island - No Motion
+                    icon: mdi:lightbulb-outline
+                    secondary_info: last-triggered
+                  - entity: automation.turn_on_christmas_lights_weekends
+                    name: Turn On Christmas Lights - Weekends
+                    icon: mdi:string-lights
+                    secondary_info: last-triggered
+                  - entity: automation.turn_on_christmas_lights_weekdays
+                    name: Turn On Christmas Lights - Weekdays
+                    icon: mdi:string-lights
+                    secondary_info: last-triggered
+                  - entity: automation.turn_off_christmas_lights
+                    name: Turn Off Christmas Lights
+                    icon: mdi:string-lights
+                    secondary_info: last-triggered
+                head:
+                  label: Automations
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+            show_header_toggle: false
+            style: |
+              ha-card {
+              }
+
+
+
+
+
+
+
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Shion Room Aircon
+            state_color: true
+            entities:
+              - entities:
+                  - entity: automation.sr_aircon
+                    name: Shion Room AC Control
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.sr_aircon_am_schedule
+                    name: Shion Room AC AM Schedule
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.sr_aircon_pm_schedule
+                    name: Shion Room AC PM Schedule
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.sr_aircon_am_off
+                    name: Shion Room AC AM Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.sr_aircon_pm_off
+                    name: Shion Room AC PM Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.sr_aircon_cool_temperature_adjust
+                    name: Shion Room Air Cool Temp Adjust
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.sr_aircon_heat_temperature_adjust
+                    name: Shion Room Air Heat Temp Adjust
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                head:
+                  label: Automations
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+            show_header_toggle: false
+            style: |
+              ha-card {
+              }
+
+      - type: entities
+        title: Leaving Automations
+        show_header_toggle: false
+        entities:
+          - entity: automation.presence_scan_departure
+            name: Presence Detection - Depart Scan
+            icon: mdi:hail
+            secondary_info: last-triggered
+
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Master Room Aircon
+            state_color: true
+            entities:
+              - entities:
+                  - entity: automation.mr_aircon
+                    name: Master Room AC Control
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.mr_aircon_am_schedule
+                    name: Master Room AC AM Schedule
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.mr_aircon_pm_schedule
+                    name: Master Room AC PM Schedule
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.mr_aircon_am_off
+                    name: Master Room AC AM Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.mr_aircon_pm_off
+                    name: Master Room AC PM Off
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.mr_aircon_cool_temperature_adjust
+                    name: Master Room Air Cool Temp Adjust
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                  - entity: automation.mr_aircon_heat_temperature_adjust
+                    name: Master Room Air Heat Temp Adjust
+                    icon: mdi:fan
+                    secondary_info: last-triggered
+                head:
+                  label: Automations
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+            show_header_toggle: false
+            style: |
+              ha-card {
+              }
+
+      - type: entities
+        title: Climate Automations
+        show_header_toggle: false
+        entities:
+          - type: divider
+          - entity: automation.enable_toilet_seat_heater
+            name: Turn On Toilet Seat Heat
+            icon: mdi:toilet
+            secondary_info: last-triggered
+          - entity: automation.adjust_toilet_seat_heater_temperature
+            name: Adjust Toilet Seat Temperature
+            icon: mdi:thermometer-plus
+            secondary_info: last-triggered
+
+      - type: entities
+        title: Maintenances
+        show_header_toggle: false
+        entities:
+          - entity: automation.laundry_notification
+            name: Laundry Notification
+            icon: mdi:washing-machine-alert
+            secondary_info: last-triggered
+          - entity: automation.clean_nozzle_filters
+            name: Clean Toilet Nozzle & AC Filters
+            icon: mdi:air-filter
+            secondary_info: last-triggered
+
+      - type: entities
+        title: Automation Modes
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.vacation_mode
+            icon: mdi:beach
+            name: Vacation
+          - entity: input_boolean.guest_mode
+            icon: mdi:alien
+            name: We have guests
+          - entity: input_boolean.child_mode
+#            icon: mdi:home-account
+            name: Child Lock
+      - type: entities
+        title: ATV Automations
+        show_header_toggle: false
+        entities:
+          - entity: automation.turn_on_appletv_netflix
+            name: Turn On Apple TV - Netflix
+            icon: si:netflix
+            secondary_info: last-triggered
+          - entity: automation.turn_on_appletv_plex
+            name: Turn on Apple Tv - Plex
+            icon: si:plex
+            secondary_info: last-triggered
+
+
+
+      - type: entities
+        title: Other Automations
+        show_header_toggle: false
+        entities:
+          - entity: automation.turn_on_light_flash
+            name: Workout
+            icon: mdi:weight-lifter
+            secondary_info: last-triggered 
+          - entity: automation.update_zigbee_map
+            name: Update Zigbee Mesh Devices
+            icon: mdi:graphql
+            secondary_info: last-triggered
+          - entity: automation.morning_briefing_duc
+            name: Morning Briefing - Duc
+            icon: mdi:notebook-edit
+            secondary_info: last-triggered
+          - entity: automation.morning_briefing_eri
+            name: Morning Briefing - Eri
+            icon: mdi:notebook-edit
+
+            secondary_info: last-triggered
+          - entity: automation.backup_config_github
+            name: Backup Config to Github
+            icon: mdi:github
+            secondary_info: last-triggered
+          - type: divider
+          - entity: automation.bedtime_start_announcements
+            name: Go to Bed Annoucement
+            icon: mdi:bullhorn
+            secondary_info: last-triggered
+          - entity: automation.turn_on_24hr_fan
+            name: Turn on 24hr Fan
+            icon: mdi:fan
+            secondary_info: last-triggered
+          - entity: automation.turn_off_24hr_fan
+            name: Turn off 24hr Fan
+            icon: mdi:fan-off
+            secondary_info: last-triggered
+
+
+
+
+
+
+
+
+
+
+
+
+      - type: entities
+        title: Arriving Automations
+        show_header_toggle: false
+        entities:
+          - entity: automation.motion_genkan_light_on
+            name: Turn On Genkan Lights - Alexa Greetings
+            icon: mdi:home-outline
+            secondary_info: last-triggered
+          - entity: automation.presence_scan_arrival
+            name: Presence Detection - Arrival Scan 
+            icon: mdi:hail
+            secondary_info: last-triggered
+          - entity: automation.security_camera_snapshot
+            name: Snapshot at Genkan
+            icon: mdi:camera
+            secondary_info: last-triggered
+          - entity: automation.announce_who_is_arriving
+            name: Announce Who is Arriving
+            icon: mdi:amazon-alexa
+            secondary_info: last-triggered
+          - entity: automation.welcome_home_announcement
+            name: Welcome Home Announcement
+            icon: mdi:amazon-alexa
+            secondary_info: last-triggered
+
+
+####################################################
+#                                                                                                    #
+#          END OF CONFIGURATION FILE                                                   #
+#                                                                                                    #
+####################################################

@@ -1,0 +1,53 @@
+# ESP8266 NodeMCU....
+esphome:
+  name: dht_sensor
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: 'rice_dwarf'
+  password: !secret ssid_pass
+
+# Fallback portal 
+captive_portal:
+# Logging
+logger:
+# Uncomment this if you use Home Assistant
+#api:
+#  password: ''
+
+mqtt:
+  broker: 192.168.1.20
+  username: !secret mqtt_user
+  password: !secret mqtt_pass
+
+ota:
+  password: !secret ota_pass
+
+sensor:
+# Master Room Temperature
+   - platform: dht
+     pin: GPIO0
+     model: AM2302
+     temperature:
+       name: 'Master Room Temperature'
+     humidity:
+       name: 'Master Room Humidity'
+     update_interval: 60s
+# Outside Temperature
+   - platform: dht
+     pin: GPIO2
+     model: AM2302
+     temperature:
+       name: 'Outside Temperature'
+     humidity:
+       name: 'Outside Humidity'
+     update_interval: 60s
+   - platform: wifi_signal
+     name: 'DHT Sensor WiFi Signal'
+
+binary_sensor:
+   - platform: status
+     name: MR DHT Status
+   - platform: status
+     name: Outside DHT Status

@@ -1,0 +1,98 @@
+#########################################################
+#                                                                                                              #
+#             Turn on Netflix on ATV                                                                   #
+#                                                                                                              #
+#########################################################
+
+- alias: 'turn on appletv netflix'
+  trigger:
+    platform: state
+    entity_id: input_boolean.appletv_netflix
+    from: 'off'
+    to: 'on'
+  action:
+  - service: script.turn_on
+    entity_id: script.appletv_netflix
+  - service: input_boolean.toggle
+    entity_id: input_boolean.appletv_netflix
+
+#########################################################
+#                                                                                                              #
+#             Turn on Plex on ATV                                                                      #
+#                                                                                                              #
+#########################################################
+
+- alias: 'turn on appletv plex'
+  trigger:
+    platform: state
+    entity_id: input_boolean.appletv_plex
+    from: 'off'
+    to: 'on'
+  action:
+  - service: script.turn_on
+    entity_id: script.appletv_plex
+  - service: input_boolean.toggle
+    entity_id: input_boolean.appletv_plex
+
+#########################################################
+#                                                                                                              #
+#             Toggle Jcom Tv Box                                                                       #
+#                                                                                                              #
+#########################################################
+
+- alias: 'toggle jcom tv box'
+  trigger:
+    platform: state
+    entity_id: input_boolean.jcom_tv_box
+    from: 'off'
+    to: 'on'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.jcom_tv_box
+  - service: input_boolean.toggle
+    entity_id: input_boolean.jcom_tv_box
+
+#########################################################
+#                                                                                                              #
+#             Toggle Floor Heater                                                                       #
+#                                                                                                              #
+#########################################################
+
+- alias: 'toggle floor heater'
+  trigger:
+    platform: state
+    entity_id: input_boolean.floor_heater
+    from: 'off'
+    to: 'on'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.floor_heater
+  - service: input_boolean.toggle
+    entity_id: input_boolean.floor_heater
+
+
+#########################################################
+#                                                                                                              #
+#             Desktop Automations                                                                     #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'Turn on desktop in morning'
+  trigger:
+    platform: time
+    at: '04:55:00'
+  condition:
+  - condition: template # Duc is home
+    value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
+  - condition: template # PC is not on
+    value_template: "{{ not is_state('binary_sensor.desktop_connected', 'on') }}"
+  action:
+    - service: script.desktop_wol
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################
