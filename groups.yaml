@@ -73,12 +73,6 @@
      - media_player.ai_2
      - media_player.ai_3
 
-  gitupdate:
-    name: Update Github
-    icon: mdi:home
-    entities:
-      - script.gitupdate
-
   clean_aircon_filter:
     name: Clean Aircon Filter
     icon: mdi:air-filter

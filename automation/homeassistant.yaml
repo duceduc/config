@@ -7,7 +7,7 @@
   - alias: 'Backup Config Github'
     trigger:
       platform: time
-      at: '18:03:00'
+      at: '18:00:00'
     action:
       - service: homeassistant.turn_on
         entity_id: switch.update_github

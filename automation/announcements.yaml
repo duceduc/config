@@ -98,10 +98,9 @@
       data:
         brightness: 200
 
-
 #########################################################
 #                                                                                                              #
-#             Alexa Greets at Genkan                                                                   #
+#             Guest Trigger                                                                               #
 #                                                                                                              #
 #########################################################
 
@@ -115,24 +114,31 @@
     - service: switch.turn_on
       data:
         entity_id: switch.momentary_activate_guest
-###
-###
+
+#########################################################
+#                                                                                                              #
+#             Alexa Greets at Genkan                                                                  #
+#                                                                                                              #
+#########################################################
+
 - alias: welcome home announcement
   trigger:
-     - platform: state
-       entity_id:
-        - binary_sensor.duc_presence
-        - binary_sensor.eri_presence
-        - binary_sensor.shion_presence
-        - binary_sensor.sachiko_presence
-       to: 'on'
-  condition:
-    - condition: state
-      entity_id: binary_sensor.motion_g1_occupancy
-      state: 'on'
+    - platform: state
+      entity_id:
+       - binary_sensor.duc_presence
+       - binary_sensor.eri_presence
+       - binary_sensor.shion_presence
+       - binary_sensor.sachiko_presence
+      to: 'on'
+#  condition:
+#    - condition: state
+#      entity_id: binary_sensor.motion_g1_occupancy
+#      state: 'on'
   action:
-    - delay:
-        seconds: 1
+    - delay: 1
+    - wait_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'on') }}"
+      continue_on_timeout: false
+      timeout: 10
     - service_template: >
            {% if is_state('switch.momentary_activate_guest', 'on') %}
               script.door_guest_greeting
@@ -154,7 +160,6 @@
           after: '17:45:00'
           before: '18:30:00'
     - service: script.turn_on_lr_lights
-
 
 #########################################################
 #                                                                                                              #
