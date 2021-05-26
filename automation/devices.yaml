@@ -11,8 +11,7 @@
     from: 'off'
     to: 'on'
   action:
-  - service: script.turn_on
-    entity_id: script.appletv_netflix
+  - service: script.appletv_netflix
   - service: input_boolean.toggle
     entity_id: input_boolean.appletv_netflix
 
@@ -29,8 +28,7 @@
     from: 'off'
     to: 'on'
   action:
-  - service: script.turn_on
-    entity_id: script.appletv_plex
+  - service: script.appletv_plex
   - service: input_boolean.toggle
     entity_id: input_boolean.appletv_plex
 

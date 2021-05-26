@@ -50,13 +50,13 @@
     switches:
      desktop:
        friendly_name: 'Desktop'
-       value_template: "{{ states('input_boolean.desktop') }}"
+       value_template: "{{ states('binary_sensor.desktop_connected') }}"
        turn_on:
          - service: script.desktop_wol
        turn_off:
          - service: script.desktop_shutdown
        icon_template: >-
-         {% if is_state('input_boolean.desktop', 'on') %}
+         {% if is_state('binary_sensor.desktop_connected', 'on') %}
             mdi:desktop-mac-dashboard
          {% else %}
             mdi:desktop-mac

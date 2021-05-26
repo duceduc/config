@@ -22,7 +22,6 @@
       - wait_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"
         timeout: 60
         continue_on_timeout: false
-
       - service: switch.turn_on
         data:
           entity_id: switch.jcom_tv

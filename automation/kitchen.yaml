@@ -6,10 +6,9 @@
 
 - alias: 'motion kitchen lights on'
   trigger:
-    platform: state
-    entity_id: 
-     - binary_sensor.motion_k1_occupancy
-    to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_k1_occupancy
+      to: 'on'
   action:
     - service: light.turn_on
       data_template:
@@ -28,22 +27,21 @@
 
 - alias: 'motion kitchen all lights on'
   trigger:
-    platform: state
-    entity_id:
-      - binary_sensor.motion_k1_occupancy
-    to: 'on'
-    for: '00:03:00'
+    - platform: state
+      entity_id: binary_sensor.motion_k1_occupancy
+      to: 'on'
+      for: '00:03:00'
   action:
-  - service: light.turn_on
-    data_template:
-      entity_id: >
-       {% if now().hour > 6 and now().hour < 10 %}
-          light.counter, light.cabinet
-       {% elif  now().hour > 16 and now().hour < 21 %}
-          light.counter, light.cabinet
-       {% else %}
-          light.k_1, light.k_3
-       {% endif %}
+    - service: light.turn_on
+      data_template:
+        entity_id: >
+          {% if now().hour > 6 and now().hour < 10 %}
+             light.counter, light.cabinet
+          {% elif  now().hour > 16 and now().hour < 21 %}
+             light.counter, light.cabinet
+          {% else %}
+             light.k_1, light.k_3
+          {% endif %}
 
 #########################################################
 #                                                                                                              #
@@ -53,18 +51,16 @@
 
 - alias: 'motion kitchen lights off'
   trigger:
-    platform: state
-    entity_id:
-     - binary_sensor.motion_k1_occupancy
-    to: 'off'
-    for: 00:00:30
+    - platform: state
+      entity_id: binary_sensor.motion_k1_occupancy
+      to: 'off'
+      for: '00:00:30'
   action:
-    service: light.turn_off
-    entity_id:
-      - light.kitchen
+    - service: light.turn_off
+      entity_id: light.kitchen
 
 #########################################################
-#                                                                                                              #
+#                                                                                                               #
 #             END OF CONFIGURATION FILE                                                          #
 #                                                                                                              #
 #########################################################
