@@ -14,7 +14,7 @@
     db_url: !secret MySQL_login
     queries:
       - name: 'ha_db'
-        query: 'SELECT table_schema "database", Round(Sum(data_length + index_length) / 1024 / 1024, 1) "value" FROM information_schema.tables WHERE table_schema="jnzufwmy_hassio" GROUP BY table_schema;'
+        query: 'SELECT table_schema "database", Round(Sum(data_length + index_length) / 1024 / 1024, 1) "value" FROM information_schema.tables WHERE table_schema="jnzufwmy_homeassistant" GROUP BY table_schema;'
         column: 'value'
         unit_of_measurement: MB
 

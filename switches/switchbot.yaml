@@ -14,12 +14,15 @@
         friendly_name: Computer Room Curtains
         command_on: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=open"'
         command_off: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=close"'
+        command_state: 'true'
+        value_template: "{{ states('sensor.cr_curtain_left_position') | float < 90 }}"  
 
       living_room_curtains:
         friendly_name: Living Room Curtains
         command_on: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=open"'
         command_off: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=close"'
-
+        command_state: 'true'
+        value_template: "{{ states('sensor.lr_curtain_left_position') | float < 90 }}"  
 
 
 ### switchbotMQTT TEST##############
