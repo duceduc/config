@@ -60,6 +60,11 @@
              states('sensor.outside_temperature')|int <= 19 }}
         sequence:
           - service: script.toilet_seat_low_heat
+      - conditions: >
+          {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
+             states('sensor.outside_temperature')| int >= 20 }}
+        sequence:
+          - service: script.toilet_seat_off_heat
 
 #########################################################
 #                                                                                                              #

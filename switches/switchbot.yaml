@@ -1,13 +1,12 @@
 ####################################################
 #                                                                                                    #
-#                    SWITCHBOT DEVICES                                                   #
+#                    Switchbot Curtain Device Source                                    #
 #                                                                                                    #
 ####################################################
-
-
 # External Integration Due to BT out of range
 # Restart BLE is not responding. Path /etc/systemd/system
 # Restart: sudo systemctl restart bots.service
+
   - platform: command_line
     switches:
       computer_room_curtains:
@@ -24,80 +23,12 @@
         command_state: 'true'
         value_template: "{{ states('sensor.lr_curtain_left_position') | float < 90 }}"  
 
+####################################################
+#                                                                                                    #
+#                    Switchbot CR Curtains Emulated Hue                                #
+#                                                                                                    #
+####################################################
 
-### switchbotMQTT TEST##############
-  - platform: template
-    switches:
-     24h_fan:
-       friendly_name: '24h Fan'
-       value_template: "{{ states('input_boolean.washroom_fan') }}"
-       turn_on:
-         - service: script.enable_bots_tpl
-           data:
-             bot: '24hr_fan'
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.washroom_fan
-       turn_off:
-         - service: script.enable_bots_tpl
-           data:
-             bot: '24hr_fan'
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.washroom_fan
-       icon_template: >-
-         {% if is_state('input_boolean.washroom_fan', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
-
-     floor_heater:
-       friendly_name: 'Floor Heater'
-       value_template: "{{ states('input_boolean.floor_heat') }}"
-       turn_on:
-         - service: script.enable_bots_tpl
-           data:
-             bot: 'floor_heat'
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.floor_heat
-       turn_off:
-         - service: script.enable_bots_tpl
-           data:
-             bot: 'floor_heat'
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.floor_heat
-       icon_template: >-
-         {% if is_state('input_boolean.floor_heat', 'on') %}
-            mdi:radiator
-         {% else %}
-            mdi:radiator-off
-         {% endif %}
-
-     jcom_tv_box:
-       friendly_name: 'Jcom Tv Box'
-       value_template: "{{ states('input_boolean.jcom_tv') }}"
-       turn_on:
-         - service: script.enable_bots_tpl
-           data:
-             bot: 'jcom_tv_box'
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.jcom_tv
-       turn_off:
-         - service: script.enable_bots_tpl
-           data:
-             bot: 'jcom_tv_box'
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.jcom_tv
-       icon_template: >-
-         {% if is_state('input_boolean.jcom_tv', 'on') %}
-            mdi:monitor
-         {% else %}
-            mdi:monitor-off
-         {% endif %}
-
-
-########Node.js#########
-
-## CR Curtains
   - platform: template
     switches:
      computer_room_curtain:
@@ -122,7 +53,13 @@
          {% else %}
             mdi:blinds
          {% endif %}
-## LR Curtains
+
+####################################################
+#                                                                                                    #
+#                    Switchbot LR Curtains Emulated Hue                                #
+#                                                                                                    #
+####################################################
+
   - platform: template
     switches:
      living_room_curtain:
@@ -148,9 +85,12 @@
             mdi:blinds
          {% endif %}
 
+####################################################
+#                                                                                                    #
+#                    Switchbot Bots Emulated Hue                                         #
+#                                                                                                    #
+####################################################
 
-
-## Bots
   - platform: template
     switches:
       24hr_fan:
@@ -175,8 +115,6 @@
              mdi:fan-off
           {% endif %}
 
- #  - platform: template
- #    switches:
       floor_heat:
         friendly_name: 'Floor Heat'
         value_template: "{{ states('input_boolean.floor_heat') }}"
@@ -220,8 +158,6 @@
           {% else %}
              mdi:monitor-off
           {% endif %}
-
-
 
 ####################################################
 #                                                                                                    #

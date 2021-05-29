@@ -19,18 +19,6 @@
             - service: shell_command.{{ bot }}
             - delay: 1
 
-###### switchbot mqtt tpl ######
-  enable_bots_tpl:
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: 'switchbotmqtt/control'
-          payload_template: "{\"id\":\"{{ bot }}\", \"value\":\"press\"}"
-#      - delay: 8
-#      - service: script.switchbot_update_device
-#        data_template:
-#          bot: "{{ bot }}"
-
 #########################################################
 #                                                                                                              #
 #             Curtain Device TPL                                                                        #
@@ -70,84 +58,11 @@
                 position: "{{ position }}"
             - delay: 1
 
-###### MQTT TPL ############
-  enable_cr_curtains_tpl:
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: 'switchbotmqtt/control'
-          payload_template: "{\"id\":\"{{ bot }}\", \"value\":\"{{ modus }}\"}"
-      - delay: 15
-#      - service: script.switchbot_update_device
-#        data_template:
-#          bot: "{{ bot }}"
-      - service: shell_command.switchbot_updates # Nodejs
-#      - delay: 5
-      - service: script.switchbot_update_device
-        data_template:
-          bot: 'cr_curtain_rt'
-
-
-
-  enable_lr_curtains_tpl:
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: 'switchbotmqtt/control'
-          payload_template: "{\"id\":\"{{ bot }}\", \"value\":\"{{ modus }}\"}"
-      - delay: 15
-#      - service: script.switchbot_update_device
-#        data_template:
-#          bot: "{{ bot }}"
-      - service: shell_command.switchbot_updates # Nodejs
-#      - delay: 5
-      - service: script.switchbot_update_device
-        data_template:
-          bot: 'lr_curtain_rt'
-
-
-
-#########################################################
-#                                                                                                              #
-#             MQTT Switchbot Update Scan                                                         #
-#                                                                                                              #
-#########################################################
-
-  switchbot_update_all_devices:
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: 'switchbotmqtt/rescan'
-          payload_template: "{\"sec\":\"30\"}"
-
-  switchbot_update_device:
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: 'switchbotmqtt/requestInfo'
-          payload_template: "{\"id\":\"{{ bot }}\"}"
-
-#  switchbot_update_device:
-#    sequence:
-#      - repeat:
-#          count: "{{ state_attr('input_select.switchbot_updates', 'options') | count }}"
-#          sequence:
-#            - service: mqtt.publish
-#              data:
-#                topic: switchbotmqtt/requestInfo
-#                payload: >-
-#                  {% set bot = state_attr('input_select.switchbot_updates', 'options')[repeat.index] %}
-#                  {"id":"{{ bot }}"}
-#            - delay: 20
-
-
-
 #########################################################
 #                                                                                                              #
 #             Front Room Combined Curtains                                                         #
 #                                                                                                              #
 #########################################################
-
 
   fr_curtains:
     sequence:
@@ -167,7 +82,6 @@
         data:
           position: "{{ position }}"
 
-
 #########################################################
 #                                                                                                              #
 #             Livingroom Curtain Toggle Switches                                                  #
@@ -179,13 +93,10 @@
       - service: script.lr_curtain_toggle_active
         data:
           entity: switch.living_room_curtains
-# MQTT
-#          entity: switch.living_room_curtain
 
   lr_curtain_toggle_active:
     sequence:
-      - service_template: >
-             script.lr_curtain_toggle_active_{{ 'on' if is_state('cover.living_room_curtains', 'closed') else 'off' }}           
+      - service_template: script.lr_curtain_toggle_active_{{ 'on' if is_state('cover.living_room_curtains', 'closed') else 'off' }}           
         data_template:
           entity: '{{ entity }}'
 
@@ -230,14 +141,10 @@
       - service: script.cr_curtain_toggle_mode
         data:
           entity: switch.computer_room_curtains
-# MQTT
-#          entity: cover.computer_room_curtain
-
 
   cr_curtain_toggle_mode:
     sequence:
-      - service_template: >
-             script.cr_curtain_toggle_mode_{{ 'on' if is_state('cover.computer_room_curtains', 'closed') else 'off' }}           
+      - service_template: script.cr_curtain_toggle_mode_{{ 'on' if is_state('cover.computer_room_curtains', 'closed') else 'off' }}           
         data_template:
           entity: '{{ entity }}'
 
@@ -270,8 +177,6 @@
             - service: homeassistant.turn_off
               data:
                 entity_id: '{{ entity }}'
-
-
 
 #########################################################
 #                                                                                                              #
