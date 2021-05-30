@@ -33,5 +33,6 @@ id_ha
 gitupdate.sh
 ip_bans.yaml
 secrets.yaml
+web_hooks.yaml
 known_devices.yaml
 shell_commands.yaml

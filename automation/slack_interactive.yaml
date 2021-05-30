@@ -1,27 +1,5 @@
 #########################################################
 #                                                                                                              #
-#             Slack Webhook                                                                             #
-#                                                                                                              #
-#########################################################
-
-- alias: slack_webhook
-  trigger:
-    - platform: webhook
-      webhook_id: koohbew_kcals
-  condition:
-    - condition: template
-      value_template: >
-        {% set payload = trigger.data.payload | from_json %}
-        {{ (payload.token == states('input_text.slack_app_verification_token')) and (payload.type == 'interactive_message') }}
-  action:
-    - service_template: >
-        {%- set payload = trigger.data.payload | from_json -%}
-        script.{{ payload.callback_id }}
-      data_template:
-        payload: '{{ trigger.data.payload }}'
-
-#########################################################
-#                                                                                                              #
 #             Slack Actionable Notifications                                                          #
 #                                                                                                              #
 #########################################################

@@ -7,19 +7,19 @@
 
 - alias: 'Open Living Room Curtains Sunrise'
   trigger:
-  - entity_id: sensor.period_of_the_day
-    platform: state
-    to:
-     - 'dawnlight'
-     - 'daylight'
+    - entity_id: sensor.period_of_the_day
+      platform: state
+      to:
+       - 'dawnlight'
+       - 'daylight'
   condition:
-  - condition: template # Someone is home
-    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-  - service: cover.set_cover_position
-    data:
-      position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 0 {% endif %}'
-      entity_id: cover.fr_curtains
+    - service: cover.set_cover_position
+      data:
+        position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 0 {% endif %}'
+        entity_id: cover.fr_curtains
 
 
 #########################################################
@@ -31,19 +31,19 @@
 
 - alias: 'Close Living Room Curtains Sunset'
   trigger:
-  - entity_id: sensor.period_of_the_day
-    platform: state
-    to:
-      - 'dusklight'
-      - 'nightlight'
+    - entity_id: sensor.period_of_the_day
+      platform: state
+      to:
+        - 'dusklight'
+        - 'nightlight'
   condition:
-  - condition: template 
-    value_template: '{{ states("cover.living_room_curtains") != "closed" or states("cover.computer_room_curtains") != "closed" }}'
+    - condition: template 
+      value_template: '{{ states("cover.living_room_curtains") != "closed" or states("cover.computer_room_curtains") != "closed" }}'
   action:
-  - service: cover.set_cover_position
-    data:
-      position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 100 {% endif %}'
-      entity_id: cover.fr_curtains
+    - service: cover.set_cover_position
+      data:
+        position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 100 {% endif %}'
+        entity_id: cover.fr_curtains
 
 
 #########################################################

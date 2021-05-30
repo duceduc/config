@@ -85,7 +85,7 @@
         target:
          - media_player.ai_1
         message: >
-         {% set alias = {"Eri":"mommy", "Duc":"daddy"} %}
+         {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
          {% set p = trigger.to_state.attributes.friendly_name %}
          {% set person = alias.get(p) %}
          {{ person }}, will be home in about 10 minutes.
