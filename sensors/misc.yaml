@@ -8,22 +8,24 @@
 
   - platform: moon
 
-# Can be deleted
-  - platform: template
-    sensors:
-      all_home:
-        friendly_name: Number of people home
-        unit_of_measurement: 'ppl'
-        value_template: >-
-         {{ [states.binary_sensor.duc_home, states.binary_sensor.eri_home, states.binary_sensor.shion_home]
-              | selectattr('state', 'eq', 'on')
-              | list | count }}
+
+####################################################
+#                                                                                                    #
+#            Alexa                                                                                #
+#                                                                                                    #
+####################################################
 
   - platform: template
     sensors:
       last_alexa:
         value_template: >
           {{ expand(states.group.echos) | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+
+####################################################
+#                                                                                                    #
+#            Icon Tpl                                                                             #
+#                                                                                                    #
+####################################################
 
   - platform: template
     sensors:
@@ -88,7 +90,6 @@
 #                                                                                                    #
 ####################################################
 
-
   - platform: template
     sensors:
       date_dayoftheweek:
@@ -109,7 +110,6 @@
           {% if is_state('sensor.date_weekend', 'weekday') %} on
           {% else %} off
           {% endif %}
-
 
 ####################################################
 #                                                                                                    #

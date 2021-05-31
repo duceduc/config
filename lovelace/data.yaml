@@ -130,7 +130,7 @@ cards:
       - entity: sensor.processor_use
         name: Processor Use
         icon: mdi:memory
-      - entity: sensor.ha_db
+      - entity: sensor.recorder_db
         name: MySQL Use
         icon: mdi:database
 #      - entity: sensor.network_throughput_in_eth0
@@ -233,6 +233,8 @@ cards:
                 name: Floor Heater
               - entity: sensor.washroom_fan_battery
                 name: 24hr Fan
+              - entity: sensor.hdmi_selector_battery
+                name: HDMI Selector
             head:
               label: Switchbots
               type: section

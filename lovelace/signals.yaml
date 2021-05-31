@@ -33,6 +33,8 @@ cards:
         name: Jcom Tv Box
       - entity: sensor.washroom_fan_ble_signal
         name: 24hr Fan
+      - entity: sensor.hdmi_selector_ble_signal
+        name: HDMI Selector
       - entity: sensor.genkan_ble_signal
         name: Genkan Thermometer
     severity:

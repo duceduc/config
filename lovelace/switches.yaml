@@ -20,18 +20,14 @@ cards:
       - entity: light.ceiling_fan_lights
         name: Dining Room
       - type: divider
-#      - entity: switch.floor_heater
-#        name: Floor Heater Mqtt
-#      - entity: switch.jcom_tv_box
-#        name: Jcom Tv Mqtt
       - entity: switch.floor_heat
         name: Floor Heater
       - entity: switch.jcom_tv
         name: Jcom Tv
-      - entity: switch.desktop
-        name: Desktop
       - entity: switch.tv_lock
         name: Tv Lock
+      - entity: switch.desktop
+        name: Desktop
       - entity: switch.christmas_lights
         name: Christmas Lights
       - type: divider

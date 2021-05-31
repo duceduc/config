@@ -62,28 +62,6 @@
             mdi:desktop-mac
          {% endif %}
 
-# Tv Lock Switch
-  - platform: template
-    switches:
-     tv_lock:
-       friendly_name: 'Tv Lock'
-       value_template: "{{ states('input_boolean.tv_lock') }}"
-       turn_on:
-         - service: switch.turn_off
-           entity_id: switch.sp4_0
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.tv_lock
-       turn_off:
-         - service: switch.turn_on
-           entity_id: switch.sp4_0
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.tv_lock
-       icon_template: >-
-         {% if is_state('input_boolean.tv_lock', 'on') %}
-            mdi:monitor-lock
-         {% else %}
-            mdi:monitor
-         {% endif %}
 
 
 ####################################################
