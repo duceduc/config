@@ -1,11 +1,13 @@
 #########################################################
 #                                                                                                              #
-#             Turn off TV                                                                                  #
+#             Enable Tv Lock                                                                             #
 #                                                                                                              #
 #########################################################
 
 
-- alias: turn off tv - weekdays
+- alias: enable tv lock - weekdays
+  variables:
+    digit: 6
   trigger:
   - platform: time
     at: '20:59:00'
@@ -24,11 +26,31 @@
           type: tts
         target:
          - media_player.ai_1
-        message: "<audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>The tv will shutoff in 6 minutes."
-    - delay: '00:06:00'
+        message: "<audio src='https://ha.snailmsg.com/local/alerts/en/minecraft-theme.mp3'/> The time is {{ now().hour }} {{ now().minute }}, The tv will shutoff in {{ digit }} minutes."
+    - delay:
+        minutes: "{{ digit }}"
     - condition: template # Child mode is on
       value_template: "{{ is_state('input_boolean.child_mode', 'on') }}"
     - service: switch.turn_on
+      entity_id: switch.tv_lock
+
+
+#########################################################
+#                                                                                                              #
+#             Disable Tv Lock                                                                             #
+#                                                                                                              #
+#########################################################
+
+
+- alias: disable tv lock - weekdays
+  trigger:
+    - platform: time
+      at: '01:00:00'
+  condition:
+    - condition: template
+      value_template: "{{ is_state('switch.tv_lock', 'on') }}"
+  action:
+    - service: switch.turn_off
       entity_id: switch.tv_lock
 
 

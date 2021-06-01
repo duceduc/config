@@ -68,13 +68,13 @@
     action:
       - service: notify.home_assistant
         data_template:
-          title: "SSL Certificate Expire Notification"
+          title: "Certificate Expiring in {{ states.sensor.vj_ssl_cert_expiry.state }} Days: vj.ducsu.com"
           message: >
-                    <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-                    <br>
-                    Domain ducsu.com ssl certificates expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
-                    Renew the certificates at gogetssl.com. <br>
-                    <br>
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            This is to notify you that your certificate with the common name ducsu.com will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
+            To renew your certificate, please visit <a href="https://my.gogetssl.com/en/user/">gogetssl.com</a>.<br>
+            <br>
           data:
             images: []
 

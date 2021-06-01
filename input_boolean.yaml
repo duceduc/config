@@ -36,7 +36,6 @@
   tv_lock:
     name: Tv Lock
     icon: mdi:monitor-lock
-    initial: on
 
   desktop:
     name: Desktop

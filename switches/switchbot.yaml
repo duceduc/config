@@ -158,28 +158,6 @@
           {% else %}
              mdi:monitor-off
           {% endif %}
-          
-      jcom_tv:
-        friendly_name: 'Jcom Tv'
-        value_template: "{{ states('input_boolean.jcom_tv') }}"
-        turn_on:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'jcom_tv_box'
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.jcom_tv
-        turn_off:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'jcom_tv_box'
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.jcom_tv
-        icon_template: >-
-          {% if is_state('input_boolean.jcom_tv', 'on') %}
-             mdi:monitor
-          {% else %}
-             mdi:monitor-off
-          {% endif %}
 
       tv_lock:
         friendly_name: 'Tv Lock'

@@ -155,7 +155,7 @@
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
     - condition: state
       entity_id: input_select.home_mode
-      state: Home
+      state: 'Home'
   action:
     - service: input_select.select_option
       entity_id: input_select.home_mode
