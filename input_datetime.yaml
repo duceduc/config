@@ -53,3 +53,8 @@
   last_reset:
     name: Last Reset
     has_date: true
+
+  tv_lock_time:
+    name: TV Lock Time
+    has_time: true
+    initial: '21:24'

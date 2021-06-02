@@ -4,7 +4,6 @@
 #                                                                                                              #
 #########################################################
 
-
 - alias: 'computer room lights'
   trigger:
     - platform: sun
@@ -27,8 +26,6 @@
         entity_id: light.computer_room
         transition: 600
         brightness_pct: 80
-
-
 
 #########################################################
 #                                                                                                              #

@@ -152,6 +152,7 @@ cards:
               label: Settings
               type: section
             items:
+              - input_datetime.tv_lock_time
               - input_number.wakeup_hour
               - input_number.wakeup_minutes
               - input_number.wakeup_duration

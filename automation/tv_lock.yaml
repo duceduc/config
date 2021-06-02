@@ -5,20 +5,19 @@
 #########################################################
 
 
-- alias: enable tv lock - weekdays
+- alias: enable tv lock
   variables:
     digit: 6
   trigger:
-  - platform: time
-    at: '20:59:00'
+    - platform: template
+      value_template: '{{ states.sensor.time.state == states.input_datetime.tv_lock_time.state[0:5] }}'
   condition:
-  - condition: template # Child mode is on
-    value_template: "{{ is_state('input_boolean.child_mode', 'on') }}"
-  - condition: state
-    entity_id: group.family_presence
-    state: 'on'
-  - condition: template # Is weekday
-    value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+    - condition: template # Child mode is on
+      value_template: "{{ is_state('input_boolean.child_mode', 'on') }}"
+    - condition: template # Someone is home
+      value_template: "{{ is_state('group.family_presence', 'on') }}"
+    - condition: template # Is weekday
+      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
   action:
     - service: notify.alexa_media
       data_template:
@@ -42,7 +41,7 @@
 #########################################################
 
 
-- alias: disable tv lock - weekdays
+- alias: disable tv lock
   trigger:
     - platform: time
       at: '01:00:00'
