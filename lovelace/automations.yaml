@@ -328,6 +328,11 @@ cards:
             name: Go to Bed Annoucement
             icon: mdi:bullhorn
             secondary_info: last-triggered
+
+          - entity: automation.enable_tv_lock
+            name: Enable Tv Lock
+            icon: mdi:monitor-lock
+            secondary_info: last-triggered
           - entity: automation.turn_on_24hr_fan
             name: Turn on 24hr Fan
             icon: mdi:fan

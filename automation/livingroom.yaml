@@ -38,7 +38,7 @@
         - 'nightlight'
   condition:
     - condition: template 
-      value_template: '{{ states("cover.living_room_curtains") != "closed" or states("cover.computer_room_curtains") != "closed" }}'
+      value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"
   action:
     - service: cover.set_cover_position
       data:

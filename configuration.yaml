@@ -51,6 +51,9 @@ homeassistant:
 recorder:
   db_url: !secret MySQL_login
   purge_keep_days: 5
+  include: 
+    entities:
+      - sensor.last_boot
   exclude:
     domains:
      - group
@@ -59,6 +62,7 @@ recorder:
      - media_player
      - scene
      - script
+     - sensor
     entities:
      - sun.sun
      - sensor.date_time
