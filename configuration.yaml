@@ -48,6 +48,11 @@ homeassistant:
   customize: !include customize.yaml
   packages: !include_dir_named integrations
 
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.15  #Ngnix
+
 recorder:
   db_url: !secret MySQL_login
   purge_keep_days: 5

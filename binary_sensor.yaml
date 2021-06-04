@@ -164,13 +164,13 @@
     qos: 1
 
   - platform: threshold
-    entity_id: sensor.devices_with_low_battery
     name: Devices with low battery
+    entity_id: sensor.devices_with_low_battery
     upper: 0.5
 
   - platform: threshold
-    entity_id: sensor.sb1_updates
     name: sb1 updates
+    entity_id: sensor.sb1_updates
     upper: 0.5
 
 
