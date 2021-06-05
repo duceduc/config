@@ -6,14 +6,14 @@
 
 - alias: 'turn on appletv netflix'
   trigger:
-    platform: state
-    entity_id: input_boolean.appletv_netflix
-    from: 'off'
-    to: 'on'
+    - platform: state
+      entity_id: input_boolean.appletv_netflix
+      from: 'off'
+      to: 'on'
   action:
-  - service: script.appletv_netflix
-  - service: input_boolean.toggle
-    entity_id: input_boolean.appletv_netflix
+    - service: script.appletv_netflix
+    - service: input_boolean.toggle
+      entity_id: input_boolean.appletv_netflix
 
 #########################################################
 #                                                                                                              #
@@ -23,14 +23,14 @@
 
 - alias: 'turn on appletv plex'
   trigger:
-    platform: state
-    entity_id: input_boolean.appletv_plex
-    from: 'off'
-    to: 'on'
+    - platform: state
+      entity_id: input_boolean.appletv_plex
+      from: 'off'
+      to: 'on'
   action:
-  - service: script.appletv_plex
-  - service: input_boolean.toggle
-    entity_id: input_boolean.appletv_plex
+    - service: script.appletv_plex
+    - service: input_boolean.toggle
+      entity_id: input_boolean.appletv_plex
 
 #########################################################
 #                                                                                                              #
@@ -40,15 +40,15 @@
 
 - alias: 'toggle jcom tv box'
   trigger:
-    platform: state
-    entity_id: input_boolean.jcom_tv_box
-    from: 'off'
-    to: 'on'
+    - platform: state
+      entity_id: input_boolean.jcom_tv_box
+      from: 'off'
+      to: 'on'
   action:
-  - service: switch.turn_on
-    entity_id: switch.jcom_tv_box
-  - service: input_boolean.toggle
-    entity_id: input_boolean.jcom_tv_box
+    - service: switch.turn_on
+      entity_id: switch.jcom_tv_box
+    - service: input_boolean.toggle
+      entity_id: input_boolean.jcom_tv_box
 
 #########################################################
 #                                                                                                              #
@@ -58,16 +58,15 @@
 
 - alias: 'toggle floor heater'
   trigger:
-    platform: state
-    entity_id: input_boolean.floor_heater
-    from: 'off'
-    to: 'on'
+    - platform: state
+      entity_id: input_boolean.floor_heater
+      from: 'off'
+      to: 'on'
   action:
-  - service: switch.turn_on
-    entity_id: switch.floor_heater
-  - service: input_boolean.toggle
-    entity_id: input_boolean.floor_heater
-
+    - service: switch.turn_on
+      entity_id: switch.floor_heater
+    - service: input_boolean.toggle
+      entity_id: input_boolean.floor_heater
 
 #########################################################
 #                                                                                                              #
@@ -75,19 +74,17 @@
 #                                                                                                              #
 #########################################################
 
-
 - alias: 'Turn on desktop in morning'
   trigger:
-    platform: time
-    at: '04:55:00'
+    - platform: time
+      at: '04:55:00'
   condition:
-  - condition: template # Duc is home
-    value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
-  - condition: template # PC is not on
-    value_template: "{{ not is_state('binary_sensor.desktop_connected', 'on') }}"
+    - condition: template # Duc is home
+      value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
+    - condition: template # PC is not on
+      value_template: "{{ not is_state('binary_sensor.desktop_connected', 'on') }}"
   action:
     - service: script.desktop_wol
-
 
 #########################################################
 #                                                                                                              #

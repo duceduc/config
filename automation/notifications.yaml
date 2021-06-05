@@ -23,7 +23,7 @@
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
             <b> List of Containers/Vehicles Arriving Soon </b> <br>
-            {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %} The following units are arriving in about 10 days. Please make arrangement to have BL send to customers.<br><br>{{ states.sensor.deliveryin2week.state}}{% endif %} <br>
+            {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %} The following units are arriving in about 10 days. Please make arrangement to have BL send to customers.<br><br> {{ states('sensor.deliveryin2week') }} {% endif %} <br>
             <br>
           data:
             images: []
@@ -68,12 +68,15 @@
     action:
       - service: notify.home_assistant
         data_template:
-          title: "Certificate Expiring in {{ states.sensor.vj_ssl_cert_expiry.state }} Days: vj.ducsu.com"
-          message: >
+          title: "Certificate Expiring in {{ states.sensor.vj_ssl_cert_expiry.state }} Days: {{ states('sensor.vj_ssl_cert_cn') }}"
+          message: >-
+            {% set s =states('sensor.vj_ssl_cert_issuer') %}
+            {% set site = (s|regex_findall_index('O=[a-zA-Z]+',0)).replace('O=','') %}
+            
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
-            This is to notify you that your certificate with the common name ducsu.com will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
-            To renew your certificate, please visit <a href="https://my.gogetssl.com/en/user/">gogetssl.com</a>.<br>
+            This is to notify you that your certificate with the common name {{ states('sensor.vj_ssl_cert_cn') }} will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
+            To renew your certificate, please visit <a href="https://my.gogetssl.com/en/user/">{{ site }}</a>.<br>
             <br>
           data:
             images: []

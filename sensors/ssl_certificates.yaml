@@ -5,7 +5,7 @@
 ####################################################
 
   - platform: rest
-    name: vj ssl cert issued
+    name: vj ssl cert issue
     resource: 'https://crt.sh/?q=vj.ducsu.com&exclude=expired&output=json&deduplicate=Y'
     scan_interval: 14400
     value_template: '{{ value_json[0].entry_timestamp }}'

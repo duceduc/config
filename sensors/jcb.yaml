@@ -9,11 +9,13 @@
   - platform: command_line
     name: Deliveryin2week
     command: 'cat /config/www/data/days.json'
+    scan_interval: 14400
     value_template: >
       {% set today = as_timestamp(now() + timedelta(days = 11))|timestamp_custom('%-m/%d/%Y', true ) %}
+      {% if delivery | trim == "" %}
       {% set delivery =  value_json.MAJOR_JP.jcb[ today ] %}
+      {% endif %}
       {{ delivery }}
-    scan_interval: 14400
 
 
 ####################################################

@@ -55,10 +55,7 @@ http:
 
 recorder:
   db_url: !secret MySQL_login
-  purge_keep_days: 5
-  include: 
-    entities:
-      - sensor.last_boot
+  purge_keep_days: 4
   exclude:
     domains:
      - group
@@ -67,7 +64,6 @@ recorder:
      - media_player
      - scene
      - script
-     - sensor
     entities:
      - sun.sun
      - sensor.date_time
@@ -126,7 +122,25 @@ panel_iframe:
 
 #########################################################
 #                                                                                                              #
-#             Intergrations                                                                                #
+#             Sensor Integrations                                                                       #
+#                                                                                                              #
+#########################################################
+
+rest:
+  - resource: !secret crt_search
+    scan_interval: 14400
+    sensor:
+      - name: vj ssl cert issued
+        value_template: "{{ value_json[0].entry_timestamp }}"
+        device_class: timestamp
+      - name: vj ssl cert issuer
+        value_template: "{{ value_json[0].issuer_name }}"
+      - name: vj ssl cert cn
+        value_template: "{{ value_json[0].common_name }}"
+
+#########################################################
+#                                                                                                              #
+#             Integration                                                                                  #
 #                                                                                                              #
 #########################################################
 
