@@ -22,6 +22,17 @@
         value_template: '{{ 90 - (( as_timestamp(now()) - as_timestamp(strptime(states.sensor.vj_ssl_cert_issued.state, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}'
         unit_of_measurement: Days
 
+
+
+#########TEST##############
+
+  - platform: command_line
+    name: mqtt ssl cert issued
+    scan_interval: 14400
+    command: "python3 /ssl/pem2json.py server.crt"
+    value_template: '{{ value_json.notBefore }}'
+
+
 ####################################################
 #                                                                                                    #
 #            END OF CONFIGURATION FILE                                                 #
