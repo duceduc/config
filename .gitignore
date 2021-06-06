@@ -14,6 +14,7 @@
 *.json
 *.backup
 *.csv
+*.key
 
 # You can whitelist files/folders with !, these will not be ignored.
 !*.yaml
