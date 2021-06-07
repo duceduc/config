@@ -20,6 +20,9 @@ cards:
       - entity: light.ceiling_fan_lights
         name: Dining Room
       - type: divider
+      - entity: switch.ceiling_fan_summer
+        icon: mdi:pinwheel
+        name: Ceiling Fan
       - entity: switch.floor_heat
         name: Floor Heater
       - entity: switch.jcom_tv

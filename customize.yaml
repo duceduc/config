@@ -110,6 +110,7 @@ group.bed_sensors:
   device_class: problem
 switch.ceiling_fan_summer:
   friendly_name: Ceiling Fan Summer
+  assumed_state: false
 switch.ceiling_fan_winter:
   friendly_name: Ceiling Fan Winter
 switch.ceiling_fanlight:
