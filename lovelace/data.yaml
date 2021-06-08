@@ -33,6 +33,7 @@ cards:
       - entity_3: sensor.guest_mode
       - name_3: Guest
 
+
   - type: custom:decluttering-card
     template: five_sensors_tpl
     variables:

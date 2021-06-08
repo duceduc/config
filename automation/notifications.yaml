@@ -59,7 +59,7 @@
 #########################################################
 
 
-  - alias: "SSL Certificate Expiry Notification"
+  - alias: "VJ SSL Certificate Expiry Notification"
     initial_state: true
     trigger:
       - platform: numeric_state
@@ -72,7 +72,6 @@
           message: >-
             {% set s =states('sensor.vj_ssl_cert_issuer') %}
             {% set site = (s|regex_findall_index('O=[a-zA-Z]+',0)).replace('O=','') %}
-            
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
             This is to notify you that your certificate with the common name {{ states('sensor.vj_ssl_cert_cn') }} will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
@@ -81,6 +80,48 @@
           data:
             images: []
 
+
+  - alias: "HA SSL Certificate Expiry Notification"
+    initial_state: true
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.ha_ssl_cert_expiry
+        below: 3
+    action:
+      - service: notify.home_assistant
+        data_template:
+          title: >-
+            {% set str=states.sensor.ha_ssl_cert_cn.state %}
+            {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}?\.[a-zA-Z]{1,}',1)) %}
+            Certificate Expiring in {{ states.sensor.ha_ssl_cert_expiry.state }} Days: {{cn}}
+          message: >-
+            {% set str=states.sensor.ha_ssl_cert_cn.state %}
+            {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}?\.[a-zA-Z]{1,}',1)) %}
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            This is to notify you that your certificate with the common name {{cn}} will expire in {{ states.sensor.ha_ssl_cert_expiry.state }} days. <br>
+            <br>
+          data:
+            images: []
+
+
+  - alias: "Mqtt SSL Certificate Expiry Notification"
+    initial_state: true
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.mqtt_ssl_cert_expiry
+        below: 3
+    action:
+      - service: notify.home_assistant
+        data_template:
+          title: "Certificate Expiring in {{ states.sensor.mqtt_ssl_cert_expiry.state }} Days: MQTT Broker"
+          message: >-
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            This is to notify you that your MQTT Broker & user client certificates will expire in {{ states.sensor.mqtt_ssl_cert_expiry.state }} days. <br>
+            <br>
+          data:
+            images: []
 
 ####################################################
 #                                                                                                    #

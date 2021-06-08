@@ -88,6 +88,16 @@ sensor.mdf_condensation_chance:
 sensor.genkan_condensation_chance:
   friendly_name: Genkan Condensation
   icon: mdi:weather-rainy
+
+sensor.vj_ssl_cert_expiry:
+  icon: mdi:file-certificate
+sensor.mqtt_ssl_cert_expiry:
+  icon: mdi:file-certificate
+sensor.ha_ssl_cert_expiry:
+  icon: mdi:file-certificate
+  
+  
+
 group.wakeuplight:
   name: Wakeup Light
   control: hidden
