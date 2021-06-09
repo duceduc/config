@@ -65,6 +65,58 @@
         inline_keyboard: []
 
 
+#########################################################
+#                                                                                                              #
+#             Controllable Devices                                                                       #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'Control Devices'
+  initial_state: 'on'
+  trigger:
+    platform: event
+    event_type: telegram_text
+  condition:
+    condition: template
+    value_template: >-
+      {%- set text = trigger.event.data.text|lower -%}
+      {%- set text = text.split(' ') -%}
+      {%- if (text[0] == 'turn' or text[0] == 'switch') and (text[1] == 'on' or text[1] == 'off') -%}
+      true
+      {%- endif -%}
+  action:
+    - service: telegram_bot.send_message
+      data_template:
+        message: >-
+          {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
+          {%- for entity in states.group.controllable_devices.attributes.entity_id if states[entity.split('.')[0]][entity.split('.')[1]].name|lower == device -%}
+          OK, {{ trigger.event.data.text|lower|replace('turn','turning')|replace('switch','switching') }}.
+          {%- else -%}
+          I'm sorry. I cannot find the device named {{device}} in the house.
+          {%- endfor -%}
+        title: ''
+        target: '{{ trigger.event.data.chat_id }}'
+    - condition: template
+      value_template: >-
+        {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
+        {%- for entity in states.group.controllable_devices.attributes.entity_id if states[entity.split('.')[0]][entity.split('.')[1]].name|lower == device -%}
+        true
+        {%- else -%}
+        false
+        {%- endfor -%}
+    - service_template: >-
+        {%- set text = trigger.event.data.text|lower -%}
+        {%- set text = text.split(' ') -%}
+        {%- set onoff = text[1] -%}
+        homeassistant.turn_{{onoff}}
+      data_template:
+        entity_id: >-
+          {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
+          {%- for entity in states.group.controllable_devices.attributes.entity_id if states[entity.split('.')[0]][entity.split('.')[1]].name|lower == device -%}
+          {{ entity }}
+          {%- endfor -%}
+
 
 
 #########################################################

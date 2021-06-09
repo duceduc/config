@@ -1,70 +1,53 @@
   wakeuplight:
     name: Wakeup Light
     entities:
-      - sensor.wakeup_alarm_time
-      - sensor.wakeup_start_time_lights
-      - sensor.wakeup_fadein_duration
-      - input_number.wakeup_hour
-      - input_number.wakeup_minutes
-      - input_number.wakeup_duration
-      - input_boolean.wakeup
-      - input_boolean.wakeup_weekends
-      - input_select.wakeup_select
+     - sensor.wakeup_alarm_time
+     - sensor.wakeup_start_time_lights
+     - sensor.wakeup_fadein_duration
+     - input_number.wakeup_hour
+     - input_number.wakeup_minutes
+     - input_number.wakeup_duration
+     - input_boolean.wakeup
+     - input_boolean.wakeup_weekends
+     - input_select.wakeup_select
 
-  ir_switches:
-    name: IR Switches
-    entities:
-      - switch.ceiling_fan_lights
-      - switch.ceiling_fan_summer
-      - switch.ceiling_fan_winter
-      - switch.ceiling_fanlight
-      - switch.ac_lr_unit
-      - switch.heater_lr_unit
-      - switch.humidifier_lr_unit
-      - switch.ac_mr_unit
-      - switch.heater_mr_unit
-      - switch.humidifier_mr_unit
-      - switch.ac_sr_unit
-      - switch.heater_sr_unit
-      - switch.humidifier_sr_unit
-      - switch.yuasa_fan
 
   garbage_collection:
     name: Garbage Collection
     entities:
-      - sensor.combustible_waste
-      - sensor.plastic_recycle
-      - sensor.metal_paper_recycle
-      - sensor.bottle_can_recycle
-      - sensor.pet_clothes_recycle
+     - sensor.combustible_waste
+     - sensor.plastic_recycle
+     - sensor.metal_paper_recycle
+     - sensor.bottle_can_recycle
+     - sensor.pet_clothes_recycle
 
   all_home:
     name: Whose Home
     icon: mdi:home
     entities:
-      - binary_sensor.duc_presence
-      - binary_sensor.eri_presence
+     - binary_sensor.duc_presence
+     - binary_sensor.eri_presence
 
   family_presence:
     name: Family Presence
     icon: mdi:home
     entities:
-      - binary_sensor.duc_presence
-      - binary_sensor.eri_presence
-      - binary_sensor.shion_presence
+     - binary_sensor.duc_presence
+     - binary_sensor.eri_presence
+     - binary_sensor.shion_presence
 
   guest_presence:
     name: Guest Presence
     icon: mdi:home
     entities:
-      - binary_sensor.sachiko_presence
+     - binary_sensor.sachiko_presence
 
   bed_sensors:
     name: Bed Sensors
     all: true
     entities:
-      - binary_sensor.top
-      - binary_sensor.middle
+     - binary_sensor.top
+     - binary_sensor.middle
 
   echos:
     name: All Amazon Echo's
@@ -94,5 +77,31 @@
     icon: mdi:camera
     all: true
     entities:
-      - light.h_1
-      - binary_sensor.genkan_door
+     - light.h_1
+     - binary_sensor.genkan_door
+
+
+
+#########################################################
+#                                                                                                              #
+#             Telegram Bot Controllable Devices                                                    #
+#                                                                                                              #
+#########################################################
+
+  controllable_devices:
+    name: Controllable Devices
+    entities:
+     - light.computer_room # Computer Room
+     - switch.desktop #Desktop
+     - switch.yuasa_fan # Fan
+     - switch.jcom_tv # Jcom tv
+     - switch.ceiling_fan_summer # Ceiling Fan Summer
+     - switch.tv_lock # Tv Lock
+
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

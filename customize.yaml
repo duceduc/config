@@ -104,9 +104,7 @@ group.wakeuplight:
 group.lights_flash:
   name: Switches
   control: hidden
-group.ir_switches:
-  name: IR Switches
-  control: hidden
+
 group.garbage_collection:
   name: Garbage Collection
   control: hidden

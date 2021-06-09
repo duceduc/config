@@ -10,6 +10,12 @@
     command: "python3 /ssl/pem2json.py mqtt-server.crt"
     value_template: '{{ value_json.notBefore }}'
 
+  - platform: command_line
+    name: mqtt ssl cert cn
+    scan_interval: 14400
+    command: "python3 /ssl/pem2json.py mqtt-server.crt"
+    value_template: '{{ value_json.subject }}'
+
 ####################################################
 #                                                                                                    #
 #                      ws1/External SSL Certs                                               #
