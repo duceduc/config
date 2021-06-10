@@ -1,8 +1,31 @@
 #########################################################
 #                                                                                                              #
-#                   VEHICLES                                                                              #
+#                   Windows Desktop Notification                                                    #
 #                                                                                                              #
 #########################################################
+
+##notify.desktop works, but log still shows error.##
+  - alias: school time notification
+    trigger:
+      - platform: time
+        at: '07:19:00'
+    condition:
+      - condition: template # is the weekday
+        value_template: "{{ is_state('binary_sensor.date_weekday', 'on') }}"
+      - condition: template # pc is on
+        value_template: "{{ is_state('binary_sensor.desktop_connected', 'on') }}"
+    action:
+      - service: notify.desktop
+        data_template:
+          message: "Time for Shion to go to   school."
+
+
+#########################################################
+#                                                                                                              #
+#                   Vehicles Delivery Notifications                                                    #
+#                                                                                                              #
+#########################################################
+
 
   - alias: "Vehicle Delivery Notification"
     initial_state: true
