@@ -86,10 +86,9 @@
           type: tts
         target:
          - media_player.ai_1
-        message: "The laundry has finished. Don't forget to remove the load from the machine for drying."
+        message: "<audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>. The laundry has finished. Don't forget to remove the load from the machine for drying."
     - condition: template
       value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
-#      value_template: '{{ states("cover.living_room_curtains") != "open" }}'
     - service: cover.open_cover
       entity_id:
        - cover.living_room_curtains

@@ -1,6 +1,6 @@
 #########################################################
 #                                                                                                              #
-#             Ask to turn on ac if above 32C                                                         #
+#             Ask to turn on ac if above 30C                                                         #
 #                                                                                                              #
 #########################################################
 
@@ -28,7 +28,7 @@
   action:
     - service: script.activate_alexa_actionable_notification
       data_template:
-        text: 'The Livingroom temperature is above {{ states("sensor.livingroom_temperature") }} degree celsius. Would you like me to turn on the livingroom AC?'
+        text: 'The livingroom temperature is {{ states("sensor.livingroom_temperature") }} degree celsius. Would you like me to turn on the livingroom AC?'
         event_id: 'ask_to_turn_on_lr_aircon'
         alexa_device: 'media_player.ai_1'
 
