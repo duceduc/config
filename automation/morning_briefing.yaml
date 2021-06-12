@@ -8,8 +8,8 @@
   - alias: "Morning Briefing Duc"
     initial_state: true
     trigger:
-      platform: time
-      at: '06:00:00'
+      - platform: time
+        at: '06:00:00'
     action:
       - service: notify.home_assistant
         data_template:
@@ -34,8 +34,8 @@
   - alias: "Morning Briefing Eri"
     initial_state: true
     trigger:
-      platform: time
-      at: '06:00:00'
+      - platform: time
+        at: '06:00:00'
     action:
       - service: notify.eri
         data_template:
