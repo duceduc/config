@@ -34,8 +34,8 @@
     - entity_id: sensor.period_of_the_day
       platform: state
       to:
-        - 'dusklight'
-        - 'nightlight'
+       - 'dusklight'
+       - 'nightlight'
   condition:
     - condition: template 
       value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"

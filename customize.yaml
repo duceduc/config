@@ -188,15 +188,13 @@ switch.heat_water:
 switch.computer_room_curtains:
   icon: mdi:power
   assumed_state: false
-switch.computer_room_curtains_half:
-  icon: mdi:power
-  assumed_state: false
+
 switch.living_room_curtains:
   icon: mdi:power
   assumed_state: false
-switch.living_room_curtains_half:
-  icon: mdi:power
-  assumed_state: false
+
+  
+  
 person.duc:
   entity_picture: /local/img/people/avatar-duc.png
 person.eri:

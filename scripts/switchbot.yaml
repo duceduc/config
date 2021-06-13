@@ -130,6 +130,35 @@
               data:
                 entity_id: '{{ entity }}'
 
+
+#############MQTT#############
+  lr_curtains_toggle:
+    sequence:
+      - service: script.lr_curtains_toggle_mode
+        data:
+          entity: cover.lr_curtain_lt_curtain
+
+  lr_curtains_toggle_mode:
+    sequence:
+      - service_template: script.lr_curtains_toggle_mode_{{ 'on' if is_state('cover.lr_curtain_lt_curtain', 'closed') else 'off' }}           
+        data_template:
+          entity: '{{ entity }}'
+
+  lr_curtains_toggle_mode_on:
+    sequence:
+      - service: cover.open_cover
+        target:
+          entity_id: '{{ entity }}'
+
+  lr_curtains_toggle_mode_off:
+    sequence:
+      - service: cover.close_cover
+        target:
+          entity_id: '{{ entity }}'
+
+
+
+
 #########################################################
 #                                                                                                              #
 #             Computer Room Curtain Toggle Switches                                           #
@@ -177,6 +206,46 @@
             - service: homeassistant.turn_off
               data:
                 entity_id: '{{ entity }}'
+
+
+
+#############MQTT#############
+  cr_curtains_toggle:
+    sequence:
+      - service: script.cr_curtains_toggle_mode
+        data:
+          entity: cover.cr_curtain_lt_curtain
+
+  cr_curtains_toggle_mode:
+    sequence:
+      - service_template: script.cr_curtains_toggle_mode_{{ 'on' if is_state('cover.cr_curtain_lt_curtain', 'closed') else 'off' }}           
+        data_template:
+          entity: '{{ entity }}'
+
+  cr_curtains_toggle_mode_on:
+    sequence:
+      - service: cover.open_cover
+        target:
+          entity_id: '{{ entity }}'
+
+  cr_curtains_toggle_mode_off:
+    sequence:
+      - service: cover.close_cover
+        target:
+          entity_id: '{{ entity }}'
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #########################################################
 #                                                                                                              #

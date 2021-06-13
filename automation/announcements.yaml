@@ -134,10 +134,6 @@
        - binary_sensor.shion_presence
        - binary_sensor.sachiko_presence
       to: 'on'
-#  condition:
-#    - condition: state
-#      entity_id: binary_sensor.motion_g1_occupancy
-#      state: 'on'
   action:
     - delay: 1
     - wait_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'on') }}"
