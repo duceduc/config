@@ -115,6 +115,42 @@
              mdi:fan-off
           {% endif %}
 
+
+
+######MQTT##########################################
+  - platform: template
+    switches:
+      24h_fan:
+        friendly_name: '24h Fan'
+        value_template: "{{ states('input_boolean.washroom_fan') }}"
+        turn_on:
+          - service: switch.turn_on
+            entity_id: switch.24hr_fan_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.washroom_fan
+
+        turn_off:
+          - service: script.holdpress_bot
+            data:
+              bot: '24hr_fan'
+              press: 3
+          - service: switch.turn_off
+            entity_id: switch.24hr_fan_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.washroom_fan
+
+        icon_template: >-
+          {% if is_state('input_boolean.washroom_fan', 'on') %}
+             mdi:fan
+          {% else %}
+             mdi:fan-off
+          {% endif %}
+####################################################
+
+
+
+
+
       floor_heat:
         friendly_name: 'Floor Heat'
         value_template: "{{ states('input_boolean.floor_heat') }}"

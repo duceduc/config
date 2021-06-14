@@ -18,8 +18,10 @@
   action:
     - service: cover.set_cover_position
       data:
-        position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 0 {% endif %}'
-        entity_id: cover.fr_curtains
+        position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 100 {% endif %}'
+        entity_id:
+        - cover.cr_curtain_lt_curtain
+        - cover.lr_curtain_lt_curtain
 
 
 #########################################################
@@ -42,9 +44,10 @@
   action:
     - service: cover.set_cover_position
       data:
-        position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 100 {% endif %}'
-        entity_id: cover.fr_curtains
-
+        position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 0 {% endif %}'
+        entity_id:
+        - cover.cr_curtain_lt_curtain
+        - cover.lr_curtain_lt_curtain
 
 #########################################################
 #                                                                                                              #
