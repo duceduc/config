@@ -120,10 +120,14 @@
 ######MQTT##########################################
   - platform: template
     switches:
-      24h_fan:
-        friendly_name: '24h Fan'
+      test_sw:
+        friendly_name: 'Test SW'
         value_template: "{{ states('input_boolean.washroom_fan') }}"
         turn_on:
+          - service: script.holdpress_bot
+            data:
+              bot: '24hr_fan'
+              press: 0
           - service: switch.turn_on
             entity_id: switch.24hr_fan_switch
           - service: input_boolean.turn_on
@@ -134,16 +138,16 @@
             data:
               bot: '24hr_fan'
               press: 3
-          - service: switch.turn_off
+          - service: switch.turn_on
             entity_id: switch.24hr_fan_switch
           - service: input_boolean.turn_off
             entity_id: input_boolean.washroom_fan
 
         icon_template: >-
           {% if is_state('input_boolean.washroom_fan', 'on') %}
-             mdi:fan
+             mdi:check-circle
           {% else %}
-             mdi:fan-off
+             mdi:check-circle-outline
           {% endif %}
 ####################################################
 

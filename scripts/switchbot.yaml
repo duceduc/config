@@ -242,8 +242,8 @@
         data:
 #          topic: 'switchbotmqtt/bot/{{ bot }}/set'
 #          payload: "{{ press }}"
-          topic: 'switchbotmqtt/setHold'
-          payload_template: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
+          topic: 'switchbotmqtt/esp32/setHold'
+          payload: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
 
 
 

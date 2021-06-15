@@ -47,7 +47,9 @@
   action:
     - service: switch.turn_on
       data:
-        entity_id: switch.24hr_fan
+#        entity_id: switch.24hr_fan
+        entity_id: switch.test_sw
+
 
 - alias: 'turn off 24hr fan'
   trigger:
@@ -59,7 +61,8 @@
   action:
     - service: switch.turn_off
       data:
-        entity_id: switch.24hr_fan
+#        entity_id: switch.24hr_fan
+        entity_id: switch.test_sw
 
 
 #########################################################

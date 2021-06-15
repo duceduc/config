@@ -33,6 +33,8 @@ cards:
         name: Desktop
       - entity: switch.christmas_lights
         name: Christmas Lights
+      - entity: switch.test_sw
+        name: Test Switch
       - type: divider
       - entity: cover.computer_room_curtains
         name: Computer Room Curtains
