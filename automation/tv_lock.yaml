@@ -48,6 +48,8 @@
   action:
     - service: switch.turn_off
       entity_id: switch.tv_lock
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.child_mode
 
 #########################################################
 #                                                                                                              #

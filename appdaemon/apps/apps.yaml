@@ -19,6 +19,11 @@ living_room_curtains:
   controller: sensor.lr_curtains_action
   integration: z2m
   cover: cover.living_room_curtains
+  merge_mapping:
+    "on": toggle_close
+    "off": toggle_open
+    brightness_move_up: close
+    brightness_move_down: open
 
 aio_living_room:
   module: controllerx
@@ -94,6 +99,11 @@ computer_room_curtains:
   controller: sensor.cr_curtains_action
   integration: z2m
   cover: cover.computer_room_curtains
+  merge_mapping:
+    "on": toggle_close
+    "off": toggle_open
+    brightness_move_up: close
+    brightness_move_down: open
 
 #########################################################
 #                                                                                                              #
