@@ -86,6 +86,7 @@
   action:
     - service: script.desktop_wol
 
+
 #########################################################
 #                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #

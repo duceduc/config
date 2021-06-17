@@ -37,32 +37,48 @@
 #########################################################
 
 
-- alias: 'turn on 24hr fan'
+- alias: '24hr fan toggle on-off'
   trigger:
-    platform: time
-    at: '05:30:00'
+    - platform: time
+      at: '05:25:00'
+    - platform: time
+      at: '23:00:00'
   condition:
     - condition: template # Someone is Home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
+    - service: >-
+        {% if is_state('sensor.time', '05:25') %}
+           switch.turn_on
+        {% else %}
+           switch.turn_off
+        {% endif %}
+
+      data:
+#        entity_id: switch.24hr_fan
+        entity_id: switch.test_sw
+
+
+
+- alias: '24hr fan toggle speed'
+  trigger:
+    - platform: state
+      entity_id: sensor.period_of_the_day
+      to: 'nightlight'
+    - platform: time
+      at: '05:30:00'
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    - service: script.holdpress_bot
+      data:
+        bot: '24hr_fan'
+        press: 0
     - service: switch.turn_on
       data:
-#        entity_id: switch.24hr_fan
-        entity_id: switch.test_sw
+        entity_id: switch.24hr_fan_switch
 
-
-- alias: 'turn off 24hr fan'
-  trigger:
-    platform: time
-    at: '23:00:00'
-  condition:
-    - condition: template # Someone is Home
-      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-  action:
-    - service: switch.turn_off
-      data:
-#        entity_id: switch.24hr_fan
-        entity_id: switch.test_sw
 
 
 #########################################################
