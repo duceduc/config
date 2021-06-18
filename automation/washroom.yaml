@@ -48,7 +48,7 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
     - service: >-
-        {% if is_state('sensor.time', '05:25') %}
+        {% if is_state( 'sensor.time', '05:25' ) %}
            switch.turn_on
         {% else %}
            switch.turn_off

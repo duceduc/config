@@ -29,9 +29,9 @@ input_boolean: !include input_boolean.yaml
 emulated_hue: !include emulated_hue.yaml
 garbage_collection: !include garbage_collection.yaml
 shell_command: !include shell_commands.yaml
-binary_sensor: !include binary_sensor.yaml
+#binary_sensor: !include binary_sensor.yaml
 
-# binary_sensor: !include_dir_merge_list binary_sensors/
+binary_sensor: !include_dir_merge_list binary_sensors/
 automation: !include_dir_merge_list automation/
 sensor: !include_dir_merge_list sensors/
 switch: !include_dir_merge_list switches/
@@ -196,6 +196,61 @@ input_text:
     name: Alexa Actionable Notification Holder
     max: 255
     initial: '{"text": "This is a test of the alexa actions custom skill. Did it work?", "event": "actionable.skill.test"}'
+
+#################
+  status_fan_speed:
+    name: Status Fan Speed
+
+
+
+fan:
+  - platform: template
+    fans:
+      yuasa_fan:
+        speed_count: 3
+        value_template: "{{ states('input_boolean.status_fan_power') }}"
+        percentage_template: "{{ states('input_text.status_fan_speed') | int }}"
+        turn_on:
+          - condition: state
+            entity_id: input_boolean.status_fan_power
+            state: 'off'
+          - service: remote.send_command
+            data:
+              entity_id: remote.rm4_remote
+              device: Yuasa Fan
+              command: power
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.status_fan_power
+        turn_off:
+          - service: remote.send_command
+            data:
+              entity_id: remote.rm4_remote
+              device: Yuasa Fan
+              command: power
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.status_fan_power
+
+        set_percentage:
+          - service: python_script.fan_speed_control
+            data_template:
+              fan_speed: "{{ percentage }}"
+              fan_speed_entity_id: 'input_text.status_fan_speed'
+              fan_entity_id: 'fan.yuasa_fan'
+              fan_speed_count: 3
+              service_domain: 'remote'
+              service: 'send_command'
+              service_data_increase:
+                entity_id: remote.rm4_remote
+                device: Yuasa Fan
+                command: speed
+              service_data_decrease:
+                entity_id: remote.rm4_remote
+                device: Yuasa Fan
+                command: speed
+
+
+#################
+
 
 rest_command:
   slack_api:

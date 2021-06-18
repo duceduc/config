@@ -1,0 +1,30 @@
+#########################################################
+#                                                                                                              #
+#            Miscs                                                                                           #
+#                                                                                                              #
+#########################################################
+
+  - platform: mqtt
+    name: "Desktop - Connected"
+    state_topic: "iotlink/workgroup/desktop-fddl8i4/lwt"
+    value_template: "{{ value }}"
+    payload_on: "ON"
+    payload_off: "OFF"
+    device_class: "connectivity"
+    qos: 1
+
+  - platform: threshold
+    name: Devices with low battery
+    entity_id: sensor.devices_with_low_battery
+    upper: 0.5
+
+  - platform: threshold
+    name: sb1 updates
+    entity_id: sensor.sb1_updates
+    upper: 0.5
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

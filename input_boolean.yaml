@@ -94,3 +94,13 @@
   sachiko_presence:
     name: Sachiko
     icon: mdi:account
+
+
+
+#####################
+  status_fan_power:
+    name: Status Fan Power
+    icon: mdi:fan
+
+
+
