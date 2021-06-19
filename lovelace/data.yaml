@@ -302,7 +302,7 @@ cards:
         name: Last Restart
       - entity: sensor.last_boot
         name: Last Boot
-      - entity: sensor.sb1_updates
+      - entity: sensor.ms2_updates
         name: RPI's Updates
 
       - head:

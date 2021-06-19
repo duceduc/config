@@ -95,8 +95,6 @@ sensor.mqtt_ssl_cert_expiry:
   icon: mdi:file-certificate
 sensor.ha_ssl_cert_expiry:
   icon: mdi:file-certificate
-  
-  
 
 group.wakeuplight:
   name: Wakeup Light

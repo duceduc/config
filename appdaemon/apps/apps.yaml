@@ -18,12 +18,14 @@ living_room_curtains:
   class: E1743CoverController
   controller: sensor.lr_curtains_action
   integration: z2m
-  cover: cover.living_room_curtains
-  merge_mapping:
-    "on": toggle_close
-    "off": toggle_open
-    brightness_move_up: close
-    brightness_move_down: open
+  cover: cover.lr_curtain_lt_curtain
+
+#  cover: cover.living_room_curtains
+#  merge_mapping:
+#    "on": toggle_close
+#    "off": toggle_open
+#    brightness_move_up: close
+#    brightness_move_down: open
 
 aio_living_room:
   module: controllerx
@@ -54,11 +56,11 @@ aio_living_room:
     arrow_left_hold:
       service: script.turn_on
       data:
-        entity_id: script.cr_curtain_toggle
+        entity_id: script.cr_curtains_toggle
     arrow_right_hold:
       service: script.turn_on
       data:
-        entity_id: script.lr_curtain_toggle
+        entity_id: script.lr_curtains_toggle
 
     toggle:
       service: light.turn_off
@@ -98,12 +100,14 @@ computer_room_curtains:
   class: E1743CoverController
   controller: sensor.cr_curtains_action
   integration: z2m
-  cover: cover.computer_room_curtains
-  merge_mapping:
-    "on": toggle_close
-    "off": toggle_open
-    brightness_move_up: close
-    brightness_move_down: open
+  cover: cover.cr_curtain_lt_curtain
+
+#  cover: cover.cr_curtain_lt_curtain
+#  merge_mapping:
+#    "on": toggle_close
+#    "off": toggle_open
+#    brightness_move_up: close
+#    brightness_move_down: open
 
 #########################################################
 #                                                                                                              #

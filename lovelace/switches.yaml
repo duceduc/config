@@ -23,6 +23,8 @@ cards:
       - entity: switch.ceiling_fan_summer
         icon: mdi:pinwheel
         name: Ceiling Fan
+      - entity: fan.yuasa_fan
+        name: Yuasa Fan
       - entity: switch.floor_heat
         name: Floor Heater
       - entity: switch.jcom_tv
