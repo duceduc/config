@@ -55,10 +55,7 @@
         {% endif %}
 
       data:
-#        entity_id: switch.24hr_fan
-        entity_id: switch.test_sw
-
-
+        entity_id: switch.24hr_fan
 
 - alias: '24hr fan toggle speed'
   trigger:

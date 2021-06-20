@@ -87,7 +87,7 @@
 
 ####################################################
 #                                                                                                    #
-#                    Switchbot Bots Emulated Hue                                         #
+#                    Switchbot Bots MQTT Emulated Hue                                #
 #                                                                                                    #
 ####################################################
 
@@ -97,15 +97,21 @@
         friendly_name: '24hr Fan'
         value_template: "{{ states('input_boolean.washroom_fan') }}"
         turn_on:
-          - service: script.enable_bot_tpl
+          - service: script.holdpress_bot
             data:
-              bot: '24hr_fan' 
+              bot: '24hr_fan'
+              press: 0
+          - service: switch.turn_on
+            entity_id: switch.24hr_fan_switch
           - service: input_boolean.turn_on
             entity_id: input_boolean.washroom_fan
         turn_off:
-          - service: script.enable_bot_tpl
+          - service: script.holdpress_bot
             data:
               bot: '24hr_fan'
+              press: 3
+          - service: switch.turn_on
+            entity_id: switch.24hr_fan_switch
           - service: input_boolean.turn_off
             entity_id: input_boolean.washroom_fan
         icon_template: >-
@@ -117,7 +123,80 @@
 
 
 
-######MQTT##########################################
+      floor_heat:
+        friendly_name: 'Floor Heat'
+        value_template: "{{ states('input_boolean.floor_heat') }}"
+        turn_on:
+          - service: switch.turn_on
+            entity_id: switch.floor_heat_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.floor_heat
+        turn_off:
+          - service: switch.turn_on
+            entity_id: switch.floor_heat_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.floor_heat
+        icon_template: >-
+          {% if is_state('input_boolean.floor_heat', 'on') %}
+             mdi:radiator
+          {% else %}
+             mdi:radiator-off
+          {% endif %}
+
+      jcom_tv:
+        friendly_name: 'Jcom Tv'
+        value_template: "{{ states('input_boolean.jcom_tv') }}"
+        turn_on:
+          - service: switch.turn_on
+            entity_id: switch.jcom_tv_box_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.jcom_tv
+        turn_off:
+          - service: switch.turn_on
+            entity_id: switch.jcom_tv_box_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.jcom_tv
+        icon_template: >-
+          {% if is_state('input_boolean.jcom_tv', 'on') %}
+             mdi:monitor
+          {% else %}
+             mdi:monitor-off
+          {% endif %}
+
+
+
+
+#NODE.JS
+      tv_lock:
+        friendly_name: 'Tv Lock'
+        value_template: "{{ states('input_boolean.tv_lock') }}"
+        turn_on:
+          - service: script.enable_bot_tpl
+            data:
+              bot: 'hdmi_selector'
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.tv_lock
+        turn_off:
+          - service: script.enable_bot_tpl
+            data:
+              bot: 'hdmi_selector'
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.tv_lock
+        icon_template: >-
+          {% if is_state('input_boolean.tv_lock', 'on') %}
+             mdi:monitor-lock
+          {% else %}
+             mdi:monitor
+          {% endif %}
+
+
+####################################################
+#                                                                                                    #
+#                    Switchbot MQTT                                                          #
+#                                                                                                    #
+####################################################
+
+
   - platform: template
     switches:
       test_sw:
@@ -149,77 +228,9 @@
           {% else %}
              mdi:check-circle-outline
           {% endif %}
-####################################################
 
 
 
-
-
-      floor_heat:
-        friendly_name: 'Floor Heat'
-        value_template: "{{ states('input_boolean.floor_heat') }}"
-        turn_on:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'floor_heater'
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.floor_heat
-        turn_off:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'floor_heater'
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.floor_heat
-        icon_template: >-
-          {% if is_state('input_boolean.floor_heat', 'on') %}
-             mdi:radiator
-          {% else %}
-             mdi:radiator-off
-          {% endif %}
-
-      jcom_tv:
-        friendly_name: 'Jcom Tv'
-        value_template: "{{ states('input_boolean.jcom_tv') }}"
-        turn_on:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'jcom_tv_box'
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.jcom_tv
-        turn_off:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'jcom_tv_box'
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.jcom_tv
-        icon_template: >-
-          {% if is_state('input_boolean.jcom_tv', 'on') %}
-             mdi:monitor
-          {% else %}
-             mdi:monitor-off
-          {% endif %}
-
-      tv_lock:
-        friendly_name: 'Tv Lock'
-        value_template: "{{ states('input_boolean.tv_lock') }}"
-        turn_on:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'hdmi_selector'
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.tv_lock
-        turn_off:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'hdmi_selector'
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.tv_lock
-        icon_template: >-
-          {% if is_state('input_boolean.tv_lock', 'on') %}
-             mdi:monitor-lock
-          {% else %}
-             mdi:monitor
-          {% endif %}
 
 
 ####################################################

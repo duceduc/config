@@ -69,16 +69,21 @@
       - service: "cover.{{ modus }}_cover"
         target:
           entity_id:
-          - cover.living_room_curtains
-          - cover.computer_room_curtains
+          - cover.cr_curtain_lt_curtain
+          - cover.lr_curtain_lt_curtain
+#          - cover.living_room_curtains
+#          - cover.computer_room_curtains
 
   fr_curtains_position:
     sequence:
       - service: cover.set_cover_position
         target:
           entity_id:
-          - cover.living_room_curtains
-          - cover.computer_room_curtains
+          - cover.cr_curtain_lt_curtain
+          - cover.lr_curtain_lt_curtain
+#          - cover.living_room_curtains
+#          - cover.computer_room_curtains
+
         data:
           position: "{{ position }}"
 

@@ -333,12 +333,12 @@ cards:
             name: Enable Tv Lock
             icon: mdi:monitor-lock
             secondary_info: last-triggered
-          - entity: automation.turn_on_24hr_fan
-            name: Turn on 24hr Fan
+          - entity: automation.24hr_fan_toggle_on_off
+            name: Toggle 24hr Fan On-Off
             icon: mdi:fan
             secondary_info: last-triggered
-          - entity: automation.turn_off_24hr_fan
-            name: Turn off 24hr Fan
+          - entity: automation.24hr_fan_toggle_speed
+            name: Toggle 24hr Fan Speed
             icon: mdi:fan-off
             secondary_info: last-triggered
 

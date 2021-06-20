@@ -1,4 +1,5 @@
 # ESP8266 NodeMCU....
+# [BC-DD-C2-7A-CC-B4]
 esphome:
   name: dht_sensor
   platform: ESP8266
@@ -7,6 +8,10 @@ esphome:
 wifi:
   ssid: 'rice_dwarf'
   password: !secret ssid_pass
+  manual_ip:
+    static_ip: 192.168.1.89
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
 
 # Fallback portal 
 captive_portal:

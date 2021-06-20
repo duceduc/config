@@ -1,4 +1,5 @@
 # ESP32 NodeMCU
+# [7C-9E-BD-ED-C9-54]
 esphome:
   name: bed_sensor
   platform: ESP32
@@ -7,6 +8,10 @@ esphome:
 wifi:
   ssid: 'rice_dwarf'
   password: !secret ssid_pass
+  manual_ip:
+    static_ip: 192.168.1.90
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
 
 # Fallback portal 
 captive_portal:

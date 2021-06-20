@@ -11,7 +11,7 @@
 # e79341ccf8ea - Floor Heater
 # f4f839cd40fd - Jcom
 # fab6527b504e - 24 Fan
-# c9f9186ca30d - tv source
+# c9f9186ca30d - hdmi selector
 
   - platform: mqtt
     name: 'Switchbot Status'
@@ -238,14 +238,16 @@
 #                      Switchbot Combined Front Curtains                               #
 #                                                                                                    #
 ####################################################
+#{% if is_state('cover.computer_room_curtains', 'open') %}
+#{% elif is_state('cover.living_room_curtains', 'open') %}
 
   - platform: template
     sensors:
       fr_curtains:
-        value_template: >-
-          {% if is_state('cover.computer_room_curtains', 'open') %}
+        value_template: >-        
+          {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
             open
-          {% elif is_state('cover.living_room_curtains', 'open') %}
+          {% elif is_state('cover.lr_curtain_lt_curtain', 'open') %}
             open
           {% else %}
             closed

@@ -5,7 +5,7 @@
 #########################################################
 
 
-- alias: 'Open Living Room Curtains Sunrise'
+- alias: 'Open Front Curtains at Sunrise'
   trigger:
     - entity_id: sensor.period_of_the_day
       platform: state
@@ -20,8 +20,7 @@
       data:
         position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 100 {% endif %}'
         entity_id:
-        - cover.cr_curtain_lt_curtain
-        - cover.lr_curtain_lt_curtain
+        - cover.fr_curtains
 
 
 #########################################################
@@ -31,7 +30,7 @@
 #########################################################
 
 
-- alias: 'Close Living Room Curtains Sunset'
+- alias: 'Close Front Curtains at Sunset'
   trigger:
     - entity_id: sensor.period_of_the_day
       platform: state
@@ -46,8 +45,8 @@
       data:
         position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 0 {% endif %}'
         entity_id:
-        - cover.cr_curtain_lt_curtain
-        - cover.lr_curtain_lt_curtain
+        - cover.fr_curtains
+
 
 #########################################################
 #                                                                                                              #
