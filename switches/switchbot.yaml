@@ -167,6 +167,7 @@
 
 
 #NODE.JS
+# switch.hdmi_selector_switch
       tv_lock:
         friendly_name: 'Tv Lock'
         value_template: "{{ states('input_boolean.tv_lock') }}"

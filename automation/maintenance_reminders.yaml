@@ -5,7 +5,8 @@
 #########################################################
 
 
-# Clean Aircon Filters Start of Season                                                  
+# Clean Aircon Filters Start of Season
+# https://www.almanac.com/content/first-day-seasons                                          
 - alias: 'Clean Nozzle Filters'
   trigger:
     platform: state
@@ -16,8 +17,7 @@
   action:
     - service: switch.turn_on # Aircon Filters
       entity_id: group.clean_aircon_filter
-    - service: script.turn_on # Toile Nozzle
-      entity_id: script.toilet_nozzle_cleaning
+    - service: script.toilet_nozzle_cleaning
 
 
 #########################################################
@@ -32,24 +32,21 @@
     platform: template
     value_template: '{{ states.sensor.time.state == states.sensor.wakeup_start_time_lights.state }}'
   condition:
-      condition: and
+    - condition: state
+      entity_id: input_boolean.wakeup
+      state: 'on'
+    - condition: template
+      value_template: "{{ states.sensor.holiday.state | trim == '' }}"
+    - condition: or
       conditions:
         - condition: state
-          entity_id: input_boolean.wakeup
+          entity_id: input_boolean.wakeup_weekends
           state: 'on'
-        - condition: template
-          value_template: "{{ states.sensor.holiday.state | trim == '' }}"
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: input_boolean.wakeup_weekends
-              state: 'on'
-            - condition: template # Is weekday
-              value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+        - condition: template # Is weekday
+          value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
   action:
     service: script.turn_on
     entity_id: script.wakeup_bedroom
-
 
 
 #########################################################

@@ -19,8 +19,8 @@
     upper: 0.5
 
   - platform: threshold
-    name: ms1 updates
-    entity_id: sensor.ms1_updates
+    name: ms2 updates
+    entity_id: sensor.ms2_updates
     upper: 0.5
 
 #########################################################
