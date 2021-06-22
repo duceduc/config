@@ -13,6 +13,17 @@ tts:
   - platform: google_translate
     service_name: google_say
 
+notify_events:
+  token: !secret notify_token
+
+zigbee2mqtt_networkmap:
+# Integrations
+panel_iframe:
+  networkmap:
+    title: 'Zigbee Map'
+    url: '/local/community/zigbee2mqtt_networkmap/map.html'
+    icon: 'mdi:graphql'
+
 group: !include groups.yaml
 scene: !include scenes.yaml
 timer: !include timers.yaml
@@ -75,17 +86,12 @@ recorder:
 #  appdaemon: true
 #  sidepanel_icon: mdi:alpha-c-box
 
-alexa_media:
-  accounts:
-    - email: !secret amazon_user
-      password: !secret amazon_password
-      url: amazon.com
-      include_devices:
-       - Ai.1
-       - Ai.2
-       - Ai.3
-# Find Amazon dot name
-# https://alexa.amazon.com/api/devices-v2/device
+
+#########################################################
+#                                                                                                              #
+#             Device Tracker                                                                             #
+#                                                                                                              #
+#########################################################
 
 person:
   - name: Shion
@@ -108,19 +114,6 @@ homekit:
      - input_boolean.duc_home
      - input_boolean.eri_home
      - input_boolean.shion_home
-
-notify_events:
-  token: !secret notify_token
-
-zigbee2mqtt_networkmap:
-
-# Integrations
-panel_iframe:
-  networkmap:
-    title: 'Zigbee Map'
-    url: '/local/community/zigbee2mqtt_networkmap/map.html'
-    icon: 'mdi:graphql'
-
 
 #########################################################
 #                                                                                                              #
@@ -145,6 +138,18 @@ rest:
 #             Integration                                                                                  #
 #                                                                                                              #
 #########################################################
+
+alexa_media:
+  accounts:
+    - email: !secret amazon_user
+      password: !secret amazon_password
+      url: amazon.com
+      include_devices:
+       - Ai.1
+       - Ai.2
+       - Ai.3
+# Find Amazon dot name
+# https://alexa.amazon.com/api/devices-v2/device
 
 telegram_bot:
   - platform: polling
