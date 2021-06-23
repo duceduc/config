@@ -1,5 +1,8 @@
 # ESP8266 NodeMCU....
 # [BC-DD-C2-7A-CC-B4]
+substitutions:
+  base_topic: 'esphome/dht_sensor'
+
 esphome:
   name: dht_sensor
   platform: ESP8266
@@ -25,6 +28,7 @@ mqtt:
   broker: 192.168.1.20
   username: !secret mqtt_user
   password: !secret mqtt_pass
+#  topic_prefix: ${base_topic}
 
 ota:
   password: !secret ota_pass

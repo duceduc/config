@@ -155,28 +155,6 @@
         command:
         - nozzle cleaning
 
-# ESP32 Version
-  toilet_seat_esp_low_heat:
-    sequence:
-     - service: switch.turn_on
-       entity_id: switch.heat_seat_esp_low
-  toilet_seat_esp_med_heat:
-    sequence:
-     - service: switch.turn_on
-       entity_id: switch.heat_seat_esp_med
-  toilet_seat_esp_high_heat:
-    sequence:
-     - service: switch.turn_on
-       entity_id: switch.heat_seat_esp_high
-  toilet_seat_esp_off_heat:
-    sequence:
-     - service: switch.turn_off
-       entity_id: switch.heat_seat_esp_off
-
-  toilet_nozzle_esp_cleaning:
-    sequence:
-     - service: switch.turn_on
-       entity_id: switch.nozzle_esp_cleaning
 
 #########################################################
 #                                                                                                              #

@@ -124,7 +124,7 @@
       entity_id: sensor.season
       to: 'summer'
   action:
-    - delay: 2
+    - delay: 1
     - service: script.toilet_seat_off_heat
 
 #########################################################

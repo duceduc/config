@@ -121,8 +121,6 @@
              mdi:fan-off
           {% endif %}
 
-
-
       floor_heat:
         friendly_name: 'Floor Heat'
         value_template: "{{ states('input_boolean.floor_heat') }}"
@@ -163,24 +161,17 @@
              mdi:monitor-off
           {% endif %}
 
-
-
-
-#NODE.JS
-# switch.hdmi_selector_switch
       tv_lock:
         friendly_name: 'Tv Lock'
         value_template: "{{ states('input_boolean.tv_lock') }}"
         turn_on:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'hdmi_selector'
+          - service: switch.turn_on
+            entity_id: switch.hdmi_selector_switch
           - service: input_boolean.turn_on
             entity_id: input_boolean.tv_lock
         turn_off:
-          - service: script.enable_bot_tpl
-            data:
-              bot: 'hdmi_selector'
+          - service: switch.turn_on
+            entity_id: switch.hdmi_selector_switch
           - service: input_boolean.turn_off
             entity_id: input_boolean.tv_lock
         icon_template: >-
@@ -229,9 +220,6 @@
           {% else %}
              mdi:check-circle-outline
           {% endif %}
-
-
-
 
 
 ####################################################
