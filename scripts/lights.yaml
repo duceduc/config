@@ -4,6 +4,7 @@
 #                                                                                                              #
 #########################################################
 
+
   turn_on_lr_lights:
     alias: Turn on LR lights
     sequence:
@@ -27,6 +28,29 @@
           entity_id: switch.jcom_tv
       - delay: 10
       - service: script.tv_volume_down
+
+
+#########################################################
+#                                                                                                              #
+#             Hallway Light Enable                                                                      #
+#                                                                                                              #
+#########################################################
+
+  hallway_light_enable:
+    alias: Hallway Light Enable
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: light.h_2
+          brightness: '{% if now().hour > 19 or now().hour < 7 %} 50 {% else %} 200 {% endif %}'
+
+  hallway_light_enable_guest:
+    alias: Hallway Light Enable guest
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: light.h_2
+          brightness: 200
 
 #########################################################
 #                                                                                                              #

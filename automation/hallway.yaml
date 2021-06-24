@@ -6,29 +6,31 @@
 
 - alias: 'motion hallway light on'
   trigger:
-  - entity_id: binary_sensor.motion_hallway_occupancy
-    from: 'off'
-    platform: state
-    to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_hallway_occupancy
+      from: 'off'
+      to: 'on'
   condition:
     - condition: template # Not on vacation
       value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
   action:
-  - service: light.turn_on
-    entity_id: light.h_2
-    data_template:
-      brightness: '{% if now().hour > 19 or now().hour < 7 %} 50 {% else %} 200 {% endif %}'
+    - service: >-
+        {% if is_state('input_boolean.guest_mode', 'on') %}
+          script.hallway_light_enable_guest
+        {% else %}
+          script.hallway_light_enable
+        {% endif %}
+
 - alias: 'motion hallway light off'
   trigger:
-  - platform: state
-    entity_id: binary_sensor.motion_hallway_occupancy
-    to: 'off'
-    for: '00:00:30'
+    - platform: state
+      entity_id: binary_sensor.motion_hallway_occupancy
+      to: 'off'
+      for: '00:00:30'
   action:  
-  - service: light.turn_off
-    data:
-      entity_id: light.h_2
-
+    - service: light.turn_off
+      data:
+        entity_id: light.h_2
 
 #########################################################
 #                                                                                                              #
