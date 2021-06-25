@@ -42,9 +42,9 @@ cards:
       - icon: weather-rainy
       - entity_1: sensor.genkan_condensation_chance
       - name_1: Genkan Condensation
-      - entity_2: sensor.genkan_humidity
+      - entity_2: sensor.meter_humidity
       - name_2: Genkan Humidity
-      - entity_3: sensor.genkan_temperature
+      - entity_3: sensor.meter_temperature
       - name_3: Genkan Temperature
 
   - type: custom:decluttering-card

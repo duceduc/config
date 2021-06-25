@@ -163,14 +163,6 @@
     unit_of_measurement: 'dBm'
     icon: mdi:antenna
 
-# Combined Average Battery
-  - platform: template
-    sensors:
-      cr_curtain_batteries:
-        friendly_name: "CR Curtain Batteries"
-        unit_of_measurement: '%'
-        device_class: battery
-        value_template: "{{ ((states('sensor.cr_curtain_left_battery')|int + states('sensor.cr_curtain_right_battery')|int) /2)|int }}"
 
 # Position State
   - platform: mqtt
@@ -216,14 +208,7 @@
     unit_of_measurement: 'dBm'
     icon: mdi:antenna
 
-# Combined Average Battery
-  - platform: template
-    sensors:
-      lr_curtain_batteries:
-        friendly_name: "LR Curtain Batteries"
-        unit_of_measurement: '%'
-        device_class: battery
-        value_template: "{{ ((states('sensor.lr_curtain_left_battery')|int + states('sensor.lr_curtain_right_battery')|int) /2)|int }}"
+
 
 # Position State
   - platform: mqtt
@@ -232,6 +217,39 @@
     value_template: '{{ value_json.serviceData.position }}'
     unit_of_measurement: "%"
     icon: mdi:format-list-numbered
+
+
+
+
+
+####################################################
+#                                                                                                    #
+#                      Switchbot Curtain Batteries Average                              #
+#                                                                                                    #
+####################################################
+
+# Combined Average Battery
+  - platform: template
+    sensors:
+      cr_curtain_batteries:
+        friendly_name: "CR Curtain Batteries"
+        unit_of_measurement: '%'
+        device_class: battery
+        value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int + states('sensor.cr_curtain_rt_battery')|int) /2)|int }}"
+
+
+# Combined Average Battery
+  - platform: template
+    sensors:
+      lr_curtain_batteries:
+        friendly_name: "LR Curtain Batteries"
+        unit_of_measurement: '%'
+        device_class: battery
+        value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int + states('sensor.lr_curtain_rt_battery')|int) /2)|int }}"
+
+
+
+
 
 ####################################################
 #                                                                                                    #

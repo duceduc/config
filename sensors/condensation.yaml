@@ -39,8 +39,8 @@
 # Genkan Mold Chance
   - platform: mold_indicator
     name: Genkan Condensation Chance
-    indoor_temp_sensor: sensor.genkan_temperature
-    indoor_humidity_sensor: sensor.genkan_humidity
+    indoor_temp_sensor: sensor.meter_temperature
+    indoor_humidity_sensor: sensor.meter_humidity
     outdoor_temp_sensor: sensor.outside_temperature
     calibration_factor: 1.1
 

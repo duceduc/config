@@ -14,12 +14,7 @@
     - condition: template # Not on vacation
       value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
   action:
-    - service: >-
-        {% if is_state('input_boolean.guest_mode', 'on') %}
-          script.hallway_light_enable_guest
-        {% else %}
-          script.hallway_light_enable
-        {% endif %}
+    - service_template: script.hallway_light_guest_mode_{{ 'on' if is_state('input_boolean.guest_mode', 'on') else 'off' }}
 
 - alias: 'motion hallway light off'
   trigger:

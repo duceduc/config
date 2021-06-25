@@ -240,14 +240,15 @@
           entity_id: '{{ entity }}'
 
 
-########PRESS HOLD#################
+########HOLD PRESS#################
   holdpress_bot:
     sequence:
       - service: mqtt.publish
         data:
 #          topic: 'switchbotmqtt/bot/{{ bot }}/set'
 #          payload: "{{ press }}"
-          topic: 'switchbotmqtt/esp32/setHold'
+#          topic: 'switchbotmqtt/esp32/setHold'
+          topic: 'switchbotmqtt/esp32/holdPress'
           payload: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
 
 

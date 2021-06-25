@@ -226,13 +226,13 @@ cards:
                 name: Computer Room Curtains
               - entity: sensor.lr_curtain_batteries
                 name: Livingroom Curtains
-              - entity: sensor.genkan_battery
+              - entity: sensor.meter_battery
                 name: Thermometer
-              - entity: sensor.jcom_tv_box_battery
+              - entity: sensor.jcom_tv_box_battery_2
                 name: Jcom Tv Box
-              - entity: sensor.floor_heater_battery
+              - entity: sensor.floor_heat_battery
                 name: Floor Heater
-              - entity: sensor.washroom_fan_battery
+              - entity: sensor.24hr_fan_battery
                 name: 24hr Fan
               - entity: sensor.hdmi_selector_battery
                 name: HDMI Selector

@@ -101,8 +101,8 @@
             data:
               bot: '24hr_fan'
               press: 0
-          - service: switch.turn_on
-            entity_id: switch.24hr_fan_switch
+#          - service: switch.turn_on
+#            entity_id: switch.24hr_fan_switch
           - service: input_boolean.turn_on
             entity_id: input_boolean.washroom_fan
         turn_off:
@@ -110,8 +110,8 @@
             data:
               bot: '24hr_fan'
               press: 3
-          - service: switch.turn_on
-            entity_id: switch.24hr_fan_switch
+#          - service: switch.turn_on
+#            entity_id: switch.24hr_fan_switch
           - service: input_boolean.turn_off
             entity_id: input_boolean.washroom_fan
         icon_template: >-

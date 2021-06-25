@@ -72,9 +72,9 @@
       data:
         bot: '24hr_fan'
         press: 0
-    - service: switch.turn_on
-      data:
-        entity_id: switch.24hr_fan_switch
+#    - service: switch.turn_on
+#      data:
+#        entity_id: switch.24hr_fan_switch
 
 
 

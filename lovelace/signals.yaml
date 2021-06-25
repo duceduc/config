@@ -19,23 +19,23 @@ cards:
       indicator: 'off'
       value: inside
     entities:
-      - entity: sensor.cr_curtain_left_ble_signal
+      - entity: sensor.cr_curtain_lt_linkquality
         name: Curtain Computer Room Left
-      - entity: sensor.cr_curtain_right_ble_signal
+      - entity: sensor.cr_curtain_rt_linkquality
         name: Curtain Computer Room Right
-      - entity: sensor.lr_curtain_left_ble_signal
+      - entity: sensor.lr_curtain_lt_linkquality
         name: Curtain Living Room Left
-      - entity: sensor.lr_curtain_right_ble_signal
+      - entity: sensor.lr_curtain_rt_linkquality
         name: Curtain Living Room Right
-      - entity: sensor.floor_heater_ble_signal
+      - entity: sensor.floor_heat_linkquality
         name: Floor Heater
-      - entity: sensor.jcom_tv_box_ble_signal
+      - entity: sensor.jcom_tv_box_linkquality
         name: Jcom Tv Box
-      - entity: sensor.washroom_fan_ble_signal
+      - entity: sensor.24hr_fan_linkquality
         name: 24hr Fan
-      - entity: sensor.hdmi_selector_ble_signal
+      - entity: sensor.hdmi_selector_linkquality
         name: HDMI Selector
-      - entity: sensor.genkan_ble_signal
+      - entity: sensor.meter_linkquality
         name: Genkan Thermometer
     severity:
       - color: var(--label-badge-green)
@@ -162,7 +162,9 @@ cards:
       - entity: sensor.master_dimmer_linkquality
         name: Master Room Dimmer
       - entity: sensor.zigbeerpt_1_linkquality
-        name: Zigbee Repeater
+        name: Zigbee Repeater 1
+      - entity: sensor.0x00124b001938c31b_linkquality
+        name: Zigbee Repeater 2
     severity:
       - color: var(--label-badge-red)
         from: 0
