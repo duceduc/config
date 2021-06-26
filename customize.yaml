@@ -190,8 +190,6 @@ switch.computer_room_curtains:
 switch.living_room_curtains:
   icon: mdi:power
   assumed_state: false
-
-  
   
 person.duc:
   entity_picture: /local/img/people/avatar-duc.png
@@ -201,6 +199,23 @@ person.shion:
   entity_picture: /local/img/people/avatar-shion.png
 person.kiki:
   entity_picture: /local/img/people/avatar-kiki.png
+      
+cover.fr_curtains:
+  assumed_state: true
+device_tracker.shion:
+  friendly_name: Shion
+device_tracker.duc:
+  friendly_name: Duc
+device_tracker.eri:
+  friendly_name: Eri
+
+#########################################################
+#                                                                                                              #
+#             Customize UI                                                                                #
+#                                                                                                              #
+#########################################################
+
+
 input_select.home_mode:
   templates:
     icon: if ( state === 'Home' ) return 'mdi:home'; if ( state === 'Away' ) return
@@ -211,11 +226,15 @@ sensor.n_people_home:
     icon: if ( state ===  '0' ) return 'mdi:account-off'; if ( state ===  '1' ) return
       'mdi:account'; if ( state === '2' ) return 'mdi:account-multiple'; if ( state
       ===  '3' ) return 'mdi:account-group'; return 'mdi:account-multiple-plus';
-cover.fr_curtains:
-  assumed_state: true
-device_tracker.shion:
-  friendly_name: Shion
-device_tracker.duc:
-  friendly_name: Duc
-device_tracker.eri:
-  friendly_name: Eri
+
+sensor.toilet:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+      
+sensor.hallway:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.genkan:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';

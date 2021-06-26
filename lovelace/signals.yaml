@@ -161,8 +161,6 @@ cards:
         name: Shion Room Dimmer
       - entity: sensor.master_dimmer_linkquality
         name: Master Room Dimmer
-      - entity: sensor.zigbeerpt_1_linkquality
-        name: Zigbee Repeater 1
       - entity: sensor.0x00124b001938c31b_linkquality
         name: Zigbee Repeater 2
     severity:

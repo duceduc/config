@@ -7,27 +7,22 @@
 
 - alias: 'motion washroom light on'
   trigger:
-    platform: state
-    entity_id: binary_sensor.motion_washroom_occupancy
-    to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_washroom_occupancy
+      to: 'on'
   action:
-    service: light.turn_on
-    entity_id: light.wash_room
+    - service: light.turn_on
+      entity_id: light.wash_room
 
 - alias: 'motion washroom light off'
   trigger:
-    platform: state
-    entity_id: binary_sensor.motion_washroom_occupancy
-    to: 'off'
-    for: 00:00:30
+    - platform: state
+      entity_id: binary_sensor.motion_washroom_occupancy
+      to: 'off'
+      for: 00:00:30
   action:
-    service_template: >
-      {% if is_state('light.shower_room', 'on') %}
-      light.turn_on
-      {% else %}
-      light.turn_off
-      {% endif %}
-    entity_id: light.wash_room
+    - service_template: light.turn_{{ 'on' if is_state('light.shower_room', 'on') else 'off' }}
+      entity_id: light.wash_room
 
 
 #########################################################
@@ -40,20 +35,14 @@
 - alias: '24hr fan toggle on-off'
   trigger:
     - platform: time
-      at: '05:25:00'
+      at: '05:30:00'
     - platform: time
       at: '23:00:00'
   condition:
     - condition: template # Someone is Home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    - service: >-
-        {% if is_state( 'sensor.time', '05:25' ) %}
-           switch.turn_on
-        {% else %}
-           switch.turn_off
-        {% endif %}
-
+    - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:30') else 'off' }}
       data:
         entity_id: switch.24hr_fan
 
@@ -61,9 +50,9 @@
   trigger:
     - platform: state
       entity_id: sensor.period_of_the_day
-      to: 'nightlight'
+      to: 'dusklight'
     - platform: time
-      at: '05:30:00'
+      at: '05:30:20'
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
@@ -72,10 +61,6 @@
       data:
         bot: '24hr_fan'
         press: 0
-#    - service: switch.turn_on
-#      data:
-#        entity_id: switch.24hr_fan_switch
-
 
 
 #########################################################
@@ -135,7 +120,6 @@
           {% elif fr in ['run', 'fill', 'wait', 'unknown'] and to == 'stop' %} stop
           {% else %} unknown
           {% endif %}
-
 
 
 #########################################################

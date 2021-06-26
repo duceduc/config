@@ -18,7 +18,7 @@
         column: 'value'
         unit_of_measurement: MB
 
-# Pi Servers
+# HA Servers
   - platform: systemmonitor
     resources:
       - type: memory_free
@@ -30,10 +30,10 @@
       - type: load_15m
       - type: disk_use_percent
         arg: /
-      - type: throughput_network_in
-        arg: eth0
-      - type: throughput_network_out
-        arg: eth0
+#      - type: throughput_network_in
+#        arg: eth0
+#      - type: throughput_network_out
+#        arg: eth0
 
   - platform: uptime
     name: Time Online

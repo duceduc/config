@@ -32,9 +32,9 @@
           - sensor.computer_room_battery
           - sensor.living_room_battery
           - sensor.shower_room_battery
-          - sensor.genkan_battery
+          - sensor.meter_battery
           - sensor.jcom_tv_box_battery
-          - sensor.floor_heater_battery
+          - sensor.floor_heat_battery
           - sensor.hallway_door_battery
           - sensor.genkan_door_battery
           - sensor.cr_curtain_batteries
