@@ -11,9 +11,9 @@
     cancellable: True
 
   - platform: momentary
-    name: Switchbot Status
+    name: Tv Enable
     mode: on
-    toggle_for: 3
+    toggle_for: 5
     cancellable: True
 
 ####################################################
