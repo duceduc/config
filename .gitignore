@@ -3,7 +3,7 @@
 # An * ensures that everything will be ignored.
 *.log
 *.db
-*.db-sha
+*.db-shm
 *.db-wal
 *.conf
 *.json

@@ -57,7 +57,7 @@
     sensors:
       mqtt_ssl_cert_expiry:
         value_template: >-
-         {% set alias={"Jan":"01", "Feb":"02", "Mar":"03","Apr":"04", "May":"05", "Jun":"06","Jul":"07", "Aug":"08", "Sep":"09","Oct":"10", "Nov":"11", "Dec":"12"} %}
+         {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
          {% set str=states.sensor.mqtt_ssl_cert_issued.state %}
          
          {% set Y=(str|regex_findall_index('[0-9]{4}',0)).replace('','') %}
@@ -73,7 +73,7 @@
     sensors:
       ha_ssl_cert_expiry:
         value_template: >-
-         {% set alias={"Jan":"01", "Feb":"02", "Mar":"03","Apr":"04", "May":"05", "Jun":"06","Jul":"07", "Aug":"08", "Sep":"09","Oct":"10", "Nov":"11", "Dec":"12"} %}
+         {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
          {% set str=states.sensor.ha_ssl_cert_issued.state %}
          
          {% set Y=(str|regex_findall_index('[0-9]{4}',0)).replace('','') %}

@@ -11,12 +11,15 @@
       - service: light.turn_on
         data:
           entity_id: light.living_room
+      - delay: 2
       - condition: template # Duc is home
-        value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
-      - service: script.desktop_wol
-      - condition: template # pc not yet on
-#        value_template: "{{ is_state('binary_sensor.desktop_connected', 'off') }}"
+#        value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
         value_template: "{{ is_state('switch.momentary_tv_enable', 'on') }}"
+
+      - service: script.desktop_wol
+#      - condition: template # pc not yet on
+#        value_template: "{{ is_state('binary_sensor.desktop_connected', 'off') }}"
+#        value_template: "{{ is_state('switch.momentary_tv_enable', 'on') }}"
       - service: switch.turn_on
         data:
           entity_id: switch.jcom_tv
