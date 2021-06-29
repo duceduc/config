@@ -48,6 +48,42 @@
         - cover.fr_curtains
 
 
+
+#########################################################
+#                                                                                                              #
+#             Motion Light Trigger                                                                      #
+#                                                                                                              #
+#########################################################
+## TEST##
+
+- alias: 'motion Livingroom Lights On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sr_occupancy
+      to: 'on'
+  action:  
+    - service: light.turn_on
+      data:
+        entity_id: light.l_2
+
+
+- alias: 'motion Livingroom Lights Off'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sr_occupancy
+      to: 'off'
+      for:
+       seconds: 15      
+  action:  
+    - service: light.turn_off
+      data:
+        entity_id: light.l_2
+
+
+
+
+
+
 #########################################################
 #                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #

@@ -23,6 +23,24 @@
     entity_id: sensor.ms2_updates
     upper: 0.5
 
+
+#########################################################
+#                                                                                                              #
+#            Motion Sensors                                                                              #
+#                                                                                                              #
+#########################################################
+
+  - platform: mqtt
+    name: "Motion SR Occupancy"
+    state_topic: "esphome/sensor/pir01_sr"
+    value_template: "{{ value }}"
+    payload_on: 1
+    payload_off: 0
+#    device_class: "connectivity"
+
+
+
+
 #########################################################
 #                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #

@@ -104,20 +104,26 @@
 
 #########################################################
 #                                                                                                              #
-#             Guest Trigger                                                                               #
+#             Momentary Switch Trigger                                                               #
 #                                                                                                              #
 #########################################################
 
-- alias: guest trigger
+- alias: Momentary Switch Trigger
   trigger:
      - platform: state
        entity_id:
         - group.guest_presence
+        - binary_sensor.duc_presence
        to: 'on'
   action:
     - service: switch.turn_on
       data:
-        entity_id: switch.momentary_activate_guest
+        entity_id: >-
+          {% if is_state('binary_sensor.duc_presence', 'on') %}
+             switch.momentary_tv_enable
+          {% else %}
+             switch.momentary_activate_guest
+          {% endif %}
 
 #########################################################
 #                                                                                                              #
@@ -161,11 +167,6 @@
           before: '18:30:00'
     - service: script.turn_on_lr_lights
 
-    - condition: template # Turn Tv only for Duc
-      value_template: "{{ trigger.to_state.attributes.friendly_name == 'Duc' }}"
-    - service: switch.turn_on
-      data:
-        entity_id: switch.momentary_tv_enable
 
 #########################################################
 #                                                                                                              #
