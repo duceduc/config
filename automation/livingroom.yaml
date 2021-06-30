@@ -73,7 +73,7 @@
       entity_id: binary_sensor.motion_sr_occupancy
       to: 'off'
       for:
-       seconds: 15      
+       seconds: 15     
   action:  
     - service: light.turn_off
       data:

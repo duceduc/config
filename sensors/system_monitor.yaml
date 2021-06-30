@@ -18,6 +18,10 @@
         column: 'value'
         unit_of_measurement: MB
 
+  - platform: filesize
+    file_paths:
+      - /config/home-assistant_v2.db
+
 # HA Servers
   - platform: systemmonitor
     resources:

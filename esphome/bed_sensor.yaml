@@ -56,7 +56,7 @@ binary_sensor:
    - platform: esp32_touch
      name: 'Top'
      pin: GPIO14
-     threshold: 29
+     threshold: 30
      id: top
      filters:
        - delayed_off: 1s
