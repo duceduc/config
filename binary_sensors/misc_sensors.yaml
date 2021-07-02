@@ -31,8 +31,8 @@
 #########################################################
 
   - platform: mqtt
-    name: "Motion SR Occupancy"
-    state_topic: "esphome/sensor/pir01_sr"
+    name: "motion lr occupancy"
+    state_topic: "esphome/sensor/pir01_lr"
     value_template: "{{ value }}"
     payload_on: 1
     payload_off: 0

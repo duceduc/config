@@ -2,3 +2,6 @@
 # Bedtime Looper
   looper:
     duration: '00:15:00'
+
+  motion_lr:
+    duration: '00:10:00'
