@@ -15,21 +15,21 @@
         data_template:
           title: "Morning Briefing"
           message: >
-                    <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-                    <br>
-                    <b> Today's Weather </b> <br>
-                    The current temperature is {{state_attr('weather.weatherbit_shimotoda', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].temperature }}. <br>
-                    The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
-                    <br>
-                    <b> Holiday's & Birthdays </b> <br>
-                    {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states.sensor.holiday.state}}.{% endif %} <br>
-                    {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states.sensor.holidaytomorrow.state}}.{% endif %} <br>
-                    {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states.sensor.holidayinaweek.state}} is in one week.{% endif %} <br>
-                    <br>
-                    <b> A Picture of Us! </b>
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            <b> Today's Weather </b> <br>
+            The current temperature is {{state_attr('weather.weatherbit_shimotoda', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].temperature }}. <br>
+            The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
+            <br>
+            <b> Holiday's & Birthdays </b> <br>
+            {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states.sensor.holiday.state}}.{% endif %} <br>
+            {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states.sensor.holidaytomorrow.state}}.{% endif %} <br>
+            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states.sensor.holidayinaweek.state}} is in one week.{% endif %} <br>
+            <br>
+            <b> A Picture of Us! </b>
           data:
             images:
-              - /config/www/img/private/{{ range(1, 25) | random }}.jpg 
+            - /config/www/img/private/{{ range(1, 25) | random }}.jpg 
 
   - alias: "Morning Briefing Eri"
     initial_state: true
@@ -41,21 +41,52 @@
         data_template:
           title: "Morning Briefing"
           message: >
-                    <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-                    <br>
-                    <b> Today's Weather </b> <br>
-                    The current temperature is {{state_attr('weather.weatherbit_shimotoda', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].temperature }}. <br>
-                    The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
-                    <br>
-                    <b> Holiday's & Birthdays </b> <br>
-                    {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states.sensor.holiday.state}}.{% endif %} <br>
-                    {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states.sensor.holidaytomorrow.state}}.{% endif %} <br>
-                    {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states.sensor.holidayinaweek.state}} is in one week.{% endif %} <br>
-                    <br>
-                    <b> A Picture of Us! </b>
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            <b> Today's Weather </b> <br>
+            The current temperature is {{state_attr('weather.weatherbit_shimotoda', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].temperature }}. <br>
+            The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
+            <br>
+            <b> Holiday's & Birthdays </b> <br>
+            {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states.sensor.holiday.state}}.{% endif %} <br>
+            {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states.sensor.holidaytomorrow.state}}.{% endif %} <br>
+            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states.sensor.holidayinaweek.state}} is in one week.{% endif %} <br>
+            <br>
+            <b> A Picture of Us! </b>
           data:
             images:
-              - /config/www/img/private/{{ range(1, 25) | random }}.jpg 
+            - /config/www/img/private/{{ range(1, 25) | random }}.jpg 
+
+
+
+
+
+  - alias: 'livingroom motion triggered'
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.motion_lr_occupancy
+        to: 'on'
+        for:
+          seconds: 10
+    condition:
+      - condition: template # Someone is home
+        value_template: "{{ is_state('input_select.home_mode', 'Away') }}"
+    action:
+      - service: notify.home_assistant
+        data_template:
+          title: "House Motion Triggered"
+          message: >
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            <b> Motion Triggered  </b> <br>
+            No no one is home and the Livingroom motion has been triggered.
+            <br>
+          data:
+            images: []
+
+
+
+
 
 
 ####################################################

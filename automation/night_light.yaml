@@ -5,7 +5,7 @@
 #########################################################
 
 
-- alias: 'turn on night light'
+- alias: 'night light on'
   trigger:
   - platform: time
     at: '23:30:00'
@@ -18,7 +18,7 @@
       data:
         brightness: 10
 
-- alias: 'turn off night light'
+- alias: 'night light off'
   trigger:
   - platform: state
     entity_id: sensor.period_of_the_day
@@ -32,6 +32,8 @@
       value_template: "{{ not is_state('light.ntl_1', 'off') }}"
   action:
     - service: script.returntonormal
+      data:
+        entity: light.ntl_1
 
 
 #########################################################
