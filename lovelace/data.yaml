@@ -97,16 +97,6 @@ cards:
   - type: custom:decluttering-card
     template: server_tpl
     variables:
-      - title: sb1
-      - entity_1: sensor.sb1_memory_use
-      - entity_2: sensor.sb1_disk_use
-      - entity_3: sensor.sb1_cpu_usage
-      - entity_4: sensor.sb1_temperature
-
-
-  - type: custom:decluttering-card
-    template: server_tpl
-    variables:
       - title: desktop
       - entity_1: sensor.desktop_fddl8i4_memory_usage
       - entity_2: sensor.desktop_fddl8i4_storage_c_usage

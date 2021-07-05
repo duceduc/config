@@ -68,8 +68,7 @@ cards:
         name: MS1 Server
       - entity: sensor.ms2_wifi_strength
         name: MS2 Server
-      - entity: sensor.sb1_wifi_strength
-        name: SB1 Server
+
     severity:
       - color: var(--label-badge-green)
         from: -67
