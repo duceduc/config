@@ -57,38 +57,6 @@
             images:
             - /config/www/img/private/{{ range(1, 25) | random }}.jpg 
 
-
-
-
-
-  - alias: 'livingroom motion triggered'
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.motion_lr_occupancy
-        to: 'on'
-        for:
-          seconds: 10
-    condition:
-      - condition: template # Someone is home
-        value_template: "{{ is_state('input_select.home_mode', 'Away') }}"
-    action:
-      - service: notify.home_assistant
-        data_template:
-          title: "House Motion Triggered"
-          message: >
-            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-            <br>
-            <b> Motion Triggered  </b> <br>
-            No no one is home and the Livingroom motion has been triggered.
-            <br>
-          data:
-            images: []
-
-
-
-
-
-
 ####################################################
 #                                                                                                    #
 #           END OF CONFIGURATION FILE                                                  #

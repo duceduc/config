@@ -57,6 +57,7 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
+    - delay: 1
     - service: script.holdpress_bot
       data:
         bot: '24hr_fan'

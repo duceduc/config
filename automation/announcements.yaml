@@ -120,8 +120,8 @@
       data:
         entity_id: >-
           {% if is_state('binary_sensor.duc_presence', 'on') %}
-             switch.momentary_tv_enable
-          {% else %}
+             switch.momentary_activate_tv
+          {% elif is_state('group.guest_presence', 'on') %}
              switch.momentary_activate_guest
           {% endif %}
 

@@ -12,7 +12,7 @@
           entity_id: light.living_room
       - delay: 1
       - condition: template # Turn on pc/tv only if Duc is home
-        value_template: "{{ is_state('switch.momentary_tv_enable', 'on') }}"
+        value_template: "{{ is_state('switch.momentary_activate_tv', 'on') }}"
       - service: script.desktop_wol
       - service: switch.turn_on
         data:

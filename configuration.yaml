@@ -59,6 +59,8 @@ homeassistant:
   internal_url: !secret internal_url
   customize: !include customize.yaml
   packages: !include_dir_named integrations
+  allowlist_external_dirs:
+    - '/config'
 
 # https://community.home-assistant.io/t/reverse-proxy-error/312936
 http:
