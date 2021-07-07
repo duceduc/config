@@ -12,8 +12,7 @@
       from: 'off'
       to: 'on'
   action:
-    - service: script.turn_on
-      entity_id: script.light_loop
+    - service: script.light_loop
 
 - alias: 'turn off light flash'
   trigger:
@@ -22,7 +21,7 @@
       from: 'on'
       to: 'off'
   action:
-    - service: script.turn_off
+    - service: homeassistant.turn_off
       entity_id: script.light_loop, script.light_flash
 
 

@@ -20,32 +20,51 @@
 
 #########################################################
 #                                                                                                              #
-#             Livingroom Motion Triggered                                                            #
+#             Alarm Triggered                                                                            #
 #                                                                                                              #
 #########################################################
 
-- alias: 'livingroom motion triggered'
+- alias: 'Trigger alarm while armed away'
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_lr_occupancy
       to: 'on'
-      for:
-        seconds: 10
   condition:
-    - condition: template # Someone is home
-      value_template: "{{ is_state('input_select.home_mode', 'Away') }}"
+    - condition: template 
+      value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"
   action:
+    - service: script.alarm_light_flash
+
     - service: notify.home_assistant
       data_template:
-        title: "House Motion Triggered"
+        title: "Alarm Triggered Notification"
         message: >
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          <b> Motion Triggered  </b> <br>
-          Livingroom motion has been triggered and no one is home.
+          <b> Alarm Motion Triggered  </b> <br>
+          Livingroom motion sensor has been triggered and no one is home.
           <br>
         data:
           images: []
+
+
+
+- alias: 'Return Alarm Light to normal when alarm is Disarmed'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.home_alarm
+      to: "disarmed"
+  action:
+    - service: script.returntonormal
+      data:
+        entity: light.m_2
+
+
+
+
+
+
+
 
 #########################################################
 #                                                                                                              #

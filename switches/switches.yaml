@@ -13,7 +13,7 @@
   - platform: momentary
     name: Activate Tv
     mode: on
-    toggle_for: 10
+    toggle_for: 8
     cancellable: True
 
 ####################################################

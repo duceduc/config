@@ -86,6 +86,27 @@
           kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
 
+
+#########################################################
+#                                                                                                              #
+#             Alarm Light Flash                                                                          #
+#                                                                                                              #
+#########################################################
+
+  alarm_light_flash:
+    sequence:
+      - repeat:
+          until:
+            - condition: template
+              value_template: "{{ is_state('alarm_control_panel.home_alarm', 'disarmed') }}"
+          sequence:
+            - service: light.toggle
+              data:
+                entity_id: light.m_2
+                color_name: red
+                brightness: 254
+            - delay: 2
+
 #########################################################
 #                                                                                                              #
 #             Excercise Light Flash                                                                      #
@@ -306,6 +327,8 @@
       - service: light.turn_on
         data:
           entity_id: '{{ entity }}'
+          rgb_color: [255,222,8]
+#          color_name: white
           brightness: 254
 
 #########################################################

@@ -142,6 +142,14 @@ rest:
 #                                                                                                              #
 #########################################################
 
+alarm_control_panel:
+  - platform: manual
+    name: Home Alarm
+    code: !secret alarm_code
+    arming_time: 30
+    delay_time: 30
+    trigger_time: 1
+
 alexa_media:
   accounts:
     - email: !secret amazon_user
@@ -204,6 +212,7 @@ input_text:
     name: Alexa Actionable Notification Holder
     max: 255
     initial: '{"text": "This is a test of the alexa actions custom skill. Did it work?", "event": "actionable.skill.test"}'
+
 
 #################
   status_fan_speed:
