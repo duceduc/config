@@ -11,6 +11,10 @@ icon: mdi:weather-partly-snowy-rainy
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
 
+  - type: alarm-panel
+    entity: alarm_control_panel.home_alarm
+    states: 
+      - arm_away
 
   - type: weather-forecast
     name: Kawaguchi
@@ -32,20 +36,13 @@ cards:
         name: Sun Elevation
         icon: mdi:weather-sunset
 
+
   - type: picture-entity
     title: Cam
     show_header_toggle: false
     aspect_ratio: 16x9
     entity: camera.security
     camera_view: live
-
-
-  - type: alarm-panel
-    entity: alarm_control_panel.home_alarm
-    states: 
-      - arm_away
-
-
 
 
 ####################################################

@@ -10,6 +10,12 @@ icon: mdi:bed-empty
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
 
+
+
+
+
+
+
   - type: custom:decluttering-card
     template: aircon_tpl
     variables:
@@ -20,78 +26,8 @@ cards:
       - entity_3: sensor.livingroom_humidity
       - entity_4: sensor.lr_condensation_chance
 
-  - type: custom:decluttering-card
-    template: aircon_tpl
-    variables:
-      - title: Master Room Aircon Controls
-      - room: mr
-      - entity_1: input_select.mr_ac_mode
-      - entity_2: sensor.master_room_temperature
-      - entity_3: sensor.master_room_humidity
-      - entity_4: sensor.mr_condensation_chance
 
-  - type: custom:decluttering-card
-    template: aircon_tpl
-    variables:
-      - title: Shion Room Aircon Controls
-      - room: sr
-      - entity_1: input_select.sr_ac_mode
-      - entity_2: sensor.shion_room_temperature
-      - entity_3: sensor.shion_room_humidity
-      - entity_4: sensor.sr_condensation_chance
 
-  - type: vertical-stack
-    cards:
-      - type: custom:stack-in-card
-        mode: horizontal
-        title: Living Room Lights
-        cards:
-          - type: light
-            entity: light.living_room
-            icon: mdi:lightbulb-outline
-            name: Sofa
-          - type: light
-            entity: light.living_room
-            icon: mdi:lightbulb-outline
-            name: Movie Mode
-          - type: light
-            entity: light.ceiling_fan_lights
-            icon: mdi:lightbulb-outline
-            name: Dining Table
-
-      - type: custom:stack-in-card
-        mode: horizontal
-        title: Computer Room 
-        cards:
-          - type: light
-            entity: light.computer_room
-            name: Work 
-            icon: mdi:lightbulb-outline
-          - type: light
-            entity: light.c_1
-            name: Movie
-            icon: mdi:lightbulb-outline
-          - type: light
-            entity: light.computer_room
-            name: Nap 
-            icon: mdi:lightbulb-outline
-
-      - type: custom:stack-in-card
-        mode: horizontal
-        title: Kitchen Island
-        cards:
-          - type: light
-            entity: light.kitchen
-            name: Island 
-            icon: mdi:lightbulb-outline
-          - type: light
-            entity: light.counter
-            name: Counter Lights
-            icon: mdi:lightbulb-outline
-          - type: light
-            entity: light.cabinet
-            name: Cabinent 
-            icon: mdi:lightbulb-outline
 
   - type: vertical-stack
     cards:
@@ -112,6 +48,64 @@ cards:
             icon: mdi:lightbulb-outline
             name: Floor Lamp
 
+
+
+
+
+  - type: vertical-stack
+    cards:
+      - type: custom:stack-in-card
+        mode: horizontal
+        title: Living Room Lights
+        cards:
+          - type: light
+            entity: light.living_room
+            icon: mdi:lightbulb-outline
+            name: Sofa
+          - type: light
+            entity: light.living_room
+            icon: mdi:lightbulb-outline
+            name: Movie Mode
+          - type: light
+            entity: light.ceiling_fan_lights
+            icon: mdi:lightbulb-outline
+            name: Dining Table
+      - type: custom:stack-in-card
+        mode: horizontal
+        title: Computer Room 
+        cards:
+          - type: light
+            entity: light.computer_room
+            name: Work 
+            icon: mdi:lightbulb-outline
+          - type: light
+            entity: light.c_1
+            name: Movie
+            icon: mdi:lightbulb-outline
+          - type: light
+            entity: light.computer_room
+            name: Nap 
+            icon: mdi:lightbulb-outline
+      - type: custom:stack-in-card
+        mode: horizontal
+        title: Kitchen Island
+        cards:
+          - type: light
+            entity: light.kitchen
+            name: Island 
+            icon: mdi:lightbulb-outline
+          - type: light
+            entity: light.counter
+            name: Counter Lights
+            icon: mdi:lightbulb-outline
+          - type: light
+            entity: light.cabinet
+            name: Cabinent 
+            icon: mdi:lightbulb-outline
+
+
+
+
       - type: custom:stack-in-card
         mode: horizontal
         title: Shion Room Lights
@@ -128,6 +122,35 @@ cards:
             entity: light.shion_room
             name: Study
             icon: mdi:lightbulb-outline
+
+
+
+
+  - type: custom:decluttering-card
+    template: aircon_tpl
+    variables:
+      - title: Shion Room Aircon Controls
+      - room: sr
+      - entity_1: input_select.sr_ac_mode
+      - entity_2: sensor.shion_room_temperature
+      - entity_3: sensor.shion_room_humidity
+      - entity_4: sensor.sr_condensation_chance
+
+
+
+
+  - type: custom:decluttering-card
+    template: aircon_tpl
+    variables:
+      - title: Master Room Aircon Controls
+      - room: mr
+      - entity_1: input_select.mr_ac_mode
+      - entity_2: sensor.master_room_temperature
+      - entity_3: sensor.master_room_humidity
+      - entity_4: sensor.mr_condensation_chance
+
+
+
 
   - type: 'custom:vertical-stack-in-card'
     cards:
@@ -162,6 +185,7 @@ cards:
             type: 'custom:fold-entity-row'
         show_header_toggle: false
         type: entities
+
 
   - type: entities
     title: TV and Stereo Controls
@@ -198,6 +222,22 @@ cards:
         name: 30 Seconds Timer
       - entity: input_select.exercise_select
         icon: mdi:bed-empty
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

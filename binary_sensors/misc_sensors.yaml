@@ -36,7 +36,7 @@
     value_template: "{{ value }}"
     payload_on: 1
     payload_off: 0
-    device_class: "connectivity"
+    device_class: "motion"
 
 
 

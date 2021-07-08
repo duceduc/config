@@ -9,6 +9,8 @@ path: data
 icon:  mdi:home-analytics
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
+
+
   - type: custom:decluttering-card
     template: four_sensors_tpl
     variables:
@@ -23,6 +25,15 @@ cards:
       - name_4: Shion
 
   - type: custom:decluttering-card
+    template: server_tpl
+    variables:
+      - title: ns1
+      - entity_1: sensor.ns1_memory_use
+      - entity_2: sensor.ns1_disk_use
+      - entity_3: sensor.ns1_cpu_usage
+      - entity_4: sensor.ns1_temperature
+
+  - type: custom:decluttering-card
     template: three_sensors_tpl
     variables:
       - title: Home Status
@@ -32,7 +43,6 @@ cards:
       - name_2: Status
       - entity_3: sensor.guest_mode
       - name_3: Guest
-
 
   - type: custom:decluttering-card
     template: five_sensors_tpl
@@ -48,33 +58,6 @@ cards:
       - name_4: Washroom
       - entity_5: sensor.kitchen
       - name_5: Kitchen
-
-  - type: custom:decluttering-card
-    template: server_tpl
-    variables:
-      - title: ws1
-      - entity_1: sensor.ws1_memory_use
-      - entity_2: sensor.ws1_disk_use
-      - entity_3: sensor.ws1_cpu_usage
-      - entity_4: sensor.ws1_temperature
-
-  - type: custom:decluttering-card
-    template: server_tpl
-    variables:
-      - title: ns1
-      - entity_1: sensor.ns1_memory_use
-      - entity_2: sensor.ns1_disk_use
-      - entity_3: sensor.ns1_cpu_usage
-      - entity_4: sensor.ns1_temperature
-
-  - type: custom:decluttering-card
-    template: server_tpl
-    variables:
-      - title: ps1
-      - entity_1: sensor.ps1_memory_use
-      - entity_2: sensor.ps1_disk_use
-      - entity_3: sensor.ps1_cpu_usage
-      - entity_4: sensor.ps1_temperature
 
   - type: custom:decluttering-card
     template: server_tpl
@@ -97,12 +80,33 @@ cards:
   - type: custom:decluttering-card
     template: server_tpl
     variables:
+      - title: ws1
+      - entity_1: sensor.ws1_memory_use
+      - entity_2: sensor.ws1_disk_use
+      - entity_3: sensor.ws1_cpu_usage
+      - entity_4: sensor.ws1_temperature
+
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
+      - title: ps1
+      - entity_1: sensor.ps1_memory_use
+      - entity_2: sensor.ps1_disk_use
+      - entity_3: sensor.ps1_cpu_usage
+      - entity_4: sensor.ps1_temperature
+
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
       - title: desktop
       - entity_1: sensor.desktop_fddl8i4_memory_usage
       - entity_2: sensor.desktop_fddl8i4_storage_c_usage
       - entity_3: sensor.desktop_fddl8i4_cpu_usage
       - entity_4: sensor.desktop_cpu_temperature
 
+
+
+###################
 
   - type: entities
     title: Server Load
@@ -147,7 +151,6 @@ cards:
       - name_4: Bottle
       - entity_5: sensor.pet_clothes_recycle
       - name_5: Clothes
-
 
   - type: vertical-stack
     cards:
@@ -237,6 +240,9 @@ cards:
           }
 
 
+
+
+
   - type: vertical-stack
     cards:
       - type: entities
@@ -281,6 +287,7 @@ cards:
             icon: mdi:lightbulb
 
 
+
   - type: entities
     title: Other Automations
     show_header_toggle: false
@@ -319,6 +326,16 @@ cards:
       - entity: switch.esphome
         name: ESPHome
         icon: mdi:server-plus
+
+
+
+
+
+
+
+
+
+
 
 
 
