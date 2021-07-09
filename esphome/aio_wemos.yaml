@@ -1,0 +1,58 @@
+# ESP8266 D1 Mini
+esphome:
+  name: aio_wemos
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  ssid: 'rice_dwarf'
+  password: !secret ssid_pass
+  manual_ip:
+    static_ip: 192.168.1.95
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
+
+captive_portal:
+
+logger:
+
+# Uncomment this if you use Home Assistant
+api:
+  password: !secret ota_pass
+ota:
+  password: !secret ota_pass
+
+# Sensors
+sensor:
+  - platform: dht
+    temperature:
+      name: 'MR Temperature'
+    humidity:
+      name: 'MR Humidity'
+    model: AM2302
+    update_interval: 60s
+    pin: D6
+
+  - platform: dht
+    temperature:
+      name: 'OST Temperature'
+    humidity:
+      name: 'OST Humidity'
+    model: AM2302
+    update_interval: 60s
+    pin: D7
+
+  - platform: wifi_signal
+    name: $name WiFi Signal
+
+binary_sensor:
+  - platform: status
+    name: MR Sensor Status
+  - platform: status
+    name: $name Sensor Status
+
+  - platform: gpio
+    pin: D5
+    name: 'Motion MR Occupancy'
+    device_class: motion
+

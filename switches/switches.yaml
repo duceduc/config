@@ -7,13 +7,13 @@
   - platform: momentary
     name: Activate Guest
     mode: on
-    toggle_for: 10
+    toggle_for: 15
     cancellable: True
 
   - platform: momentary
     name: Activate Tv
     mode: on
-    toggle_for: 10
+    toggle_for: 15
     cancellable: True
 
 ####################################################

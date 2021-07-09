@@ -37,8 +37,8 @@
           - sensor.floor_heat_battery
           - sensor.hallway_door_battery
           - sensor.genkan_door_battery
-          - sensor.cr_curtain_batteries
-          - sensor.lr_curtain_batteries
+#          - sensor.cr_curtain_batteries
+#          - sensor.lr_curtain_batteries
         below: 9
     action:
       service: notify.notify_events
