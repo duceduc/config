@@ -1,8 +1,13 @@
-# ESP8266 D1 Mini
-esphome:
+# ESP8266 Uno [8C:AA:B5:79:83:92]
+substitutions:
   name: aio_wemos
   platform: ESP8266
   board: d1_mini
+
+esphome:
+  name: $name
+  platform: $platform
+  board: $board
 
 wifi:
   ssid: 'rice_dwarf'
@@ -25,31 +30,39 @@ ota:
 # Sensors
 sensor:
   - platform: dht
+    model: AM2302
+    pin: D6
     temperature:
       name: 'MR Temperature'
     humidity:
       name: 'MR Humidity'
-    model: AM2302
     update_interval: 60s
-    pin: D6
 
   - platform: dht
+    model: AM2302
+    pin: D7
     temperature:
       name: 'OST Temperature'
     humidity:
       name: 'OST Humidity'
-    model: AM2302
     update_interval: 60s
-    pin: D7
 
   - platform: wifi_signal
     name: $name WiFi Signal
 
+  - platform: adc
+    pin: A0
+    name: 'OST Illuminance'
+    unit_of_measurement: lux
+    update_interval: 60s
+#    filters:
+#      - lambda: (x * 3.3 / 10000.0) * 2000000.0
+
 binary_sensor:
   - platform: status
-    name: MR Sensor Status
+    name: MR DHT Sensor Status
   - platform: status
-    name: $name Sensor Status
+    name: OST DHT Sensor Status
 
   - platform: gpio
     pin: D5

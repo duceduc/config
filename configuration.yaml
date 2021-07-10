@@ -202,6 +202,10 @@ counter:
   dining_lights_toggle:
     initial: 1
     step: 1
+#Glade
+  glade_airfreshner:
+    step: 1
+    icon: mdi:spray
 
 input_text:
   slack_app_verification_token:
