@@ -16,7 +16,8 @@ wifi:
     static_ip: 192.168.1.95
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-
+#  output_power : 10db
+  
 captive_portal:
 
 logger:
