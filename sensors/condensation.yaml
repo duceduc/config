@@ -9,15 +9,15 @@
     name: Lr Condensation Chance
     indoor_temp_sensor: sensor.livingroom_temperature
     indoor_humidity_sensor: sensor.livingroom_humidity
-    outdoor_temp_sensor: sensor.outside_temperature
+    outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.4
     
 # MR Mold Chance
   - platform: mold_indicator
     name: Mr Condensation Chance
-    indoor_temp_sensor: sensor.master_room_temperature
-    indoor_humidity_sensor: sensor.master_room_humidity
-    outdoor_temp_sensor: sensor.outside_temperature
+    indoor_temp_sensor: sensor.mr_temperature
+    indoor_humidity_sensor: sensor.mr_humidity
+    outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 2.4
     
 # SR Mold Chance
@@ -25,7 +25,7 @@
     name: Sr Condensation Chance
     indoor_temp_sensor: sensor.shion_room_temperature
     indoor_humidity_sensor: sensor.shion_room_humidity
-    outdoor_temp_sensor: sensor.outside_temperature
+    outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.4
 
 # MDF Mold Chance
@@ -33,7 +33,7 @@
     name: MDF Condensation Chance
     indoor_temp_sensor: sensor.mdf_temperature
     indoor_humidity_sensor: sensor.mdf_humidity
-    outdoor_temp_sensor: sensor.outside_temperature
+    outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 2.8
 
 # Genkan Mold Chance
@@ -41,7 +41,7 @@
     name: Genkan Condensation Chance
     indoor_temp_sensor: sensor.meter_temperature
     indoor_humidity_sensor: sensor.meter_humidity
-    outdoor_temp_sensor: sensor.outside_temperature
+    outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.1
 
 

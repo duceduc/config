@@ -1,10 +1,9 @@
-# ESP8266 Uno [8C:AA:B5:79:83:92]
+# ESP8266 NodeMCU....
+# [50:02:91:FD:4B:26]
 substitutions:
-  name: aio_wemos
+  name: lr_sensor
   platform: ESP8266
-  board: d1_mini
-  oa: oa
-  mr: mr
+  board: nodemcuv2
 
 esphome:
   name: $name
@@ -15,10 +14,10 @@ wifi:
   ssid: 'rice_dwarf'
   password: !secret ssid_pass
   manual_ip:
-    static_ip: 192.168.1.95
+    static_ip: 192.168.1.96
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-#  output_power : 10db
+  output_power : 10db
   
 captive_portal:
 
@@ -34,20 +33,11 @@ ota:
 sensor:
   - platform: dht
     model: AM2302
-    pin: D6
+    pin: D4
     temperature:
-      name: '$mr temperature'
+      name: 'lr temperature'
     humidity:
-      name: '$mr humidity'
-    update_interval: 60s
-
-  - platform: dht
-    model: AM2302
-    pin: D7
-    temperature:
-      name: '$oa temperature'
-    humidity:
-      name: '$oa humidity'
+      name: 'lr humidity'
     update_interval: 60s
 
   - platform: wifi_signal
@@ -55,21 +45,18 @@ sensor:
 
   - platform: adc
     pin: A0
-    name: 'rear Illuminance'
+    name: 'front illuminance'
     unit_of_measurement: lux
     update_interval: 60s
-
 #    filters:
 #      - lambda: (x * 3.3 / 10000.0) * 2000000.0
 
 binary_sensor:
   - platform: status
-    name: $mr dht sensor status
-  - platform: status
-    name: $oa dht sensor status
+    name: $name dht Status
 
   - platform: gpio
-    pin: D5
-    name: 'motion $mr occupancy'
+    pin: D8
+    name: 'motion lr occupancy'
     device_class: motion
 

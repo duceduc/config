@@ -145,8 +145,8 @@ cards:
       - title: Master Room Aircon Controls
       - room: mr
       - entity_1: input_select.mr_ac_mode
-      - entity_2: sensor.master_room_temperature
-      - entity_3: sensor.master_room_humidity
+      - entity_2: sensor.mr_temperature
+      - entity_3: sensor.mr_humidity
       - entity_4: sensor.mr_condensation_chance
 
 

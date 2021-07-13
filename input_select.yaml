@@ -33,8 +33,8 @@
       - sensor.livingroom_humidity
       - sensor.shion_room_temperature
       - sensor.shion_room_humidity
-      - sensor.master_room_temperature
-      - sensor.master_room_humidity
+      - sensor.mr_temperature
+      - sensor.mr_humidity
       - sensor.genkan_temperature
       - sensor.genkan_humidity
       - sensor.mdf_temperature
