@@ -27,10 +27,10 @@
       - switch.ac_mr_unit
       - switch.ac_sr_unit
       - sensor.outside_temperature
-      - sensor.livingroom_temperature
+      - sensor.lr_temperature
       - group.bed_sensors
       - sensor.outside_humidity
-      - sensor.livingroom_humidity
+      - sensor.lr_humidity
       - sensor.shion_room_temperature
       - sensor.shion_room_humidity
       - sensor.mr_temperature
@@ -53,7 +53,7 @@
       - The (e01f) is turned (e01s)
       - The (e02f) is turned (e02s)
       - The current (e03f) is (e03$) degrees and the humidity is (e06$) percent # Outside Temp
-      - The current (e04f) is (e04S) and the humidity is (e07S) # Livingroom Temp
+      - The current livingroom temperature is (e04S) and the humidity is (e07S) # Livingroom Temp
       - The current (e10f) is (e10$) degrees and the humidity is (e11$) # Master Room Temp
       - The current (e12f) is (e12$) degrees the humidity is (e13$) percent # Hallway Temp
       - The current (e08f) is (e08$) degrees and the humidity is (e09$) percent # Shion Room Temp

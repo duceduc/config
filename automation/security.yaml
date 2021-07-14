@@ -84,6 +84,30 @@
         data:
           images: []
 
+- alias: 'ESP8266 Offline Notification'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.lr_sensor_dht_status
+      to: 'off'
+  action:
+    - service: notify.home_assistant
+      data_template:
+        title: "Livingroom ESP8266 Offline"
+        message: >
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          <b> LR ESP8266 Offline  </b> <br>
+          This email was send because the ESP8266 in the living room is offline
+          <br>
+        data:
+          images: []
+
+########################
+
+
+
+
+
 
 
 

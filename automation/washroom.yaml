@@ -93,7 +93,7 @@
       value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
     - service: cover.open_cover
       entity_id:
-       - cover.living_room_curtains
+       - cover.lr_curtain_lt_curtain
 
 # Washing State
 - alias: Washer Operation

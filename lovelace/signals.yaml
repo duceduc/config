@@ -64,6 +64,8 @@ cards:
         name: ESP32 Bed Sensor
       - entity: sensor.aio_wemos_wifi_signal
         name: Aio Wemos
+      - entity: sensor.lr_sensor_wifi_signal
+        name: Livingroom Sensors
       - entity: sensor.ms1_wifi_strength
         name: MS1 Server
       - entity: sensor.ms2_wifi_strength
