@@ -186,15 +186,15 @@ cards:
             type: 'custom:fold-entity-row'
           - entities:
               - entity: sensor.motion_t1_battery
-                name: Toilet Light
+                name: Toilet Room
               - entity: sensor.motion_g1_battery
-                name: Genkan Light
-              - entity: sensor.motion_hallway_battery
-                name: Hallway Light
+                name: Genkan Area
               - entity: sensor.motion_k1_battery
-                name: Kitchen Lights
+                name: Kitchen Area
               - entity: sensor.motion_washroom_battery
-                name: Washroom Light
+                name: Wash Room
+              - entity: sensor.motion_hallway_battery
+                name: Hallway                   
             head:
               label: Motion Sensors
               type: section

@@ -1,7 +1,7 @@
 # ESP8266 NodeMCU....
-# [50:02:91:FD:4B:26]
+# [BC-DD-C2-7A-CC-B4]
 substitutions:
-  name: lr_sensor
+  name: sr_sensor
   platform: ESP8266
   board: nodemcuv2
 
@@ -16,10 +16,10 @@ wifi:
   fast_connect : true
   power_save_mode: none
   manual_ip:
-    static_ip: 192.168.1.96
+    static_ip: 192.168.1.89
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-  
+
 captive_portal:
 
 logger:
@@ -30,21 +30,12 @@ ota:
   password: !secret ota_pass
 
 sensor:
-  - platform: dht
-    model: AM2302
-    pin: D4
-    temperature:
-      name: 'lr temperature'
-    humidity:
-      name: 'lr humidity'
-    update_interval: 60s
-
   - platform: wifi_signal
     name: $name wifi signal
 
   - platform: adc
     pin: A0
-    name: 'front illuminance'
+    name: 'sr illuminance'
     unit_of_measurement: lux
     update_interval: 60s
 
@@ -53,7 +44,7 @@ binary_sensor:
     name: $name dht Status
 
   - platform: gpio
-    pin: D8
-    name: 'motion lr occupancy'
+    pin: D5
+    name: 'motion sr occupancy'
     device_class: motion
 

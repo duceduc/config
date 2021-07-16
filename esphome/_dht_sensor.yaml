@@ -13,7 +13,7 @@ wifi:
   password: !secret ssid_pass
   fast_connect : true
   manual_ip:
-    static_ip: 192.168.1.89
+    static_ip: 192.168.1.89 # <---- change to another ip. 89 in use
     subnet: 255.255.255.0
     gateway: 192.168.1.1
 
