@@ -1,7 +1,7 @@
 # ESP8266 NodeMCU....
 # [BC-DD-C2-7A-CC-B4]
 substitutions:
-  name: sr_sensor
+  name: toilet_airfreshener
   platform: ESP8266
   board: nodemcuv2
 
@@ -29,22 +29,22 @@ api:
 ota:
   password: !secret ota_pass
 
+switch:
+  - platform: gpio
+    name: $name
+    id: relay
+    pin: D4
+    icon: mdi:spray
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 12s
+      - switch.turn_off: relay
+
 sensor:
   - platform: wifi_signal
     name: $name wifi signal
 
-  - platform: adc
-    pin: A0
-    name: 'sr illuminance'
-    unit_of_measurement: lux
-    update_interval: 60s
-
 binary_sensor:
   - platform: status
-    name: $name dht Status
-
-  - platform: gpio
-    pin: D5
-    name: 'motion sr occupancy'
-    device_class: motion
+    name: $name status
 

@@ -12,7 +12,7 @@
       to: 'on'
   action:
     - service: light.turn_on
-      entity_id: light.wash_room
+      entity_id: light.w_1
 
 - alias: 'motion washroom light off'
   trigger:
@@ -22,7 +22,7 @@
       for: 00:00:30
   action:
     - service_template: light.turn_{{ 'on' if is_state('light.shower_room', 'on') else 'off' }}
-      entity_id: light.wash_room
+      entity_id: light.w_1
 
 
 #########################################################

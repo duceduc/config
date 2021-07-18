@@ -18,6 +18,19 @@
     state_topic: 'switchbot/status/msg'
     value_template: '{{ value }}'
 
+
+####################################################
+#                                                                                                    #
+#                      Switchbot ESP32 Offline                                              #
+#                                                                                                    #
+####################################################
+
+  - platform: mqtt
+    name: 'Switchbot Devices Offline'
+    state_topic: 'switchbotmqtt/esp32/lastwill'
+    value_template: '{{ value }}'
+    icon: mdi:server-network-off
+
 ####################################################
 #                                                                                                    #
 #                      Switchbot Meter                                                        #

@@ -45,7 +45,7 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
     - service: switch.turn_on
-      entity_id: switch.floor_heat_switch
+      entity_id: switch.toilet_airfreshener
     - service: counter.increment
       target:
         entity_id: counter.glade_airfreshner

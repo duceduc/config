@@ -14,7 +14,7 @@
   action:  
   - service: light.turn_off
     data:
-      entity_id: light.storage_room
+      entity_id: light.str_1
 
 
 #########################################################
