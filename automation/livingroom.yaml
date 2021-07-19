@@ -57,17 +57,15 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance
-      above: 0.19
+      above: 0.15
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # not weekday
-      value_template: "{{ is_state('sensor.date_weekday', 'off') }}"
+#    - condition: template # not weekday
+#      value_template: "{{ is_state('sensor.date_weekday', 'off') }}"
   action:
-
     - service: light.turn_on
-      data:
-        entity_id: light.living_room
+      entity_id: light.living_room
 
 
 #########################################################

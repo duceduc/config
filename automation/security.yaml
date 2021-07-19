@@ -27,29 +27,29 @@
 - alias: 'Trigger alarm while armed away'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_lr_occupancy
+      entity_id: binary_sensor.motion_mr_occupancy
       to: 'on'
   condition:
     - condition: template 
       value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"
   action:
-#    - service: script.alarm_light_flash
+    - service: script.alarm_light_flash
 
     - service: notify.home_assistant
       data_template:
-        title: "Alarm Triggered Notification"
+        title: "{{ trigger.to_state.attributes.friendly_name }} Alarm Triggered Notification"
         message: >
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          <b> Alarm Motion Triggered  </b> <br>
-          Livingroom motion sensor has been triggered and no one is home.
+          <b> Motion Alarm Triggered  </b> <br>
+          The {{ trigger.to_state.attributes.friendly_name }} sensor has been triggered while no one is home.
           <br>
         data:
           images: []
 
 
 
-- alias: 'Return Alarm Light to normal when alarm is Disarmed'
+- alias: 'Return Alarm to normal when alarm Disarmed'
   trigger:
     - platform: state
       entity_id: alarm_control_panel.home_alarm
@@ -57,7 +57,7 @@
   action:
     - service: script.returntonormal
       data:
-        entity: light.m_2
+        entity: light.ntl_1
 
 
 
@@ -106,9 +106,6 @@
           images: []
 
 ########################
-
-
-
 
 
 

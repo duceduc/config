@@ -71,7 +71,7 @@ cards:
         name: Wash Room
       - entity: light.shower_room
         name: Shower Room
-      - entity: light.t_1
+      - entity: light.toilet
         name: Toilet
       - type: divider
       - entity: switch.24hr_fan

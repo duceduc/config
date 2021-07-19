@@ -102,7 +102,7 @@
           sequence:
             - service: light.toggle
               data:
-                entity_id: light.m_2
+                entity_id: light.ntl_1
                 color_name: red
                 brightness: 254
             - delay: 2
@@ -327,8 +327,8 @@
       - service: light.turn_on
         data:
           entity_id: '{{ entity }}'
-          rgb_color: [255,222,8]
-#          color_name: white
+#          rgb_color: [240,163,10]
+          kelvin: 2600
           brightness: 254
 
 #########################################################
