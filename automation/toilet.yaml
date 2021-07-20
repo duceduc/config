@@ -8,38 +8,42 @@
 - alias: 'motion toilet room light on'
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_t1_occupancy
+    entity_id: binary_sensor.motion_tr1_occupancy
     to: 'on'
   action:
     - service: light.turn_on
-      entity_id: light.t_1
+      entity_id: light.toilet
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.engage_toilet_airfreshner
 
 - alias: 'motion toilet room light off'
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_t1_occupancy
+    entity_id: binary_sensor.motion_tr1_occupancy
     to: 'off'
-    for: '00:00:31'
-  condition:
-    - condition: template # No guest
-      value_template: "{{not is_state('input_boolean.guest_mode', 'on') }}"
+    for: '00:01:30'
   action:
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.engage_toilet_airfreshner
+    - condition: template # If guest is present, do not turn off
+      value_template: "{{not is_state('input_boolean.guest_mode', 'on') }}"
     - service: light.turn_off
-      entity_id: light.t_1
+      entity_id: light.toilet
 
 
 #########################################################
 #                                                                                                              #
-#             Enable Air Freshner Enable                                                              #
+#             Engage Toilet Air Freshner                                                               #
 #                                                                                                              #
 #########################################################
 
-- alias: 'Enable Toilet Air freshner'
+- alias: 'Engage Toilet Air freshner'
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_t1_occupancy
+#    entity_id: binary_sensor.motion_t1_occupancy
+    entity_id: input_boolean.engage_toilet_airfreshner
     to: 'on'
-    for: '00:03:40'
+    for: '00:03:30'
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"

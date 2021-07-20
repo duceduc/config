@@ -80,7 +80,11 @@
      - light.h_1
      - binary_sensor.genkan_door
 
-
+  motion_kitchen_occupancy:
+    name: Motion Kitchen Occupancy
+    entities:
+      - binary_sensor.motion_k1_occupancy
+      - binary_sensor.motion_t1_occupancy
 
 
 #########################################################

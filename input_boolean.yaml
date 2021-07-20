@@ -102,5 +102,8 @@
     name: Status Fan Power
     icon: mdi:fan
 
-
+  engage_toilet_airfreshner:
+    name: engage toilet airfreshner
+    icon: mdi:spray  
+    initial: off
 

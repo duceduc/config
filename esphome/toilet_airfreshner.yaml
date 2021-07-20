@@ -48,3 +48,8 @@ binary_sensor:
   - platform: status
     name: $name status
 
+  - platform: gpio
+    pin: D5
+    name: 'motion tr1 occupancy'
+    device_class: motion
+

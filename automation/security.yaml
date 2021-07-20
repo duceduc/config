@@ -27,8 +27,11 @@
 - alias: 'Trigger alarm while armed away'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_mr_occupancy
+      entity_id: 
+       - binary_sensor.motion_mr_occupancy
+       - binary_sensor.motion_lr_occupancy
       to: 'on'
+
   condition:
     - condition: template 
       value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"

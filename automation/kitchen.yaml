@@ -1,13 +1,13 @@
 #########################################################
 #                                                                                                              #
-#             Kitchen Island                                                                              #
+#             Turn on Cabinent Lights                                                                 #
 #                                                                                                              #
 #########################################################
 
 - alias: 'motion kitchen lights on'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_k1_occupancy
+      entity_id: group.motion_kitchen_occupancy
       to: 'on'
   action:
     - service: light.turn_on
@@ -21,14 +21,14 @@
 
 #########################################################
 #                                                                                                              #
-#             Turn on All Lights Depend Time of Day                                              #
+#             Turn on All Lights                                                                          #
 #                                                                                                              #
 #########################################################
 
 - alias: 'motion kitchen all lights on'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_k1_occupancy
+      entity_id: group.motion_kitchen_occupancy
       to: 'on'
       for: '00:03:00'
   action:
@@ -52,7 +52,7 @@
 - alias: 'motion kitchen lights off'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_k1_occupancy
+      entity_id: group.motion_kitchen_occupancy
       to: 'off'
       for: '00:00:30'
   action:

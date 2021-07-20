@@ -46,9 +46,9 @@
     sensors:
       kitchen:
         value_template: >-
-         {% if is_state("binary_sensor.motion_k1_occupancy", "off") %}Closed{% else %}Open{% endif %}
+         {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.motion_k1_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
+         {% if is_state("group.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
 
   - platform: template
     sensors:
@@ -70,9 +70,9 @@
     sensors:
       toilet:
         value_template: >-
-         {% if is_state("binary_sensor.motion_t1_occupancy", "off") %}Off{% else %}On{% endif %}
+         {% if is_state("binary_sensor.motion_tr1_occupancy", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.motion_t1_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+         {% if is_state("binary_sensor.motion_tr1_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 
   - platform: template
     sensors:
