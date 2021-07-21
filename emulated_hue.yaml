@@ -58,35 +58,6 @@
       name: 'Ceiling Fan Running'
       hidden: false
 
-# Keep
-    switch.ac_lr_unit:
-      name: AC Livingroom
-      hidden: false      
-    switch.heater_lr_unit:
-      name: Heater Livingroom
-      hidden: false    
-    switch.humidifier_lr_unit:
-      name: Humidifier Livingroom
-      hidden: false
-    switch.ac_mr_unit:
-      name: AC Master Room
-      hidden: false
-    switch.heater_mr_unit:
-      name: Heater Master Room
-      hidden: false    
-    switch.humidifier_mr_unit:
-      name: Humidifier Master Room
-      hidden: false
-
-    switch.ac_sr_unit:
-      name: AC She On Room
-      hidden: false
-    switch.heater_sr_unit:
-      name: Heater She On Room
-      hidden: false    
-    switch.humidifier_sr_unit:
-      name: Humidifier She On Room
-      hidden: false
 
     switch.jcom_tv:
 #    jcom_tv_box: # mqtt
@@ -112,6 +83,43 @@
 
     switch.living_room_curtain:
       name: 'Living Room Curtains'
+      hidden: false
+
+
+#########################################################
+#                                                                                                              #
+#             Aircons                                                                                       #
+#                                                                                                              #
+#########################################################
+
+    switch.ac_lr_unit:
+      name: AC Livingroom
+      hidden: false      
+    switch.heater_lr_unit:
+      name: Heater Livingroom
+      hidden: false    
+    switch.humidifier_lr_unit:
+      name: Humidifier Livingroom
+      hidden: false
+
+    switch.ac_mr_unit:
+      name: AC Master Room
+      hidden: false
+    switch.heater_mr_unit:
+      name: Heater Master Room
+      hidden: false    
+    switch.humidifier_mr_unit:
+      name: Humidifier Master Room
+      hidden: false
+
+    switch.ac_sr_unit:
+      name: AC She On Room
+      hidden: false
+    switch.heater_sr_unit:
+      name: Heater She On Room
+      hidden: false    
+    switch.humidifier_sr_unit:
+      name: Humidifier She On Room
       hidden: false
 
 

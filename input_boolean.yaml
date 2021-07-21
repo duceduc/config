@@ -107,3 +107,34 @@
     icon: mdi:spray  
     initial: off
 
+
+  ac_lr_unit:
+    name: 'AC LR Unit'
+    icon: mdi:air-conditioner
+  heater_lr_unit:
+    name: 'Heater LR Unit'
+    icon: mdi:air-filter
+
+  ac_mr_unit:
+    name: 'AC MR Unit'
+    icon: mdi:air-conditioner
+  heater_mr_unit:
+    name: 'Heater MR Unit'
+    icon: mdi:air-filter
+
+  ac_sr_unit:
+    name: 'AC SR Unit'
+    icon: mdi:air-conditioner
+  heater_sr_unit:
+    name: 'Heater SR Unit'
+    icon: mdi:air-filter
+
+
+
+
+
+
+
+
+
+

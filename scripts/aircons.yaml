@@ -44,10 +44,16 @@
         - cool
         - temperature increase
         hold_secs: 6
+
   lr_ac_normal_cool:
     sequence:
-     - service: switch.turn_on
-       entity_id: switch.ac_lr_unit
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - cool
+
   lr_ac_silent_cool:
     sequence:
     - service: remote.send_command
@@ -71,10 +77,15 @@
     sequence:
      - service: switch.turn_on
        entity_id: switch.fan_lr_unit
+
   lr_ac_off:
     sequence:
-     - service: switch.turn_off
-       entity_id: switch.ac_lr_unit
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm4_remote
+        device: Living Room Aircon
+        command:
+        - 'off'
 
 # LR Toggle Script
   lr_ac_heat_toggle:
@@ -168,10 +179,16 @@
         - cool
         - temperature increase
         hold_secs: 6
+
   mr_ac_normal_cool:
     sequence:
-     - service: switch.turn_on
-       entity_id: switch.ac_mr_unit
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command:
+        - cool
+
   mr_ac_silent_cool:
     sequence:
     - service: remote.send_command
@@ -195,10 +212,16 @@
     sequence:
      - service: switch.turn_on
        entity_id: switch.fan_mr_unit
+
   mr_ac_off:
     sequence:
-     - service: switch.turn_off
-       entity_id: switch.ac_mr_unit
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command:
+        - 'off'
+
 
 #########################################################
 #                                                                                                              #

@@ -52,7 +52,7 @@
       entity_id: switch.toilet_airfreshener
     - service: counter.increment
       target:
-        entity_id: counter.glade_airfreshner
+        entity_id: counter.toilet_airfreshner
 
 #########################################################
 #                                                                                                              #

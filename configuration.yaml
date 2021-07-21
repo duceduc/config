@@ -203,7 +203,7 @@ counter:
     initial: 1
     step: 1
 #Glade
-  glade_airfreshner:
+  toilet_airfreshner:
     step: 1
     icon: mdi:spray
 
