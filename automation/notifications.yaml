@@ -77,6 +77,33 @@
 
 #########################################################
 #                                                                                                              #
+#      Samba Snapshot Backup                                                                       #
+#                                                                                                              #
+#########################################################
+
+  - alias: Backup Notifications
+    trigger:
+      platform: state
+      entity_id: sensor.samba_backup
+    condition:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.samba_backup
+          state: IDLE
+    action:
+      - service: notify.mobile_app_id
+        data:
+          message: "Samba backup {{ states('sensor.samba_backup')|lower }}."
+          title: '*Information*'
+      - service: logbook.log
+        data_template:
+          name: Samba Backup
+          message: "{{ states('sensor.samba_backup')|lower }}"
+
+
+#########################################################
+#                                                                                                              #
 #      SSL Certificate Expiry Notification                                                           #
 #                                                                                                              #
 #########################################################

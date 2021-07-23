@@ -125,8 +125,8 @@ cards:
       - entity: sensor.processor_use
         name: Processor Use
         icon: mdi:memory
-      - entity: sensor.home_assistant_v2_db
-        name: SQLite Use
+      - entity: sensor.recorder_db
+        name: MariaDB Use
         icon: mdi:database
 #      - entity: sensor.network_throughput_in_eth0
 #        name: Network Throughput IN

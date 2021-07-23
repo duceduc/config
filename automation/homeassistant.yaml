@@ -115,6 +115,22 @@
             {{ trigger.event.data.service_data.notification_id }}
 
 
+#########################################################
+#                                                                                                              #
+#             Restore Samba Backup on Startup                                                    #
+#                                                                                                              #
+#########################################################
+
+  - alias: Restore Samba Backup sensor on startup
+    trigger:
+    - event: start
+      platform: homeassistant
+    action:
+    - service: hassio.addon_stdin
+      data:
+        addon: 15d21743_samba_backup
+        input: restore-sensor
+
 ####################################################
 #                                                                                                    #
 #          END OF CONFIGURATION FILE                                                   #

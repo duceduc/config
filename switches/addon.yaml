@@ -38,6 +38,7 @@
           service: hassio.addon_stop
           data:
             addon: cebe7a76_hassio_google_drive_backup
+
       mosquitto:
         value_template: "{{ is_state('sensor.mosquitto', 'started') }}"
         turn_on:
