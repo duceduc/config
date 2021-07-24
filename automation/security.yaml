@@ -15,7 +15,7 @@
     - service: camera.snapshot
       data:
         entity_id: camera.security
-        filename: '/config/www/img/security/genkan_{{ now().strftime("%Y%m%d_%H%M%S") }}.jpg'
+        filename: '/config/www/img/security/{{ now().strftime("%Y%m%d_%H%M%S") }}security_camera.jpg'
 
 
 #########################################################
