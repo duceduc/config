@@ -49,7 +49,6 @@ sensor:
    - platform: wifi_signal
      name: 'Bed Sensor WiFi Signal'
 
-
 binary_sensor:
    - platform: status
      name: SR DHT Status

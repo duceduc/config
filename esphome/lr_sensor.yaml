@@ -53,7 +53,7 @@ binary_sensor:
     name: $name dht Status
 
   - platform: gpio
-    pin: D8
+    pin: D5
     name: 'motion lr occupancy'
     device_class: motion
 

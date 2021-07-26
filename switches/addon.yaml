@@ -54,11 +54,11 @@
         turn_on:
           service: hassio.addon_start
           data:
-            addon: 7ad98f9c_zigbee2mqtt
+            addon: 45df7312_zigbee2mqtt
         turn_off:
           service: hassio.addon_stop
           data:
-            addon: 7ad98f9c_zigbee2mqtt
+            addon: 45df7312_zigbee2mqtt
       samba:
         value_template: "{{ is_state('sensor.samba', 'started') }}"
         turn_on:

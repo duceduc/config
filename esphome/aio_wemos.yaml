@@ -20,7 +20,6 @@ wifi:
     static_ip: 192.168.1.95
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-#  output_power : 10db
   
 captive_portal:
 
@@ -61,9 +60,6 @@ sensor:
     unit_of_measurement: lux
     update_interval: 60s
 
-#    filters:
-#      - lambda: (x * 3.3 / 10000.0) * 2000000.0
-
 binary_sensor:
   - platform: status
     name: $mr dht sensor status
@@ -74,4 +70,3 @@ binary_sensor:
     pin: D5
     name: 'motion $mr occupancy'
     device_class: motion
-
