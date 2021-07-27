@@ -110,6 +110,35 @@
           {% else %} off
           {% endif %}
 
+####################################################
+#                                                                                                    #
+#            Earthquake Alert                                                                  #
+#                                                                                                    #
+####################################################
+
+  - platform: rest
+    name: Earthquake Alert
+    json_attributes_path: "$.[0]"
+    json_attributes:
+      - at
+      - anm
+      - en_anm
+      - mag
+      - maxi
+    resource: https://www.jma.go.jp/bosai/quake/data/list.json
+    value_template: "{{ value_json[0].ctt }}"
+    scan_interval: 300 
+
+  - platform: template
+    sensors:
+      earthquake_observed:
+        value_template: "{{ state_attr('sensor.earthquake_alert', 'at') }}"
+      earthquake_epicenter:
+        value_template: "{{ state_attr('sensor.earthquake_alert', 'en_anm') }}"
+      earthquake_magnitude:
+        value_template: "{{ state_attr('sensor.earthquake_alert', 'mag') }}"
+      earthquake_intensity:
+        value_template: "{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
 
 ####################################################

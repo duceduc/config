@@ -4,23 +4,6 @@
 #                                                                                                    #
 ####################################################
 
-
-  - platform: rest
-    name: earthquake alert location
-    resource: https://www.jma.go.jp/bosai/quake/data/list.json
-    value_template: '{{ value_json.0.en_anm }}' # Wh to kWh
-    scan_interval: 300 
-
-
-
-
-
-
-#################################
-
-
-
-
   - platform: rest
     name: Shelly T31 Total Energy # lights and power
     resource: http://192.168.1.87/status

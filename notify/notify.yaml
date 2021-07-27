@@ -72,6 +72,11 @@
     filename: /config/www/data/csv_logs/energy_log.csv
     timestamp: false
 
+  - name: earthquake_log
+    platform: file
+    filename: /config/www/data/csv_logs/earthquake_log.csv
+    timestamp: false
+
 
 #########################################################
 #                                                                                                              #

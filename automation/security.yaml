@@ -63,30 +63,6 @@
         entity: light.ntl_1
 
 
-
-########################
-- alias: 'Count False Triggers'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.motion_lr_occupancy
-      to: 'on'
-  condition:
-    - condition: time 
-      after: '22:00:00'
-      before: '04:50:00'
-  action:
-    - service: notify.home_assistant
-      data_template:
-        title: "False Trigger Notification"
-        message: >
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          <b> False Trigger  </b> <br>
-          This email was send because the motion sensor detected false movement.
-          <br>
-        data:
-          images: []
-
 - alias: 'ESP8266 Offline Notification'
   trigger:
     - platform: state
@@ -107,10 +83,6 @@
           <br>
         data:
           images: []
-
-########################
-
-
 
 
 
