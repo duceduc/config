@@ -1,5 +1,51 @@
 #########################################################
 #                                                                                                              #
+#             Turn on Lights                                                                              #
+#                                                                                                              #
+#########################################################
+
+- alias: 'motion shion room light on'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sr_occupancy
+    to: 'on'
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # only on weekdays
+      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+    - condition: time
+      after: '07:00:00'
+      before: '21:01:00'
+  action:
+    - service: light.turn_on
+      entity_id: light.shion_room
+      data:
+        brightness: 225
+
+#        brightness: '{% if now().hour > 15 or now().hour < 9 %} 225 {% else %} 150 {% endif %}'
+
+
+- alias: 'motion shion room light off'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sr_occupancy
+    to: 'off'
+    for: '00:02:00'
+  condition:
+    - condition: template # only on weekdays
+      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+    - condition: time
+      after: '07:00:00'
+      before: '19:01:00'
+  action:
+    - service: light.turn_off
+      entity_id: light.shion_room
+
+
+
+#########################################################
+#                                                                                                              #
 #             Shion Room Air Conditioning                                                            #
 #                                                                                                              #
 #########################################################

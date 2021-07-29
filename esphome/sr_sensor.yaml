@@ -1,5 +1,5 @@
 # ESP8266 NodeMCU....
-# [BC-DD-C2-7A-CC-B4]
+# [C4:5B:BE:70:D3:D2]
 substitutions:
   name: sr_sensor
   platform: ESP8266
@@ -30,14 +30,17 @@ ota:
   password: !secret ota_pass
 
 sensor:
+  - platform: dht
+    model: AM2302
+    pin: D4
+    temperature:
+      name: 'sr temperature'
+    humidity:
+      name: 'sr humidity'
+    update_interval: 60s
+
   - platform: wifi_signal
     name: $name wifi signal
-
-  - platform: adc
-    pin: A0
-    name: 'sr illuminance'
-    unit_of_measurement: lux
-    update_interval: 60s
 
 binary_sensor:
   - platform: status

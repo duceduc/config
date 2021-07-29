@@ -23,8 +23,8 @@
 # SR Mold Chance
   - platform: mold_indicator
     name: Sr Condensation Chance
-    indoor_temp_sensor: sensor.shion_room_temperature
-    indoor_humidity_sensor: sensor.shion_room_humidity
+    indoor_temp_sensor: sensor.sr_temperature
+    indoor_humidity_sensor: sensor.sr_humidity
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.4
 

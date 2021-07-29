@@ -64,6 +64,8 @@ cards:
         name: ESP32 Bed Sensor
       - entity: sensor.aio_wemos_wifi_signal
         name: Aio Wemos
+      - entity: sensor.sr_sensor_wifi_signal
+        name: Shion Room Sensors
       - entity: sensor.toilet_airfreshener_wifi_signal
         name: Toilet Air Freshner
       - entity: sensor.lr_sensor_wifi_signal

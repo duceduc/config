@@ -132,8 +132,8 @@ cards:
       - title: Shion Room Aircon Controls
       - room: sr
       - entity_1: input_select.sr_ac_mode
-      - entity_2: sensor.shion_room_temperature
-      - entity_3: sensor.shion_room_humidity
+      - entity_2: sensor.sr_temperature
+      - entity_3: sensor.sr_humidity
       - entity_4: sensor.sr_condensation_chance
 
 
