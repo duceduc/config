@@ -21,10 +21,7 @@
     - service: light.turn_on
       entity_id: light.shion_room
       data:
-        brightness: 225
-
-#        brightness: '{% if now().hour > 15 or now().hour < 9 %} 225 {% else %} 150 {% endif %}'
-
+        brightness: '{% if states.sensor.rear_illuminance.state | float >= 0.20 %} 225 {% else %} 150 {% endif %}'
 
 - alias: 'motion shion room light off'
   trigger:
