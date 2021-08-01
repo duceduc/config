@@ -1,5 +1,42 @@
 #########################################################
 #                                                                                                              #
+#             Motion Kitchen Lights                                                                    #
+#                                                                                                              #
+#########################################################
+
+  motion_kitchen_lights_illuminance_offline:
+    alias: Motion Kitchen Lights Illuminance Off
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: >
+            {% if now().hour > 6 and now().hour < 10 %}
+               light.counter, light.cabinet
+            {% elif now().hour > 16 and now().hour < 21 %}
+               light.counter, light.cabinet
+            {% else %}
+               light.k_1, light.k_3
+            {% endif %}
+
+  motion_kitchen_lights_illuminance_online:
+    alias: Motion Kitchen Lights Illuminance On
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: >
+            {% if states.sensor.front_illuminance.state | float <= 0.10 %}
+               light.k_1, light.k_3
+            {% elif states.sensor.front_illuminance.state | float <= 0.13 %}
+               light.k_1, light.k_3, light.k_5
+            {% elif states.sensor.front_illuminance.state | float <= 0.18 %}
+               light.k_1, light.k_3, light.counter
+            {% else %}
+               light.counter, light.cabinet
+            {% endif %}
+
+
+#########################################################
+#                                                                                                              #
 #             Lights On Upon Arrival after Sunset                                                  #
 #                                                                                                              #
 #########################################################

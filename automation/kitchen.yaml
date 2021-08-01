@@ -1,6 +1,6 @@
 #########################################################
 #                                                                                                              #
-#             Turn on Cabinent Lights                                                                 #
+#             Motion Triggered                                                                           #
 #                                                                                                              #
 #########################################################
 
@@ -13,10 +13,12 @@
     - service: light.turn_on
       data_template:
         entity_id: >
-         {% if now().hour > 15 or now().hour < 10 %}
+         {% if is_state('sensor.front_illuminance', 'unavailable') %}
           light.k_1, light.k_3
-         {% else %}
+         {% elif states.sensor.front_illuminance.state | float <= 0.10 %}
           light.k_1
+         {% else %}
+          light.k_1, light.k_3
          {% endif %}
 
 #########################################################
@@ -32,16 +34,8 @@
       to: 'on'
       for: '00:03:00'
   action:
-    - service: light.turn_on
-      data_template:
-        entity_id: >
-          {% if now().hour > 6 and now().hour < 10 %}
-             light.counter, light.cabinet
-          {% elif  now().hour > 16 and now().hour < 21 %}
-             light.counter, light.cabinet
-          {% else %}
-             light.k_1, light.k_3
-          {% endif %}
+    - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.front_illuminance', 'unavailable') else 'online' }}
+
 
 #########################################################
 #                                                                                                              #
