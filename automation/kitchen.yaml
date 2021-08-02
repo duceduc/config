@@ -14,11 +14,11 @@
       data_template:
         entity_id: >
          {% if is_state('sensor.front_illuminance', 'unavailable') %}
-          light.k_1, light.k_3
+            light.k_1, light.k_3
          {% elif states.sensor.front_illuminance.state | float <= 0.10 %}
-          light.k_1
+            light.k_1
          {% else %}
-          light.k_1, light.k_3
+            light.k_1, light.k_3
          {% endif %}
 
 #########################################################
@@ -27,12 +27,20 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'motion kitchen all lights on'
+- alias: 'motion kitchen lights all on'
   trigger:
     - platform: state
       entity_id: group.motion_kitchen_occupancy
       to: 'on'
       for: '00:03:00'
+    - platform: state
+      entity_id: sensor.kitchen_illuminance
+      to: 'on'
+
+  condition:
+    - condition: template
+      value_template: "{{ is_state('group.motion_kitchen_occupancy', 'on') }}"
+    
   action:
     - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.front_illuminance', 'unavailable') else 'online' }}
 

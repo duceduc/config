@@ -5,7 +5,7 @@
 #########################################################
 
   motion_kitchen_lights_illuminance_offline:
-    alias: Motion Kitchen Lights Illuminance Off
+    alias: Motion Kitchen Lights Illuminance Offline
     sequence:
       - service: light.turn_on
         data_template:
@@ -19,7 +19,7 @@
             {% endif %}
 
   motion_kitchen_lights_illuminance_online:
-    alias: Motion Kitchen Lights Illuminance On
+    alias: Motion Kitchen Lights Illuminance Online
     sequence:
       - service: light.turn_on
         data_template:
@@ -30,6 +30,8 @@
                light.k_1, light.k_3, light.k_5
             {% elif states.sensor.front_illuminance.state | float <= 0.18 %}
                light.k_1, light.k_3, light.counter
+            {% elif now().hour > 22 or now().hour < 5 %}
+               light.k_1, light.k_3
             {% else %}
                light.counter, light.cabinet
             {% endif %}
