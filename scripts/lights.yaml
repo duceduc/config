@@ -367,7 +367,7 @@
         data:
           entity_id: '{{ entity }}'
 #          rgb_color: [240,163,10]
-          brightness: 254
+          brightness: 250
           kelvin: 3000
 
 #########################################################

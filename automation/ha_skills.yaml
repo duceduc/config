@@ -40,7 +40,10 @@
         event_id: 'ask_to_turn_on_lr_aircon'
         event_response_type: ResponseYes
   action:
-    - service: script.lr_ac_normal_cool
+#    - service: script.lr_ac_normal_cool
+    - service: switch.turn_on
+      entity_id: switch.ac_lr_unit
+
 
 
 #########################################################
