@@ -45,7 +45,7 @@
     to: 'off'
   condition:
   - condition: template # Vacation mode is not On
-    value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}}"
+    value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
   - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
     entity_id: input_select.lr_ac_mode
     state: 'Off'
