@@ -94,7 +94,7 @@
 
 #########################################################
 #                                                                                                              #
-#            Arrival | Departure Scan                                                                  #
+#            Arrival | Departure | Restart Scan                                                     #
 #                                                                                                              #
 #########################################################
 
@@ -119,6 +119,17 @@
     - service: mqtt.publish
       data_template:
         topic: monitor/scan/arrive
+
+- alias: Presence Restart Daily
+  initial_state: 'on'
+  trigger:
+    - platform: time
+      at: '04:01:00'
+  action:
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/restart
+        payload: ''
 
 
 #########################################################
