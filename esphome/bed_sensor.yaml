@@ -1,9 +1,14 @@
 # ESP32 NodeMCU
 # [7C-9E-BD-ED-C9-54]
-esphome:
+substitutions:
   name: bed_sensor
   platform: ESP32
   board: nodemcu-32s
+
+esphome:
+  name: $name
+  platform: $platform
+  board: $board
 
 wifi:
   ssid: 'rice_dwarf'
@@ -32,26 +37,24 @@ mqtt:
 ota:
   password: !secret ota_pass
 
-# Setting up the pressure mats
 esp32_touch:
    setup_mode: false
 
-# Sensors
 sensor:
-   - platform: dht
-     pin: GPIO12
-     model: AM2302
-     temperature:
-       name: 'Shion Room Temperature'
-     humidity:
-       name: 'Shion Room Humidity'
-     update_interval: 60s
    - platform: wifi_signal
-     name: 'Bed Sensor WiFi Signal'
+     name: $name wiFi signal
+#   - platform: dht
+#     pin: GPIO12
+#     model: AM2302
+#     temperature:
+#       name: 'Shion Room Temperature'
+#     humidity:
+#       name: 'Shion Room Humidity'
+#     update_interval: 60s
 
 binary_sensor:
    - platform: status
-     name: SR DHT Status
+     name: $name Status
    - platform: esp32_touch
      name: 'Top'
      pin: GPIO14
@@ -74,7 +77,7 @@ binary_sensor:
      filters:
        - delayed_off: 1s
    - platform: template
-     name: 'Bed Sensor'
+     name: $name
      lambda: |-
        if (id(top).state ||
            id(middle).state ||

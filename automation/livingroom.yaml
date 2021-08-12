@@ -49,10 +49,9 @@
 
 #########################################################
 #                                                                                                              #
-#             Livingroom Lights On When low natural light                                       #
+#             Livingroom Lights on when low light                                                  #
 #                                                                                                              #
 #########################################################
-
 
 - alias: 'livingroom lights on when dark'
   trigger:
@@ -62,57 +61,22 @@
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    - service: light.turn_on
+      data:
+        entity_id: light.computer_room
+        transition: 600
+        brightness_pct: 60
+        
     - condition: or
       conditions:
         - condition: template # Is the weekend
           value_template: "{{ is_state('sensor.date_weekday', 'off') }}" 
         - condition: template # Is a holiday
           value_template: "{{ states('sensor.holiday')| trim != '' }}"
-  action:
     - service: light.turn_on
       data:
         entity_id: light.living_room
-
-
-#########################################################
-#                                                                                                              #
-#             Motion LR Lights Trigger                                                                 #
-#                                                                                                              #
-#########################################################
-## TEST##
-
-- alias: 'motion livingroom lights on'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.motion_lr_occupancy
-      to: 'on'
-  condition:
-    - condition: template # Someone is home
-      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # Is not daylight
-      value_template: "{{ states('sensor.period_of_the_day') != 'daylight' }}"
-  action:
-    - service: timer.start
-      entity_id: timer.motion_lr
-    - service: light.turn_on
-      data:
-        entity_id: light.c_2
-
-- alias: 'motion livingroom lights off'
-  trigger:
-    - platform: event
-      event_type: timer.finished
-      event_data:
-        entity_id: timer.motion_lr
-  condition:
-    - condition: state
-      entity_id: binary_sensor.motion_lr_occupancy
-      state: 'off'
-  action:
-    - service: light.turn_off
-      data:
-        entity_id: light.c_2
-
 
 #########################################################
 #                                                                                                              #
