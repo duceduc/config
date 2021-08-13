@@ -98,13 +98,13 @@ cards:
     entities:
       - entity: sensor.motion_g1_linkquality
         name: Genkan Hallway Motion Sensor
-      - entity: sensor.motion_t1_linkquality
-        name: Toilet Motion Sensor
       - entity: sensor.motion_hallway_linkquality
         name: Hallway Motion Sensor
       - entity: sensor.motion_washroom_linkquality
         name: Washroom Motion Sensor
       - entity: sensor.motion_k1_linkquality
+        name: Kitchen Motion Sensor
+      - entity: sensor.motion_k2_linkquality
         name: Kitchen Motion Sensor
     severity:
       - color: var(--label-badge-red)

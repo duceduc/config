@@ -24,10 +24,10 @@
       - platform: numeric_state
         entity_id:
           - sensor.motion_g1_battery
-          - sensor.motion_t1_battery
           - sensor.motion_hallway_battery
           - sensor.motion_washroom_battery
           - sensor.motion_k1_battery
+          - sensor.motion_k2_battery
           - sensor.shion_room_battery
           - sensor.computer_room_battery
           - sensor.living_room_battery

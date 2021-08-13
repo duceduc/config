@@ -58,6 +58,9 @@
       name: 'Ceiling Fan Running'
       hidden: false
 
+    switch.toilet_airfreshener:
+      name: Toilet Airfreshener
+      hidden: false
 
     switch.jcom_tv:
 #    jcom_tv_box: # mqtt

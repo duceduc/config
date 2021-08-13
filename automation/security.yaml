@@ -27,11 +27,8 @@
 - alias: 'Trigger alarm while armed away'
   trigger:
     - platform: state
-      entity_id: 
-       - binary_sensor.motion_mr_occupancy
-       - binary_sensor.motion_lr_occupancy
+      entity_id: group.home_alarm_motion_sensors
       to: 'on'
-
   condition:
     - condition: template 
       value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"
@@ -50,8 +47,6 @@
         data:
           images: []
 
-
-
 - alias: 'Return Alarm to normal when alarm Disarmed'
   trigger:
     - platform: state
@@ -61,29 +56,6 @@
     - service: script.returntonormal
       data:
         entity: light.ntl_1
-
-
-- alias: 'ESP8266 Offline Notification'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.lr_sensor_dht_status
-      to: 'off'
-    - platform: state
-      entity_id: binary_sensor.mr_dht_sensor_status
-      to: 'off'
-  action:
-    - service: notify.home_assistant
-      data_template:
-        title: "{{ trigger.to_state.attributes.friendly_name }} Offline"
-        message: >
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          <b> ESP8266 Offline  </b> <br>
-          This email was send because the {{ trigger.to_state.attributes.friendly_name }} sensor is offline.
-          <br>
-        data:
-          images: []
-
 
 
 #########################################################

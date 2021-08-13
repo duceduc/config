@@ -18,13 +18,9 @@ wifi:
     subnet: 255.255.255.0
     gateway: 192.168.1.1
 
-# Fallback portal 
 captive_portal:
-# Logging
+
 logger:
-# Uncomment this if you use Home Assistant
-#api:
-#  password: ''
 
 #status_led:
 #  pin: GPIO2
@@ -42,7 +38,7 @@ esp32_touch:
 
 sensor:
    - platform: wifi_signal
-     name: $name wiFi signal
+     name: $name wifi signal
 #   - platform: dht
 #     pin: GPIO12
 #     model: AM2302
@@ -54,7 +50,7 @@ sensor:
 
 binary_sensor:
    - platform: status
-     name: $name Status
+     name: $name status
    - platform: esp32_touch
      name: 'Top'
      pin: GPIO14

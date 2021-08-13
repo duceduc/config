@@ -1,6 +1,6 @@
 #########################################################
 #                                                                                                              #
-#            PRESENCE - FAMILY                                                                        #
+#            Presence - Family                                                                          #
 #                                                                                                              #
 #########################################################
 
@@ -66,7 +66,7 @@
 
 #########################################################
 #                                                                                                              #
-#            PRESENCE - GUESTS                                                                      #
+#            Presence - Guests                                                                         #
 #                                                                                                              #
 #########################################################
 
@@ -94,10 +94,9 @@
 
 #########################################################
 #                                                                                                              #
-#            Arrival | Departure | Restart Scan                                                     #
+#            Departure | | Arrival                                                                       #
 #                                                                                                              #
 #########################################################
-
 
 - alias: Presence Scan Departure
   trigger:
@@ -113,12 +112,21 @@
 - alias: Presence Scan Arrival
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_g1_occupancy
+      entity_id: binary_sensor.motion_g2_occupancy
       to: 'on'
+  condition:
+    - condition: template
+      value_template: "{{ not is_state('binary_sensor.genkan_door', 'on') }}"
   action:
     - service: mqtt.publish
       data_template:
         topic: monitor/scan/arrive
+
+#########################################################
+#                                                                                                              #
+#            Restart Monitor                                                                              #
+#                                                                                                              #
+#########################################################
 
 - alias: Presence Restart Daily
   initial_state: 'on'

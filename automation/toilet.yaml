@@ -40,7 +40,6 @@
 - alias: 'Engage Toilet Air freshner'
   trigger:
     platform: state
-#    entity_id: binary_sensor.motion_t1_occupancy
     entity_id: input_boolean.engage_toilet_airfreshner
     to: 'on'
     for: '00:04:00'

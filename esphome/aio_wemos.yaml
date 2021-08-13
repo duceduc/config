@@ -70,3 +70,8 @@ binary_sensor:
     pin: D5
     name: 'motion $mr occupancy'
     device_class: motion
+
+  - platform: gpio
+    pin: GPIO4
+    name: 'motion g2 occupancy'
+    device_class: motion

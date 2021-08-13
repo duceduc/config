@@ -185,11 +185,11 @@ cards:
             padding: 0
             type: 'custom:fold-entity-row'
           - entities:
-              - entity: sensor.motion_t1_battery
-                name: Toilet Room
               - entity: sensor.motion_g1_battery
                 name: Genkan Area
               - entity: sensor.motion_k1_battery
+                name: Kitchen Area
+              - entity: sensor.motion_k2_battery
                 name: Kitchen Area
               - entity: sensor.motion_washroom_battery
                 name: Wash Room

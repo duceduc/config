@@ -49,7 +49,7 @@
 
 #########################################################
 #                                                                                                              #
-#             Livingroom Lights on when low light                                                  #
+#             Automate Livingroom Lights via Photosensitivity                                  #
 #                                                                                                              #
 #########################################################
 
@@ -57,7 +57,7 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance
-      above: 0.19
+      above: 0.21
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
@@ -77,6 +77,18 @@
     - service: light.turn_on
       data:
         entity_id: light.living_room
+
+- alias: 'livingroom lights off when bright'
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.front_illuminance
+      below: 0.18
+  action:
+    - service: light.turn_off
+      entity_id:
+       -  light.computer_room
+       -  light.living_room
+
 
 #########################################################
 #                                                                                                              #
