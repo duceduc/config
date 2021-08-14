@@ -103,9 +103,9 @@ cards:
       - entity: sensor.motion_washroom_linkquality
         name: Washroom Motion Sensor
       - entity: sensor.motion_k1_linkquality
-        name: Kitchen Motion Sensor
+        name: Kitchen Sink Sensor
       - entity: sensor.motion_k2_linkquality
-        name: Kitchen Motion Sensor
+        name: Kitchen Fridge Sensor
     severity:
       - color: var(--label-badge-red)
         from: 0
@@ -167,7 +167,7 @@ cards:
       - entity: sensor.master_dimmer_linkquality
         name: Master Room Dimmer
       - entity: sensor.0x00124b001938c31b_linkquality
-        name: Zigbee Repeater 2
+        name: CC2531 Router
     severity:
       - color: var(--label-badge-red)
         from: 0

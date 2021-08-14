@@ -128,6 +128,83 @@
 
 #########################################################
 #                                                                                                              #
+#             Computer Room Fade in                                                                  #
+#                                                                                                              #
+#########################################################
+
+  cr_lights_fadein_day:
+    alias: 'cr lights fadein_day'
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 1
+          kelvin: 5000
+      - delay:
+          seconds: 1
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 64
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 128
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 191
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+
+  cr_lights_fadein_night:
+    alias: 'cr lights fadein_night'
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 1
+          kelvin: 5000
+      - delay:
+          seconds: 1
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 64
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 128
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 191
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 254
+          kelvin: 5000
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+
+
+
+#########################################################
+#                                                                                                              #
 #             Alarm Light Flash                                                                          #
 #                                                                                                              #
 #########################################################

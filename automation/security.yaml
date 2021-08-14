@@ -27,7 +27,10 @@
 - alias: 'Trigger alarm while armed away'
   trigger:
     - platform: state
-      entity_id: group.home_alarm_motion_sensors
+      entity_id:
+       - binary_sensor.motion_lr_occupancy
+       - binary_sensor.motion_mr_occupancy
+       - binary_sensor.motion_sr_occupancy
       to: 'on'
   condition:
     - condition: template 
