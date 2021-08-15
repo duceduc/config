@@ -62,38 +62,41 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    - service_template: script.cr_lights_fadein_{{ 'day' if now().hour > 10 and now().hour < 17 else 'night' }}
+    - service_template: script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
       data:
         entity: computer_room
-
 
 - alias: 'livingroom lights on when dark'
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance
       above: 0.21
-  action:
-    - service: light.turn_on
-      data:
-        entity_id: light.living_room
-        transition: 600
-        brightness_pct: 60
-
-
-- alias: 'livingroom lights off when bright'
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.front_illuminance
-      below: 0.18
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: or
       conditions:
-        - condition: template # Is the weekend
+        - condition: template # Is the weekend or
           value_template: "{{ is_state('sensor.date_weekday', 'off') }}" 
         - condition: template # Is a holiday
           value_template: "{{ states('sensor.holiday')| trim != '' }}"
+  action:
+    - service_template: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+      data:
+        entity: living_room
+
+#    - service: light.turn_on
+#      data:
+#        entity_id: light.living_room
+#        transition: 600
+#        brightness_pct: 60
+
+
+- alias: 'front area lights off when bright'
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.front_illuminance
+      below: 0.18
   action:
     - service: light.turn_off
       entity_id:

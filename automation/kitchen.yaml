@@ -32,7 +32,7 @@
     - platform: state
       entity_id: group.motion_kitchen_occupancy
       to: 'on'
-      for: '00:03:00'
+      for: '00:03:10'
     - platform: state
       entity_id: sensor.kitchen_illuminance
       to: 'on'

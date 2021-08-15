@@ -128,7 +128,7 @@
 
 #########################################################
 #                                                                                                              #
-#             Computer Room Fade in                                                                  #
+#             Computer Room Lights Fade in                                                         #
 #                                                                                                              #
 #########################################################
 
@@ -159,7 +159,7 @@
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
-          brightness: 191
+          brightness: 161
           kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
 
@@ -201,6 +201,73 @@
           kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
 
+
+#########################################################
+#                                                                                                              #
+#             Living Room Lights Fade                                                                  #
+#                                                                                                              #
+#########################################################
+
+
+  lr_lights_fadein_day:
+    alias: 'lr lights fadein_day'
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 1
+      - delay:
+          seconds: 1
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 64
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 128
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 181
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+
+  lr_lights_fadein_night:
+    alias: 'lr lights fadein_night'
+    sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 1
+      - delay:
+          seconds: 1
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 64
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 128
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 191
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
+      - service: light.turn_on
+        data_template:
+          entity_id: light.{{ entity }}
+          brightness: 254
+          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
 
 
 #########################################################

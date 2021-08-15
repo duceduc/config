@@ -208,7 +208,6 @@
           message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
   - alias: "Earthquake Notification"
-    initial_state: true
     trigger:
       - platform: state
         entity_id:

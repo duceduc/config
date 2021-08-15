@@ -39,11 +39,11 @@
           - sensor.genkan_door_battery
 #          - sensor.cr_curtain_batteries
 #          - sensor.lr_curtain_batteries
-        below: 9
+        below: 35
     action:
       service: notify.notify_events
       data_template:
-        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 10 percent."
+        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 35 percent."
 
 #########################################################
 #                                                                                                              #
