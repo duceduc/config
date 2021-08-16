@@ -26,13 +26,13 @@
       - switch.ac_lr_unit
       - switch.ac_mr_unit
       - switch.ac_sr_unit
-      - sensor.outside_temperature
+      - sensor.oa_temperature
       - sensor.lr_temperature
       - group.bed_sensors
-      - sensor.outside_humidity
+      - sensor.oa_humidity
       - sensor.lr_humidity
-      - sensor.shion_room_temperature
-      - sensor.shion_room_humidity
+      - sensor.sr_temperature
+      - sensor.sr_humidity
       - sensor.mr_temperature
       - sensor.mr_humidity
       - sensor.genkan_temperature
@@ -52,11 +52,11 @@
       - (e16f) light is at (e16B) % brightness with brightness level set at (e16b)
       - The (e01f) is turned (e01s)
       - The (e02f) is turned (e02s)
-      - The current (e03f) is (e03$) degrees and the humidity is (e06$) percent # Outside Temp
+      - The current outside temperature is (e03$) degrees and the humidity is (e06$) percent # Outside Temp
       - The current livingroom temperature is (e04S) and the humidity is (e07S) # Livingroom Temp
       - The current (e10f) is (e10$) degrees and the humidity is (e11$) # Master Room Temp
       - The current (e12f) is (e12$) degrees the humidity is (e13$) percent # Hallway Temp
-      - The current (e08f) is (e08$) degrees and the humidity is (e09$) percent # Shion Room Temp
+      - The current she on room temperature is (e08$) degrees and the humidity is (e09$) percent # Shion Room Temp
       - The current (e14f) is (e14$) degrees and the humidity is (e15$) percent # MDF Temp
       - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
       - The (e00f) is turned (e00s)

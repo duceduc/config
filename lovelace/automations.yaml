@@ -196,7 +196,10 @@ cards:
             name: Presence Detection - Depart Scan
             icon: mdi:hail
             secondary_info: last-triggered
-
+          - entity: automation.home_mode_leaving
+            name: Turn Off Any Enabled Devices
+            icon: mdi:check-network
+            secondary_info: last-triggered
 
       - type: vertical-stack
         cards:
