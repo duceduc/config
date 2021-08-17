@@ -131,11 +131,6 @@
             off
           {% endif %}
 
-      oa_illuminance:
-        unit_of_measurement: lux'
-        device_class: voltage
-        value_template: "{{ '%.2f'|format( ( states('sensor.front_illuminance')|float + states('sensor.rear_illuminance')|float ) / 2 ) }}"
-
 
 ####################################################
 #                                                                                                    #
