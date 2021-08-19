@@ -158,13 +158,16 @@
          {% set p = trigger.to_state.attributes.friendly_name %}
          {% set user = alias.get(p) %}
          {{ user }}
-    - condition: or
-      conditions:
-        - condition: template 
-          value_template: "{{ states.sensor.period_of_the_day.state != 'daylight' }}" # Turn on LR lights
-        - condition: time
-          after: '17:45:00'
-          before: '18:30:00'
+#    - condition: or
+#      conditions:
+#        - condition: template 
+#          value_template: "{{ states.sensor.period_of_the_day.state != 'daylight' }}" # Turn on LR lights
+#        - condition: time
+#          after: '17:45:00'
+#          before: '18:30:00'
+
+    - condition: template 
+      value_template: "{{ states.sensor.front_illuminance.state | float > 0.22 }}" 
     - service: script.turn_on_lr_lights
 
 

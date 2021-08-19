@@ -95,6 +95,9 @@
       entity_id:
        -  light.computer_room
        -  light.living_room
+    - service: script.turn_off
+      data_template:
+        entity_id: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
 
 
 #########################################################
