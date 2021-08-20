@@ -1,37 +1,51 @@
 #########################################################
 #                                                                                                              #
-#             Turn on Lights                                                                              #
+#             Auto Mode Lights On/Off                                                                #
 #                                                                                                              #
 #########################################################
 
-- alias: 'motion shion room light on'
+- alias: 'motion shion room auto-on'
   trigger:
-    platform: state
-    entity_id: binary_sensor.motion_sr_occupancy
-    to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sr_occupancy
+      from: 'off'
+      to: 'on'
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # only on weekdays
       value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+    - condition: template # Not a holiday
+      value_template: "{{ is_state('sensor.holiday', '') }}"
+    - condition: state
+      entity_id: light.shion_room
+      state: 'off'
+    - condition: template
+      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
     - condition: time
       after: '07:00:00'
-      before: '21:01:00'
+      before: '19:01:00'
   action:
     - service: light.turn_on
       entity_id: light.shion_room
       data:
         brightness: '{% if states.sensor.rear_illuminance.state | float >= 0.20 %} 250 {% else %} 160 {% endif %}'
 
-- alias: 'motion shion room light off'
+- alias: 'motion shion room auto-off'
   trigger:
-    platform: state
-    entity_id: binary_sensor.motion_sr_occupancy
-    to: 'off'
-    for: '00:02:00'
+    - platform: state
+      entity_id: binary_sensor.motion_sr_occupancy
+      to: 'off'
+      for: '00:02:00'
   condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # only on weekdays
       value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+    - condition: template # Not a holiday
+      value_template: "{{ is_state('sensor.holiday', '') }}"
+    - condition: template
+      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
     - condition: time
       after: '07:00:00'
       before: '19:01:00'
@@ -39,6 +53,59 @@
     - service: light.turn_off
       entity_id: light.shion_room
 
+#########################################################
+#                                                                                                              #
+#             Override Auto Mode Lights On/Off                                                    #
+#                                                                                                              #
+#########################################################
+
+- alias: 'SR light turned off'
+  trigger:
+    - platform: state
+      entity_id: light.shion_room
+      from: 'on'
+      to: 'off'
+  action:
+    - service: timer.start
+      entity_id: timer.sr_mcl
+
+- alias: 'SR light turned on'
+  trigger:
+    - platform: state
+      entity_id: light.shion_room
+      from: 'off'
+      to: 'on'
+  condition:
+    - condition: template
+      value_template: "{{ is_state('timer.sr_mcl', 'active') }}"
+  action:
+    -  service: input_boolean.toggle
+       entity_id: input_boolean.sr_mcl
+
+- alias: 'SR MCL Announce State'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.sr_mcl
+  action:
+    - service: notify.alexa_media
+      data_template:
+        data:
+          type: tts
+        target:
+        - media_player.ai_3
+        message: >
+         {% set mode = '自動' if trigger.to_state.state == 'on' else 'マニュアル' %}
+         <speak> シオンルームライトが {{ mode }} モードになりました。 </speak>
+
+- alias: 'SR MCL Re-Enable'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.sr_mcl
+      to: 'off'
+      for: '01:00:00'
+  action:
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.sr_mcl
 
 
 #########################################################

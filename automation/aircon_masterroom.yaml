@@ -1,19 +1,25 @@
 #########################################################
 #                                                                                                              #
-#             Turn on Lights                                                                              #
+#             Auto Mode Lights On/Off                                                                #
 #                                                                                                              #
 #########################################################
 
-- alias: 'motion master room light on'
+- alias: 'motion master room auto-on'
   trigger:
-    platform: state
-    entity_id: binary_sensor.motion_mr_occupancy
-    to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_mr_occupancy
+      to: 'on'
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # pc is not off
       value_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"
+    - condition: state
+      entity_id: light.master_room
+      state: 'off'
+    - condition: template
+      value_template: "{{ is_state('input_boolean.mr_mcl', 'on') }}"
+
     - condition: time
       after: '06:00:00'
       before: '23:01:00'
@@ -21,15 +27,75 @@
     - service: light.turn_on
       entity_id: light.m_1
 
-- alias: 'motion master room light off'
+- alias: 'motion master room auto-off'
   trigger:
-    platform: state
-    entity_id: binary_sensor.motion_mr_occupancy
-    to: 'off'
-    for: '00:02:00'
+    - platform: state
+      entity_id: binary_sensor.motion_mr_occupancy
+      to: 'off'
+      for: '00:02:00'
+  condition:
+    - condition: template # pc is not off
+      value_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"
+    - condition: template
+      value_template: "{{ is_state('input_boolean.mr_mcl', 'on') }}"
   action:
     - service: light.turn_off
       entity_id: light.master_room
+
+#########################################################
+#                                                                                                              #
+#             Override Auto Mode Lights On/Off                                                    #
+#                                                                                                              #
+#########################################################
+
+- alias: 'MR light turned off'
+  trigger:
+    - platform: state
+      entity_id: light.master_room
+      from: 'on'
+      to: 'off'
+  action:
+    - service: timer.start
+      entity_id: timer.mr_mcl
+
+- alias: 'MR light turned on'
+  trigger:
+    - platform: state
+      entity_id: light.master_room
+      from: 'off'
+      to: 'on'
+  condition:
+    - condition: template
+      value_template: "{{ is_state('timer.mr_mcl', 'active') }}"
+  action:
+    - service: input_boolean.toggle
+      entity_id: input_boolean.mr_mcl
+
+- alias: 'MR MCL Announce State'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.mr_mcl
+  action:
+    - service: notify.alexa_media
+      data_template:
+        data:
+          type: tts
+        target:
+        - media_player.ai_2
+        message: >
+          {% set mode = 'automatic' if trigger.to_state.state == 'on' else 'manual' %}
+          <speak> Master room light is now in {{ mode }} mode. </speak>
+
+- alias: 'MR MCL Re-Enable'
+  trigger:
+    -  platform: state
+       entity_id: input_boolean.mr_mcl
+       to: 'off'
+       for: '01:00:00'
+  action:
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.mr_mcl
+
 
 #########################################################
 #                                                                                                              #
