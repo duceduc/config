@@ -53,7 +53,7 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'computer room lights on when dark'
+- alias: 'computer room lights auto-on'
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance
@@ -66,7 +66,7 @@
       data:
         entity: computer_room
 
-- alias: 'livingroom lights on when dark'
+- alias: 'livingroom lights auto-on'
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance
@@ -76,16 +76,16 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: or
       conditions:
-        - condition: template # Is the weekend or
+        - condition: template # is the weekend or
           value_template: "{{ is_state('sensor.date_weekday', 'off') }}" 
-        - condition: template # Is a holiday
+        - condition: template # is a holiday
           value_template: "{{ states('sensor.holiday')| trim != '' }}"
   action:
     - service_template: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
       data:
         entity: living_room
 
-- alias: 'front area lights off when bright'
+- alias: 'front area lights auto-off'
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance

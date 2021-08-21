@@ -4,7 +4,7 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'motion hallway light on'
+- alias: 'motion hallway auto-on'
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_hallway_occupancy
@@ -16,7 +16,7 @@
   action:
     - service_template: script.hallway_light_guest_mode_{{ 'on' if is_state('input_boolean.guest_mode', 'on') else 'off' }}
 
-- alias: 'motion hallway light off'
+- alias: 'motion hallway auto-off'
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_hallway_occupancy
@@ -61,7 +61,7 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'motion genkan light on'
+- alias: 'motion genkan auto-on'
   trigger:
    - platform: state
      entity_id: binary_sensor.motion_g1_occupancy
@@ -72,7 +72,7 @@
       data:
         brightness: 200
 
-- alias: 'motion genkan light off'
+- alias: 'motion genkan auto-off'
   trigger:
   - platform: state
     entity_id: binary_sensor.motion_g1_occupancy

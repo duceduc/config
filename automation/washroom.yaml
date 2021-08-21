@@ -5,7 +5,7 @@
 #########################################################
 
 
-- alias: 'motion washroom light on'
+- alias: 'motion washroom auto-on'
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_washroom_occupancy
@@ -14,7 +14,7 @@
     - service: light.turn_on
       entity_id: light.w_1
 
-- alias: 'motion washroom light off'
+- alias: 'motion washroom auto-off'
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_washroom_occupancy
