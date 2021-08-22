@@ -346,21 +346,11 @@ cards:
             secondary_info: last-triggered
 
 
-
-
-
-
-
-
-
-
-
-
       - type: entities
         title: Arriving Automations
         show_header_toggle: false
         entities:
-          - entity: automation.motion_genkan_light_on
+          - entity: automation.motion_genkan_auto_on
             name: Turn On Genkan Lights - Alexa Greetings
             icon: mdi:home-outline
             secondary_info: last-triggered
