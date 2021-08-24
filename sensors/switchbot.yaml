@@ -260,10 +260,6 @@
         device_class: battery
         value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int + states('sensor.lr_curtain_rt_battery')|int) /2)|int }}"
 
-
-
-
-
 ####################################################
 #                                                                                                    #
 #                      Switchbot Combined Front Curtains                               #

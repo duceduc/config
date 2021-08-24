@@ -24,6 +24,24 @@
     upper: 0.5
 
 
+###################################################
+#                                                                                                    #
+#            Motion Sensors                                                                    #
+#                                                                                                    #
+####################################################
+
+  - platform: template
+    sensors:
+      motion_sr_auto_on:
+        value_template: >
+          {% set p = states('sensor.date_weekday') %}
+          {% set end = '20:00:01' %}
+          {% if p == 'on' %} 
+            {{ '07:00:00' < states('sensor.time') < end }}
+          {% else %}
+            {{ '09:30:00' < states('sensor.time') < end }}
+          {% endif %}
+
 #########################################################
 #                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #
