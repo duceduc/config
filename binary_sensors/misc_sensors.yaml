@@ -34,9 +34,10 @@
     sensors:
       motion_sr_auto_on:
         value_template: >
-          {% set p = states('sensor.date_weekday') %}
+          {% set w = states('sensor.date_weekday') %}
+          {% set h = states('sensor.holiday')| trim !='' %}
           {% set end = '20:00:01' %}
-          {% if p == 'on' %} 
+          {% if w == 'on' or h == 'false' %} 
             {{ '07:00:00' < states('sensor.time') < end }}
           {% else %}
             {{ '09:30:00' < states('sensor.time') < end }}
