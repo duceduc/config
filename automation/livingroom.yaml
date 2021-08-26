@@ -92,7 +92,7 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.front_illuminance
-      below: 0.18
+      below: 0.17
   action:
     - service: light.turn_off
       entity_id:
