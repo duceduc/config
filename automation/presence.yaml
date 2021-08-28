@@ -181,6 +181,10 @@
       data:
         option: 'Away'
     - service: script.dev_check # turn off any devices that was left on
+    - service: notify.mobile_app_id
+      data:
+        message: "There are {{ states('sensor.n_people_home') }} people at home now."
+        title: '*Home Status*'
 
 # Returning
 - alias: Home Mode - Returning
