@@ -19,9 +19,9 @@ cards:
       - entity_1: sensor.home_windgust
       - name_1: Wind Gust
       - entity_2: sensor.oa_humidity
-      - name_2: Front Humidity
+      - name_2: Rear Humidity
       - entity_3: sensor.oa_temperature 
-      - name_3: Front Temperature
+      - name_3: Rear Temperature
 
   - type: custom:decluttering-card
     template: temperature _tpl

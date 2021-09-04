@@ -88,7 +88,7 @@
           type: tts
         target:
          - media_player.ai_1
-        message: "<audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>. The laundry has finished. Don't forget to remove the load from the machine for drying."
+        message: "<audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>. The laundry  load has finished. Don't forget to remove the clothes from the machine for drying."
     - condition: template
       value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
     - service: cover.open_cover
@@ -111,11 +111,12 @@
           {% if fr == 'stop' and to == 'fill' %} wash fill
           {% elif fr == 'fill' and to == 'run' %} wash
           {% elif fr == 'stop' and to == 'run' %} wash
+          {% elif fr == 'wait' and to == 'pulse' %} dryer
           {% elif fr == 'run' and to == 'pulse' and s == 'wash' %} wash spin
           {% elif fr == 'pulse' and to == 'run' and s == 'wash spin' %} wash drain
           {% elif fr == 'run' and to == 'fill' %} rinse fill
           {% elif fr in ['fill', 'run'] and to == 'wait' %} rinse wait
-          {% elif fr == 'wait' and to == 'run' %} rinse
+          {% elif fr == 'wait' and to == 'run' %} rinse               
           {% elif fr == 'run' and to == 'pulse' and s == 'rinse' %} rinse spin
           {% elif fr == 'pulse' and to == 'run' and s == 'rinse spin' %} rinse drain
           {% elif fr in ['run', 'fill', 'wait', 'unknown'] and to == 'stop' %} stop
