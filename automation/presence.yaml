@@ -94,20 +94,9 @@
 
 #########################################################
 #                                                                                                              #
-#            Departure | | Arrival                                                                       #
-#                                                                                                              #
+#            Arrival | Departure                                                                         #
+#                                                                                                             #
 #########################################################
-
-- alias: Presence Scan Departure
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.genkan_door
-      to: 'on'
-  action:
-    - delay: '00:02:00'
-    - service: mqtt.publish
-      data_template:
-        topic: monitor/scan/depart
 
 - alias: Presence Scan Arrival
   trigger:
@@ -116,11 +105,27 @@
       to: 'on'
   condition:
     - condition: template
-      value_template: "{{ not is_state('binary_sensor.genkan_door', 'on') }}"
+      value_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'off') }}"
   action:
     - service: mqtt.publish
       data_template:
         topic: monitor/scan/arrive
+
+- alias: Presence Scan Departure
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.genkan_door
+      to: 'on'
+  condition:
+    - condition: template
+      value_template: "{{ is_state('binary_sensor.motion_hallway_occupancy', 'on') }}"
+    - condition: template
+      value_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'on') }}"
+  action:
+    - delay: '00:02:00'
+    - service: mqtt.publish
+      data_template:
+        topic: monitor/scan/depart
 
 #########################################################
 #                                                                                                              #
