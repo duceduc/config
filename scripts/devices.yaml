@@ -92,7 +92,7 @@
 
   dev_check_3:
     sequence:
-#      - service: script.dev_check_4
+      - service: script.dev_check_4
       - condition: template
         value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
       - service: input_select.select_option
@@ -101,6 +101,18 @@
           option: 'Off'
 
   dev_check_4:
+    sequence:
+#      - service: script.dev_check_5
+      - condition: template
+        value_template: '{{ states("sensor.front_illuminance")| float >= 0.21 }}'
+      - service: light.turn_off
+        data:
+          entity_id: light.computer_room, light.living_room
+      - service: script.turn_off
+        data_template:
+          entity_id:  script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+
+  dev_check_5:
     sequence:
       - condition: template
         value_template: '{{ states("group.christmas_lights") != "off" }}'

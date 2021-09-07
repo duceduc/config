@@ -10,7 +10,7 @@
         friendly_name: 'Devices with low battery'
         unit_of_measurement: devices
         value_template: >-
-          {% set ignore_entities = ['sensor.id_battery_level', 'sensor.lr_curtain_batteries', 'sensor.hallway_door_battery'] %}
+          {% set ignore_entities = ['sensor.id_battery_level', 'sensor.hallway_door_battery'] %}
           {{ states.sensor
             | selectattr('attributes.device_class', 'eq', 'battery')
             | rejectattr('entity_id', 'in', ignore_entities)

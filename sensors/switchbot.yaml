@@ -221,8 +221,6 @@
     unit_of_measurement: 'dBm'
     icon: mdi:antenna
 
-
-
 # Position State
   - platform: mqtt
     name: "LR Curtain Left Position"
@@ -230,9 +228,6 @@
     value_template: '{{ value_json.serviceData.position }}'
     unit_of_measurement: "%"
     icon: mdi:format-list-numbered
-
-
-
 
 
 ####################################################
@@ -249,7 +244,6 @@
         unit_of_measurement: '%'
         device_class: battery
         value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int + states('sensor.cr_curtain_rt_battery')|int) /2)|int }}"
-
 
 # Combined Average Battery
   - platform: template
