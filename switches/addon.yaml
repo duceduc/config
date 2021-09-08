@@ -39,6 +39,17 @@
           data:
             addon: cebe7a76_hassio_google_drive_backup
 
+      portainer:
+        value_template: "{{ is_state('sensor.portainer', 'started') }}"
+        turn_on:
+          service: hassio.addon_start
+          data:
+            addon: a0d7b954_portainer
+        turn_off:
+          service: hassio.addon_stop
+          data:
+            addon: a0d7b954_portainer
+
       mosquitto:
         value_template: "{{ is_state('sensor.mosquitto', 'started') }}"
         turn_on:
