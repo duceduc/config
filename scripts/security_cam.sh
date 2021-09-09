@@ -1,4 +1,5 @@
  #!/bin/bash
+ # https://community.home-assistant.io/t/record-video-from-esp32-cam-config-with-esphome-in-hassio-works-great/153354/69
 rm /config/www/data/logs/security_cam.log;
 exec &>>/config/www/data/logs/security_cam.log;
 

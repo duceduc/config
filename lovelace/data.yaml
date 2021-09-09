@@ -305,8 +305,8 @@ cards:
       - head:
         label: Add-On Status
         type: section
-      - entity: switch.gdrivebackup
-        name: Google Drive Backup # shion.su account
+      - entity: switch.sambabackup
+        name: Samba Backup 
         icon: mdi:server-plus
       - entity: switch.portainer
         name: Portainer

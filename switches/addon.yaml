@@ -28,16 +28,16 @@
 
   - platform: template
     switches:
-      gdrivebackup:
-        value_template: "{{ is_state('sensor.gdrivebackup', 'started') }}"
+      sambabackup:
+        value_template: "{{ is_state('sensor.sambabackup', 'started') }}"
         turn_on:
           service: hassio.addon_start
           data:
-            addon: cebe7a76_hassio_google_drive_backup
+            addon: 15d21743_samba_backup
         turn_off:
           service: hassio.addon_stop
           data:
-            addon: cebe7a76_hassio_google_drive_backup
+            addon: 15d21743_samba_backup
 
       portainer:
         value_template: "{{ is_state('sensor.portainer', 'started') }}"
