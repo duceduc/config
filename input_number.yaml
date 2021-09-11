@@ -171,3 +171,13 @@
     icon: mdi:currency-jpy
 
 
+
+
+######################
+  returntonormal:
+    name: Return to Normal
+    initial: 255
+    min: 0
+    max: 255
+    step: 1
+

@@ -23,19 +23,9 @@
 #                                                                                                    #
 ####################################################
 
-  - platform: command_line
-    switches:
-      kill_is_internet:
-        command_on: "/usr/bin/curl -X GET http://192.168.1.120:7022/disconnect?ip=192.168.1.103"
-        command_off: "/usr/bin/curl -X GET http://192.168.1.120:7022/reconnect?ip=192.168.1.103"
-        command_state: "/usr/bin/curl -X GET http://192.168.1.120:7022/status?ip=192.168.1.103"
-        value_template: '{{ value == "1" }}'
 
-      kill_isp_internet:
-        command_on: "/usr/bin/curl -X GET http://192.168.1.120:7022/disconnect?ip=192.168.1.104"
-        command_off: "/usr/bin/curl -X GET http://192.168.1.120:7022/reconnect?ip=192.168.1.104"
-        command_state: "/usr/bin/curl -X GET http://192.168.1.120:7022/status?ip=192.168.1.104"
-        value_template: '{{ value == "1" }}'
+
+
 
 ####################################################
 #                                                                                                    #

@@ -16,6 +16,7 @@
       data:
         entity_id: camera.security
         filename: '/config/www/img/security/{{ now().strftime("%Y%m%d_%H%M%S") }}security_camera.jpg'
+    - service: shell_command.clean_security_images
 
 
 #########################################################

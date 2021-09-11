@@ -501,7 +501,7 @@
   returntonormal:
     sequence:
       - service: script.normallight
-        data:
+        data_template:
           entity: '{{ entity }}'
       - delay: 1
       - service: light.turn_off
@@ -511,11 +511,11 @@
   normallight:
     sequence:
       - service: light.turn_on
-        data:
+        data_template:
           entity_id: '{{ entity }}'
-#          rgb_color: [240,163,10]
-          brightness: 250
-          kelvin: 3000
+          rgb_color: [255, 212, 113]
+          brightness: 255
+#          kelvin: 2900
 
 #########################################################
 #                                                                                                              #

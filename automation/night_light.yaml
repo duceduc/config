@@ -16,7 +16,7 @@
     - service: light.turn_on
       entity_id: light.ntl_1
       data:
-        brightness: 10
+        brightness: 40
 
 - alias: 'night light off'
   trigger:

@@ -305,6 +305,9 @@ cards:
         title: Other Automations
         show_header_toggle: false
         entities:
+          - entity: automation.presence_restart_daily
+            name: Restart Monitor Presence
+            icon: mdi:hail
           - entity: automation.turn_on_light_flash
             name: Workout
             icon: mdi:weight-lifter
