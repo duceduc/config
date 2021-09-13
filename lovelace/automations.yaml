@@ -307,7 +307,8 @@ cards:
         entities:
           - entity: automation.presence_restart_daily
             name: Restart Monitor Presence
-            icon: mdi:hail
+            icon: mdi:target-account
+            secondary_info: last-triggered 
           - entity: automation.turn_on_light_flash
             name: Workout
             icon: mdi:weight-lifter

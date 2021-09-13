@@ -8,10 +8,13 @@
 - alias: 'Security Camera Snapshot'
   trigger:
     - platform: state
-      entity_id: group.trigger_camera
+      entity_id: binary_sensor.genkan_door
       to: 'on'
   action:
-    - delay: 10
+    - wait_template: "{{ is_state('light.h_1', 'on') }}"
+      continue_on_timeout: false
+      timeout: 10
+    - delay: 1
     - service: camera.snapshot
       data:
         entity_id: camera.security
