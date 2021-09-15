@@ -18,7 +18,7 @@
       - version_latest
 
   - platform: rest
-    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_portainer/info
+    resource: http://192.168.1.20:8123/api/hassio/addons/db21ed7f_portainer/info
     name: portainer
     value_template: '{{ value_json.data.state }}'
     scan_interval: 60

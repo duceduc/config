@@ -16,12 +16,12 @@
       state: 'off'
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # bed occupied 
-      value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
-    - condition: template
-      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
     - condition: template
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
+    - condition: template
+      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
+    - condition: template # bed occupied 
+      value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
 
   action:
     - service: light.turn_on
@@ -38,10 +38,12 @@
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # bed occupied 
-      value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
     - condition: template
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
+    - condition: template
+      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
+    - condition: template # bed occupied 
+      value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
   action:
     - service: light.turn_off
       entity_id: light.shion_room

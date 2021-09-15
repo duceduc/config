@@ -1,6 +1,6 @@
 #########################################################
 #                                                                                                              #
-#             Enable Tv Lock                                                                             #
+#              Tv Lock                                                                                      #
 #                                                                                                              #
 #########################################################
 
@@ -34,22 +34,34 @@
 
 #########################################################
 #                                                                                                              #
-#             Disable Tv Lock                                                                             #
+#             Disable Internet on Devices                                                            #
 #                                                                                                              #
 #########################################################
 
-- alias: disable tv lock
+
+- alias: disable iphone internet
+  trigger:
+    - platform: time
+      at: sensor.disable_device_time
+  action:
+    - condition: template
+      value_template: "{{ not is_state('switch.is_internet', 'on') or not is_state('switch.isp_internet', 'on') }}"
+    - service: switch.turn_on
+      entity_id: switch.is_internet, switch.isp_internet
+
+
+#########################################################
+#                                                                                                              #
+#             Enable all Disabled Devices at Midnight                                              #
+#                                                                                                              #
+#########################################################
+
+- alias: enable devices at midnight
   trigger:
     - platform: time
       at: '01:00:00'
-  condition:
-    - condition: template
-      value_template: "{{ is_state('switch.tv_lock', 'on') }}"
   action:
-    - service: switch.turn_off
-      entity_id: switch.tv_lock
-    - service: homeassistant.turn_off
-      entity_id: input_boolean.child_mode
+    - service: script.enable_devices
 
 #########################################################
 #                                                                                                              #

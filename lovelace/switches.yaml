@@ -29,8 +29,6 @@ cards:
         name: Floor Heater
       - entity: switch.jcom_tv
         name: Jcom Tv
-      - entity: switch.tv_lock
-        name: Tv Lock
       - entity: switch.desktop
         name: Desktop
       - entity: switch.christmas_lights
@@ -98,6 +96,19 @@ cards:
         name: Master Closet
       - entity: light.shion_room
         name: Shion Room
+
+  - type: entities
+    title: Disable Devices
+    show_header_toggle: false
+    entities:
+      - entity: switch.is_internet
+        name: iPhone 6
+        icon: mdi:wifi
+      - entity: switch.isp_internet
+        name: iPhone 6+
+        icon: mdi:wifi
+      - entity: switch.tv_lock
+        name: Tv Lock
 
 
 ####################################################

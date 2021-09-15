@@ -122,6 +122,33 @@
 
 #########################################################
 #                                                                                                              #
+#             Enable Devices at midnight                                                             #
+#                                                                                                              #
+#########################################################
+
+  enable_devices:
+    sequence:
+      - service: script.enable_dev1
+
+  enable_dev1:
+    sequence:
+      - service: script.enable_dev2
+      - condition: template
+        value_template: "{{ is_state('switch.tv_lock', 'on') }}"
+      - service: homeassistant.turn_off
+        data:
+          entity_id: switch.tv_lock, input_boolean.child_mode
+
+  enable_dev2:
+    sequence:
+      - condition: template
+        value_template: "{{ is_state('switch.is_internet', 'on') or is_state('switch.isp_internet', 'on') }}"
+      - service: switch.turn_off
+        data:
+          entity_id: switch.is_internet, switch.isp_internet
+
+#########################################################
+#                                                                                                              #
 #             Toilet Seat Heater/Cleaning                                                             #
 #                                                                                                              #
 #########################################################

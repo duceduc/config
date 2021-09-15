@@ -44,11 +44,11 @@
         turn_on:
           service: hassio.addon_start
           data:
-            addon: a0d7b954_portainer
+            addon: db21ed7f_portainer
         turn_off:
           service: hassio.addon_stop
           data:
-            addon: a0d7b954_portainer
+            addon: db21ed7f_portainer
 
       mosquitto:
         value_template: "{{ is_state('sensor.mosquitto', 'started') }}"

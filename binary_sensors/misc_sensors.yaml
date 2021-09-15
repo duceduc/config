@@ -36,7 +36,7 @@
         value_template: >
           {% set w = states('sensor.date_weekday') %}
           {% set h = states('sensor.holiday')| trim !='' %}
-          {% set end = '20:00:01' %}
+          {% set end = '20:00:00' %}
           {% if w == 'on' or h == 'false' %} 
             {{ '07:00:00' < states('sensor.time') < end }}
           {% else %}
