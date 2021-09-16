@@ -336,10 +336,6 @@ cards:
             icon: mdi:bullhorn
             secondary_info: last-triggered
 
-          - entity: automation.enable_tv_lock
-            name: Enable Tv Lock
-            icon: mdi:monitor-lock
-            secondary_info: last-triggered
           - entity: automation.24hr_fan_toggle_on_off
             name: Toggle 24hr Fan On-Off
             icon: mdi:fan
@@ -374,6 +370,22 @@ cards:
             name: Welcome Home Announcement
             icon: mdi:amazon-alexa
             secondary_info: last-triggered
+
+
+
+      - type: entities
+        title: Disable Device Automations
+        show_header_toggle: false
+        entities:
+          - entity: automation.enable_tv_lock
+            name: Enable Tv Lock
+            icon: mdi:monitor-lock
+            secondary_info: last-triggered
+          - entity: automation.disable_iphone_internet
+            name: Disable iPhone Internet
+            icon: mdi:wifi
+            secondary_info: last-triggered
+
 
 
 ####################################################

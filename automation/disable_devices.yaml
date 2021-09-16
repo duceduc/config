@@ -41,8 +41,8 @@
 
 - alias: disable iphone internet
   trigger:
-    - platform: time
-      at: sensor.disable_device_time
+    - platform: template
+      value_template: "{{ states.sensor.time.state == states.sensor.disable_device_time.state[0:5] }}"
   action:
     - condition: template
       value_template: "{{ not is_state('switch.is_internet', 'on') or not is_state('switch.isp_internet', 'on') }}"

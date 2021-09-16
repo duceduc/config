@@ -36,17 +36,14 @@
             mdi:weather-sunny
           {% endif %}
 
-
-
-
-
   - platform: template
     sensors:
       disable_device_time:
         value_template: >-
-          {% if is_state("sensor.date_weekday", "on") %}21:15:00{% else %}22:15:00{% endif %}
-
-
+          {% set wday = states('input_datetime.weekday_disable_device_time') %}
+          {% set wend = states('input_datetime.weekend_disable_device_time') %}
+          
+          {% if is_state("sensor.date_weekday", "on") %} {{wday}} {% else %} {{wend}} {% endif %}
 
 
 ####################################################
