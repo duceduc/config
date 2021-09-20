@@ -26,6 +26,12 @@
 
   - platform: command_line
     switches:
+      switch_internet:
+        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.102"
+        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.102"
+        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.102"
+        value_template: '{{ value == "1" }}'
+
       is_internet:
         command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
         command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
@@ -37,6 +43,8 @@
         command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.104"
         command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.104"
         value_template: '{{ value == "1" }}'
+
+
 
 
 ####################################################

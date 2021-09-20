@@ -145,7 +145,7 @@
         value_template: "{{ is_state('switch.is_internet', 'on') or is_state('switch.isp_internet', 'on') }}"
       - service: switch.turn_off
         data:
-          entity_id: switch.is_internet, switch.isp_internet
+          entity_id: switch.is_internet, switch.isp_internet, switch.switch_internet
 
 #########################################################
 #                                                                                                              #
