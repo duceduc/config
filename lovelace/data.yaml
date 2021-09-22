@@ -221,7 +221,7 @@ cards:
                 name: Livingroom Curtains
               - entity: sensor.meter_battery
                 name: Thermometer
-              - entity: sensor.jcom_tv_box_battery_2
+              - entity: sensor.jcom_tv_box_battery
                 name: Jcom Tv Box
               - entity: sensor.floor_heat_battery
                 name: Floor Heater

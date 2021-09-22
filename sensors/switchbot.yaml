@@ -68,12 +68,12 @@
 #                                                                                                    #
 ####################################################
 
-  - platform: mqtt
-    name: "Jcom Tv Box Battery"
-    state_topic: 'switchbot/bot/f4f839cd40fd'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
+#  - platform: mqtt
+#    name: "Jcom Tv Box Battery"
+#    state_topic: 'switchbot/bot/f4f839cd40fd'
+#    value_template: '{{ value_json.serviceData.battery }}'
+#    unit_of_measurement: "%"
+#    icon: mdi:battery
   - platform: mqtt
     name: 'Jcom Tv Box BLE Signal'
     state_topic: 'switchbot/bot/f4f839cd40fd'
@@ -126,12 +126,12 @@
 #                                                                                                    #
 ####################################################
 
-  - platform: mqtt
-    name: "HDMI Selector Battery"
-    state_topic: 'switchbot/bot/c9f9186ca30d'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
+#  - platform: mqtt
+#    name: "HDMI Selector Battery"
+#    state_topic: 'switchbot/bot/c9f9186ca30d'
+#    value_template: '{{ value_json.serviceData.battery }}'
+#    unit_of_measurement: "%"
+#    icon: mdi:battery
   - platform: mqtt
     name: 'HDMI Selector BLE Signal'
     state_topic: 'switchbot/bot/c9f9186ca30d'
