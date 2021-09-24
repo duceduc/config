@@ -354,7 +354,7 @@
           17
         {% endif %}
   - condition: template
-    value_template: "{{ states('sensor.outside_temperature')|float > 22 }}"
+    value_template: "{{ states('sensor.oa_temperature')|float > 22 }}"
   - service: input_number.set_value
     data:
       entity_id: input_number.lr_heater_heat_temp_set

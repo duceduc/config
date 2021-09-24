@@ -73,22 +73,22 @@
           - service: script.toilet_seat_off_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.outside_temperature')|int <= 9}}
+             states('sensor.oa_temperature')|int <= 9}}
         sequence:
           - service: script.toilet_seat_high_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.outside_temperature')|int <= 14 }}
+             states('sensor.oa_temperature')|int <= 14 }}
         sequence:
           - service: script.toilet_seat_med_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.outside_temperature')|int <= 19 }}
+             states('sensor.oa_temperature')|int <= 19 }}
         sequence:
           - service: script.toilet_seat_low_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.outside_temperature')| int >= 20 }}
+             states('sensor.oa_temperature')| int >= 20 }}
         sequence:
           - service: script.toilet_seat_off_heat
 
@@ -101,39 +101,39 @@
 - alias: 'Adjust Toilet Seat Heater Temperature'
   trigger:
     - platform: state
-      entity_id: sensor.outside_temperature
+      entity_id: sensor.oa_temperature
   condition:
     - condition: template # Is not summer
       value_template: "{{ not is_state('sensor.season', 'summer') }}"
   action:
     choose:
       - conditions: >
-           {{ states.sensor.outside_temperature.state | int <= 9 and
+           {{ states.sensor.oa_temperature.state | int <= 9 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_high_heat
       - conditions: >
-           {{ states.sensor.outside_temperature.state | int <= 14 and
+           {{ states.sensor.oa_temperature.state | int <= 14 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_med_heat
       - conditions: >
-           {{ states.sensor.outside_temperature.state | int <= 19 and
+           {{ states.sensor.oa_temperature.state | int <= 19 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_low_heat
 #      - conditions: >
-#           {{ states.sensor.outside_temperature.state | int <= 20 and
+#           {{ states.sensor.oa_temperature.state | int <= 20 and
 #              states.input_select.home_mode.state == 'Home' }}
 #        sequence:
 #          - service: script.toilet_seat_off_heat
       - conditions: >
-           {{ states.sensor.outside_temperature.state | int >= 20 and
+           {{ states.sensor.oa_temperature.state | int >= 20 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_off_heat
       - conditions: > # default to low if sensor not on
-           {{ not is_state('binary_sensor.outside_dht_status', 'on') and
+           {{ not is_state('binary_sensor.oa_dht_sensor_status', 'on') and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_low_heat
