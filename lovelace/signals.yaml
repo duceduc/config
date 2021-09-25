@@ -60,6 +60,8 @@ cards:
     entities:
       - entity: sensor.security_cam_wifi_signal
         name: ESP32 Camera
+      - entity: sensor.esp32_linkquality
+        name: ESP32 Switchbot
       - entity: sensor.bed_sensor_wifi_signal
         name: ESP32 Bed Sensor
       - entity: sensor.aio_wemos_wifi_signal
@@ -74,6 +76,7 @@ cards:
         name: MS1 Server
       - entity: sensor.ms2_wifi_strength
         name: MS2 Server
+
 
     severity:
       - color: var(--label-badge-green)

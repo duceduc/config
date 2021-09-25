@@ -48,9 +48,6 @@
 
 - alias: '24hr fan toggle speed'
   trigger:
-    - platform: state
-      entity_id: sensor.period_of_the_day
-      to: 'dusklight'
     - platform: time
       at: '05:30:20'
   condition:
