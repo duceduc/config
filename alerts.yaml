@@ -4,7 +4,6 @@
 #                                                                                                              #
 #########################################################
 
-
   low_battery_devices:
     name: Devices have low battery
     entity_id: binary_sensor.devices_with_low_battery
@@ -16,13 +15,11 @@
     notifiers:
     - 'notify_events'
 
-
 #########################################################
 #                                                                                                              #
 #             Raspberry Pi Update Available Notification                                          #
 #                                                                                                              #
 #########################################################
-
 
   rpi_updates:
     name: Raspberry Pi Updates Available
@@ -34,8 +31,6 @@
     repeat: 720
     notifiers:
     - 'notify_events'
-
-
 
 #########################################################
 #                                                                                                              #

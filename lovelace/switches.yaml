@@ -107,6 +107,9 @@ cards:
       - entity: switch.isp_internet
         name: iPhone 6+
         icon: mdi:wifi
+      - entity: switch.switch_internet
+        name: Nintendo Switch
+        icon: mdi:wifi
       - entity: switch.tv_lock
         name: Tv Lock
 

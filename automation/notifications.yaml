@@ -19,6 +19,51 @@
       data_template:
         message: "Time for Shion to go to   school."
 
+#########################################################
+#                                                                                                              #
+#                   ISP Internet Status                                                                 #
+#                                                                                                              #
+#########################################################
+
+- alias: ISP Internet Status Notification
+  variables:
+    status_msg: "Internet is {{ states('binary_sensor.internet')|lower }}line."
+  trigger:
+    platform: state
+    entity_id: binary_sensor.internet
+    to: 'off'
+    for: 10
+  action:
+    - service: notify.home_assistant
+      data_template:
+        title: "Internet {{ states('binary_sensor.internet')| title }}line Notification"
+        message: >
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          The Internet appears to be {{ states('binary_sensor.internet') }}line.
+          <br>
+        data:
+          images: []
+
+    - service: notify.amberthebot
+      data_template:
+        message: '{{ status_msg }}'
+
+    - service: notify.desktop
+      data_template:
+        message: '{{ status_msg }}'
+        
+    - service: notify.mobile_app_id
+      data:
+        message: '{{ status_msg }}'
+        title: '*Internet Status*'
+
+    - service: logbook.log
+      data_template:
+        name: Internet Status
+        message: "{{ states('binary_sensor.internet')|lower }}line"
+
+
 
 #########################################################
 #                                                                                                              #
