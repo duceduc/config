@@ -35,21 +35,21 @@
 - alias: '24hr fan toggle on-off'
   trigger:
     - platform: time
-      at: '05:30:00'
+      at: '05:29:00'
     - platform: time
       at: '23:00:00'
   condition:
     - condition: template # Someone is Home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:30') else 'off' }}
+    - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:29') else 'off' }}
       data:
         entity_id: switch.24hr_fan
 
 - alias: '24hr fan toggle speed'
   trigger:
     - platform: time
-      at: '05:30:00'
+      at: '05:29:00'
     - platform: state
       entity_id: sensor.period_of_the_day
       to: 'dusklight'
@@ -57,7 +57,7 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    - delay: 20
+    - delay: 60
     - service: script.holdpress_bot
       data:
         bot: '24hr_fan'

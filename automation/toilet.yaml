@@ -73,17 +73,17 @@
           - service: script.toilet_seat_off_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.oa_temperature')|int <= 9}}
+             states('sensor.oa_temperature')| int <= 9}}
         sequence:
           - service: script.toilet_seat_high_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.oa_temperature')|int <= 14 }}
+             states('sensor.oa_temperature')| int <= 14 }}
         sequence:
           - service: script.toilet_seat_med_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' or trigger.to_state.state == 'Returning' and 
-             states('sensor.oa_temperature')|int <= 19 }}
+             states('sensor.oa_temperature')| int <= 19 }}
         sequence:
           - service: script.toilet_seat_low_heat
       - conditions: >
