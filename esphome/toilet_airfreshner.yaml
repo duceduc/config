@@ -11,7 +11,7 @@ esphome:
   board: $board
 
 wifi:
-  ssid: 'rice_dwarf'
+  ssid: !secret ssid_2
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
