@@ -49,9 +49,9 @@
   action:
     - service: switch.turn_on
       entity_id: switch.toilet_airfreshener
-    - service: counter.increment
-      target:
-        entity_id: counter.toilet_airfreshner
+#    - service: counter.increment
+#      target:
+#        entity_id: counter.toilet_airfreshner
 
 #########################################################
 #                                                                                                              #

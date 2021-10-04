@@ -1,7 +1,7 @@
 # ESP8266 NodeMCU....
 # [BC-DD-C2-7A-CC-B4]
 substitutions:
-  name: toilet_airfreshener
+  name: toilet-airfreshener
   platform: ESP8266
   board: nodemcuv2
 
@@ -11,7 +11,8 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid_2
+#  use_address: toilet_airfreshener.local
+  ssid: !secret ssid_1
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
@@ -31,22 +32,27 @@ ota:
 
 switch:
   - platform: gpio
-    name: $name
+    name: toilet_airfreshener
     id: relay
     pin: D1 # use D1, D2, d5, d6, d7 for relays
     icon: mdi:spray
     restore_mode: ALWAYS_OFF
     on_turn_on:
+      - homeassistant.service:
+           service: counter.increment
+           data:
+             entity_id: counter.toilet_airfreshner
+
       - delay: 12s
       - switch.turn_off: relay
 
 sensor:
   - platform: wifi_signal
-    name: $name wifi signal
+    name: toilet_airfreshener wifi signal
 
 binary_sensor:
   - platform: status
-    name: $name status
+    name: toilet_airfreshener status
 
   - platform: gpio
     pin: D5

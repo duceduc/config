@@ -13,6 +13,8 @@ esphome:
 wifi:
   ssid: 'rice_dwarf'
   password: !secret ssid_pass
+  fast_connect : true
+  power_save_mode: none
   manual_ip:
     static_ip: 192.168.1.90
     subnet: 255.255.255.0

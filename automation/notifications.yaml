@@ -19,44 +19,28 @@
       data_template:
         message: "Time for Shion to go to   school."
 
+#########################################################
+#                                                                                                              #
+#                   Replace Toilet Airfreshner Notification                                         #
+#                                                                                                              #
+#########################################################
 
-
-
-
-### TEST
-- alias:  Alert when batteries are below 25
+- alias: "Replace Toilet Airfreshner Notification"
   trigger:
-  - platform: state
-    entity_id: binary_sensor.battery_alert
-    to: 'on'
+    - platform: numeric_state
+      entity_id: counter.toilet_airfreshner
+      below: 400
   action:
-  - service: notify.home_assistant
-    data_template:
-      message: >
-        {%- set ns = namespace(below=[]) %}
-        {%- for s in states.sensor %}
-          {%- if s.entity_id.endswith('battery') and s.state|int < 25 %}
-            {%- set ns.below = ns.below + [ s.attributes.friendly_name ] %}
-          {%- endif %}
-        {%- endfor %}
-        {%- if ns.below | count == 1 %}
-          {{ ns.below[0] }} is low!
-        {%- elif ns.below | count == 2 %}
-          {{ ns.below | join(' and ') }} are low!
-        {%- else %}
-          {{ ns.below[:-1] | join(', ') }}, and {{ ns.below[-1] }} are low!
-        {%- endif %}
-
-
-
-
-
-
-
-
-
-
-
+    - service: notify.home_assistant
+      data_template:
+        title: "Replace Toilet Airfreshner Notification"
+        message: >-
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          The toilet air freshner bottle needs to be replaced. It has sprayed over 400 times.<br>
+          <br>
+        data:
+          images: []
 
 #########################################################
 #                                                                                                              #

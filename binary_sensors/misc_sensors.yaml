@@ -23,39 +23,6 @@
     entity_id: sensor.ms2_updates
     upper: 0.5
 
-
-
-
-
-
-
-### TEST
-
-  - platform: template
-    sensors:
-      battery_alert:
-        value_template: >
-          {%- set ns = namespace(below=[]) %}
-          {%- for s in states.sensor %}
-            {%- if s.entity_id.endswith('battery') and s.state|int < 25 %}
-              {%- set ns.below = ns.below + [ s ] %}
-            {%- endif %}
-          {%- endfor %}
-          {{ ns.below | count > 0 }}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ####################################################
 #                                                                                                    #
 #            Motion Sensors                                                                    #

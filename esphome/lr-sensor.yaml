@@ -1,7 +1,7 @@
 # ESP8266 NodeMCU....
 # [50:02:91:FD:4B:26]
 substitutions:
-  name: lr_sensor
+  name: lr-sensor
   platform: ESP8266
   board: nodemcuv2
 
@@ -11,7 +11,8 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid_2
+#  use_address: lr_sensor.local
+  ssid: !secret ssid_1
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
