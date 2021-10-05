@@ -111,6 +111,11 @@
   condition:
     - condition: template # Is not summer
       value_template: "{{ not is_state('sensor.season', 'summer') }}"
+    - condition: template # Only run if not sensor is on
+      value_template: "{{ not is_state('binary_sensor.oa_dht_sensor_status', 'off') }}"
+
+#    - condition: template # Only run if not in Unavailable or Unknown
+#      value_template: "{{ states('sensor.oa_temperature') not in ['Unavailable', 'Unknown'] }}"
   action:
     choose:
       - conditions: >
@@ -134,11 +139,11 @@
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_low_heat
-      - conditions: > # default to low if sensor not on
-           {{ not is_state('binary_sensor.oa_dht_sensor_status', 'on') and
-              states.input_select.home_mode.state == 'Home' }}
-        sequence:
-          - service: script.toilet_seat_low_heat
+#      - conditions: > # default to low if sensor not on
+#           {{ not is_state('binary_sensor.oa_dht_sensor_status', 'on') and
+#              states.input_select.home_mode.state == 'Home' }}
+#        sequence:
+#          - service: script.toilet_seat_low_heat
 
 #########################################################
 #                                                                                                              #
