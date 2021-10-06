@@ -1,5 +1,6 @@
 # ESP8266 NodeMCU....
-# [50:02:91:FD:4B:26]
+# [98:CD:AC:31:B8:E7] NEW
+# [50:02:91:FD:4B:26] OLD
 substitutions:
   name: lr-sensor
   platform: ESP8266

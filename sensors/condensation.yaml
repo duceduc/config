@@ -7,8 +7,8 @@
 # LR Mold Chance
   - platform: mold_indicator
     name: Lr Condensation Chance
-    indoor_temp_sensor: sensor.lr_temperature
-    indoor_humidity_sensor: sensor.lr_humidity
+    indoor_temp_sensor: sensor.livingroom_temperature
+    indoor_humidity_sensor: sensor.livingroom_humidity
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.4
     

@@ -22,8 +22,8 @@ cards:
       - title: Livingroom Aircon Controls
       - room: lr
       - entity_1: input_select.lr_ac_mode
-      - entity_2: sensor.lr_temperature
-      - entity_3: sensor.lr_humidity
+      - entity_2: sensor.livingroom_temperature
+      - entity_3: sensor.livingroom_humidity
       - entity_4: sensor.lr_condensation_chance
 
 
