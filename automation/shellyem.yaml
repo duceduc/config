@@ -17,7 +17,7 @@
   - service: input_number.set_value
     data_template:
       entity_id: input_number.cumulative_energy_cost
-      value: "{{ states('input_number.cumulative_energy_cost')|float + states('sensor.total_cost_today')|float }}"
+      value: "{{ states('input_number.cumulative_energy_cost')|float(0) + states('sensor.total_cost_today')|float(0) }}"
   - service: notify.energy_log
     data_template:
       message: "{{ states('sensor.date') }},{{ states('sensor.energy_t31_light_and_power_day') }},{{ states('sensor.energy_t31_light_and_power_night') }},{{ states('sensor.energy_t31_light_and_power_total') }},{{ states('sensor.energy_t41_heating_day') }},{{ states('sensor.energy_t41_heating_night') }},{{ states('sensor.energy_t41_heating_total') }},{{ states('sensor.total_energy_day') }},{{ states('sensor.total_energy_night') }},{{ states('sensor.total_energy') }},{{ state_attr('sensor.power_stats','min_value') }},{{ state_attr('sensor.power_stats','max_value') }},{{ states('sensor.power_stats') }},{{ states('sensor.total_cost_today') }}"

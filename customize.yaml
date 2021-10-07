@@ -169,6 +169,8 @@ switch.humidifier_sr_unit:
   friendly_name: Humidifier Shion Room
 switch.tv_power:
   friendly_name: TV Power
+  assumed_state: false
+
 switch.tv_mute:
   friendly_name: TV Mute
 switch.tv_volume:

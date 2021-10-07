@@ -41,8 +41,8 @@
         friendly_name: 'Outside Feels Like'
         unit_of_measurement: "°C"
         value_template: >
-          {% set temp = states('sensor.oa_temperature')|float %}
-          {% set humidity = states('sensor.oa_humidity')|float %}
+          {% set temp = states('sensor.oa_temperature')|float(0) %}
+          {% set humidity = states('sensor.oa_humidity')|float(0) %}
           {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
 
 ####################################################

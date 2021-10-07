@@ -27,7 +27,7 @@
       - switch.ac_mr_unit
       - switch.ac_sr_unit
       - sensor.oa_temperature
-      - sensor.livingroom_temperature
+      - sensor.lr_temperature
       - group.bed_sensors
       - sensor.oa_humidity
       - sensor.livingroom_humidity

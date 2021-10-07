@@ -12,7 +12,7 @@
       to: 'on'
       for: '00:00:30'
     - platform: numeric_state
-      entity_id: sensor.livingroom_temperature
+      entity_id: sensor.lr_temperature
       above: input_number.lr_ac_cool_temp_set
       for: '00:00:10'
 
@@ -23,12 +23,12 @@
       value_template: "{{ is_state('input_select.lr_ac_mode', 'Off') }}"
     - condition: template
       value_template: >- # LR Aircon cool settings
-          {{ states('sensor.livingroom_temperature') | float(default=24) > states('input_number.lr_ac_cool_temp_set') | float(default=25) }}
+          {{ states('sensor.lr_temperature') | float(default=24) > states('input_number.lr_ac_cool_temp_set') | float(default=25) }}
 
   action:
     - service: script.activate_alexa_actionable_notification
       data_template:
-        text: 'The current livingroom temperature is {{ states("sensor.livingroom_temperature") }} degree celsius. Would you like me to turn on the livingroom AC?'
+        text: 'The current livingroom temperature is {{ states("sensor.lr_temperature") }} degree celsius. Would you like me to turn on the livingroom AC?'
         event_id: 'ask_to_turn_on_lr_aircon'
         alexa_device: 'media_player.ai_1'
 

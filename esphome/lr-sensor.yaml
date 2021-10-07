@@ -34,7 +34,7 @@ ota:
 sensor:
   - platform: dht
     model: AM2302
-    pin: D4
+    pin: D3 #Avoid D4. LED Driven
     temperature:
       name: 'lr temperature'
     humidity:

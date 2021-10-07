@@ -1,7 +1,7 @@
 # ESP8266 NodeMCU....
 # [C4:5B:BE:70:D3:D2]
 substitutions:
-  name: sr_sensor
+  name: sr-sensor
   platform: ESP8266
   board: nodemcuv2
 
@@ -11,10 +11,11 @@ esphome:
   board: $board
 
 wifi:
-  ssid: 'rice_dwarf'
+#  use_address: sr_sensor.local
+  ssid: !secret ssid_1
   password: !secret ssid_pass
-#  fast_connect : true
-#  power_save_mode: none
+  fast_connect : true
+  power_save_mode: none
   manual_ip:
     static_ip: 192.168.1.92
     subnet: 255.255.255.0
@@ -32,7 +33,7 @@ ota:
 sensor:
   - platform: dht
     model: AM2302
-    pin: D4
+    pin: D3 #Avoid D4. LED Driven. Use D3
     temperature:
       name: 'sr temperature'
     humidity:

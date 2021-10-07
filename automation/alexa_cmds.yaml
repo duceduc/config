@@ -58,7 +58,7 @@
                 {% set rp = state_attr(et,"friendly_name")|replace('_', '  ') %}
               {% elif tn|regex_search('\(e..[s$S]\)') %}
                 {% if tn[4:5] == "S" %}
-                  {% set st = states(et)|float|round(1)|string %}
+                  {% set st = states(et)|float(0)|round(1)|string %}
                   {% set st = st ~ " " ~ state_attr(et,"unit_of_measurement")|replace('None','') %}
                 {% endif %}
                 {% if tn[4:5] == "$" %}
@@ -112,7 +112,7 @@
       option: >
         {% set slist = state_attr('input_select.speak_list','options') %}
         {% set opt = state_attr('light.alexa_virtual','brightness') %}
-        {% set opt = (opt | float / 255  * 100+0.5)|int %}
+        {% set opt = (opt | float(0) / 255  * 100+0.5)|int %}
         {% if opt|int > slist|length %}
           {% set opt = 0 %}
         {% endif %}
