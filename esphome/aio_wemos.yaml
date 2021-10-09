@@ -58,7 +58,7 @@ sensor:
     pin: A0
     name: 'rear Illuminance'
     unit_of_measurement: lux
-    update_interval: 60s
+    update_interval: 30s
 
 binary_sensor:
   - platform: status
