@@ -32,7 +32,7 @@ ota:
 
 switch:
   - platform: gpio
-    name: toilet_airfreshener
+    name: $name
     id: relay
     pin: D1 # use D1, D2, d5, d6, d7 for relays
     icon: mdi:spray
@@ -41,18 +41,17 @@ switch:
       - homeassistant.service:
            service: counter.increment
            data:
-             entity_id: counter.toilet_airfreshner
-
+             entity_id: counter.toilet_airfreshener
       - delay: 12s
       - switch.turn_off: relay
 
 sensor:
   - platform: wifi_signal
-    name: toilet_airfreshener wifi signal
+    name: $name wifi signal
 
 binary_sensor:
   - platform: status
-    name: toilet_airfreshener status
+    name: $name status
 
   - platform: gpio
     pin: D5

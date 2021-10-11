@@ -39,7 +39,7 @@ sensor:
       name: 'lr temperature'
     humidity:
       name: 'lr humidity'
-    update_interval: 60s
+    update_interval: 50s
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -48,7 +48,7 @@ sensor:
     pin: A0
     name: 'front illuminance'
     unit_of_measurement: lux
-    update_interval: 30s
+    update_interval: 55s
 
 binary_sensor:
   - platform: status
