@@ -11,10 +11,10 @@
     command: 'cat /config/www/data/days.json'
     value_template: >
       {% set today = now().month  ~ '/' ~ now().day  %}
-      {% set holiday =  value_json.MAJOR_JP.static[ today ] %}
+      {% set holiday = value_json.MAJOR_JP.static[ today ] %}
       {% if holiday | trim == "" %}
         {% set today = now().month  ~ '/' ~ now().day ~ '/' ~ now().year %}
-        {% set holiday =  value_json.MAJOR_JP.dynamic[ today ] %}
+        {% set holiday = value_json.MAJOR_JP.dynamic[ today ] %}
       {% endif %}
       {{ holiday }}
     scan_interval: 14400
@@ -24,10 +24,10 @@
     command: 'cat /config/www/data/days.json'
     value_template: >
       {% set today = as_timestamp(now() + timedelta(days = 1))|timestamp_custom('%-m/%d', true )  %}
-      {% set holiday =  value_json.MAJOR_JP.static[ today ] %}
+      {% set holiday = value_json.MAJOR_JP.static[ today ] %}
       {% if holiday | trim == "" %}
         {% set today = as_timestamp(now() + timedelta(days = 1))|timestamp_custom('%-m/%d', true ) ~ '/' ~ now().year  %}
-        {% set holiday =  value_json.MAJOR_JP.dynamic[ today ] %}
+        {% set holiday = value_json.MAJOR_JP.dynamic[ today ] %}
       {% endif %}
       {{ holiday }}
     scan_interval: 14400
@@ -37,10 +37,10 @@
     command: 'cat /config/www/data/days.json'
     value_template: >
       {% set today = as_timestamp(now() + timedelta(days = 7))|timestamp_custom('%-m/%d', true )  %}
-      {% set holiday =  value_json.MAJOR_JP.static[ today ] %}
+      {% set holiday = value_json.MAJOR_JP.static[ today ] %}
       {% if holiday | trim == "" %}
         {% set today = as_timestamp(now() + timedelta(days = 7))|timestamp_custom('%-m/%d', true ) ~ '/' ~ now().year  %}
-        {% set holiday =  value_json.MAJOR_JP.dynamic[ today ] %}
+        {% set holiday = value_json.MAJOR_JP.dynamic[ today ] %}
       {% endif %}
       {{ holiday }}
     scan_interval: 14400

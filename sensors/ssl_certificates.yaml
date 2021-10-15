@@ -60,10 +60,10 @@
          {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
          {% set str=states.sensor.mqtt_ssl_cert_issued.state %}
          
-         {% set Y=(str|regex_findall_index('[0-9]{4}',0)).replace('','') %}
-         {% set mt=(str|regex_findall_index('[a-zA-Z]{3}',0)).replace('','') %}
+         {% set Y=(str|regex_findall_index('[0-9]{4}')).replace('','') %}
+         {% set mt=(str|regex_findall_index('[a-zA-Z]{3}')).replace('','') %}
          {% set m=alias.get(mt) %}
-         {% set d=(str|regex_findall_index('[0-9]{1,2}',0)).replace('','') %}
+         {% set d=(str|regex_findall_index('[0-9]{1,2}')).replace('','') %}
          
          {% set date=Y + '-' + m + '-' + d %}
          {{ 720 - (( as_timestamp(now()) - as_timestamp(strptime(date, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}
