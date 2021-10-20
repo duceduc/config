@@ -75,12 +75,12 @@
   trigger:
     - platform: state
       entity_id: 
-#        - binary_sensor.duc_home
-#        - binary_sensor.eri_home
-        - device_tracker.duc
-        - device_tracker.eri
-#      to: 'on'
-      to: 'home'
+        - binary_sensor.duc_home
+        - binary_sensor.eri_home
+#        - device_tracker.duc
+#        - device_tracker.eri
+      to: 'on'
+#      to: 'home'
   action:
     - service: notify.alexa_media
       data_template:
