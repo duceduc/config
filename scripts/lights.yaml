@@ -520,6 +520,21 @@
           entity_id: '{{ entity }}'
           brightness: 255
 
+
+### TEST
+  all_out:
+    sequence:
+      - service: light.turn_off
+        data_template:
+          entity_id: >
+            {% set exclude_light = [
+              'light.house_number',
+              'light.aquarium',
+              'light.entrance'
+            ] %}
+            {%- for device in states.light|rejectattr('entity_id','in',exclude_light)|rejectattr('state','in','off') %}{%- if loop.first %}{%- else %}, {% endif %}{{device.entity_id }}{%- if loop.last %}{% endif %}{%- endfor  %}
+
+
 #########################################################
 #                                                                                                              #
 #          END OF CONFIGURATION FILE                                                             #
