@@ -514,7 +514,7 @@
         data_template:
           entity_id: '{{ entity }}'
           rgb_color: [255, 212, 113]
-      - delay: 1 # Need delay for color blub to change brightness
+      - delay: 1 # Needs delay for color blub to change brightness
       - service: light.turn_on
         data_template:
           entity_id: '{{ entity }}'
@@ -522,7 +522,7 @@
 
 
 ### TEST
-  all_out:
+  lights_out:
     sequence:
       - service: light.turn_off
         data_template:

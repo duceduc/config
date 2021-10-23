@@ -11,7 +11,7 @@
     indoor_humidity_sensor: sensor.livingroom_humidity
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.4
-    
+
 # MR Mold Chance
   - platform: mold_indicator
     name: Mr Condensation Chance

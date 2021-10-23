@@ -1,7 +1,9 @@
 # ESP32 NodeMCU
-# [7C-9E-BD-ED-C9-54]
+# [30-83-98-00-A5-B8]
+# [7C-9E-BD-ED-C9-54] OLD
+
 substitutions:
-  name: bed_sensor
+  name: bed-sensor
   platform: ESP32
   board: nodemcu-32s
 
@@ -11,7 +13,7 @@ esphome:
   board: $board
 
 wifi:
-  ssid: 'rice_dwarf'
+  ssid: !secret ssid_1  
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
