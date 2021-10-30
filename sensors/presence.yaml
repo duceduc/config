@@ -1,6 +1,6 @@
 ####################################################
 #                                                                                                    #
-#            PRESENCE - GENKAN                                                             #
+#            PRESENCE/RSSI - GENKAN                                                      #
 #                                                                                                    #
 ####################################################
 
@@ -52,9 +52,83 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
+# Duc RSSI
+  - platform: mqtt
+    name: 'iD Genkan RSSI'
+    state_topic: 'monitor/livingroom/id/rssi'
+    value_template: '{{ value_json }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
+
+
 ####################################################
 #                                                                                                    #
-#            PRESENCE - LIVINGROOM                                                       #
+#            PRESENCE/RSSI - SHION ROOM                                               #
+#                                                                                                    #
+####################################################
+
+# Duc
+  - platform: mqtt
+    name: 'iD Shionroom'
+    state_topic: 'monitor/shionroom/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - platform: mqtt
+    name: 'iE Shionroom'
+    state_topic: 'monitor/shionroom/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - platform: mqtt
+    name: 'iS Shionroom'
+    state_topic: 'monitor/shionroom/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - platform: mqtt
+    name: 'iSp Shionroom'
+    state_topic: 'monitor/shionroom/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - platform: mqtt
+    name: 'tms Shionroom'
+    state_topic: 'monitor/shionroom/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Sachiko
+  - platform: mqtt
+    name: 'Sachiko Shionroom'
+    state_topic: 'monitor/shionroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Duc RSSI
+  - platform: mqtt
+    name: 'iD Shionroom RSSI'
+    state_topic: 'monitor/shionroom/id/rssi'
+    value_template: '{{ value_json }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
+
+
+####################################################
+#                                                                                                    #
+#            PRESENCE/RSSI - LIVINGROOM                                               #
 #                                                                                                    #
 ####################################################
 
@@ -106,6 +180,14 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
+# Duc RSSI
+  - platform: mqtt
+    name: 'iD Livingroom RSSI'
+    state_topic: 'monitor/genkan/id/rssi'
+    value_template: '{{ value_json }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:antenna
+
 ####################################################
 #                                                                                                    #
 #            PRESENCE - MIN/MAX                                                           #
@@ -119,6 +201,7 @@
     entity_ids:
       - sensor.id_genkan
       - sensor.id_livingroom
+      - sensor.id_shionroom
 
   - platform: min_max
     name: 'iE Presence'
@@ -127,6 +210,7 @@
     entity_ids:
       - sensor.ie_genkan
       - sensor.ie_livingroom
+      - sensor.ie_shionroom
 
   - platform: min_max
     name: 'iS Presence'
@@ -135,6 +219,7 @@
     entity_ids:
       - sensor.is_genkan
       - sensor.is_livingroom
+      - sensor.is_shionroom
 
   - platform: min_max
     name: 'iSp Presence'
@@ -143,6 +228,7 @@
     entity_ids:
       - sensor.isp_genkan
       - sensor.isp_livingroom
+      - sensor.isp_shionroom
 
   - platform: min_max
     name: 'tms Presence'
@@ -151,6 +237,7 @@
     entity_ids:
       - sensor.tms_genkan
       - sensor.tms_livingroom
+      - sensor.tms_shionroom
 
 # Guests
   - platform: min_max
@@ -160,6 +247,25 @@
     entity_ids:
       - sensor.sachiko_genkan
       - sensor.sachiko_livingroom
+      - sensor.sachiko_shionroom
+
+# Where is 
+  - platform: template
+    sensors:
+      duc_location:
+        value_template: >-
+         {% if states("sensor.id_genkan_rssi")| int >= -13 %}Master Room
+         {% elif states("sensor.id_shionroom_rssi")| int >= -13 %}Shion Room         
+         {% elif states("sensor.id_livingroom_rssi")| int >= -26 %}Living Room
+         {% elif states("sensor.id_presence")| int == 0 %}Away
+         {% else %}Unknown{% endif %}
+        icon_template: >-
+         {% if states("sensor.id_genkan_rssi")| int >= -13 %}mdi:bed-empty
+         {% elif states("sensor.id_shionroom_rssi")| int >= -13 %}mdi:bed-empty                 
+         {% elif states("sensor.id_livingroom_rssi")| int >= -26 %}mdi:sofa
+         {% elif states("sensor.id_presence")| int == 0 %}mdi:account-arrow-right
+         {% else %}mdi:account-question{% endif %}
+
 
 ####################################################
 #                                                                                                    #
