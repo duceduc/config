@@ -52,15 +52,6 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
-# Duc RSSI
-  - platform: mqtt
-    name: 'iD Genkan RSSI'
-    state_topic: 'monitor/livingroom/id/rssi'
-    value_template: '{{ value_json }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-
 
 ####################################################
 #                                                                                                    #
@@ -115,15 +106,6 @@
     value_template: '{{ value_json.confidence }}'
     unit_of_measurement: '%'
     icon: mdi:account
-
-# Duc RSSI
-  - platform: mqtt
-    name: 'iD Shionroom RSSI'
-    state_topic: 'monitor/shionroom/id/rssi'
-    value_template: '{{ value_json }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
 
 
 ####################################################
@@ -180,13 +162,6 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
-# Duc RSSI
-  - platform: mqtt
-    name: 'iD Livingroom RSSI'
-    state_topic: 'monitor/genkan/id/rssi'
-    value_template: '{{ value_json }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
 
 ####################################################
 #                                                                                                    #
@@ -248,23 +223,6 @@
       - sensor.sachiko_genkan
       - sensor.sachiko_livingroom
       - sensor.sachiko_shionroom
-
-# Where is 
-  - platform: template
-    sensors:
-      duc_location:
-        value_template: >-
-         {% if states("sensor.id_genkan_rssi")| int >= -13 %}Master Room
-         {% elif states("sensor.id_shionroom_rssi")| int >= -13 %}Shion Room         
-         {% elif states("sensor.id_livingroom_rssi")| int >= -26 %}Living Room
-         {% elif states("sensor.id_presence")| int == 0 %}Away
-         {% else %}Unknown{% endif %}
-        icon_template: >-
-         {% if states("sensor.id_genkan_rssi")| int >= -13 %}mdi:bed-empty
-         {% elif states("sensor.id_shionroom_rssi")| int >= -13 %}mdi:bed-empty                 
-         {% elif states("sensor.id_livingroom_rssi")| int >= -26 %}mdi:sofa
-         {% elif states("sensor.id_presence")| int == 0 %}mdi:account-arrow-right
-         {% else %}mdi:account-question{% endif %}
 
 
 ####################################################

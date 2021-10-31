@@ -79,6 +79,8 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # is daylight
       value_template: "{{ is_state('sensor.period_of_the_day', 'daylight') }}"
+    - condition: template # is NOT on
+      value_template: "{{ states('light.living_room') != 'on' }}"
     - condition: or
       conditions:
         - condition: template # is the weekend or
