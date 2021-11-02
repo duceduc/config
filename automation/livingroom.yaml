@@ -63,6 +63,8 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # is daylight
       value_template: "{{ is_state('sensor.period_of_the_day', 'daylight') }}"
+    - condition: template # is NOT on already
+      value_template: "{{ states('light.computer_room') != 'on' }}"      
   action:
     - service_template: script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
       data:
@@ -79,7 +81,7 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # is daylight
       value_template: "{{ is_state('sensor.period_of_the_day', 'daylight') }}"
-    - condition: template # is NOT on
+    - condition: template # is NOT on already
       value_template: "{{ states('light.living_room') != 'on' }}"
     - condition: or
       conditions:
