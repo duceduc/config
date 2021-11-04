@@ -86,19 +86,18 @@
         unit_of_measurement: Days
 
 
+####################################################
+#                                                                                                    #
+#                      IG Token Expiry                                                          #
+#                                                                                                    #
+####################################################
 
 
-
-
-
-
-
-
-
-
-
-
-
+  - platform: command_line
+    name: ig token expiry
+    scan_interval: 14400
+    command: !secret ig_token
+    value_template: '{{ (value_json.expires_in / 86400) |  round(0) }}'
 
 
 ####################################################
