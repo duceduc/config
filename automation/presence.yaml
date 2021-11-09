@@ -80,7 +80,7 @@
   action:
     - service: input_boolean.turn_on
       data:
-        entity_id: input_boolean.sachiko_presence
+        entity_id: input_boolean.sachiko_presence, input_boolean.toggle_guest_presence
 - alias: Presence Sachiko Off
   trigger:
     - platform: numeric_state

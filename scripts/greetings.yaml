@@ -119,17 +119,17 @@
              'Hello,',
              'Hi,',
              'Howdy,',
-             'Greetings,'
-             'Long time no see,'
-             'How are things?,'
+             'Greetings,',
+             'Long time no see,',
+             'How are things?,',
              'Hey, What’s up?,',
              'Salutation,',
-             'Ahoy, matey!,'
-             'Greetings and salutations!,'
-             'Look what the cat dragged in!,'
-             'How have you been?,'
+             'Ahoy, matey!,',
+             'Greetings and salutations!,',
+             'Look what the cat dragged in!,',
+             'How have you been?,',
              'You have made it,',
-             'What’s going on?,',
+             'What’s going on?,',             
              'Great to have you back,',
              'Nice to see you back,',
              'You are are here,',
@@ -140,9 +140,14 @@
              )|random +(
              'Hope you had a wonderful day today.',
              'How was your day?',
+             'Enjoy your stay,',
              'Enjoy the rest of the day.',
              'I am glad to see you.'
              )|random }}
+      - service: homeassistant.turn_off
+        data:
+          entity_id: input_boolean.toggle_guest_presence 
+
 
 #########################################################
 #                                                                                                              #

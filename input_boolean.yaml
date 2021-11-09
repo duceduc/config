@@ -139,9 +139,10 @@
     icon: mdi:air-filter
 
 
-
-
-
+  toggle_guest_presence:
+    name: 'Toggle Guest Presence'
+    icon: mdi:account-convert
+    initial: off
 
 
 

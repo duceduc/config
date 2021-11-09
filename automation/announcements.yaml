@@ -115,17 +115,17 @@
   trigger:
      - platform: state
        entity_id:
-        - group.guest_presence
+        - input_boolean.toggle_guest_presence   
         - binary_sensor.duc_presence
        to: 'on'
   action:
     - service: switch.turn_on
       data:
         entity_id: >-
-          {% if is_state('binary_sensor.duc_presence', 'on') %}
-             switch.momentary_activate_tv
-          {% elif is_state('group.guest_presence', 'on') %}
+          {% if is_state('input_boolean.toggle_guest_presence', 'on') %}
              switch.momentary_activate_guest
+          {% elif is_state('binary_sensor.duc_presence', 'on') %}
+             switch.momentary_activate_tv
           {% endif %}
 
 #########################################################
@@ -161,13 +161,9 @@
          {% set p = trigger.to_state.attributes.friendly_name %}
          {% set user = alias.get(p) %}
          {{ user }}
-#    - condition: or
-#      conditions:
-#        - condition: template 
-#          value_template: "{{ states.sensor.period_of_the_day.state != 'daylight' }}" # Turn on LR lights
-#        - condition: time
-#          after: '17:45:00'
-#          before: '18:30:00'
+
+    - condition: template 
+      value_template: "{{ not is_state('switch.momentary_activate_guest', 'on') }}" 
 
     - condition: template 
       value_template: "{{ states.sensor.front_illuminance.state | float > 0.22 }}" 

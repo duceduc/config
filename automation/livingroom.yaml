@@ -15,6 +15,8 @@
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Not in Vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
   action:
     - service: cover.set_cover_position
       data:
@@ -39,6 +41,8 @@
   condition:
     - condition: template 
       value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"
+    - condition: template # Not in Vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
   action:
     - service: cover.set_cover_position
       data:
@@ -58,13 +62,15 @@
       entity_id: sensor.front_illuminance
       above: 0.21
       below: 0.23
-  condition:
+  condition:  
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # is daylight
       value_template: "{{ is_state('sensor.period_of_the_day', 'daylight') }}"
     - condition: template # is NOT on already
-      value_template: "{{ states('light.computer_room') != 'on' }}"      
+      value_template: "{{ states('light.computer_room') != 'on' }}"
+    - condition: template # Not in Vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
   action:
     - service_template: script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
       data:
@@ -89,6 +95,8 @@
           value_template: "{{ is_state('sensor.date_weekday', 'off') }}" 
         - condition: template # is a holiday
           value_template: "{{ states('sensor.holiday')| trim != '' }}"
+    - condition: template # Not in Vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"        
   action:
     - service_template: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
       data:
