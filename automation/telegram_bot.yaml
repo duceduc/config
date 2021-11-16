@@ -16,7 +16,7 @@
   action:
     - service: notify.amberthebot
       data_template:
-        message: "The PC was left {{ states.binary_sensor.desktop_connected.state }} and no one is home."
+        message: "The PC was left {{ states.binary_sensor.desktop_connected.state }} and there are {{ states.sensor.n_people_home.state }} person at home."
         data:
           inline_keyboard:
           - 'Turn off pc:/turn_off_pc, Leave it:/donothing'
