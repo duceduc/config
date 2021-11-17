@@ -95,7 +95,7 @@
 
   - platform: command_line
     name: ig token expiry
-    scan_interval: 21600
+    scan_interval: 43200
     command: !secret ig_token
     value_template: '{{ (value_json.expires_in / 86400) |  round(0) }}'
 
