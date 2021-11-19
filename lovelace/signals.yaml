@@ -76,6 +76,8 @@ cards:
         name: MS1 Server
       - entity: sensor.ms2_wifi_strength
         name: MS2 Server
+      - entity: sensor.ms3_wifi_strength
+        name: MS3 Server
 
 
     severity:
