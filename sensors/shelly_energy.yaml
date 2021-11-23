@@ -94,7 +94,7 @@
     sensors:
       total_power:
         friendly_name: 'Total Power'
-        value_template: "{{ (states('sensor.tariff_31_power')|float + states('sensor.tariff_41_power')|float)|round(1) }}"
+        value_template: "{{ (states('sensor.tariff_31_power')|float(0) + states('sensor.tariff_41_power')|float(0))|round(1) }}"
         unit_of_measurement: "W"
 
   - platform: template
@@ -102,8 +102,8 @@
       t31_amperage:
         friendly_name: 'T31 Current Amperage'
         value_template: >
-          {% if states('sensor.mains_voltage')|float > 0 %}
-            {{ (states('sensor.tariff_31_power')|float / states('sensor.mains_voltage')|float)|round(1) }}
+          {% if states('sensor.mains_voltage')|float(0) > 0 %}
+            {{ (states('sensor.tariff_31_power')|float(0) / states('sensor.mains_voltage')|float(0))|round(1) }}
           {% else %}
             unknown
           {% endif %}

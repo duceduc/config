@@ -243,7 +243,7 @@
         friendly_name: "CR Curtain Batteries"
         unit_of_measurement: '%'
         device_class: battery
-        value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int + states('sensor.cr_curtain_rt_battery')|int) /2)|int }}"
+        value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int(0) + states('sensor.cr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
 
 # Combined Average Battery
   - platform: template
@@ -252,7 +252,7 @@
         friendly_name: "LR Curtain Batteries"
         unit_of_measurement: '%'
         device_class: battery
-        value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int + states('sensor.lr_curtain_rt_battery')|int) /2)|int }}"
+        value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int(0) + states('sensor.lr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
 
 ####################################################
 #                                                                                                    #

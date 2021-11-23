@@ -121,11 +121,11 @@
     sensors:
       kitchen_illuminance:
         value_template: >
-          {% if states.sensor.front_illuminance.state | float == 0.10 %}
+          {% if states.sensor.front_illuminance.state | float(0) == 0.10 %}
             on
-          {% elif states.sensor.front_illuminance.state | float == 0.13 %}
+          {% elif states.sensor.front_illuminance.state | float(0) == 0.13 %}
             on
-          {% elif states.sensor.front_illuminance.state | float == 0.18 %}
+          {% elif states.sensor.front_illuminance.state | float(0) == 0.18 %}
             on
           {% else %}
             off

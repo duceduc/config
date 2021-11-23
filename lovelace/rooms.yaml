@@ -205,13 +205,13 @@ cards:
       - type: section
         label: Living Room
       - entity: media_player.living_room
-        icon: mdi:apple-airplay
+        icon: mdi:cast-variant
         name: Apple Tv
       - type: section
         label: Basement
       - entity: switch.tv_power
         name: TV
-        icon: mdi:television-clean
+        icon: mdi:television-shimmer
 
   - type: entities
     title: Workout

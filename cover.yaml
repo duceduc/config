@@ -10,7 +10,7 @@
         device_class: curtain
         friendly_name: "Computer Room Curtains"
         value_template: >-
-          {% if states('sensor.cr_curtain_left_position')|float < 90 %}
+          {% if states('sensor.cr_curtain_left_position')|float(0) < 90 %}
             open
           {% else %}
             closed
@@ -45,7 +45,7 @@
         device_class: curtain
         friendly_name: "Living Room Curtains"
         value_template: >-
-          {% if states('sensor.lr_curtain_left_position')|float < 90 %}
+          {% if states('sensor.lr_curtain_left_position')|float(0) < 90 %}
             open
           {% else %}
             closed
