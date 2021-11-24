@@ -71,28 +71,28 @@
           - service: script.toilet_seat_off_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' and 
-             states('sensor.oa_temperature')| int >= 20 }}
+             states('sensor.oa_temperature')| int(0) >= 20 }}
         sequence:
           - service: script.toilet_seat_off_heat
 
       - conditions: >
           {{ trigger.to_state.state == 'Home' and 
-             states('sensor.oa_temperature')| int <= 9}}
+             states('sensor.oa_temperature')| int(0) <= 9}}
         sequence:
           - service: script.toilet_seat_high_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' and 
-             states('sensor.oa_temperature')| int <= 14 }}
+             states('sensor.oa_temperature')| int(0) <= 14 }}
         sequence:
           - service: script.toilet_seat_med_heat
       - conditions: >
           {{ trigger.to_state.state == 'Home' and 
-             states('sensor.oa_temperature')| int <= 19 }}
+             states('sensor.oa_temperature')| int(0) <= 19 }}
         sequence:
           - service: script.toilet_seat_low_heat
       - conditions: >
           {{ trigger.to_state.state == 'Returning' and 
-             states('sensor.oa_temperature')| int <= 19 }}
+             states('sensor.oa_temperature')| int(0) <= 19 }}
         sequence:
           - service: script.toilet_seat_low_heat
 
@@ -117,23 +117,23 @@
   action:
     choose:
       - conditions: >
-           {{ states.sensor.oa_temperature.state | int >= 20 and
+           {{ states.sensor.oa_temperature.state | int(0) >= 20 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_off_heat
 
       - conditions: >
-           {{ states.sensor.oa_temperature.state | int <= 9 and
+           {{ states.sensor.oa_temperature.state | int(0) <= 9 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_high_heat
       - conditions: >
-           {{ states.sensor.oa_temperature.state | int <= 14 and
+           {{ states.sensor.oa_temperature.state | int(0) <= 14 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_med_heat
       - conditions: >
-           {{ states.sensor.oa_temperature.state | int <= 19 and
+           {{ states.sensor.oa_temperature.state | int(0) <= 19 and
               states.input_select.home_mode.state == 'Home' }}
         sequence:
           - service: script.toilet_seat_low_heat
