@@ -364,11 +364,11 @@ cards:
             secondary_info: last-triggered
           - entity: automation.announce_who_is_arriving
             name: Announce Who is Arriving
-            icon: mdi:speaker
+            icon: si:amazonalexa
             secondary_info: last-triggered
           - entity: automation.welcome_home_announcement
             name: Welcome Home Announcement
-            icon: mdi:speaker
+            icon: si:amazonalexa
             secondary_info: last-triggered
 
 

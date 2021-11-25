@@ -13,7 +13,7 @@
     opt: >
       {% set sp = states.input_select.speak_list.state %}
       {% set no = sp.find("(c")+2 %}
-      {{sp[no:no+2]|int}}
+      {{ sp[no:no+2]|int(0) }}
   condition:
   - condition: template
     value_template: '{{states.input_select.speak_list.state != "do not use"  }}'

@@ -43,7 +43,7 @@
       - sensor.shion_birthday
       - sensor.genkan_door
   speak_list:
-    icon: mdi:amazon-alexa 
+    icon: si:amazonalexa 
     name: Speak List
     options:
       - do not use

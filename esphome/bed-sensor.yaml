@@ -90,13 +90,13 @@ binary_sensor:
 # Remote Control
 remote_receiver:
   pin: 
-    number: GPIO15
+    number: GPIO15 # use GPIO16
     inverted: True
     mode: INPUT_PULLUP
   dump: raw
 
 remote_transmitter:
-  pin: GPIO2
+  pin: GPIO2 # use GPIO17
   carrier_duty_percent: 50%
 
 switch:
