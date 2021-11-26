@@ -30,6 +30,8 @@ logger:
 #  pin: GPIO2
 
 mqtt:
+#  topic_prefix: esphome/$name
+#  discovery: false
   broker: 192.168.1.20
   username: !secret mqtt_user
   password: !secret mqtt_pass
@@ -43,14 +45,6 @@ esp32_touch:
 sensor:
    - platform: wifi_signal
      name: $name wifi signal
-#   - platform: dht
-#     pin: GPIO12
-#     model: AM2302
-#     temperature:
-#       name: 'Shion Room Temperature'
-#     humidity:
-#       name: 'Shion Room Humidity'
-#     update_interval: 60s
 
 binary_sensor:
    - platform: status

@@ -16,7 +16,7 @@
     - service: script.notify_slack
       data_template:
         channel: !secret slack_channel_id
-        message: "The PC was left on and no one is home."
+        message: "The PC was left {{ states('binary_sensor.desktop_connected') }} and there are {{ states('sensor.n_people_home') }} person at home."
         attachments:
           - title: Turn off the PC?
             callback_id: turn_off_pc_callback

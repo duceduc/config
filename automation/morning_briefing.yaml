@@ -22,9 +22,9 @@
             The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
             <br>
             <b> Holiday's & Birthdays </b> <br>
-            {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states.sensor.holiday.state}}.{% endif %} <br>
-            {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states.sensor.holidaytomorrow.state}}.{% endif %} <br>
-            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states.sensor.holidayinaweek.state}} is in one week.{% endif %} <br>
+            {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>
+            {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %} <br>
+            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %} <br>
             <br>
             <b> A Picture of Us! </b>
           data:
@@ -48,9 +48,9 @@
             The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
             <br>
             <b> Holiday's & Birthdays </b> <br>
-            {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states.sensor.holiday.state}}.{% endif %} <br>
-            {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states.sensor.holidaytomorrow.state}}.{% endif %} <br>
-            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states.sensor.holidayinaweek.state}} is in one week.{% endif %} <br>
+            {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>
+            {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %} <br>
+            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %} <br>
             <br>
             <b> A Picture of Us! </b>
           data:
