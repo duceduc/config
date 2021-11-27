@@ -10,7 +10,6 @@ icon:  mdi:home-analytics
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
 
-
   - type: custom:decluttering-card
     template: four_sensors_tpl
     variables:
@@ -62,24 +61,6 @@ cards:
   - type: custom:decluttering-card
     template: server_tpl
     variables:
-      - title: ms1
-      - entity_1: sensor.ms1_memory_use
-      - entity_2: sensor.ms1_disk_use
-      - entity_3: sensor.ms1_cpu_usage
-      - entity_4: sensor.ms1_temperature
-
-  - type: custom:decluttering-card
-    template: server_tpl
-    variables:
-      - title: ms2
-      - entity_1: sensor.ms2_memory_use
-      - entity_2: sensor.ms2_disk_use
-      - entity_3: sensor.ms2_cpu_usage
-      - entity_4: sensor.ms2_temperature
-
-  - type: custom:decluttering-card
-    template: server_tpl
-    variables:
       - title: ws1
       - entity_1: sensor.ws1_memory_use
       - entity_2: sensor.ws1_disk_use
@@ -98,13 +79,38 @@ cards:
   - type: custom:decluttering-card
     template: server_tpl
     variables:
+      - title: ms1
+      - entity_1: sensor.ms1_memory_use
+      - entity_2: sensor.ms1_disk_use
+      - entity_3: sensor.ms1_cpu_usage
+      - entity_4: sensor.ms1_temperature
+
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
+      - title: ms2
+      - entity_1: sensor.ms2_memory_use
+      - entity_2: sensor.ms2_disk_use
+      - entity_3: sensor.ms2_cpu_usage
+      - entity_4: sensor.ms2_temperature
+
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
+      - title: ms3
+      - entity_1: sensor.ms3_memory_use
+      - entity_2: sensor.ms3_disk_use
+      - entity_3: sensor.ms3_cpu_usage
+      - entity_4: sensor.ms3_temperature
+
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
       - title: pc
       - entity_1: sensor.desktop_fddl8i4_memory_usage
       - entity_2: sensor.desktop_fddl8i4_storage_c_usage
       - entity_3: sensor.desktop_fddl8i4_cpu_usage
       - entity_4: sensor.desktop_cpu_temperature
-
-
 
 ###################
 
@@ -239,9 +245,47 @@ cards:
           ha-card {
           }
 
+  - type: entities
+    title: Other Automations
+    show_header_toggle: false
+    entities:
+      - head:
+        label: Uptime Status
+        type: section
+      - entity: sensor.time_online
+        name: Last Restart
+      - entity: sensor.last_boot
+        name: Last Boot
+      - entity: sensor.ms2_updates
+        name: RPI's Updates
 
-
-
+      - head:
+        label: Add-On Status
+        type: section
+      - entity: switch.sambabackup
+        name: Samba Backup 
+        icon: mdi:server-plus
+      - entity: switch.portainer
+        name: Portainer
+        icon: mdi:server-plus
+      - entity: switch.mosquitto
+        name: Mosquitto MQTT
+        icon: mdi:server-plus
+      - entity: switch.zigbee2mqtt
+        name: Zigbee2MQTT
+        icon: mdi:server-plus
+      - entity: switch.samba
+        name: Samba
+        icon: mdi:server-plus
+      - entity: switch.ssh
+        name: SSH
+        icon: mdi:server-plus
+      - entity: switch.appdaemon
+        name: AppDaemon
+        icon: mdi:server-plus
+      - entity: switch.esphome
+        name: ESPHome
+        icon: mdi:server-plus
 
   - type: vertical-stack
     cards:
@@ -285,62 +329,6 @@ cards:
           - entity: sensor.lights_count
             name: Number of Lights
             icon: mdi:lightbulb
-
-
-
-  - type: entities
-    title: Other Automations
-    show_header_toggle: false
-    entities:
-      - head:
-        label: Uptime Status
-        type: section
-      - entity: sensor.time_online
-        name: Last Restart
-      - entity: sensor.last_boot
-        name: Last Boot
-      - entity: sensor.ms2_updates
-        name: RPI's Updates
-
-      - head:
-        label: Add-On Status
-        type: section
-      - entity: switch.sambabackup
-        name: Samba Backup 
-        icon: mdi:server-plus
-      - entity: switch.portainer
-        name: Portainer
-        icon: mdi:server-plus
-      - entity: switch.mosquitto
-        name: Mosquitto MQTT
-        icon: mdi:server-plus
-      - entity: switch.zigbee2mqtt
-        name: Zigbee2MQTT
-        icon: mdi:server-plus
-      - entity: switch.samba
-        name: Samba
-        icon: mdi:server-plus
-      - entity: switch.ssh
-        name: SSH
-        icon: mdi:server-plus
-      - entity: switch.appdaemon
-        name: AppDaemon
-        icon: mdi:server-plus
-      - entity: switch.esphome
-        name: ESPHome
-        icon: mdi:server-plus
-
-
-
-
-
-
-
-
-
-
-
-
 
 ####################################################
 #                                                                                                    #
