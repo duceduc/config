@@ -12,9 +12,11 @@
         type: module
       - url: /local/custom_ui/custom-ui.js?v=20200918
         type: module
-
       - url: /local/custom_ui/decluttering-card.js
         type: module
+      - url: /local/custom_ui/button-card.js
+        type: module
+        
       - url: /local/custom_ui/vertical-stack-in-card.js
         type: js
       - url: /local/custom_ui/card-tools.js

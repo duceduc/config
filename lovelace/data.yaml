@@ -10,6 +10,33 @@ icon:  mdi:home-analytics
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
 
+
+  - type: custom:decluttering-card
+    template: person_card_new
+    variables:
+      - entity: person.duc
+      - name: Duc
+      - battery: device_tracker.life360_ben
+      - work_sensor: sensor.ben_to_work_waze
+      - home_sensor: sensor.ben_to_home_waze
+      - work_icon: mdi:car
+      - entity_picture: /local/img/people/avatar-duc.png
+      - show_entity_picture: true
+      - tap_action: 
+          action: more-info
+          haptic: light
+
+
+
+
+
+
+
+
+
+
+
+
   - type: custom:decluttering-card
     template: four_sensors_tpl
     variables:

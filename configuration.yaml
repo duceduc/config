@@ -100,11 +100,11 @@ person:
   - name: Shion
     id: shion0614
     device_trackers:
-     - device_tracker.is
+     - device_tracker.shion
   - name: Eri
     id: eri1118
     device_trackers:
-     - device_tracker.ie
+     - device_tracker.eri
   - name: Kiki
     id: kiki2005
     device_trackers:

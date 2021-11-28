@@ -201,6 +201,7 @@
 #        - binary_sensor.eri_home
         - device_tracker.duc
         - device_tracker.eri
+        - device_tracker.shion        
 #      to: 'on'
       to: 'home'
   condition:
@@ -242,6 +243,39 @@
             entity_id: input_select.home_mode
             data:
               option: 'Home'
+
+
+#########################################################
+#                                                                                                              #
+#            Set Custom Device Tracker Location                                                  #
+#                                                                                                              #
+#########################################################
+
+
+- alias: Set tms Tile Location
+  trigger:
+    - platform: state
+      entity_id: input_boolean.shion_presence
+  action:
+    choose:
+      - conditions: "{{ trigger.to_state.state == 'on' }}"
+        sequence:
+          - service: device_tracker.see
+            data:
+              dev_id: shion
+              location_name: "home"
+              gps: 
+              - '35.8182373046875'
+              - '139.70377148641893'
+      - conditions: "{{ trigger.to_state.state == 'off' }}"
+        sequence:
+          - service: device_tracker.see
+            data:
+              dev_id: shion
+              location_name: "not_home"
+              gps: 
+              - '00.0'
+              - '000.0'
 
 
 #########################################################
