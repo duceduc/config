@@ -57,6 +57,12 @@ midnight:
   label-badge-green: "#0da035" #Default Value
   label-badge-yellow: "#f4b400" #Default Value
 
+  #For Person-badge
+  severity-1: "#df4c1e" #Default Red Value
+  severity-4: "#039be5" #Default Blue Value
+  severity-5: "#0da035" #Default Green Value
+  severity-3: "#f4b400" #Default Yellow Value
+
   #Paper items - These Need to Be removed/repalced based on Breaking Changes in 0.113.0 release notes
   paper-grey-50: "#fafafa" #Default Value
   paper-grey-200: "#eeeeee" #Default Value

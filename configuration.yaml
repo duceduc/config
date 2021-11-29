@@ -105,11 +105,7 @@ person:
     id: eri1118
     device_trackers:
      - device_tracker.eri
-  - name: Kiki
-    id: kiki2005
-    device_trackers:
-     - device_tracker.isp
-    
+
 homekit:
   name: Home-Assistant
   filter:

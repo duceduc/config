@@ -179,10 +179,32 @@ decluttering_templates:
 
 
   person_card_new:
+    default:
+      - size: 60%
+      - color: auto
+      - background_color: var(--primary-background-color)
+      - variable: spin
+      - spin: false
+      - show_name: false
+      - show_state: true
+      - show_label: false
+      - show_icon: true
+      - show_last_changed: false
+      - show_entity_picture: false
+      - tap_action:
+          action: more-info
+          haptic: light
+      - aspect_ratio: 2/1
+      - margin-right: 20px
+      - label: '&nbsp;'
+      - off_icon_color: gray
+      - off_name_color: gray
+      - off_state_color: gray
     card:
-        type: custom:button-card
-        cards:
-      battery: '[[battery]]'
+      type: custom:button-card
+      battery_level: '[[battery_level]]'
+      battery_state: '[[battery_state]]'
+  
       home_sensor: '[[home_sensor]]'
       work_sensor: '[[work_sensor]]'
       work_icon: '[[work_icon]]'
@@ -204,7 +226,7 @@ decluttering_templates:
       show_entity_picture: '[[show_entity_picture]]'
       styles:
         card:
-          - border-radius: 12px
+#          - border-radius: 12px
           - --card-background-color: '[[background_color]]'
         icon:
           - grid-column: 1
@@ -216,12 +238,12 @@ decluttering_templates:
           - padding: 0px 10px
           - justify-self: start
         state:
-          - font-size: 12px
+          - font-size: 18px
   #        - font-family: Helvetica
           - padding: 0px 10px
           - justify-self: start
           - text-transform: capitalize
-          - font-weight: bold
+#          - font-weight: bold
           - padding-left: 10px
           - color: var(--primary-text-color)
         grid:
@@ -239,51 +261,48 @@ decluttering_templates:
   #        - font-family: Helvetica 
           - font-size: 13px
         entity_picture:
-          - height: 60px
-          - width: 60px
+          - height: 100px
+          - width: 100px
           - border-radius: 100%
         custom_fields:
           battery:
             - align-self: start
             - justify-self: start
-            - font-size: 12px
-            - color: var(--secondary-text-color)
+            - font-size: 14px
           home:
             - align-self: start
             - justify-self: start
-            - font-size: 12px
-            - color: var(--secondary-text-color)
+            - font-size: 14px
           work:
             - align-self: start
             - justify-self: start
-            - font-size: 12px
-            - color: var(--secondary-text-color)
+            - font-size: 14px
       custom_fields:
             battery: >
                 [[[
-                  if (states['[[battery]]'].attributes.battery_charging === false)
+                  if (states['[[battery_state]]'].state === 'Not Charging')
                     return `<ha-icon
                       icon="mdi:battery"
-                      style="; --mdc-icon-size: 14px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
-                      </ha-icon><span>${states['[[battery]]'].attributes.battery}%</span>`
+                      style="; --mdc-icon-size: 24px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
+                      </ha-icon><span>${states['[[battery_level]]'].state} %</span>`
                   else return `<ha-icon
                     icon="mdi:battery-charging"
-                    style="; --mdc-icon-size: 14px; padding-left: 5px; padding-right: 5px; color: var(--primary-color);">
-                    </ha-icon><span>${states['[[battery]]'].attributes.battery}%</span>`
+                    style="; --mdc-icon-size: 24px; padding-left: 5px; padding-right: 5px; color: var(--primary-color);">
+                    </ha-icon><span>${states['[[battery_level]]'].state} %</span>`
                 ]]]
             home: >
                 [[[
                   return `<ha-icon
                     icon="mdi:home-import-outline"
-                    style="; --mdc-icon-size: 14px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
-                    </ha-icon><span>${states['[[home_sensor]]'].state}mins</span>`
+                    style="; --mdc-icon-size: 24px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
+                    </ha-icon><span>${states['[[home_sensor]]'].state} mins</span>`
                 ]]]
             work: >
                 [[[
                   return `<ha-icon
                     icon="[[work_icon]]"
-                    style="; --mdc-icon-size: 14px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
-                    </ha-icon><span>${states['[[work_sensor]]'].state}mins</span>`
+                    style="; --mdc-icon-size: 24px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
+                    </ha-icon><span>${states['[[work_sensor]]'].state} mins</span>`
                 ]]]
       state:
         - value: "not_home"
@@ -296,11 +315,11 @@ decluttering_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-5)
-        - value: "Ben Work"
+        - value: "Duc Work"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-4)
-        - value: "Jess Work"
+        - value: "Eri Work"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-4)
@@ -316,13 +335,6 @@ decluttering_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)
-  
-
-
-
-
-
-
 
 
 

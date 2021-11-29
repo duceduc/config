@@ -16,26 +16,16 @@ cards:
     variables:
       - entity: person.duc
       - name: Duc
-      - battery: device_tracker.life360_ben
-      - work_sensor: sensor.ben_to_work_waze
-      - home_sensor: sensor.ben_to_home_waze
+      - battery_level: sensor.id_battery_level
+      - battery_state: sensor.id_battery_state      
+      - work_sensor: sensor.duc_to_work_waze
+      - home_sensor: sensor.duc_to_home_waze
       - work_icon: mdi:car
       - entity_picture: /local/img/people/avatar-duc.png
       - show_entity_picture: true
       - tap_action: 
           action: more-info
           haptic: light
-
-
-
-
-
-
-
-
-
-
-
 
   - type: custom:decluttering-card
     template: four_sensors_tpl
@@ -50,14 +40,22 @@ cards:
       - entity_4: sensor.shion_door
       - name_4: Shion
 
+
   - type: custom:decluttering-card
-    template: server_tpl
+    template: person_card_new
     variables:
-      - title: ns1
-      - entity_1: sensor.ns1_memory_use
-      - entity_2: sensor.ns1_disk_use
-      - entity_3: sensor.ns1_cpu_usage
-      - entity_4: sensor.ns1_temperature
+      - entity: person.eri
+      - name: Eri
+      - battery_level: sensor.id_battery_level
+      - battery_state: sensor.id_battery_state      
+      - work_sensor: sensor.duc_to_work_waze
+      - home_sensor: sensor.duc_to_home_waze
+      - work_icon: mdi:car
+      - entity_picture: /local/img/people/avatar-eri.png
+      - show_entity_picture: true
+      - tap_action: 
+          action: more-info
+          haptic: light
 
   - type: custom:decluttering-card
     template: three_sensors_tpl
@@ -69,6 +67,24 @@ cards:
       - name_2: Status
       - entity_3: sensor.guest_mode
       - name_3: Guest
+
+
+  - type: custom:decluttering-card
+    template: person_card_new
+    variables:
+      - entity: person.shion
+      - name: Shion
+      - battery_level: sensor.id_battery_level
+      - battery_state: sensor.id_battery_state      
+      - work_sensor: sensor.duc_to_work_waze
+      - home_sensor: sensor.duc_to_home_waze
+      - work_icon: mdi:car
+      - entity_picture: /local/img/people/avatar-shion.png
+      - show_entity_picture: true
+      - tap_action: 
+          action: more-info
+          haptic: light
+
 
   - type: custom:decluttering-card
     template: five_sensors_tpl
@@ -84,6 +100,17 @@ cards:
       - name_4: Washroom
       - entity_5: sensor.kitchen
       - name_5: Kitchen
+
+
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
+      - title: ns1
+      - entity_1: sensor.ns1_memory_use
+      - entity_2: sensor.ns1_disk_use
+      - entity_3: sensor.ns1_cpu_usage
+      - entity_4: sensor.ns1_temperature
+
 
   - type: custom:decluttering-card
     template: server_tpl
