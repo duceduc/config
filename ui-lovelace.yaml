@@ -177,7 +177,7 @@ decluttering_templates:
 
 
 
-
+# data.yaml
   person_card_new:
     default:
       - size: 60%

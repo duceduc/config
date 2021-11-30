@@ -18,9 +18,9 @@ cards:
       - name: Duc
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
-      - work_sensor: sensor.duc_to_work_waze
-      - home_sensor: sensor.duc_to_home_waze
-      - work_icon: mdi:car
+      - work_sensor: sensor.shion_to_school_waze
+      - home_sensor: sensor.shion_to_home_waze
+      - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-duc.png
       - show_entity_picture: true
       - tap_action: 
@@ -46,11 +46,11 @@ cards:
     variables:
       - entity: person.eri
       - name: Eri
-      - battery_level: sensor.id_battery_level
-      - battery_state: sensor.id_battery_state      
-      - work_sensor: sensor.duc_to_work_waze
-      - home_sensor: sensor.duc_to_home_waze
-      - work_icon: mdi:car
+      - battery_level: sensor.ie_battery_level
+      - battery_state: sensor.ie_battery_state      
+      - work_sensor: sensor.eri_to_work_waze
+      - home_sensor: sensor.eri_to_home_waze
+      - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-eri.png
       - show_entity_picture: true
       - tap_action: 
@@ -76,9 +76,9 @@ cards:
       - name: Shion
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
-      - work_sensor: sensor.duc_to_work_waze
-      - home_sensor: sensor.duc_to_home_waze
-      - work_icon: mdi:car
+      - work_sensor: sensor.shion_to_school_waze
+      - home_sensor: sensor.shion_to_home_waze
+      - work_icon: mdi:chair-school
       - entity_picture: /local/img/people/avatar-shion.png
       - show_entity_picture: true
       - tap_action: 

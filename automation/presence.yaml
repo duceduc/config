@@ -278,6 +278,45 @@
               - '000.0'
 
 
+
+
+- alias: Set to work location
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.shion_to_school_waze
+      below: 1
+    - platform: numeric_state
+      entity_id: sensor.eri_to_work_waze
+      below: 1      
+  action:
+    choose:
+      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'shion to school waze' }}"
+        sequence:
+          - service: device_tracker.see
+            data:
+              dev_id: duc
+              location_name: 'Duc Work'
+
+      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'eri to work waze' }}"
+        sequence:
+          - service: device_tracker.see
+            data:
+              dev_id: eri
+              location_name: 'Duc Work'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #########################################################
 #                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #

@@ -104,7 +104,8 @@ person:
   - name: Eri
     id: eri1118
     device_trackers:
-     - device_tracker.eri
+     - device_tracker.eri    
+     - device_tracker.ie
 
 homekit:
   name: Home-Assistant
