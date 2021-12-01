@@ -18,8 +18,8 @@ cards:
       - name: Duc
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
-      - work_sensor: sensor.shion_to_school_waze
-      - home_sensor: sensor.shion_to_home_waze
+      - work_sensor: sensor.duc_to_work_waze
+      - home_sensor: sensor.duc_to_home_waze
       - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-duc.png
       - show_entity_picture: true

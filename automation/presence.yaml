@@ -251,7 +251,6 @@
 #                                                                                                              #
 #########################################################
 
-
 - alias: Set tms Tile Location
   trigger:
     - platform: state
@@ -277,44 +276,26 @@
               - '00.0'
               - '000.0'
 
-
-
-
-- alias: Set to work location
+- alias: Set to work location waze
   trigger:
     - platform: numeric_state
-      entity_id: sensor.shion_to_school_waze
-      below: 1
-    - platform: numeric_state
-      entity_id: sensor.eri_to_work_waze
-      below: 1      
+      entity_id: sensor.duc_to_work_waze, sensor.eri_to_work_waze
+      below: 3
   action:
     choose:
-      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'shion to school waze' }}"
+      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'duc to work waze' }}"
         sequence:
           - service: device_tracker.see
             data:
               dev_id: duc
               location_name: 'Duc Work'
-
+              
       - conditions: "{{ trigger.to_state.attributes.friendly_name == 'eri to work waze' }}"
         sequence:
           - service: device_tracker.see
             data:
               dev_id: eri
-              location_name: 'Duc Work'
-
-
-
-
-
-
-
-
-
-
-
-
+              location_name: 'Eri Work'
 
 
 #########################################################

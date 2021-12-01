@@ -322,21 +322,11 @@ decluttering_templates:
         - value: "Eri Work"
           styles:
             entity_picture:
-              - border: 2px solid var(--severity-4)
-        - value: "Poppy Home"
+              - border: 2px solid var(--severity-3)
+        - value: "Shion School"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)
-        - value: "Lola Home"
-          styles:
-            entity_picture:
-              - border: 2px solid var(--severity-3)
-        - value: "GPa and GMa Home"
-          styles:
-            entity_picture:
-              - border: 2px solid var(--severity-3)
-
-
 
 
 
