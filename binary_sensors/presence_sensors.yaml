@@ -90,46 +90,27 @@
 
 
 
-
-
-
-
-
-
-
-
-
   - platform: bayesian
     prior: 0.6
-    name: Shion Presence Bayn
+    name: Shion at School Baysn
     probability_threshold: 0.92
  #   device_class: presence
     observations:
-    - entity_id: 'input_boolean.shion_presence'
-      prob_given_true: 0.8
-      prob_given_false: 0.3
-      platform: 'state'
-      to_state: 'on'
-    - entity_id: 'sensor.date_weekend'
-      prob_given_true: 0.3
-      prob_given_false: 0.8
-      platform: 'state'
-      to_state: 'weekend'
+      - entity_id: 'input_boolean.shion_presence'
+        prob_given_true: 0.8
+        prob_given_false: 0.3
+        platform: 'state'
+        to_state: 'off'
+      - entity_id: 'sensor.date_weekend'
+        prob_given_true: 0.8
+        prob_given_false: 0.3
+        platform: 'state'
+        to_state: 'weekday'
 
-    - value_template: "{{ is_state('sensor.holiday', '') or 'duc' not in states.sensor.holiday.state.lower() }}"
-      prob_given_true: 0.8
-      prob_given_false: 0.3
-      platform: 'template'
-
-    - value_template: "{{ 'shion' not in states.sensor.holiday.state.lower() or 'eri' not in states.sensor.holiday.state.lower() }}"
-      prob_given_true: 0.8
-      prob_given_false: 0.3
-      platform: 'template'
-
-
-
-
-
+      - value_template: "{{ is_state('sensor.holiday', '') or states('sensor.holiday').lower() in ['shion', 'eri', 'duc'] }}"
+        prob_given_true: 0.8
+        prob_given_false: 0.3
+        platform: 'template'
 
 
 

@@ -264,7 +264,7 @@
         message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
     - condition: template
-      value_template: "{{ state_attr('sensor.earthquake_alert', 'mag')| float >= 4 }}"
+      value_template: "{{ state_attr('sensor.earthquake_alert', 'mag')| float(0) >= 4 }}"
     - service: notify.mobile_app_id
       data_template:
         message: "Location: {{ state_attr('sensor.earthquake_alert', 'en_anm') }} M{{ state_attr('sensor.earthquake_alert', 'mag') }}"
