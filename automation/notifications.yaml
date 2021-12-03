@@ -29,7 +29,7 @@
   trigger:
     - platform: numeric_state
       entity_id: counter.toilet_airfreshner
-      below: 400
+      above: 400
   action:
     - service: notify.home_assistant
       data_template:

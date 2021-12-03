@@ -1,0 +1,40 @@
+#########################################################
+#                                                                                                              #
+#            Shion at school                                                                             #
+#                                                                                                              #
+#########################################################
+
+  - platform: bayesian
+    prior: 0.6
+    name: Shion at School Baysn
+    probability_threshold: 0.92
+ #   device_class: presence
+    observations:
+      - platform: 'template'
+        value_template: "{{ 'daylight' in states('sensor.period_of_the_day').lower() }}"
+        prob_given_true: 0.8
+        prob_given_false: 0.3
+    
+#      - platform: 'state'
+#        entity_id: 'input_boolean.shion_presence'
+#        to_state: 'off'
+#        prob_given_true: 0.8
+#        prob_given_false: 0.3
+        
+      - platform: 'state'
+        entity_id: 'sensor.date_weekend'
+        to_state: 'weekday'        
+        prob_given_true: 0.8
+        prob_given_false: 0.3
+        
+      - platform: 'template'
+        value_template: "{{ is_state('sensor.holiday', '') or states('sensor.holiday').lower() in ['shion', 'eri', 'duc'] }}"
+        prob_given_true: 0.8
+        prob_given_false: 0.3
+        
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

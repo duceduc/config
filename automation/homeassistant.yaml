@@ -131,6 +131,23 @@
         addon: 15d21743_samba_backup
         input: restore-sensor
 
+
+
+#########################################################
+#                                                                                                              #
+#             Set Location of device_tracker_shion on Startup                                 #
+#                                                                                                              #
+#########################################################
+
+  - alias: Restore Shion Location on startup
+    trigger:
+    - platform: homeassistant
+      event: start
+    action:
+      - service: automation.trigger
+        entity_id: automation.set_tms_tile_location
+
+
 ####################################################
 #                                                                                                    #
 #          END OF CONFIGURATION FILE                                                   #
