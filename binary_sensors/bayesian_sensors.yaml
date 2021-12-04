@@ -14,24 +14,24 @@
         value_template: "{{ 'daylight' in states('sensor.period_of_the_day').lower() }}"
         prob_given_true: 0.8
         prob_given_false: 0.3
-    
-#      - platform: 'state'
-#        entity_id: 'input_boolean.shion_presence'
-#        to_state: 'off'
-#        prob_given_true: 0.8
-#        prob_given_false: 0.3
-        
+
       - platform: 'state'
         entity_id: 'sensor.date_weekend'
         to_state: 'weekday'        
         prob_given_true: 0.8
         prob_given_false: 0.3
-        
+
       - platform: 'template'
-        value_template: "{{ is_state('sensor.holiday', '') or states('sensor.holiday').lower() in ['shion', 'eri', 'duc'] }}"
+        value_template: "{{ is_state('sensor.holiday', '') or states('sensor.holiday').lower() in ['eri birthday', 'duc birthday', 'sachiko'] }}"
         prob_given_true: 0.8
         prob_given_false: 0.3
-        
+
+      - platform: 'template'
+        value_template: "{{ states('sensor.holiday').lower() in ['shion school day'] }}"
+        prob_given_true: 0.9
+        prob_given_false: 0.3
+
+
 
 #########################################################
 #                                                                                                              #
