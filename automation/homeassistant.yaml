@@ -144,8 +144,7 @@
     - platform: homeassistant
       event: start
     action:
-      - service: automation.trigger
-        entity_id: automation.set_tms_tile_location
+      - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
 
 
 ####################################################

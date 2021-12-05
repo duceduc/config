@@ -44,6 +44,48 @@
 
 
 
+
+
+#########################################################
+#                                                                                                              #
+#            Set Custom Device Tracker Location                                                  #
+#                                                                                                              #
+#########################################################
+
+
+  set_device_tracker_shion_home:
+    alias: Set Device Tracker Shion Home
+    sequence:
+      - service: device_tracker.see
+        data:
+          dev_id: shion
+          location_name: "home"
+          gps:
+          - '35.8182373046875'
+          - '139.70377148641893'
+
+  set_device_tracker_shion_not_home:
+    alias: Set Device Tracker Shion Not Home
+    sequence:
+      - service: device_tracker.see # Set to away
+        data:
+          dev_id: shion
+          location_name: "not_home"
+          gps:
+          - '00.0'
+          - '000.0'
+      - condition: template
+        value_template: "{{ is_state('binary_sensor.shion_at_school_baysn', 'on') }}"
+      - delay: 30
+      - service: device_tracker.see # Set to at school
+        data:
+          dev_id: shion
+          location_name: "home"
+          gps:
+          - '35.81214930237013'
+          - '139.71171706362946'
+
+
 #########################################################
 #                                                                                                              #
 #          END OF CONFIGURATION FILE                                                             #

@@ -1,6 +1,6 @@
 # ESP32 CAM [10:52:1C:62:EC:48]
 substitutions:
-  name: security_cam
+  name: security-cam
   platform: ESP32
   board: esp-wrover-kit # esp32dev
 
@@ -10,7 +10,6 @@ esphome:
   board: $board
 
 wifi:
-#  use_address: security_cam.local
   ssid: !secret ssid_1
   password: !secret ssid_pass
   fast_connect : true
@@ -33,11 +32,11 @@ ota:
 # Sensors
 sensor:
    - platform: wifi_signal
-     name: 'Security Cam WiFi Signal'
+     name: '$name WiFi Signal'
 
 esp32_camera:
   external_clock:
-    pin: GPIO0
+    pin: GPIO3 # GPIO3
     frequency: 20MHz
   i2c_pins:
     sda: GPIO26
@@ -58,11 +57,12 @@ esp32_camera:
 # Flashlight
 output:
   - platform: gpio
-    pin: GPIO4
-    id: gpio_4
+    pin: GPIO12
+    id: gpio_12
 
 light:
   - platform: binary
-    output: gpio_4
+    output: gpio_12
     name: $name light
+
 

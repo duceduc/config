@@ -111,6 +111,11 @@ cards:
         name: Kitchen Sink Sensor
       - entity: sensor.motion_k2_linkquality
         name: Kitchen Fridge Sensor
+      - entity: sensor.motion_c1_linkquality
+        name: Closet Motion Sensorr
+      - entity: sensor.motion_s1_linkquality
+        name: Pantry Motion Sensor
+        
     severity:
       - color: var(--label-badge-red)
         from: 0

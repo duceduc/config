@@ -256,34 +256,7 @@
     - platform: state
       entity_id: input_boolean.shion_presence
   action:
-    choose:
-      - conditions: "{{ trigger.to_state.state == 'on' }}"
-        sequence:
-          - service: device_tracker.see
-            data:
-              dev_id: shion
-              location_name: "home"
-              gps: 
-              - '35.8182373046875'
-              - '139.70377148641893'
-      - conditions: "{{ trigger.to_state.state == 'off' }}"
-        sequence:
-          - service: device_tracker.see
-            data:
-              dev_id: shion
-              location_name: "not_home"
-              gps: 
-              - '00.0'
-              - '000.0'
-          - condition: template
-            value_template: "{{ is_state('binary_sensor.shion_at_school_baysn', 'on') }}"
-          - delay: 60
-          - service: device_tracker.see
-            data:
-              dev_id: shion
-              gps: 
-              - '35.81214930237013'
-              - '139.71171706362946'
+    - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
 
 
 
