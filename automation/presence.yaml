@@ -174,7 +174,7 @@
     - platform: numeric_state
       entity_id: sensor.n_people_home
       below: 1
-      for: 10
+      for: 20
   condition:
     - condition: template
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
@@ -229,7 +229,7 @@
               option: 'Vacation'
       - conditions: >
            {{ states.input_boolean.vacation_mode.state == 'off' and
-              states.sensor.n_people_home.state | int  <= 2 }}
+              states.sensor.n_people_home.state | int  < 1 }}
         sequence:
           - service: input_select.select_option
             entity_id: input_select.home_mode
@@ -237,7 +237,7 @@
               option: 'Away'
       - conditions: >
            {{ states.input_boolean.vacation_mode.state == 'off' and
-              states.sensor.n_people_home.state | int  > 2 }}
+              states.sensor.n_people_home.state | int  >= 1 }}
         sequence:
           - service: input_select.select_option
             entity_id: input_select.home_mode

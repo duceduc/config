@@ -11,7 +11,7 @@
  #   device_class: presence
     observations:
       - platform: 'template'
-        value_template: "{{ 'daylight' in states('sensor.period_of_the_day').lower() }}"
+        value_template: "{{ states('sensor.period_of_the_day').lower() in ['daylight', 'dusklight'] }}"
         prob_given_true: 0.8
         prob_given_false: 0.3
 

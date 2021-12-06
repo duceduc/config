@@ -255,6 +255,23 @@
         icon_template: >-
          {% if is_state("input_boolean.guest_mode", "off") %}mdi:account-off{% else %}mdi:account-plus{% endif %}
 
+
+
+
+####################################################
+#                                                                                                    #
+#            Monitor Online Status                                                            #
+#                                                                                                    #
+####################################################
+
+
+
+
+
+
+
+
+
 ####################################################
 #                                                                                                    #
 #            END OF CONFIGURATION FILE                                                 #
