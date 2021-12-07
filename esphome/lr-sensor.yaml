@@ -12,7 +12,6 @@ esphome:
   board: $board
 
 wifi:
-#  use_address: lr_sensor.local
   ssid: !secret ssid_1
   password: !secret ssid_pass
   fast_connect : true
@@ -55,7 +54,7 @@ binary_sensor:
     name: $name dht Status
 
   - platform: gpio
-    pin: D5
+    pin: D1
     name: 'motion lr occupancy'
     device_class: motion
 

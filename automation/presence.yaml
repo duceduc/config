@@ -174,7 +174,7 @@
     - platform: numeric_state
       entity_id: sensor.n_people_home
       below: 1
-      for: 20
+      for: 3
   condition:
     - condition: template
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"

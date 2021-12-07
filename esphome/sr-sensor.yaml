@@ -38,7 +38,7 @@ sensor:
       name: 'sr temperature'
     humidity:
       name: 'sr humidity'
-    update_interval: 50s
+    update_interval: 40s
 
   - platform: wifi_signal
     name: $name wifi signal

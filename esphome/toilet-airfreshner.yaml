@@ -34,7 +34,7 @@ switch:
   - platform: gpio
     name: $name
     id: relay
-    pin: D1 # use D1, D2, d5, d6, d7 for relays
+    pin: D2 # use D1, D2, d5, d6, d7 for relays  was D1
     icon: mdi:spray
     restore_mode: ALWAYS_OFF
     on_turn_on:
@@ -54,7 +54,7 @@ binary_sensor:
     name: $name status
 
   - platform: gpio
-    pin: D5
+    pin: D1 # was D5
     name: 'motion tr1 occupancy'
     device_class: motion
 

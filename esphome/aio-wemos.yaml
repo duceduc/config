@@ -41,7 +41,7 @@ sensor:
       name: '$mr temperature'
     humidity:
       name: '$mr humidity'
-    update_interval: 60s
+    update_interval: 40s
 
   - platform: dht
     model: AM2302
@@ -50,7 +50,7 @@ sensor:
       name: '$oa temperature'
     humidity:
       name: '$oa humidity'
-    update_interval: 60s
+    update_interval: 40s
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -59,7 +59,7 @@ sensor:
     pin: A0
     name: 'rear Illuminance'
     unit_of_measurement: lux
-    update_interval: 60s
+    update_interval: 40s
 
 binary_sensor:
   - platform: status
