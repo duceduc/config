@@ -200,7 +200,8 @@ counter:
     initial: 1
     step: 1
 #Glade
-  toilet_airfreshner:
+  toilet_airfreshener:
+    initial: 1
     step: 1
     restore: true
     icon: mdi:spray

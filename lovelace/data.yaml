@@ -3,6 +3,9 @@
 #                    DATA VIEW                                                                 #
 #                                                                                                    #
 ####################################################
+# motion_c1 - [replaced battery on 12/4 ]
+# motion_s1 - [replaced battery on 12/4 ]
+# motion_g1 - [replaced battery on 12/8 ]
 
 title: Data
 path: data
@@ -254,7 +257,11 @@ cards:
               - entity: sensor.motion_washroom_battery
                 name: Wash Room
               - entity: sensor.motion_hallway_battery
-                name: Hallway                   
+                name: Hallway
+              - entity: sensor.motion_c1_battery
+                name: Master Closet                   
+              - entity: sensor.motion_s1_battery
+                name: Pantry Room                                   
             head:
               label: Motion Sensors
               type: section
