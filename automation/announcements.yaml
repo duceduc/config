@@ -16,7 +16,7 @@
 - alias: Bedtime Stop Announcements
   trigger:
     - entity_id: group.bed_sensors
-      for: '00:01:30'
+      for: '00:00:30'
       from: 'off'
       platform: state
       to: 'on'

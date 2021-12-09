@@ -38,8 +38,8 @@
           - sensor.hallway_door_battery
           - sensor.genkan_door_battery
           - sensor.24hr_fan_battery
-          - sensor.lr_curtain_batteries
-          - sensor.cr_curtain_batteries
+#          - sensor.lr_curtain_batteries
+#          - sensor.cr_curtain_batteries
           - sensor.motion_s1_battery
           - sensor.motion_c1_battery
         below: 26

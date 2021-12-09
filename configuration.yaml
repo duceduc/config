@@ -156,6 +156,7 @@ alexa_media:
        - Ai.1
        - Ai.2
        - Ai.3
+       - Ai.4
 # Find Amazon dot name
 # https://alexa.amazon.com/api/devices-v2/device
 

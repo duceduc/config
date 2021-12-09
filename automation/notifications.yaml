@@ -21,23 +21,23 @@
 
 #########################################################
 #                                                                                                              #
-#                   Replace Toilet Airfreshner Notification                                         #
+#                   Replace Toilet Airfreshener Notification                                         #
 #                                                                                                              #
 #########################################################
 
-- alias: "Replace Toilet Airfreshner Notification"
+- alias: "Replace Toilet Airfreshener Notification"
   trigger:
     - platform: numeric_state
-      entity_id: counter.toilet_airfreshner
+      entity_id: counter.toilet_airfreshener
       above: 400
   action:
     - service: notify.home_assistant
       data_template:
-        title: "Replace Toilet Airfreshner Notification"
+        title: "Replace Toilet Airfreshener Notification"
         message: >-
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          The toilet air freshner bottle needs to be replaced. It has sprayed over 400 times.<br>
+          The toilet air freshener bottle needs to be replaced. It has sprayed over 400 times.<br>
           <br>
         data:
           images: []

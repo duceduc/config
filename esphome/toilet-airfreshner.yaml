@@ -11,7 +11,6 @@ esphome:
   board: $board
 
 wifi:
-#  use_address: toilet_airfreshener.local
   ssid: !secret ssid_1
   password: !secret ssid_pass
   fast_connect : true

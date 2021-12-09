@@ -51,7 +51,7 @@ cards:
       - name: Eri
       - battery_level: sensor.ie_battery_level
       - battery_state: sensor.ie_battery_state      
-      - work_sensor: sensor.eri_to_work_waze
+      - work_sensor: sensor.eri_to_work_k_waze
       - home_sensor: sensor.eri_to_home_waze
       - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-eri.png
