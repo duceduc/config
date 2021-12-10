@@ -54,6 +54,7 @@
      - media_player.ai_1
      - media_player.ai_2
      - media_player.ai_3
+     - media_player.ai_4
 
   clean_aircon_filter:
     name: Clean Aircon Filter
