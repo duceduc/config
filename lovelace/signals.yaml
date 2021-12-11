@@ -72,6 +72,8 @@ cards:
         name: Toilet Air Freshner
       - entity: sensor.lr_sensor_wifi_signal
         name: Livingroom Sensors
+#      - entity: sensor.ikea_pm25_wifi_signal
+#        name: Ikea Air Sensor        
       - entity: sensor.ms1_wifi_strength
         name: MS1 Server
       - entity: sensor.ms2_wifi_strength

@@ -144,16 +144,16 @@
       - midnight
       - default_ha
 
-  switchbot_updates:
-    name: Switchbot Update
-    options:
-      - ''
-      - meter
-      - 24hr_fan
-      - floor_heat
-      - jcom_tv_box
-      - lr_curtain_lt
-      - lr_curtain_rt
-      - cr_curtain_lt
-      - cr_curtain_rt
+#  switchbot_updates:
+#    name: Switchbot Update
+#    options:
+#      - ''
+#      - meter
+#      - 24hr_fan
+#      - floor_heat
+#      - jcom_tv_box
+#      - lr_curtain_lt
+#      - lr_curtain_rt
+#      - cr_curtain_lt
+#      - cr_curtain_rt
 
