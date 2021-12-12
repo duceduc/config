@@ -164,7 +164,7 @@ cards:
   - type: custom:decluttering-card
     template: server_tpl
     variables:
-      - title: pc
+      - title: desktop
       - entity_1: sensor.desktop_fddl8i4_memory_usage
       - entity_2: sensor.desktop_fddl8i4_storage_c_usage
       - entity_3: sensor.desktop_fddl8i4_cpu_usage

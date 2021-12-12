@@ -16,24 +16,6 @@ cards:
     states: 
       - arm_away
 
-  - type: entities
-    title: Living Room Air Quality
-    show_header_toggle: false
-    footer:
-      type: graph
-      entity: sensor.temperature
-      detail: 3
-    entities:
-      - entity: sensor.ikea_pm25
-        name: Air Quality
-      - entity: sensor.carbon_dioxide
-        name: Carbon Dioxide
-      - entity: sensor.carbon_monoxide
-        name: Carbon Monoxide
-      - type: divider
-      - entity: sensor.temperature
-        name: PM25 Temperature
-
   - type: weather-forecast
     name: Kawaguchi
     entity: weather.weatherbit_shimotoda
@@ -54,14 +36,12 @@ cards:
         name: Sun Elevation
         icon: mdi:weather-sunset
 
-
   - type: picture-entity
     title: Cam
     show_header_toggle: false
     aspect_ratio: 16x9
     entity: camera.security
     camera_view: live
-
 
 
 ####################################################

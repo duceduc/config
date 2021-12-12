@@ -14,7 +14,7 @@
           {% set p = states('sensor.shelly_washer_power') %}
           {% if p == 'unavailable' %} unavailable
           {% else %}
-            {% set p = p | int %}
+            {% set p = p | int(0) %}
             {% if p == 0 %} stop
             {% elif p < 5 %} wait 
             {% elif 5 <= p <= 14 %}

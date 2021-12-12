@@ -86,10 +86,6 @@ cards:
             state_color: true
             entities:
               - entities:
-                  - entity: automation.computer_room_lights
-                    name: Turn on Comouter Room Lights - Sunset
-                    icon: mdi:lightbulb-outline
-                    secondary_info: last-triggered
                   - entity: automation.turn_on_genkan_for_eri
                     name: Turn On Genkan Light - Eri Leaving
                     icon: mdi:lightbulb-outline
@@ -98,32 +94,8 @@ cards:
                     name: Turn On Shion Room - School Day
                     icon: mdi:lightbulb-outline
                     secondary_info: last-triggered
-                  - entity: automation.motion_genkan_light_off
-                    name: Turn Off Genkan Light - No Motion
-                    icon: mdi:lightbulb-outline
-                    secondary_info: last-triggered
-                  - entity: automation.motion_hallway_light_off
-                    name: Turn Off Hallway Light - No Motion
-                    icon: mdi:lightbulb-outline
-                    secondary_info: last-triggered
-                  - entity: automation.motion_washroom_light_off
-                    name: Turn Off Wash Room - No Motion
-                    icon: mdi:lightbulb-outline
-                    secondary_info: last-triggered
-                  - entity: automation.motion_kitchen_lights_off
-                    name: Turn Off Kitchen Island - No Motion
-                    icon: mdi:lightbulb-outline
-                    secondary_info: last-triggered
-                  - entity: automation.turn_on_christmas_lights_weekends
-                    name: Turn On Christmas Lights - Weekends
-                    icon: mdi:string-lights
-                    secondary_info: last-triggered
-                  - entity: automation.turn_on_christmas_lights_weekdays
-                    name: Turn On Christmas Lights - Weekdays
-                    icon: mdi:string-lights
-                    secondary_info: last-triggered
-                  - entity: automation.turn_off_christmas_lights
-                    name: Turn Off Christmas Lights
+                  - entity: automation.enable_christmas_lights
+                    name: Enable Christmas Lights
                     icon: mdi:string-lights
                     secondary_info: last-triggered
                 head:
