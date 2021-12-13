@@ -29,7 +29,7 @@
   trigger:
     - platform: numeric_state
       entity_id: counter.toilet_airfreshener
-      above: 400
+      above: 390
   action:
     - service: notify.home_assistant
       data_template:
@@ -37,10 +37,19 @@
         message: >-
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          The toilet air freshener bottle needs to be replaced. It has sprayed over 400 times.<br>
+          The toilet air freshener bottle needs to be replaced. It has sprayed over 390 times.<br>
           <br>
         data:
           images: []
+
+    - condition: template # Reset if bottle over threshold
+      value_template: "{{ states('counter.toilet_airfreshener')| int(0) > 390 }}"
+    - service: counter.reset
+      target:
+        entity_id: counter.toilet_airfreshener
+
+          
+
 
 #########################################################
 #                                                                                                              #

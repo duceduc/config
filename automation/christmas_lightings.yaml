@@ -9,6 +9,7 @@
   - platform: numeric_state
     entity_id: sensor.front_illuminance
     above: 0.35
+    below: 0.37
   - platform: time
     at: '18:10:00'
   - platform: time
@@ -36,7 +37,7 @@
             data:
               entity_id: switch.christmas_lights
 
-      - conditions: "{{ states('sensor.front_illuminance')| float(0) >= 0.50 and is_state('sensor.date_weekday', 'on') }}"
+      - conditions: "{{ states('sensor.front_illuminance')| float(0) >= 0.70 and is_state('sensor.date_weekday', 'on') }}"
         sequence:
           - service: switch.turn_on
             data:

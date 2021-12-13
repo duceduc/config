@@ -28,20 +28,23 @@
       - switch.ac_sr_unit
       - sensor.oa_temperature
       - sensor.lr_temperature
-      - group.bed_sensors
+      - group.bed_sensors #5
       - sensor.oa_humidity
       - sensor.livingroom_humidity
       - sensor.sr_temperature
       - sensor.sr_humidity
-      - sensor.mr_temperature
+      - sensor.mr_temperature #10
       - sensor.mr_humidity
       - sensor.genkan_temperature
       - sensor.genkan_humidity
       - sensor.mdf_temperature
-      - sensor.mdf_humidity
+      - sensor.mdf_humidity #15
       - light.shion_room
       - sensor.shion_birthday
-      - sensor.genkan_door
+      - sensor.ikea_pm25
+      - sensor.carbon_dioxide
+      - sensor.carbon_monoxide #20
+      
   speak_list:
     icon: si:amazonalexa 
     name: Speak List
@@ -63,7 +66,10 @@
       - She on is (e05s) sleeping in his bed
       - She ons birthday is (e15s) from now
       - The (e02f) is turned (e02s)
-      - The (e18f) is (e18s)
+      - The (e18f) is (e18$) micrograms per cubic meter
+      - The (e19f) is (e19$) parts per million
+      - The (e20f) is (e20$) parts per million
+
       - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
 #       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
 
@@ -144,16 +150,27 @@
       - midnight
       - default_ha
 
-#  switchbot_updates:
-#    name: Switchbot Update
-#    options:
-#      - ''
-#      - meter
-#      - 24hr_fan
-#      - floor_heat
-#      - jcom_tv_box
-#      - lr_curtain_lt
-#      - lr_curtain_rt
-#      - cr_curtain_lt
-#      - cr_curtain_rt
 
+####################################################
+#                                                                                                    #
+#                      HERE Travel Time Destination                                       #
+#                                                                                                    #
+####################################################
+
+
+  duc_destination_here:
+    options:
+      - zone.home
+      - zone.school
+      - zone.jcb
+    initial: zone.school
+
+  duc_mode_here:
+    options:
+      - car
+      - bicycle      
+      - pedestrian  
+      - publicTransportTimeTable
+    initial: publicTransportTimeTable
+    
+      
