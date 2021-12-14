@@ -51,6 +51,7 @@
     name: 'Power Stats'
     entity_id: sensor.total_power
     sampling_size: 10000
+    state_characteristic : mean
     max_age:
       hours: 24
     precision: 1

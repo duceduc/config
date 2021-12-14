@@ -299,6 +299,24 @@ rest_command:
       }
 
 
+
+#########################################################
+#                                                                                                              #
+#             Panel Redirect                                                                              #
+#                                                                                                              #
+#########################################################
+
+panel_custom:
+  - name: panel-redirect
+    url_path: redirect-server-controls
+    sidebar_title: Server Controls
+    sidebar_icon: mdi:server
+    module_url: /local/custom_ui/panel-redirect.js
+    config:
+      target: /config/server_control
+
+
+
 #########################################################
 #                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #

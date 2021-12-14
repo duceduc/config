@@ -238,6 +238,7 @@
         data_template:
           entity_id: light.living_room
           brightness: 254
+      - service: script.christmas_lights_on    
       - delay: 1
       - condition: template # Turn on pc/tv only if Duc is home
         value_template: "{{ is_state('switch.momentary_activate_tv', 'on') }}"
@@ -521,6 +522,27 @@
         data_template:
           entity_id: '{{ entity }}'
           brightness: 255
+
+
+#########################################################
+#                                                                                                              #
+#             Christmas Lights                                                                           #
+#                                                                                                              #
+#########################################################
+
+  christmas_lights_on:
+    sequence:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.christmas_lights
+
+  christmas_lights_off:
+    sequence:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.christmas_lights
+
+
 
 
 ### TEST

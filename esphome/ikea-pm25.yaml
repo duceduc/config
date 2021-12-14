@@ -60,7 +60,7 @@ sensor:
     name: "Carbon Monoxide"
     update_interval: 60s
     filters:
-        - lambda: return (x * 1024/5); 
+      - lambda: return (x * 1024/5);
     unit_of_measurement: "ppm"
     icon: 'mdi:fire'
 

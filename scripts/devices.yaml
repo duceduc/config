@@ -102,7 +102,7 @@
 
   dev_check_4:
     sequence:
-#      - service: script.dev_check_5
+      - service: script.dev_check_5
       - condition: template
         value_template: '{{ states("sensor.front_illuminance")| float(0) >= 0.20 }}'
       - service: light.turn_off
@@ -115,10 +115,10 @@
   dev_check_5:
     sequence:
       - condition: template
-        value_template: '{{ states("group.christmas_lights") != "off" }}'
+        value_template: "{{ states('switch.christmas_lights') != 'off' }}"
       - service: switch.turn_off
         data:
-          entity_id: group.christmas_lights
+          entity_id: switch.christmas_lights
 
 #########################################################
 #                                                                                                              #

@@ -107,6 +107,9 @@
     - platform: numeric_state
       entity_id: sensor.front_illuminance
       below: 0.16
+  condition:      
+    - condition: template  # If guest is present, do not turn off
+      value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
   action:
     - service: light.turn_off
       entity_id:
