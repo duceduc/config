@@ -1,5 +1,5 @@
 #   smooth_fader.py
-#   Version 2.0
+#   Version 2.0.1
 #   By Ingrid Bakker studioilb.nl
 #
 #--------------------------------------
@@ -38,7 +38,7 @@
 #   50% effect at 88% time
 
 # FOR debugging
-debug_report = 1 # 0 = errors only; 1 = change events only; 2 = full
+debug_report = 2 # 0 = errors only; 1 = change events only; 2 = full
 system_lag_time = 2 # Estimation how quick the a new state readout will be available.
 
 # INPUT
@@ -65,7 +65,7 @@ else :
     logger.error ("Curved fader: When light is off or brighness_start and brighness_end is not defined or 0, the light will remain off, please define brightness")
   if (b_cur == 0 and t_start == -1) :
     logger.warning ("Curved fader: When light is off, and temperature_start is not defined, the min/max mireds average will be default, please define temperature_start.")
-    t_cur = (states.attributes.get('min_mireds') + states.attributes.get('max_mireds')) / 2
+    t_cur = round ((states.attributes.get('min_mireds') + states.attributes.get('max_mireds')) / 2)
 
   if (b_start == -1) : b_start = b_cur
   if (b_end == -1) : b_end = b_start

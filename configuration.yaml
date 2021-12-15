@@ -16,14 +16,6 @@ tts:
 notify_events:
   token: !secret notify_token
 
-zigbee2mqtt_networkmap:
-# Integrations
-panel_iframe:
-  networkmap:
-    title: 'Zigbee Map'
-    url: '/local/community/zigbee2mqtt_networkmap/map.html'
-    icon: 'mdi:graphql'
-
 group: !include groups.yaml
 scene: !include scenes.yaml
 timer: !include timers.yaml
@@ -126,7 +118,7 @@ rest:
     scan_interval: 14400
     sensor:
       - name: vj ssl cert issued
-        value_template: "{{ value_json[0].entry_timestamp }}"
+        value_template: "{{ value_json[0].not_before }}"
         device_class: timestamp
       - name: vj ssl cert issuer
         value_template: "{{ value_json[0].issuer_name }}"
@@ -308,12 +300,37 @@ rest_command:
 
 panel_custom:
   - name: panel-redirect
+    url_path: redirect-Zigbee2mqtt-controls
+    sidebar_title: Z2M Controls
+    sidebar_icon: mdi:graphql
+    module_url: /local/custom_ui/panel-redirect.js
+    config:
+      target: /hassio/ingress/45df7312_zigbee2mqtt
+
+  - name: panel-redirect
     url_path: redirect-server-controls
     sidebar_title: Server Controls
     sidebar_icon: mdi:server
     module_url: /local/custom_ui/panel-redirect.js
     config:
       target: /config/server_control
+
+  - name: panel-redirect
+    url_path: redirect-supervisor
+    sidebar_title: Supervisor
+    sidebar_icon: mdi:home-assistant
+    module_url: /local/custom_ui/panel-redirect.js
+    config:
+      target: /hassio/dashboard
+
+
+#zigbee2mqtt_networkmap:
+## Integrations
+#panel_iframe:
+#  networkmap:
+#    title: 'Zigbee Map'
+#    url: '/local/community/zigbee2mqtt_networkmap/map.html'
+#    icon: 'mdi:graphql'
 
 
 
