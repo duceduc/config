@@ -55,13 +55,13 @@
 #########################################################
 
 
-- alias: 'Update Zigbee Map'
-  trigger:
-    platform: time_pattern
-    minutes: '/10'
-    seconds: 00
-  action:
-    service: zigbee2mqtt_networkmap.update
+#- alias: 'Update Zigbee Map'
+#  trigger:
+#    platform: time_pattern
+#    minutes: '/10'
+#    seconds: 00
+#  action:
+#    service: zigbee2mqtt_networkmap.update
 
 
 #########################################################

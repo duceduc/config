@@ -285,10 +285,6 @@ cards:
             name: Workout
             icon: mdi:weight-lifter
             secondary_info: last-triggered 
-          - entity: automation.update_zigbee_map
-            name: Update Zigbee Mesh Devices
-            icon: mdi:graphql
-            secondary_info: last-triggered
           - entity: automation.morning_briefing_duc
             name: Morning Briefing - Duc
             icon: mdi:notebook-edit

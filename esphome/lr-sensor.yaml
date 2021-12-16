@@ -47,7 +47,7 @@ sensor:
     pin: A0
     name: 'front illuminance'
     unit_of_measurement: lux
-    update_interval: 30s
+    update_interval: 25s
 
 binary_sensor:
   - platform: status
