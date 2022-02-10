@@ -12,6 +12,7 @@
       - service: homeassistant.turn_on
         entity_id: switch.update_github
 
+
 ####################################################
 #                                                                                                    #
 #                    SENSOR BATTERY LOW                                                 #
