@@ -4,6 +4,90 @@
 #                                                                                                              #
 #########################################################
 
+
+- alias: Shionroom Occupancy
+  description: 'Defines occupancy state for room'
+  mode: single  
+  trigger:
+  - platform: time_pattern
+    id: time
+    seconds: '10'
+  - platform: state
+    entity_id: binary_sensor.motion_sr_occupancy
+    id: motion
+    to: 'on'
+  condition:
+    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
+      value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
+  action:
+  - service: python_script.room_occupancy
+    data:
+      roomname: shionroom 
+      entities_toggle: # entities that can mark a room as occupied
+      - binary_sensor.motion_sr_occupancy
+      - input_boolean.shionroom_mcl      
+      entities_keep: # entities that can keep a room occupied
+      - binary_sensor.middle
+#      - sensor.eri_espresense
+#      - sensor.duc_espresense
+      timeout: 2 # timeout of the room, timer gets set to this
+
+- alias: Shionroom Light
+  description: 'toggle light depending on timer state'
+  mode: single  
+  trigger:
+  - platform: state
+    entity_id: timer.shionroom_timer
+    id: 'on'
+    from: idle
+    to: active
+  - platform: state
+    entity_id: timer.shionroom_timer
+    id: 'off'
+    from: active
+    to: idle
+  - platform: state
+    entity_id: light.shion_room
+    id: 'off'
+    from: 'on'    
+    to: 'off'
+    
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+#    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
+#      value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
+#    - condition: template
+#      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"
+
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.shion_room
+        data:
+          brightness: '{% if states.sensor.rear_illuminance.state | float(0) >= 0.30 %} 250 {% else %} 160 {% endif %}'          
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - service: light.turn_off
+        target:
+          entity_id: light.shion_room  
+      - service: timer.finish
+        target:
+          entity_id: timer.shionroom_timer
+    default: []
+
+
+
+
+
+##############################
 - alias: 'motion shion room auto-on'
   trigger:
     - platform: state
@@ -19,7 +103,7 @@
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
     - condition: template
-      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
+      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"
     - condition: template # bed occupied 
       value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
 
@@ -27,7 +111,7 @@
     - service: light.turn_on
       entity_id: light.shion_room
       data:
-        brightness: '{% if states.sensor.rear_illuminance.state | float(0) >= 0.20 %} 250 {% else %} 160 {% endif %}'
+        brightness: '{% if states.sensor.rear_illuminance.state | float(0) >= 0.29 %} 250 {% else %} 160 {% endif %}'
 
 - alias: 'motion shion room auto-off'
   trigger:
@@ -36,10 +120,10 @@
       to: 'off'
       for: '00:02:00'
   condition:
-    - condition: template # switch between weekday/weekend time
+    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
     - condition: template
-      value_template: "{{ is_state('input_boolean.sr_mcl', 'on') }}"
+      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"
     - condition: template # bed occupied 
       value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
   action:
@@ -73,32 +157,31 @@
       value_template: "{{ is_state('timer.sr_mcl', 'active') }}"
   action:
     -  service: input_boolean.toggle
-       entity_id: input_boolean.sr_mcl
+       entity_id: input_boolean.shionroom_mcl
 
 - alias: 'SR MCL Announce State'
   trigger:
     - platform: state
-      entity_id: input_boolean.sr_mcl
+      entity_id: input_boolean.shionroom_mcl
   action:
-    - service: notify.alexa_media
-      data_template:
-        data:
-          type: tts
-        target:
-        - media_player.ai_3
-        message: >
-         {% set mode = '自動' if trigger.to_state.state == 'on' else 'マニュアル' %}
-         <speak> シオンルームライトが {{ mode }} モードになりました。 </speak>
+    - service: script.speech_engine_simplified
+      data: 
+        who: notify.alexa_media
+        device: media_player.ai_3
+        message:  >
+          {% set mode = '自動' if trigger.to_state.state == 'off' else 'マニュアル' %}
+          <speak> シオンルームライトが {{ mode }} モードになりました。 </speak>
+
 
 - alias: 'SR MCL Re-Enable'
   trigger:
     - platform: state
-      entity_id: input_boolean.sr_mcl
-      to: 'off'
+      entity_id: input_boolean.shionroom_mcl
+      to: 'on'
       for: '01:00:00'
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.sr_mcl
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.shionroom_mcl
 
 
 #########################################################
@@ -156,7 +239,7 @@
     entity_id: binary_sensor.shion_door
     state: 'off'
   - condition: state
-    entity_id: binary_sensor.sr_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    entity_id: binary_sensor.sr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
     state: 'on'
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:
@@ -213,7 +296,7 @@
     entity_id: binary_sensor.shion_door
     state: 'off'
   - condition: state
-    entity_id: binary_sensor.sr_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    entity_id: binary_sensor.sr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
     state: 'on'
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:

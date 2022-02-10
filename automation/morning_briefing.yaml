@@ -18,8 +18,8 @@
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
             <b> Today's Weather </b> <br>
-            The current temperature is {{state_attr('weather.weatherbit_shimotoda', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].temperature }}. <br>
-            The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
+            The current temperature is {{state_attr('weather.weatherbit', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit.attributes.forecast[0].temperature }}. <br>
+            The predicted precipitation today is {% if states.weather.weatherbit.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
             <br>
             <b> Holiday's & Birthdays </b> <br>
             {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>
@@ -42,10 +42,11 @@
           title: "Morning Briefing"
           message: >
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
             <b> Today's Weather </b> <br>
-            The current temperature is {{state_attr('weather.weatherbit_shimotoda', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].temperature }}. <br>
-            The predicted precipitation today is {% if states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit_shimotoda.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
+            The current temperature is {{state_attr('weather.weatherbit', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit.attributes.forecast[0].temperature }}. <br>
+            The predicted precipitation today is {% if states.weather.weatherbit.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
             <br>
             <b> Holiday's & Birthdays </b> <br>
             {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>

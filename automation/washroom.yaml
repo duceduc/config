@@ -1,14 +1,14 @@
 #########################################################
-#                                                                                                              #
-#             Washroom                                                                                   #
-#                                                                                                              #
+#                                                                                                              
+#             Washroom                                                                                   
+#                                                                                                              
 #########################################################
 
 
 - alias: 'motion washroom auto-on'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_washroom_occupancy
+      entity_id: binary_sensor.motion_washroom_occupancy 
       to: 'on'
   action:
     - service: light.turn_on
@@ -17,18 +17,18 @@
 - alias: 'motion washroom auto-off'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_washroom_occupancy
+      entity_id: binary_sensor.motion_washroom_occupancy 
       to: 'off'
-      for: 00:00:30
+      for: 00:01:05
   action:
     - service_template: light.turn_{{ 'on' if is_state('light.shower_room', 'on') else 'off' }}
       entity_id: light.w_1
 
 
 #########################################################
-#                                                                                                              #
-#             Automate Washroom 24hr Fan                                                         #
-#                                                                                                              #
+#                                                                                                              
+#             Automate Washroom 24hr Fan                                                         
+#                                                                                                              
 #########################################################
 
 
@@ -65,9 +65,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Washing Machine Notifcation                                                           #
-#                                                                                                              #
+#                                                                                                              
+#             Washing Machine Notifcation                                                           
+#                                                                                                              
 #########################################################
 
 # Notification
@@ -78,17 +78,14 @@
     entity_id: input_select.shelly_washer_state
     from: 'rinse wait'
     to: 'stop'
-  condition:
-    - condition: template # Someone is home
-      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    - service: notify.alexa_media
-      data_template:
-        data:
-          type: tts
-        target:
-         - media_player.ai_1
-        message: "<audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>. The laundry  load has finished. Don't forget to remove the clothes from the machine for drying."
+    - service: script.speech_engine_simplified
+      data: 
+        who: notify.alexa_media
+        device: media_player.ai_1
+        message:  >
+          <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>.. The laundry load has finished. Don't forget to remove the clothes from the machine for drying.
+          
 #    - condition: template
 #      value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
 #    - service: cover.open_cover
@@ -125,7 +122,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

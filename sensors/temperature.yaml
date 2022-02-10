@@ -3,16 +3,28 @@
 #                      TEMPERATURE                                                           #
 #                                                                                                    #
 ####################################################
+# DHT Integration
+#  - platform: dht
+#    sensor: DHT22
+#    pin: D4
+#    name: mdf
+#    scan_interval: 60
+#    monitored_conditions:
+#     - temperature
+#     - humidity
 
-# Shoe Closet. DHT Integration
-  - platform: dht
-    sensor: DHT22
-    pin: D4
-    name: mdf
-    scan_interval: 60
-    monitored_conditions:
-     - temperature
-     - humidity
+# ds1 server DHT22 GPIO#4
+  - platform: mqtt
+    name: 'MDF Temperature'
+    state_topic: 'system-sensors/sensor/ds1/dht22/temperature'
+    value_template: '{{ value }}'
+    unit_of_measurement: '°C'
+
+  - platform: mqtt
+    name: 'MDF Humidity'
+    state_topic: 'system-sensors/sensor/ds1/dht22/humidity'
+    value_template: '{{ value }}'
+    unit_of_measurement: '%'
 
 ####################################################
 #                                                                                                    #

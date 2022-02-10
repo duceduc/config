@@ -73,6 +73,18 @@
       - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
 #       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
 
+
+  sb_humidifier_mode:
+    name: SB Humidifier Mode
+    icon: mdi:air-humidifier
+    options:
+      - 'Off'
+      - Auto
+      -  Low
+      - Med
+      - High
+
+
   lr_ac_mode:
     name: LR AC Mode
     icon: mdi:air-conditioner
@@ -151,26 +163,32 @@
       - default_ha
 
 
-####################################################
-#                                                                                                    #
-#                      HERE Travel Time Destination                                       #
-#                                                                                                    #
-####################################################
+  duc_destination_waze:
+    name: Duc Destination Waze
+    options: 
+      - home
+      - school
+      - jcb
+      - others
+    initial: jcb  
+
+  eri_destination_waze:
+    name: Eri Destination Waze
+    options: 
+      - home
+      - school
+      - costcokawa
+      - costcokisa
+      - others
+    initial: costcokawa  
+
+  shion_destination_waze:
+    name: Shion Destination Waze
+    options: 
+      - home
+      - school
+      - others
+    initial: school  
 
 
-  duc_destination_here:
-    options:
-      - zone.home
-      - zone.school
-      - zone.jcb
-    initial: zone.school
 
-  duc_mode_here:
-    options:
-      - car
-      - bicycle      
-      - pedestrian  
-      - publicTransportTimeTable
-    initial: publicTransportTimeTable
-    
-      

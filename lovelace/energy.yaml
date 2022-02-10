@@ -36,7 +36,7 @@ cards:
     show_header_toggle: false
     footer:
       type: graph
-      entity: sensor.temperature
+      entity: sensor.ikea_pm25_temperature
       detail: 3
     entities:
       - entity: sensor.ikea_pm25
@@ -139,20 +139,6 @@ cards:
         style: |
           ha-card {
           }
-
-  - type: vertical-stack
-    cards:
-      - type: glance
-        title: MDF Closet
-        state_color: true
-        entities:
-          - entity: sensor.mdf_temperature
-            name: Temperature
-          - entity: sensor.mdf_humidity
-            name: Humidity
-            icon: mdi:water-percent
-          - entity: sensor.genkan_temperature
-            name: Hallway
 
 
 ####################################################

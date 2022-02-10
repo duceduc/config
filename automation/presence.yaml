@@ -91,12 +91,80 @@
       data:
         entity_id: input_boolean.sachiko_presence
 
+# Tomokun
+- alias: Presence Tomokun On
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.tomokun_presence
+      above: 10
+  action:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.tomokun_presence, input_boolean.toggle_guest_presence
+- alias: Presence Tomokun Off
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.tomokun_presence
+      below: 10
+  action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.tomokun_presence
+
+
+# Enable/Disable Guest Mode
+- alias: Enable Guest Mode
+  trigger:
+    - platform: state
+      entity_id: group.guest_presence
+      to: 'on'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.guest_mode
+      
+    - service: notify.mobile_app_id
+      data:
+        message: "Guest Mode is turned {{ states('input_boolean.guest_mode') }}."
+        title: "*Guest Mode Status*"
+
+- alias: Disable Guest Mode
+  trigger:
+    - platform: state
+      entity_id: group.guest_presence
+      to: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.guest_mode
+
+    - service: notify.mobile_app_id
+      data:
+        message: "Guest Mode is turned {{ states('input_boolean.guest_mode') }}."
+        title: "*Guest Mode Status*"
+        
+
+#########################################################
+#                                                                                                              #
+#             Momentary Switch Trigger                                                               #
+#                                                                                                              #
+#########################################################
+
+- alias: Monentary Presence Monitor Trigger
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_g1_occupancy
+      to: 'on'
+  action:
+    - delay: 4
+    - service: switch.turn_on
+      data:
+        entity_id: switch.momentary_presence_monitor
 
 #########################################################
 #                                                                                                              #
 #            Arrival | Departure                                                                         #
 #                                                                                                             #
 #########################################################
+
 
 - alias: Presence Scan Arrival
   trigger:
@@ -105,7 +173,7 @@
       to: 'on'
   condition:
     - condition: template
-      value_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'off') }}"
+      value_template: "{{ is_state('switch.momentary_presence_monitor', 'off') }}"
   action:
     - service: mqtt.publish
       data_template:
@@ -118,14 +186,17 @@
       to: 'on'
   condition:
     - condition: template
-      value_template: "{{ is_state('binary_sensor.motion_hallway_occupancy', 'on') }}"
-    - condition: template
-      value_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'on') }}"
-  action:
+      value_template: "{{ is_state('switch.momentary_presence_monitor', 'on') }}"
+  action:  
     - delay: '00:02:00'
     - service: mqtt.publish
       data_template:
         topic: monitor/scan/depart
+    - delay: '00:00:30'
+    - service: mqtt.publish
+      data_template:
+        topic: monitor/scan/depart
+
 
 #########################################################
 #                                                                                                              #
@@ -285,7 +356,7 @@
           - service: device_tracker.see
             data:
               dev_id: shion
-              location_name: "Shion School"
+              location_name: "School"
 
 
 

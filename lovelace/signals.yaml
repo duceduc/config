@@ -10,7 +10,96 @@ icon: mdi:wifi
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
   - type: custom:bar-card
-    title: Bluetooth Signals
+    title: Wifi Motion Signals
+    show_header_toggle: false
+    max: -100
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.aio_wemos_wifi_signal
+        name: Aio Wemos        
+      - entity: sensor.sr_sensor_wifi_signal
+        name: Shion Room Sensors
+      - entity: sensor.hallway_sensor_wifi_signal
+        name: Hallway Sensors
+      - entity: sensor.lr_sensor_wifi_signal
+        name: Livingroom Sensors        
+      - entity: sensor.washroom_sensor_wifi_signal
+        name: Washroom Sensor
+    severity:
+      - color: var(--label-badge-green)
+        from: -67
+        to: ''
+      - color: orange
+        from: -80
+        to: -67
+      - color: var(--label-badge-red)
+        from: -90
+        to: -80
+        
+  - type: custom:bar-card
+    title: Wifi Device Signals
+    show_header_toggle: false
+    max: -100
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.bed_sensor_wifi_signal
+        name: Bed Sensor
+      - entity: sensor.toilet_airfreshener_wifi_signal
+        name: Toilet Air Freshner
+      - entity: sensor.ikea_pm25_wifi_signal
+        name: Ikea Air Sensor
+
+    severity:
+      - color: var(--label-badge-green)
+        from: -67
+        to: ''
+      - color: orange
+        from: -80
+        to: -67
+      - color: var(--label-badge-red)
+        from: -90
+        to: -80
+
+  - type: custom:bar-card
+    title: Wifi Server Signals
+    show_header_toggle: false
+    max: -100
+    min: 0
+    positions:
+      icon: 'off'
+      indicator: 'off'
+      value: inside
+    entities:
+      - entity: sensor.esp32_linkquality
+        name: SwitchbotMQTT
+      - entity: sensor.ms1_wifi_strength
+        name: MS1 Server
+      - entity: sensor.ms2_wifi_strength
+        name: MS2 Server
+      - entity: sensor.ms3_wifi_strength
+        name: MS3 Server
+
+    severity:
+      - color: var(--label-badge-green)
+        from: -67
+        to: ''
+      - color: orange
+        from: -80
+        to: -67
+      - color: var(--label-badge-red)
+        from: -90
+        to: -80
+
+  - type: custom:bar-card
+    title: Bluetooth SB Signals
     show_header_toggle: false
     max: -100
     min: 0
@@ -27,8 +116,8 @@ cards:
         name: Curtain Living Room Left
       - entity: sensor.lr_curtain_rt_linkquality
         name: Curtain Living Room Right
-      - entity: sensor.floor_heat_linkquality
-        name: Floor Heater
+      - entity: sensor.genkan_doorlock_linkquality
+        name: Genkan Doorlock
       - entity: sensor.jcom_tv_box_linkquality
         name: Jcom Tv Box
       - entity: sensor.24hr_fan_linkquality
@@ -48,53 +137,10 @@ cards:
         from: -90
         to: -80
 
-  - type: custom:bar-card
-    title: Wifi Signals
-    show_header_toggle: false
-    max: -100
-    min: 0
-    positions:
-      icon: 'off'
-      indicator: 'off'
-      value: inside
-    entities:
-      - entity: sensor.security_cam_wifi_signal
-        name: ESP32 Camera
-      - entity: sensor.esp32_linkquality
-        name: ESP32 Switchbot
-      - entity: sensor.bed_sensor_wifi_signal
-        name: ESP32 Bed Sensor
-      - entity: sensor.aio_wemos_wifi_signal
-        name: Aio Wemos
-      - entity: sensor.sr_sensor_wifi_signal
-        name: Shion Room Sensors
-      - entity: sensor.toilet_airfreshener_wifi_signal
-        name: Toilet Air Freshner
-      - entity: sensor.ikea_pm25_wifi_signal
-        name: Ikea Air Sensor        
-      - entity: sensor.lr_sensor_wifi_signal
-        name: Livingroom Sensors
-      - entity: sensor.ms1_wifi_strength
-        name: MS1 Server
-      - entity: sensor.ms2_wifi_strength
-        name: MS2 Server
-      - entity: sensor.ms3_wifi_strength
-        name: MS3 Server
 
-
-    severity:
-      - color: var(--label-badge-green)
-        from: -67
-        to: ''
-      - color: orange
-        from: -80
-        to: -67
-      - color: var(--label-badge-red)
-        from: -90
-        to: -80
 
   - type: custom:bar-card
-    title: Zigbee Motion Signals
+    title: Zigbee Dimmer Signals
     show_header_toggle: false
     max: 125
     min: 0
@@ -103,21 +149,20 @@ cards:
       indicator: 'off'
       value: inside
     entities:
-      - entity: sensor.motion_g1_linkquality
-        name: Genkan Hallway Motion Sensor
-      - entity: sensor.motion_hallway_linkquality
-        name: Hallway Motion Sensor
-      - entity: sensor.motion_washroom_linkquality
-        name: Washroom Motion Sensor
-      - entity: sensor.motion_k1_linkquality
-        name: Kitchen Sink Sensor
-      - entity: sensor.motion_k2_linkquality
-        name: Kitchen Fridge Sensor
-      - entity: sensor.motion_c1_linkquality
-        name: Closet Motion Sensorr
-      - entity: sensor.motion_s1_linkquality
-        name: Pantry Motion Sensor
-        
+      - entity: sensor.shower_room_linkquality
+        name: Shower Room Dimmer
+      - entity: sensor.cr_curtains_linkquality
+        name: Computer Room Curtain Dimmer
+      - entity: sensor.lr_curtains_linkquality
+        name: Living Room Curtain Dimmer
+      - entity: sensor.shion_dimmer_linkquality
+        name: Shion Room Dimmer
+      - entity: sensor.master_dimmer_linkquality
+        name: Master Room Dimmer
+      - entity: sensor.kitchen_dimmer_linkquality
+        name: Kitchen Switch Dimmer        
+      - entity: sensor.0x00124b001938c31b_linkquality
+        name: CC2531 Router
     severity:
       - color: var(--label-badge-red)
         from: 0
@@ -128,6 +173,10 @@ cards:
       - color: var(--label-badge-green)
         from: 51
         to: 125
+
+
+
+
 
   - type: custom:bar-card
     title: Zigbee Controller Signals
@@ -158,8 +207,15 @@ cards:
         from: 51
         to: 125
 
+
+
+
+
+
+
+
   - type: custom:bar-card
-    title: Zigbee Dimmer Signals
+    title: Zigbee Motion Signals
     show_header_toggle: false
     max: 125
     min: 0
@@ -168,18 +224,15 @@ cards:
       indicator: 'off'
       value: inside
     entities:
-      - entity: sensor.shower_room_linkquality
-        name: Shower Room Dimmer
-      - entity: sensor.cr_curtains_linkquality
-        name: Computer Room Curtain Dimmer
-      - entity: sensor.lr_curtains_linkquality
-        name: Living Room Curtain Dimmer
-      - entity: sensor.shion_dimmer_linkquality
-        name: Shion Room Dimmer
-      - entity: sensor.master_dimmer_linkquality
-        name: Master Room Dimmer
-      - entity: sensor.0x00124b001938c31b_linkquality
-        name: CC2531 Router
+      - entity: sensor.motion_k1_linkquality
+        name: Kitchen Sink Sensor
+      - entity: sensor.motion_k2_linkquality
+        name: Kitchen Fridge Sensor
+      - entity: sensor.motion_c1_linkquality
+        name: Closet Motion Sensorr
+      - entity: sensor.motion_s1_linkquality
+        name: Pantry Motion Sensor
+        
     severity:
       - color: var(--label-badge-red)
         from: 0
@@ -190,6 +243,15 @@ cards:
       - color: var(--label-badge-green)
         from: 51
         to: 125
+
+
+
+
+
+
+
+
+
 
 
 

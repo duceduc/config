@@ -1,4 +1,4 @@
-# ESP8266 Uno [8C:AA:B5:79:83:92]
+# ESP8266 Uno 
 substitutions:
   name: aio-wemos
   platform: ESP8266
@@ -17,10 +17,10 @@ wifi:
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
-  manual_ip:
-    static_ip: 192.168.1.95
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
+#  manual_ip:
+#    static_ip: 192.168.1.95
+#    subnet: 255.255.255.0
+#    gateway: 192.168.1.1
   
 captive_portal:
 
@@ -59,7 +59,7 @@ sensor:
     pin: A0
     name: 'rear Illuminance'
     unit_of_measurement: lux
-    update_interval: 40s
+    update_interval: 20s
 
 binary_sensor:
   - platform: status

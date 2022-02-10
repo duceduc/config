@@ -20,7 +20,7 @@ background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') f
 views:
 
   - !include lovelace/data.yaml
-  - !include lovelace/network.yaml
+  - !include lovelace/climate.yaml
   - !include lovelace/switches.yaml
   - !include lovelace/rooms.yaml
   - !include lovelace/weather.yaml
@@ -36,7 +36,7 @@ views:
 ####################################################
 
 
-# network.yaml
+# climate.yaml
 decluttering_templates:
   temperature _tpl:
     card:
@@ -109,6 +109,42 @@ decluttering_templates:
               type: 'custom:fold-entity-row'
           show_header_toggle: false
           type: entities
+
+
+  humidifier_tpl:
+    card:
+      type: 'custom:vertical-stack-in-card'
+      cards:
+        - type: glance
+          title: '[[title]]'
+          state_color: false
+          show_name: false
+          entities:
+            - entity: '[[entity_1]]'
+              name: Humidifier
+            - entity: '[[entity_2]]'
+              name: Temperature
+            - entity: '[[entity_3]]'
+              name: Humidity
+            - entity: '[[entity_4]]'
+              name: Efficiency
+        - entities:
+            - head:
+                label: Automation
+                type: section
+              items:
+                - input_boolean.[[room]]_humidifier_automation_enable                                              
+                - input_datetime.[[room]]_ac_am_on_time
+                - input_datetime.[[room]]_ac_am_off_time
+                - input_datetime.[[room]]_ac_pm_on_time
+                - input_datetime.[[room]]_ac_pm_off_time
+                - input_number.[[room]]_humidity_low_set                
+                - input_number.[[room]]_humidity_high_set              
+                - input_number.[[room]]_humidity_intensity_set
+              type: 'custom:fold-entity-row'
+          show_header_toggle: false
+          type: entities
+
 
 
 # data.yaml
@@ -323,7 +359,7 @@ decluttering_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)
-        - value: "Shion School"
+        - value: "School"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)

@@ -82,6 +82,33 @@ shower_room:
   integration: z2m
   light: light.shower_room
 
+
+
+#########################################################
+#                                                                                                              #
+#             Kitchen Switch                                                                             #
+#                                                                                                              #
+#########################################################
+
+
+kitchen:
+  module: controllerx
+  class: E1743Controller
+  controller: sensor.kitchen_dimmer_click
+  integration: z2m
+  light: light.kitchen
+  merge_mapping:
+    "on":
+      service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.kitchen_mcl
+    "off":
+      service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.kitchen_mcl
+
+
+
 #########################################################
 #                                                                                                              #
 #             Computer Room                                                                            #
@@ -151,6 +178,16 @@ master_dimmer:
       data:
         entity_id:
          - light.master_room
+
+
+#########################################################
+#                                                                                                              #
+#             ESPresense IPS                                                                             #
+#                                                                                                              #
+#########################################################
+
+
+
 
 #########################################################
 #                                                                                                              #

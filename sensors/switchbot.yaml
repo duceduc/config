@@ -1,6 +1,6 @@
 ####################################################
 #                                                                                                    #
-#                      Error Check                                                              #
+#                      Switchbot ESP32 Offline                                              #
 #                                                                                                    #
 ####################################################
 # c289d47408fd -T
@@ -14,221 +14,10 @@
 # c9f9186ca30d - hdmi selector
 
   - platform: mqtt
-    name: 'Switchbot Status'
-    state_topic: 'switchbot/status/msg'
-    value_template: '{{ value }}'
-
-
-####################################################
-#                                                                                                    #
-#                      Switchbot ESP32 Offline                                              #
-#                                                                                                    #
-####################################################
-
-  - platform: mqtt
     name: 'Switchbot Devices Offline'
     state_topic: 'switchbotmqtt/esp32/lastwill'
     value_template: '{{ value }}'
     icon: mdi:server-network-off
-
-####################################################
-#                                                                                                    #
-#                      Switchbot Meter                                                        #
-#                                                                                                    #
-####################################################
-
-# Genkan Switchbot Meter [c2:89:d4:74:08:fd]
-  - platform: mqtt
-    name: 'Genkan Temperature'
-    state_topic: 'switchbot/meter/c289d47408fd'
-    value_template: '{{ value_json.serviceData.temperature.c }}'
-    unit_of_measurement: '°C'
-  - platform: mqtt
-    name: 'Genkan Humidity'
-    state_topic: 'switchbot/meter/c289d47408fd'
-    value_template: '{{ value_json.serviceData.humidity }}'
-    unit_of_measurement: '%'
-    icon: mdi:water-percent
-  - platform: mqtt
-    name: 'Genkan Battery'
-    state_topic: 'switchbot/meter/c289d47408fd'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: '%'
-    icon: mdi:battery
-  - platform: mqtt
-    name: 'Genkan BLE Signal'
-    state_topic: 'switchbot/meter/c289d47408fd'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-####################################################
-#                                                                                                    #
-#                      Switchbot Jcom Tv Box                                               #
-#                                                                                                    #
-####################################################
-
-#  - platform: mqtt
-#    name: "Jcom Tv Box Battery"
-#    state_topic: 'switchbot/bot/f4f839cd40fd'
-#    value_template: '{{ value_json.serviceData.battery }}'
-#    unit_of_measurement: "%"
-#    icon: mdi:battery
-  - platform: mqtt
-    name: 'Jcom Tv Box BLE Signal'
-    state_topic: 'switchbot/bot/f4f839cd40fd'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-####################################################
-#                                                                                                    #
-#                      Switchbot Floor Heater                                               #
-#                                                                                                    #
-####################################################
-
-  - platform: mqtt
-    name: "Floor Heater Battery"
-    state_topic: 'switchbot/bot/e79341ccf8ea'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
-  - platform: mqtt
-    name: 'Floor Heater BLE Signal'
-    state_topic: 'switchbot/bot/e79341ccf8ea'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-####################################################
-#                                                                                                    #
-#                      Switchbot 24Hr Fan                                                    #
-#                                                                                                    #
-####################################################
-
-  - platform: mqtt
-    name: "Washroom Fan Battery"
-    state_topic: 'switchbot/bot/fab6527b504e'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
-  - platform: mqtt
-    name: 'Washroom Fan BLE Signal'
-    state_topic: 'switchbot/bot/fab6527b504e'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-
-####################################################
-#                                                                                                    #
-#                      Switchbot hdmi Selector                                              #
-#                                                                                                    #
-####################################################
-
-#  - platform: mqtt
-#    name: "HDMI Selector Battery"
-#    state_topic: 'switchbot/bot/c9f9186ca30d'
-#    value_template: '{{ value_json.serviceData.battery }}'
-#    unit_of_measurement: "%"
-#    icon: mdi:battery
-  - platform: mqtt
-    name: 'HDMI Selector BLE Signal'
-    state_topic: 'switchbot/bot/c9f9186ca30d'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-
-####################################################
-#                                                                                                    #
-#                      Switchbot CR Curtain                                                  #
-#                                                                                                    #
-####################################################
-
-# Left
-  - platform: mqtt
-    name: "CR Curtain Left Battery"
-    state_topic: 'switchbot/curtain/c5c6df9448bc'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
-
-  - platform: mqtt
-    name: 'CR Curtain Left BLE Signal'
-    state_topic: 'switchbot/curtain/c5c6df9448bc'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-# Right
-  - platform: mqtt
-    name: "CR Curtain Right Battery"
-    state_topic: 'switchbot/curtain/e3459c3842fe'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
-
-  - platform: mqtt
-    name: 'CR Curtain Right BLE Signal'
-    state_topic: 'switchbot/curtain/e3459c3842fe'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-
-# Position State
-  - platform: mqtt
-    name: "CR Curtain Left Position"
-    state_topic: 'switchbot/curtain/c5c6df9448bc'
-    value_template: '{{ value_json.serviceData.position }}'
-    unit_of_measurement: "%"
-    icon: mdi:format-list-numbered
-
-####################################################
-#                                                                                                    #
-#                      Switchbot CR Curtain                                                  #
-#                                                                                                    #
-####################################################
-
-# Left
-  - platform: mqtt
-    name: "LR Curtain Left Battery"
-    state_topic: 'switchbot/curtain/e2b3c5c10dcc'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
-
-  - platform: mqtt
-    name: 'LR Curtain Left BLE Signal'
-    state_topic: 'switchbot/curtain/e2b3c5c10dcc'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-  - platform: mqtt
-
-# Right
-    name: "LR Curtain Right Battery"
-    state_topic: 'switchbot/curtain/e746bd93112f'
-    value_template: '{{ value_json.serviceData.battery }}'
-    unit_of_measurement: "%"
-    icon: mdi:battery
-
-  - platform: mqtt
-    name: 'LR Curtain Right BLE Signal'
-    state_topic: 'switchbot/curtain/e746bd93112f'
-    value_template: '{{ value_json.rssi }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:antenna
-
-# Position State
-  - platform: mqtt
-    name: "LR Curtain Left Position"
-    state_topic: 'switchbot/curtain/e2b3c5c10dcc'
-    value_template: '{{ value_json.serviceData.position }}'
-    unit_of_measurement: "%"
-    icon: mdi:format-list-numbered
-
 
 ####################################################
 #                                                                                                    #
@@ -273,6 +62,20 @@
           {% else %}
             closed
           {% endif %}
+
+####################################################
+#                                                                                                    #
+#                      Switchbot Contact Sensor                                           #
+#                                                                                                    #
+####################################################
+
+  - platform: template
+    sensors:
+      genkan_doorlock:
+        value_template: >-
+         {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}Locked{% else %}Unlocked{% endif %}
+        icon_template: >-
+         {% if is_state("sensor.genkan_doorlock_contact", "CLOSED") %}mdi:door-open{% else %}mdi:door-closed-lock{% endif %}
 
 ####################################################
 #                                                                                                    #

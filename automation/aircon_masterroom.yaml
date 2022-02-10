@@ -4,6 +4,90 @@
 #                                                                                                              #
 #########################################################
 
+
+
+- alias: Masterroom Occupancy
+  description: 'Defines occupancy state for room'
+  mode: single  
+  trigger:
+  - platform: time_pattern
+    id: time
+    seconds: '10'
+  - platform: state
+    entity_id: binary_sensor.motion_mr_occupancy
+    id: motion
+    to: 'on'
+  condition:
+    - condition: time
+      after: '06:00:00'
+      before: '22:01:00'
+  
+  action:
+  - service: python_script.room_occupancy
+    data:
+      roomname: masterroom 
+      entities_toggle: # entities that can mark a room as occupied
+      - binary_sensor.motion_mr_occupancy
+      - input_boolean.masterroom_mcl
+      entities_keep: # entities that can keep a room occupied
+#      - sensor.eri_espresense
+      - sensor.duc_espresense
+#      - sensor.shion_isp_espresense
+      timeout: 2 # timeout of the room, timer gets set to this
+
+- alias: Masterroom Light
+  description: 'toggle light depending on timer state'
+  mode: single  
+  trigger:
+  - platform: state
+    entity_id: timer.masterroom_timer
+    id: 'on'
+    from: idle
+    to: active
+    
+  - platform: state
+    entity_id: timer.masterroom_timer
+    id: 'off'
+    from: active
+    to: idle
+  - platform: state
+    entity_id: light.master_room
+    id: 'off'
+    from: 'on'    
+    to: 'off'
+    
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # pc is not off
+      value_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"      
+#    - condition: template
+#      value_template: "{{ is_state('input_boolean.masterroom_mcl', 'off') }}"
+      
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.m_1        
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - service: light.turn_off
+        target:
+          entity_id: light.master_room
+      - service: timer.finish
+        target:
+          entity_id: timer.masterroom_timer
+    default: []
+
+
+
+######################
 - alias: 'motion master room auto-on'
   trigger:
     - platform: state
@@ -18,7 +102,7 @@
       entity_id: light.master_room
       state: 'off'
     - condition: template
-      value_template: "{{ is_state('input_boolean.mr_mcl', 'on') }}"
+      value_template: "{{ is_state('input_boolean.masterroom_mcl', 'off') }}"
 
     - condition: time
       after: '06:00:00'
@@ -37,7 +121,7 @@
     - condition: template # pc is not off
       value_template: "{{ not is_state('binary_sensor.desktop_connected', 'off') }}"
     - condition: template
-      value_template: "{{ is_state('input_boolean.mr_mcl', 'on') }}"
+      value_template: "{{ is_state('input_boolean.masterroom_mcl', 'off') }}"
   action:
     - service: light.turn_off
       entity_id: light.master_room
@@ -71,12 +155,12 @@
       value_template: "{{ is_state('timer.mr_mcl', 'active') }}"
   action:
     - service: input_boolean.toggle
-      entity_id: input_boolean.mr_mcl
+      entity_id: input_boolean.masterroom_mcl
 
 - alias: 'MR MCL Announce State'
   trigger:
     - platform: state
-      entity_id: input_boolean.mr_mcl
+      entity_id: input_boolean.masterroom_mcl
   action:
     - service: notify.alexa_media
       data_template:
@@ -85,18 +169,18 @@
         target:
         - media_player.ai_2
         message: >
-          {% set mode = 'automatic' if trigger.to_state.state == 'on' else 'manual' %}
+          {% set mode = 'automatic' if trigger.to_state.state == 'off' else 'manual' %}
           <speak> Master room light is now in {{ mode }} mode. </speak>
 
 - alias: 'MR MCL Re-Enable'
   trigger:
     -  platform: state
-       entity_id: input_boolean.mr_mcl
-       to: 'off'
+       entity_id: input_boolean.masterroom_mcl
+       to: 'on'
        for: '01:00:00'
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.mr_mcl
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.masterroom_mcl
 
 
 #########################################################
@@ -154,7 +238,7 @@
     entity_id: binary_sensor.master_door
     state: 'off'
   - condition: state
-    entity_id: binary_sensor.mr_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    entity_id: binary_sensor.mr_dht_sensor_status # only if temperature sensor is available - prevents glitching when unavailable
     state: 'on'
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:
@@ -211,7 +295,7 @@
     entity_id: binary_sensor.master_door
     state: 'off'
   - condition: state
-    entity_id: binary_sensor.mr_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    entity_id: binary_sensor.mr_dht_sensor_status # only if temperature sensor is available - prevents glitching when unavailable
     state: 'on'
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:

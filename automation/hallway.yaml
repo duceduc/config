@@ -21,7 +21,7 @@
     - platform: state
       entity_id: binary_sensor.motion_hallway_occupancy
       to: 'off'
-      for: '00:00:30'
+      for: '00:01:00'
   action:  
     - service: light.turn_off
       data:
@@ -53,10 +53,10 @@
     entity_id: light.h_1
     data:
       brightness: 200
-  - delay: 00:13
-  - service: light.turn_off
-    data:
-      entity_id: light.h_1
+#  - delay: 00:13
+#  - service: light.turn_off
+#    data:
+#      entity_id: light.h_1
 
 #########################################################
 #                                                                                                              #
@@ -80,7 +80,7 @@
   - platform: state
     entity_id: binary_sensor.motion_g1_occupancy
     to: 'off'
-    for: '00:00:30'
+    for: '00:01:00'
   action:  
   - service: light.turn_off
     data:

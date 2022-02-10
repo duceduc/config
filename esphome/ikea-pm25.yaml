@@ -1,5 +1,4 @@
 # ESP8266 NodeMCU....
-# [98-CD-AC-30-E9-4F]
 substitutions:
   name: ikea-pm25
   platform: ESP8266
@@ -15,10 +14,10 @@ wifi:
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
-  manual_ip:
-    static_ip: 192.168.1.97
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
+#  manual_ip:
+#    static_ip: 192.168.1.97
+#    subnet: 255.255.255.0
+#    gateway: 192.168.1.1
   
 captive_portal:
 
@@ -55,20 +54,23 @@ sensor:
     automatic_baseline_calibration: false
     uart_id: uart_2
     
+# Danger above 50% CO    
   - platform: adc
     pin: A0
-    name: "MQ-9 (raw)"
-    update_interval: 60s
-    id: mq9
-    
-  - platform: template
     name: "Carbon Monoxide"
-    lambda: |-
-      return (id(mq9).state*1024/5);
-    unit_of_measurement: ppm
-    icon: 'mdi:fire'
+    update_interval: 60s
+    filters:
+      - lambda: return (x * 1024/5);
+    unit_of_measurement: "ppm"
+    icon: mdi:fire
 
   - platform: wifi_signal
     name: $name wifi signal
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart
+    
 
     

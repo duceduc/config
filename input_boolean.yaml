@@ -94,17 +94,22 @@
   sachiko_presence:
     name: Sachiko
     icon: mdi:account
+  tomokun_presence:
+    name: Tomokun
+    icon: mdi:account
 
 
-  sr_mcl:
+  shionroom_mcl:
     name: Motion-Controlled SR Light
-    initial: true
+    initial: off
 
-  mr_mcl:
+  masterroom_mcl:
     name: Motion-Controlled MR Light
-    initial: true
+    initial: off
 
-
+  kitchen_mcl:
+    name: Motion-Controlled Kitchen Light
+    initial: off
 
 #####################
   status_fan_power:
@@ -148,3 +153,15 @@
 
 
 
+
+  sb_humidifier:
+    name: SB Humidifier
+    icon: mdi:air-humidifier
+
+  lrh_humidifier_automation_enable:
+    name: Humidifier Automation
+    icon: mdi:av-timer
+    initial: off
+
+
+    

@@ -79,6 +79,9 @@
     - platform: time
       at: '04:55:00'
   condition:
+    - condition: template # Vacation mode is not On
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+  
     - condition: template # Duc is home
       value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
     - condition: template # PC is not on

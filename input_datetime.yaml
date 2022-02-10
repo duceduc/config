@@ -1,4 +1,24 @@
 
+  lrh_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '05:00'
+  lrh_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '07:00'
+  lrh_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '18:30'
+  lrh_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '20:00'
+
+
+
+#####
   lr_ac_am_on_time:
     name: AM On Time
     has_time: true

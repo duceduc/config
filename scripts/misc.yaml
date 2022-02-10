@@ -80,7 +80,7 @@
       - service: device_tracker.see # Set to at school
         data:
           dev_id: shion
-          location_name: "home"
+          location_name: "not_home"
           gps:
           - '35.81214930237013'
           - '139.71171706362946'

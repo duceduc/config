@@ -105,6 +105,52 @@
 
 #########################################################
 #                                                                                                              #
+#            HUMIDIFIER                                                                                    #
+#                                                                                                              #
+#########################################################
+
+
+      lrh_humidifier_am_automation_time_active:
+        friendly_name: "LRH Humidifier AM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.lrh_ac_am_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.lrh_ac_am_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+      lrh_humidifier_pm_automation_time_active:
+        friendly_name: "LRH Humidifier PM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.lrh_ac_pm_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.lrh_ac_pm_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#########################################################
+#                                                                                                              #
 #             END OF CONFIGURATION FILE                                                          #
 #                                                                                                              #
 #########################################################

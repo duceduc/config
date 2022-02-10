@@ -19,8 +19,8 @@
     upper: 0.5
 
   - platform: threshold
-    name: ms2 updates
-    entity_id: sensor.ms2_updates
+    name: ms1 updates
+    entity_id: sensor.ms1_updates
     upper: 0.5
 
 ####################################################
@@ -35,24 +35,13 @@
         value_template: >
           {% set w = states('sensor.date_weekday') %}
           {% set h = states('sensor.holiday')| trim !='' %}
-          {% set end = '20:00:00' %}
+          {% set end = '19:59:00' %}
           {% if w == 'on' and h == false %} 
             {{ '07:00:00' < states('sensor.time') < end }}
           {% else %}
             {{ '09:30:00' < states('sensor.time') < end }}
           {% endif %}
 
-
-####################################################
-#                                                                                                    #
-#            Internet Online/Offline                                                           #
-#                                                                                                    #
-####################################################
-
-  - platform: ping
-    name: Internet
-    host: 8.8.8.8
-    scan_interval: 15
 
 #########################################################
 #                                                                                                              #

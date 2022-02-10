@@ -12,6 +12,8 @@ wake_on_lan:
 tts:
   - platform: google_translate
     service_name: google_say
+#    cache_dir: /tmp/tts
+    time_memory: 300
 
 notify_events:
   token: !secret notify_token
@@ -113,17 +115,48 @@ homekit:
 #                                                                                                              #
 #########################################################
 
+
 rest:
-  - resource: !secret crt_search
-    scan_interval: 14400
+  - resource: !secret switchbot_wohumi_url
+    scan_interval: 900
+    method: GET    
+    headers:
+      Authorization: !secret switchbot_api
+      Content-Type: 'application/json'
     sensor:
-      - name: vj ssl cert issued
-        value_template: "{{ value_json[0].not_before }}"
-        device_class: timestamp
-      - name: vj ssl cert issuer
-        value_template: "{{ value_json[0].issuer_name }}"
-      - name: vj ssl cert cn
-        value_template: "{{ value_json[0].common_name }}"
+      - name: SB Humidifier Power
+        value_template: "{{ value_json.body.power }}"
+        device_class: power
+    
+      - name: SB Humidifier Lack Water
+        value_template: "{{ value_json.body.lackWater }}"
+        device_class: carbon_dioxide
+      - name: SB Humidifier Nebulization Efficiency
+        value_template: "{{ value_json.body.nebulizationEfficiency }}"
+        unit_of_measurement: '%'        
+        device_class: ozone 
+      - name: SB Humidifier Temperature
+        value_template: "{{ value_json.body.temperature }}"
+        unit_of_measurement: '°C'
+        device_class: temperature 
+      - name: SB Humidifier Humidity
+        value_template: "{{ value_json.body.humidity }}"
+        unit_of_measurement: '%'
+        device_class: humidity
+
+
+#  - resource: !secret crt_search
+#    scan_interval: 14400
+#    sensor:
+#      - name: vj ssl cert issued
+#        value_template: "{{ value_json[0].entry_timestamp }}"
+#        device_class: timestamp
+#      - name: vj ssl cert issuer
+#        value_template: "{{ value_json[0].issuer_name }}"
+#      - name: vj ssl cert cn
+#        value_template: "{{ value_json[0].common_name }}"
+
+
 
 #########################################################
 #                                                                                                              #
@@ -151,6 +184,7 @@ alexa_media:
        - Ai.4
 # Find Amazon dot name
 # https://alexa.amazon.com/api/devices-v2/device
+# reaunthenicate issue - enter random string and hit submit to refresh visable captacha.
 
 telegram_bot:
   - platform: polling
@@ -198,6 +232,13 @@ counter:
     step: 1
     restore: true
     icon: mdi:spray
+# humidifier
+  humidifier_toggle:
+    initial: 0
+    step: 1
+
+
+
 
 input_text:
   slack_app_verification_token:
@@ -290,6 +331,14 @@ rest_command:
         "attachments": {{ attachments if (attachments is defined) else '[]' }}
       }
 
+### Switchbot API Command
+  switchbot_device_command:
+    url: "https://api.switch-bot.com/v1.0/devices/{{ deviceId }}/commands"
+    method: post
+    content_type: "application/json"
+    headers:
+      Authorization: !secret switchbot_api
+    payload: '{ "command": "{{ command }}", "parameter": "{{ parameter }}" }' 
 
 
 #########################################################
@@ -322,16 +371,6 @@ panel_custom:
     module_url: /local/custom_ui/panel-redirect.js
     config:
       target: /hassio/dashboard
-
-
-#zigbee2mqtt_networkmap:
-## Integrations
-#panel_iframe:
-#  networkmap:
-#    title: 'Zigbee Map'
-#    url: '/local/community/zigbee2mqtt_networkmap/map.html'
-#    icon: 'mdi:graphql'
-
 
 
 #########################################################

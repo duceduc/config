@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                    AUTOMATIONS VIEW                                                    #
-#                                                                                                    #
+#                                                                                                                             #
+#                    AUTOMATIONS VIEW                                                                         #
+#                                                                                                                             #
 ####################################################
 
 title: Automations
@@ -107,13 +107,6 @@ cards:
             style: |
               ha-card {
               }
-
-
-
-
-
-
-
 
       - type: vertical-stack
         cards:
@@ -322,10 +315,7 @@ cards:
             name: Presence Detection - Arrival Scan 
             icon: mdi:hail
             secondary_info: last-triggered
-          - entity: automation.motion_genkan_auto_on
-            name: Turn On Genkan Lights - Alexa Greetings
-            icon: mdi:home-outline
-            secondary_info: last-triggered
+
           - entity: automation.security_camera_snapshot
             name: Snapshot at Genkan
             icon: mdi:camera
@@ -338,8 +328,6 @@ cards:
             name: Welcome Home Announcement
             icon: si:amazonalexa
             secondary_info: last-triggered
-
-
 
       - type: entities
         title: Disable Device Automations
@@ -354,6 +342,22 @@ cards:
             icon: mdi:wifi
             secondary_info: last-triggered
 
+      - type: entities
+        title: Notification Automations
+        show_header_toggle: false
+        entities:
+          - entity: automation.home_air_quality_warnings
+            name: Home Air Quality
+            icon: mdi:air-filter
+            secondary_info: last-triggered
+          - entity: automation.replace_toilet_airfreshener_notification
+            name: Replace Toilet Airfreshener
+            icon: mdi:toilet
+            secondary_info: last-triggered
+          - entity: automation.holiday_and_birthday_notification
+            name: Holidays & Birthdays
+            icon: mdi:cake-variant
+            secondary_info: last-triggered
 
 
 ####################################################

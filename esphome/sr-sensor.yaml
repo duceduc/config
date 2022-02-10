@@ -1,5 +1,4 @@
 # ESP8266 NodeMCU....
-# [C4:5B:BE:70:D3:D2]
 substitutions:
   name: sr-sensor
   platform: ESP8266
@@ -11,11 +10,11 @@ esphome:
   board: $board
 
 wifi:
-#  use_address: sr_sensor.local
   ssid: !secret ssid_1
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
+  reboot_timeout: 0s
   manual_ip:
     static_ip: 192.168.1.92
     subnet: 255.255.255.0
@@ -33,12 +32,12 @@ ota:
 sensor:
   - platform: dht
     model: AM2302
-    pin: D3 #Avoid D4. LED Driven. Use D3
+    pin: D3 #Avoid D4. LED Driven. Use D3(GPIO0)
     temperature:
       name: 'sr temperature'
     humidity:
       name: 'sr humidity'
-    update_interval: 40s
+    update_interval: 25s
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -48,7 +47,7 @@ binary_sensor:
     name: $name dht Status
 
   - platform: gpio
-    pin: D1
+    pin: D6 # Use D5 D6 D7. No luck with D1 D5
     name: 'motion sr occupancy'
     device_class: motion
 

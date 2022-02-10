@@ -4,7 +4,6 @@
 #                                                                                                              #
 #########################################################
 
-
 - alias: 'LR Room Aircon'
   initial_state: true
   trigger:
@@ -52,6 +51,9 @@
   - condition: state # only if hallway door is closed
     entity_id: binary_sensor.hallway_door
     state: 'off'
+  - condition: state
+    entity_id: binary_sensor.lr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    state: 'on'    
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:
     - condition: state
@@ -106,6 +108,9 @@
   - condition: state # only if hallway door is closed
     entity_id: binary_sensor.hallway_door
     state: 'off'
+  - condition: state
+    entity_id: binary_sensor.lr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    state: 'on'    
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:
     - condition: state
@@ -349,7 +354,7 @@
         {% elif is_state('sensor.season', 'autumn') %}
           19
         {% elif is_state('sensor.season', 'winter') %}
-          19
+          17
         {% elif is_state('sensor.season', 'spring') %}
           17
         {% endif %}
@@ -383,11 +388,132 @@
         {% elif is_state('sensor.season', 'autumn') %}
           19
         {% elif is_state('sensor.season', 'winter') %}
-          19
+          18
         {% elif is_state('sensor.season', 'spring') %}
           17
         {% endif %}
 
+
+#########################################################
+#                                                                                                              #
+#             Switchbot Humidifier                                                                 #
+#                                                                                                              #
+#########################################################
+
+- alias: 'SB Humidifier'
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: input_select.sb_humidifier_mode
+  action:
+  - service_template: >
+      {% if is_state('input_select.sb_humidifier_mode', 'Low') %} script.humidifier_low
+      {% elif is_state('input_select.sb_humidifier_mode', 'Med') %} script.humidifier_med
+      {% elif is_state('input_select.sb_humidifier_mode', 'High') %} script.humidifier_high
+      {% elif is_state('input_select.sb_humidifier_mode', 'Auto') %} script.humidifier_auto
+      {% elif is_state('input_select.sb_humidifier_mode', 'Off') %} script.humidifier_off
+      {% endif %}
+
+
+- alias: 'SB Humidifier Intensity'
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: input_number.lrh_humidity_intensity_set
+  condition:
+  - condition: template # Only if currently On
+    value_template: "{{ is_state('input_boolean.sb_humidifier', 'on') }}"
+  action:
+  - service: script.lrh_humidity_intensity_set
+
+
+- alias: 'SB Humidifier AM Schedule'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.lrh_humidifier_am_automation_time_active
+      to: 'on'
+      for:
+        seconds: 10
+  condition:
+    - condition: template # Only if automation is enabled
+      value_template: "{{ is_state('input_boolean.lrh_humidifier_automation_enable', 'on') }}"
+    - condition: template # Only if currently Off
+      value_template: "{{ is_state('input_select.sb_humidifier_mode', 'Off') }}"
+    - condition: numeric_state 
+      entity_id: sensor.livingroom_humidity # sb_humidifier_humidity
+      above: input_number.lrh_humidity_low_set
+      below: input_number.lrh_humidity_high_set
+    - condition: template # Water tank not empty
+      value_template: "{{ is_state('sensor.sb_humidifier_lack_water', 'False') }}"
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    service: input_select.select_option
+    data_template:
+      entity_id: input_select.sb_humidifier_mode
+      option: High
+
+
+- alias: 'SB Humidifier PM Schedule'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.lrh_humidifier_pm_automation_time_active
+      to: 'on'
+      for:
+        seconds: 10      
+  condition:
+    - condition: template # Only if automation is enabled
+      value_template: "{{ is_state('input_boolean.lrh_humidifier_automation_enable', 'on') }}"
+    - condition: template # Only if currently Off
+      value_template: "{{ is_state('input_select.sb_humidifier_mode', 'Off') }}"
+    - condition: numeric_state 
+      entity_id: sensor.sb_humidifier_humidity
+      above: input_number.lrh_humidity_low_set
+      below: input_number.lrh_humidity_high_set
+    - condition: template # Water tank not empty
+      value_template: "{{ is_state('sensor.sb_humidifier_lack_water', 'False') }}"
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    service: input_select.select_option
+    data_template:
+      entity_id: input_select.sb_humidifier_mode
+      option: High
+
+
+- alias: 'SB Humidifier AM Off'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.lrh_humidifier_am_automation_time_active
+      to: 'off'
+  condition:
+    - condition: state # Only if AM automation is enabled
+      entity_id: automation.sb_humidifier_am_schedule
+      state: 'on'
+    - condition: template # And only if humidifier is on
+      value_template: '{{ states("input_select.sb_humidifier_mode") != "Off" }}'
+  action:
+    service: input_select.select_option
+    data_template:
+      entity_id: input_select.sb_humidifier_mode
+      option: 'Off'
+
+- alias: 'SB Humidifier PM Off'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.lrh_humidifier_pm_automation_time_active
+      to: 'off'
+  condition:
+    - condition: state # Only if PM automation is enabled
+      entity_id: automation.sb_humidifier_pm_schedule
+      state: 'on'
+    - condition: template # And only if humidifier is on
+      value_template: '{{ states("input_select.sb_humidifier_mode") != "Off" }}'
+  action:
+    service: input_select.select_option
+    data_template:
+      entity_id: input_select.sb_humidifier_mode
+      option: 'Off'
 
 
 #########################################################

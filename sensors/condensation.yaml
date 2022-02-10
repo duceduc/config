@@ -36,6 +36,15 @@
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 2.8
 
+# Hallway Mold Chance
+  - platform: mold_indicator
+    name: Hallway Condensation Chance
+    indoor_temp_sensor: sensor.hr_sensor_temperature
+    indoor_humidity_sensor: sensor.hr_sensor_humidity
+    outdoor_temp_sensor: sensor.oa_temperature
+    calibration_factor: 2.8
+
+
 # Genkan Mold Chance
   - platform: mold_indicator
     name: Genkan Condensation Chance
@@ -44,6 +53,13 @@
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.1
 
+# Toilet Mold Chance
+  - platform: mold_indicator
+    name: Toilet Condensation Chance
+    indoor_temp_sensor: sensor.toilet_airfreshener_temperature
+    indoor_humidity_sensor: sensor.toilet_airfreshener_humidity
+    outdoor_temp_sensor: sensor.oa_temperature
+    calibration_factor: 1.1
 
 
 ####################################################

@@ -1,0 +1,86 @@
+####################################################
+#                                                                                                    #
+#                      WIFI Signal                                                                                     #
+#                                                                                                    #
+####################################################
+
+  - platform: mqtt
+    name: 'Washroom Sensor Wifi Signal'
+    state_topic: "esphome/washroom-sensor/sensor/washroom-sensor_wifi_signal/state"
+    value_template: '{{ value }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:signal
+
+  - platform: mqtt
+    name: 'Hallway Sensor Wifi Signal'
+    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_wifi_signal/state"
+    value_template: '{{ value }}'
+    unit_of_measurement: 'dBm'
+    icon: mdi:signal
+
+
+## DELTE
+#  - platform: mqtt
+#    name: 'HR Sensor Wifi Signal'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+
+
+####################################################
+#                                                                                                    #
+#                      Illuminance                                                                #
+#                                                                                                    #
+####################################################
+
+
+  - platform: mqtt
+    name: 'Hallway Illuminance'
+    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_illuminance/state"
+    value_template: '{{ value }}'
+    unit_of_measurement: 'lux'
+    icon: mdi:gamma
+
+
+
+
+####################################################
+#                                                                                                    #
+#                      Climate Sensors                                                                               #
+#                                                                                                    #
+####################################################
+
+# DELETE
+#  - platform: mqtt
+#    name: 'HR Sensor Temperature'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_temperature/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: '°C'
+#    device_class: temperature
+
+#  - platform: mqtt
+#    name: 'HR Sensor Humidity'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_humidity/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: '%'
+#    device_class: humidity
+
+#  - platform: mqtt
+#    name: 'HR Sensor Pressure'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_pressure/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'mb'
+#    device_class: pressure
+
+
+
+
+
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

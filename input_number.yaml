@@ -24,7 +24,7 @@
   lr_heater_heat_temp_set:
     name: Heat If Less Than
     icon: mdi:thermometer
-    initial: 19
+    initial: 16
     min: 0
     max: 40
     step: 1
@@ -53,7 +53,7 @@
   mr_heater_heat_temp_set:
     name: Heat If Less Than
     icon: mdi:thermometer
-    initial: 16
+    initial: 14
     min: 0
     max: 40
     step: 1
@@ -170,3 +170,42 @@
     unit_of_measurement: "¥"
     icon: mdi:currency-jpy
 
+
+##################
+  lrh_humidity_low_set:
+    name: Humidity Low Set Point
+    icon: mdi:thermometer
+    initial: 30
+    min: 0
+    max: 100
+    step: 1
+
+
+  lrh_humidity_high_set:
+    name: Humidity High Set Point
+    icon: mdi:thermometer
+    initial: 60
+    min: 0
+    max: 100
+    step: 1
+
+  lrh_humidity_intensity_set:
+    name: Humidifier Intensity
+    icon: mdi:water-plus
+    min: 34
+    max: 100
+    step: 1
+
+
+##################
+  duc_watch_present:
+    name: Duc Watch Present
+    min: -100
+    max: 0
+
+  duc_watch_not_present:
+    name: Duc Watch Not Present
+    min: -100
+    max: 0
+
+    

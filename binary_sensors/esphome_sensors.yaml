@@ -1,0 +1,70 @@
+####################################################
+#                                                                                                    #
+#            MQTT Motion Sensors                                                                                #
+#                                                                                                    #
+####################################################
+
+  - platform: mqtt
+    name: "Motion Washroom Occupancy"
+    state_topic: "esphome/washroom-sensor/binary_sensor/motion_washroom-sensor_occupancy/state"
+    value_template: '{{ value }}'
+    payload_on: "ON"
+    qos: 1
+    device_class: motion
+
+  - platform: mqtt
+    name: "Motion Kitchen Occupancy"
+    state_topic: "switchbotmqtt/esp32/contact/motion_kitchen_occupancy"
+    value_template: '{{ value }}'
+    payload_on: "ON"
+    qos: 1
+    device_class: motion
+
+
+  - platform: mqtt
+    name: "Motion G1 Occupancy"
+    state_topic: "esphome/hallway-sensor/binary_sensor/motion_g1_occupancy/state"
+    value_template: '{{ value }}'
+    payload_on: "ON"
+    qos: 1
+    device_class: motion
+
+  - platform: mqtt
+    name: "Motion Hallway Occupancy"
+    state_topic: "esphome/hallway-sensor/binary_sensor/motion_hallway_occupancy/state"
+    value_template: '{{ value }}'
+    payload_on: "ON"
+    qos: 1
+    device_class: motion
+
+
+
+
+
+
+## DELTET
+#  - platform: mqtt
+#    name: "Motion HR Occupancy"
+#    state_topic: "esphome/hr-sensor/binary_sensor/motion_hr-sensor_occupancy/state"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 1
+#    device_class: motion
+
+
+
+
+
+
+
+
+
+
+
+
+
+#########################################################
+#                                                                                                              #
+#             END OF CONFIGURATION FILE                                                          #
+#                                                                                                              #
+#########################################################

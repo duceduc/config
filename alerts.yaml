@@ -15,9 +15,9 @@
 
   rpi_updates:
     name: Raspberry Pi Updates Available
-    entity_id: binary_sensor.ms2_updates
-    title: "{{ states('sensor.ms2_updates') }} Raspberry Pi Updates Available"
-    message: "There are {{ states('sensor.ms2_updates') }} updates available for the Raspberry Pi servers"
+    entity_id: binary_sensor.ms1_updates
+    title: "{{ states('sensor.ms1_updates') }} Raspberry Pi Updates Available"
+    message: "There are {{ states('sensor.ms1_updates') }} updates available for the Raspberry Pi servers"
     state: 'on'
     can_acknowledge: true
     repeat: 720

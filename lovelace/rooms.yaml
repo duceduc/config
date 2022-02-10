@@ -10,12 +10,6 @@ icon: mdi:bed-empty
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
 
-
-
-
-
-
-
   - type: custom:decluttering-card
     template: aircon_tpl
     variables:
@@ -25,9 +19,6 @@ cards:
       - entity_2: sensor.lr_temperature
       - entity_3: sensor.livingroom_humidity
       - entity_4: sensor.lr_condensation_chance
-
-
-
 
   - type: vertical-stack
     cards:
@@ -47,10 +38,6 @@ cards:
             entity: light.m_2
             icon: mdi:lightbulb-outline
             name: Floor Lamp
-
-
-
-
 
   - type: vertical-stack
     cards:
@@ -222,13 +209,6 @@ cards:
         name: 30 Seconds Timer
       - entity: input_select.exercise_select
         icon: mdi:bed-empty
-
-
-
-
-
-
-
 
 
 

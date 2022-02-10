@@ -42,11 +42,11 @@
           {{ as_timestamp(states.sun.sun.attributes.next_setting) | timestamp_custom(' %I:%M%p') | replace(" 0", "") }}
       hoursdaylight:
         value_template: "{% set nr = as_timestamp(state_attr('sun.sun','next_rising')) %} {% set ns = as_timestamp(state_attr('sun.sun','next_setting')) %} {% if nr > ns %} {% set nr = nr - 60*60*24 %} {% endif %} {{ (ns - nr)|timestamp_custom('%H:%M',false) }}"
-      home_windgust:
-        friendly_name: 'Home Wind Gust'
+      home_windspeed:
+        friendly_name: 'Home Wind Speed'
         unit_of_measurement: "m/s"
         value_template: >
-          {{ state_attr('weather.weatherbit_shimotoda', 'wind_gust') }}
+          {{ state_attr('weather.weatherbit', 'wind_speed') }}
 
 ####################################################
 #                                                                                                    #

@@ -4,6 +4,7 @@
 #                                                                                                              #
 #########################################################
 
+
 ##notify.desktop works, but log still shows error.##
 - alias: school time notification
   trigger:
@@ -57,22 +58,22 @@
 #                                                                                                              #
 #########################################################
 
-- alias: ISP Internet Status Notification
+- alias: ISP/HA Internet Status Notification
   variables:
-    status_msg: "Internet is {{ states('binary_sensor.internet')|lower }}line."
+    status_msg: "Internet/HA is {{ states('binary_sensor.home_assistant')|lower }}line."
   trigger:
     platform: state
-    entity_id: binary_sensor.internet
+    entity_id: binary_sensor.home_assistant
     to: 'off'
     for: 10
   action:
     - service: notify.home_assistant
       data_template:
-        title: "Internet {{ states('binary_sensor.internet')| title }}line Notification"
+        title: "Internet/HA {{ states('binary_sensor.home_assistant')| title }}line Notification"
         message: >
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          The Internet appears to be {{ states('binary_sensor.internet') }}line.
+          The Internet or Home-Assistant appears to be {{ states('binary_sensor.home_assistant') }}line.
           <br>
         data:
           images: []
@@ -93,7 +94,7 @@
     - service: logbook.log
       data_template:
         name: Internet Status
-        message: "{{ states('binary_sensor.internet')|lower }}line"
+        message: "{{ states('binary_sensor.home_assistant')|lower }}line"
 
 
 
@@ -191,14 +192,14 @@
   action:
     - service: notify.home_assistant
       data_template:
-        title: "Certificate Expiring in {{ states.sensor.vj_ssl_cert_expiry.state }} Days: {{ states('sensor.vj_ssl_cert_cn') }}"
+        title: "Certificate Expiring in {{ states('sensor.vj_ssl_cert_expiry') }} Days: {{ states.sensor.vj_cert_sslmate.attributes.dns_names[0] }}"
         message: >-
           {% set s =states('sensor.vj_ssl_cert_issuer') %}
           {% set site = (s|regex_findall_index('O=[a-zA-Z]+',0)).replace('O=','') %}
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          This is to notify you that your certificate with the common name {{ states('sensor.vj_ssl_cert_cn') }} will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
-          To renew your certificate, please visit <a href="https://my.gogetssl.com/en/user/">{{ site }}</a>.<br>
+          This is to notify you that your certificate with the common name {{ states.sensor.vj_cert_sslmate.attributes.dns_names[0] }} will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
+          To renew your certificate, please visit <a href="https://my.gogetssl.com/en/user/">gogetssl</a>.<br>
           <br>
         data:
           images: []
@@ -207,7 +208,7 @@
   initial_state: true
   variables:
     cn: >-
-     {% set str=states.sensor.ha_ssl_cert_cn.state %}
+     {% set str=states('sensor.ha_ssl_cert_cn') %}
      {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}?\.[a-zA-Z]{1,}',1)) %}
      {{ cn }}
   trigger:
@@ -217,7 +218,7 @@
   action:
     - service: notify.home_assistant
       data_template:
-        title: "Certificate Expiring in {{ states.sensor.ha_ssl_cert_expiry.state }} Days: {{cn}}"
+        title: "Certificate Expiring in {{ states('sensor.ha_ssl_cert_expiry') }} Days: {{cn}}"
         message: >-
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
@@ -230,7 +231,7 @@
   initial_state: true
   variables:
     cn: >-
-     {% set str=states.sensor.mqtt_ssl_cert_cn.state %}
+     {% set str=states('sensor.mqtt_ssl_cert_cn') %}
      {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}',7)) %}
      {{ cn }}
   trigger:
@@ -240,11 +241,11 @@
   action:
     - service: notify.home_assistant
       data_template:
-        title: "Certificate Expiring in {{ states.sensor.mqtt_ssl_cert_expiry.state }} Days: {{ cn }}"
+        title: "Certificate Expiring in {{ states('sensor.mqtt_ssl_cert_expiry') }} Days: {{ cn }}"
         message: >-
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states.sensor.mqtt_ssl_cert_expiry.state }} days. <br>
+          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states('sensor.mqtt_ssl_cert_expiry') }} days. <br>
           <br>
         data:
           images: []
@@ -266,7 +267,7 @@
     - condition: template
       value_template: "{{ states('sensor.earthquake_alert') != 'unknown' }}"
     - condition: template
-      value_template: "{{ states.sensor.earthquake_alert.state | trim != '' }}"
+      value_template: "{{ states('sensor.earthquake_alert') | trim != '' }}"
   action:
     - service: notify.earthquake_log
       data_template:
@@ -308,6 +309,105 @@
           <br>
         data:
           images: []
+
+
+
+
+#########################################################
+#                                                                                                              #
+#                   Home Air Quality Notifications                                                    #
+#                                                                                                              #
+#########################################################
+
+- alias: Home Air Quality Warnings
+  variables:
+    warn_msg: "The {{ trigger.to_state.attributes.friendly_name }} in the house is at {{ trigger.to_state.state }}{{ trigger.to_state.attributes.unit_of_measurement }}. Take precautionary action."
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.ikea_pm25
+      above: 999
+      for: 61
+    - platform: numeric_state
+      entity_id: sensor.carbon_monoxide
+      above: 59
+      for: 61
+    - platform: numeric_state
+      entity_id: sensor.carbon_dioxide
+      above: 2000
+      for: 61
+
+  action:
+#    - service: notify.home_assistant
+#      data_template:
+#        title: "{{ trigger.to_state.attributes.friendly_name }} Warning"
+#        message: >
+#          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+#          <br>
+#          {{ warn_msg }}
+#          <br>
+#        data:
+#          images: []
+
+    - service: notify.amberthebot
+      data_template:
+        message: '{{ warn_msg }}'
+
+    - service: notify.desktop
+      data_template:
+        message: '{{ warn_msg }}'
+        
+#    - service: notify.mobile_app_id
+#      data:
+#        message: '{{ warn_msg }}'
+#        title: '*{{ trigger.to_state.attributes.friendly_name }} Warning*'
+
+    - service: logbook.log
+      data_template:
+        name: '{{ trigger.to_state.attributes.friendly_name }} Warning'
+        message: '{{ warn_msg }}'
+
+
+#########################################################
+#                                                                                                              #
+#                   Lock Genkan Door Announcement                                                #
+#                                                                                                              #
+#########################################################
+
+
+- alias: Lock Genkan Door Announcement
+  initial_state: true
+  trigger:
+    - platform: time
+      at: '21:01:00'
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # If door is not locked
+      value_template: "{{ is_state('sensor.genkan_doorlock', 'Unlocked') }}"
+  action:
+    - service: script.speech_engine_simplified
+      data: 
+        who: notify.alexa_media
+        device: media_player.ai_1
+        message: >
+          <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>.. 
+          {{  [
+          '',
+          'I have detected',
+          'My system detected',
+          'This is a reminder,',
+          'Don\'t forget,',
+          'It appears'
+          ]|random }}
+          the front door is {{ states('sensor.genkan_doorlock') }}. 
+          {{  [
+          'Please',
+          'Remember to',
+          'Last person up don\'t forget to',
+          'This is a reminder to'
+          ]|random }}
+          lock the door before going to bed.
+
 
 
 ####################################################

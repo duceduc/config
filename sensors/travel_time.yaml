@@ -1,55 +1,66 @@
 ####################################################
 #                                                                                                    #
-#                      HERE Travel Time                                                       #
-#                                                                                                    #
-####################################################
-
-
-# Eri
-#  - platform: here_travel_time
-#    api_key: !secret rest_here_api_key
-#    name: Eri to Home Here
-#    origin_entity_id: device_tracker.ie
-#    destination_entity_id: zone.home
-#    mode: publicTransportTimeTable
-# Costco HQ
-#  - platform: here_travel_time
-#    api_key: !secret rest_here_api_key
-#    name: Eri to Work Here
-#    origin_entity_id: device_tracker.ie
-#    destination_entity_id: zone.costco_hq
-#    mode: publicTransportTimeTable
-
-# Duc
-#  - platform: here_travel_time
-#    api_key: !secret rest_here_api_key
-#    name: Duc to Home Here
-#    origin_entity_id: device_tracker.id
-#    destination_entity_id: zone.home
-#    mode: pedestrian
-
-#  - platform: here_travel_time
-#    api_key: !secret rest_here_api_key
-#    name: Duc Destination Here
-#    origin_entity_id: device_tracker.id
-#    destination_entity_id: input_select.duc_destination_here
-#    mode: pedestrian
-    
-
-
-
-
-####################################################
-#                                                                                                    #
 #                      Waze Travel Time                                                       #
 #                                                                                                    #
 ####################################################
 
+ # Eri
+#  - platform: waze_travel_time
+#    name: Eri Destinations
+#    origin: device_tracker.ie
+#    destination: sensor.eri_destination_waze
+#    region: 'EU'
 
+####################################################
+#                                                                                                    #
+#                      Destination Waze Sensor                                             #
+#                                                                                                    #
+####################################################
+# other: USJ 34.665662588421704, 135.43233819808833
+# other:  Hotel Keihan Universal Tower 34.666553838658366, 135.43807812517124
+  - platform: template
+    sensors:
+      duc_destination_waze:
+        value_template: >-
+            {%- if is_state("input_select.duc_destination_waze", "home") -%}
+              35.81842918238185, 139.70377984736893
+            {%- elif is_state("input_select.duc_destination_waze", "school") -%}
+              35.81214930237013, 139.71171706362946
+            {%- elif is_state("input_select.duc_destination_waze", "jcb") -%}
+              35.70841730186669, 139.89219249812402
+            {%- elif is_state("input_select.duc_destination_waze", "others") -%}
+              34.666553838658366, 135.43807812517124
+            {%- else -%}
+              Unknown
+            {%- endif %}
 
+      eri_destination_waze:
+        value_template: >-
+            {%- if is_state("input_select.eri_destination_waze", "home") -%}
+              35.81842918238185, 139.70377984736893
+            {%- elif is_state("input_select.eri_destination_waze", "school") -%}
+              35.81214930237013, 139.71171706362946              
+            {%- elif is_state("input_select.eri_destination_waze", "costcokawa") -%}
+              35.52270052783271, 139.7320772738939
+            {%- elif is_state("input_select.eri_destination_waze", "costcokisa") -%}
+              35.42739226293078, 139.91645121235445
+            {%- elif is_state("input_select.eri_destination_waze", "others") -%}
+              34.666553838658366, 135.43807812517124             
+            {%- else -%}
+              Unknown
+            {%- endif %}
 
-
-
+      shion_destination_waze:
+        value_template: >-
+            {%- if is_state("input_select.shion_destination_waze", "home") -%}
+              35.81842918238185, 139.70377984736893
+            {%- elif is_state("input_select.shion_destination_waze", "school") -%}
+              35.81214930237013, 139.71171706362946
+            {%- elif is_state("input_select.shion_destination_waze", "others") -%}
+              34.666553838658366, 135.43807812517124             
+            {%- else -%}
+              Unknown
+            {%- endif %}
 
 ####################################################
 #                                                                                                    #

@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#              Tv Lock                                                                                      #
-#                                                                                                              #
+#                                                                                                              
+#              Tv Lock                                                                                      
+#                                                                                                              
 #########################################################
 
 
@@ -17,13 +17,13 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('group.family_presence', 'on') }}"
   action:
-    - service: notify.alexa_media
-      data_template:
-        data:
-          type: tts
-        target:
-         - media_player.ai_1
-        message: "<audio src='https://ha.snailmsg.com/local/alerts/en/minecraft-theme.mp3'/> The time is {{ now().hour }} {{ now().minute }}, The tv will shutoff in {{ digit }} minutes."
+    - service: script.speech_engine_simplified
+      data: 
+        who: notify.alexa_media
+        device: media_player.ai_1
+        message:  >
+          <audio src='https://ha.snailmsg.com/local/alerts/en/minecraft-theme.mp3'/>.. The time is {{ now().hour }} {{ now().minute }}, The tv will shutoff in {{ digit }} minutes.
+        
     - delay:
         minutes: "{{ digit }}"
     - condition: template # Child mode is on
@@ -33,9 +33,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Disable Internet on Devices                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Disable Internet on Devices                                                            
+#                                                                                                              
 #########################################################
 
 
@@ -51,9 +51,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Enable all Disabled Devices at Midnight                                              #
-#                                                                                                              #
+#                                                                                                              
+#             Enable all Disabled Devices at Midnight                                              
+#                                                                                                              
 #########################################################
 
 - alias: enable devices at midnight
@@ -64,7 +64,7 @@
     - service: script.enable_devices
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

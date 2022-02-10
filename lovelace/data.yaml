@@ -22,7 +22,7 @@ cards:
       - name: Duc
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
-      - work_sensor: sensor.duc_to_work_waze
+      - work_sensor: sensor.duc_destinations
       - home_sensor: sensor.duc_to_home_waze
       - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-duc.png
@@ -35,7 +35,7 @@ cards:
     template: four_sensors_tpl
     variables:
       - title: Door Detection Status
-      - entity_1: sensor.genkan_door
+      - entity_1: sensor.genkan_doorlock
       - name_1: Genkan
       - entity_2: sensor.hallway_door
       - name_2: Hallway
@@ -52,7 +52,7 @@ cards:
       - name: Eri
       - battery_level: sensor.ie_battery_level
       - battery_state: sensor.ie_battery_state      
-      - work_sensor: sensor.eri_to_work_waze
+      - work_sensor: sensor.eri_destinations
       - home_sensor: sensor.eri_to_home_waze
       - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-eri.png
@@ -80,7 +80,7 @@ cards:
       - name: Shion
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
-      - work_sensor: sensor.shion_to_school_waze
+      - work_sensor: sensor.shion_destinations
       - home_sensor: sensor.shion_to_home_waze
       - work_icon: mdi:chair-school
       - entity_picture: /local/img/people/avatar-shion.png
@@ -170,6 +170,15 @@ cards:
       - entity_3: sensor.desktop_fddl8i4_cpu_usage
       - entity_4: sensor.desktop_cpu_temperature
 
+  - type: custom:decluttering-card
+    template: server_tpl
+    variables:
+      - title: ds1
+      - entity_1: sensor.ds1_memory_use
+      - entity_2: sensor.ds1_disk_use
+      - entity_3: sensor.ds1_cpu_usage
+      - entity_4: sensor.ds1_temperature
+
 ###################
 
   - type: entities
@@ -181,7 +190,7 @@ cards:
       detail: 5
     entities:
       - entity: sensor.memory_use_percent
-        name: Memory Use (percent)
+        name: Memory Use
         icon: mdi:memory
       - entity: sensor.disk_use_percent
         name: Disk Use
@@ -226,7 +235,7 @@ cards:
             name: Battery Check
           - entities:
               - entity: sensor.master_dimmer_battery
-                name: Master Room
+                name: Master Room Dimmer
               - entity: sensor.shion_room_battery
                 name: Shion Room
               - entity: sensor.shion_dimmer_battery
@@ -243,22 +252,19 @@ cards:
                 name: Livingroom Dimmer
               - entity: sensor.shower_room_battery
                 name: Shower Room Dimmer
+              - entity: sensor.kitchen_dimmer_battery
+                name: Kitchen Dimmer
+                
             head:
               label: Controllers | Dimmers
               type: section
             padding: 0
             type: 'custom:fold-entity-row'
           - entities:
-              - entity: sensor.motion_g1_battery
-                name: Genkan Area
               - entity: sensor.motion_k1_battery
-                name: Kitchen Area
+                name: Kitchen Sink
               - entity: sensor.motion_k2_battery
-                name: Kitchen Area
-              - entity: sensor.motion_washroom_battery
-                name: Wash Room
-              - entity: sensor.motion_hallway_battery
-                name: Hallway
+                name: Kitchen Counter
               - entity: sensor.motion_c1_battery
                 name: Master Closet                   
               - entity: sensor.motion_s1_battery
@@ -297,6 +303,8 @@ cards:
                 name: 24hr Fan
               - entity: sensor.hdmi_selector_battery
                 name: HDMI Selector
+              - entity: sensor.genkan_doorlock_battery
+                name: Genkan Doorlock                
             head:
               label: Switchbots
               type: section
@@ -318,7 +326,7 @@ cards:
         name: Last Restart
       - entity: sensor.last_boot
         name: Last Boot
-      - entity: sensor.ms2_updates
+      - entity: sensor.ms1_updates
         name: RPI's Updates
 
       - head:

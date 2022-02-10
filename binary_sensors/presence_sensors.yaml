@@ -68,7 +68,7 @@
         friendly_name: 'Shion'
         device_class: presence
         value_template: >-
-          {{ is_state('input_boolean.shion_presence', 'on') }}
+          {{ is_state('input_boolean.shion_presence', 'on') }}           
         icon_template: >-
           {% if is_state('binary_sensor.shion_presence','on') %} mdi:home-account
           {% else %} mdi:home-outline
@@ -84,6 +84,18 @@
           {{ is_state('input_boolean.sachiko_presence', 'on') }}
         icon_template: >-
           {% if is_state('binary_sensor.sachiko_presence','on') %} mdi:home-account
+          {% else %} mdi:home-outline
+          {% endif %}
+
+  - platform: template
+    sensors:
+      tomokun_presence:
+        device_class: presence
+        friendly_name: 'Tomokun'
+        value_template: >-
+          {{ is_state('input_boolean.tomokun_presence', 'on') }}
+        icon_template: >-
+          {% if is_state('binary_sensor.tomokun_presence','on') %} mdi:home-account
           {% else %} mdi:home-outline
           {% endif %}
 

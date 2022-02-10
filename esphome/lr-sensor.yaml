@@ -1,6 +1,4 @@
 # ESP8266 NodeMCU....
-# [98:CD:AC:31:B8:E7] NEW
-# [50:02:91:FD:4B:26] OLD
 substitutions:
   name: lr-sensor
   platform: ESP8266
@@ -16,6 +14,7 @@ wifi:
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
+  reboot_timeout: 0s  
   manual_ip:
     static_ip: 192.168.1.96
     subnet: 255.255.255.0
@@ -38,7 +37,7 @@ sensor:
       name: 'lr temperature'
     humidity:
       name: 'lr humidity'
-    update_interval: 40s
+    update_interval: 20s
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -47,7 +46,7 @@ sensor:
     pin: A0
     name: 'front illuminance'
     unit_of_measurement: lux
-    update_interval: 25s
+    update_interval: 20s
 
 binary_sensor:
   - platform: status
@@ -58,3 +57,8 @@ binary_sensor:
     name: 'motion lr occupancy'
     device_class: motion
 
+#switch:
+#  - platform: restart
+#    name: "$name Restart"
+#    icon: mdi:restart 
+    

@@ -23,30 +23,32 @@
     trigger:
       - platform: numeric_state
         entity_id:
-          - sensor.motion_g1_battery
-          - sensor.motion_hallway_battery
-          - sensor.motion_washroom_battery
           - sensor.motion_k1_battery
           - sensor.motion_k2_battery
+          - sensor.aio_controller_battery
           - sensor.shion_room_battery
           - sensor.computer_room_battery
           - sensor.living_room_battery
-          - sensor.shower_room_battery
           - sensor.meter_battery
           - sensor.jcom_tv_box_battery
           - sensor.floor_heat_battery
           - sensor.hallway_door_battery
           - sensor.genkan_door_battery
           - sensor.24hr_fan_battery
-#          - sensor.lr_curtain_batteries
-#          - sensor.cr_curtain_batteries
+          
+          - sensor.master_dimmer_battery
+          - sensor.shion_dimmer_battery
+          - sensor.lr_curtains_battery
+          - sensor.cr_curtains_battery
+          - sensor.shower_room_battery
+
           - sensor.motion_s1_battery
           - sensor.motion_c1_battery
-        below: 26
+        below: 21
     action:
       service: notify.notify_events
       data_template:
-        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 25 percent."
+        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 20 percent."
 
 #########################################################
 #                                                                                                              #

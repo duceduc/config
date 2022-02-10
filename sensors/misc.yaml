@@ -18,7 +18,7 @@
     sensors:
       last_alexa:
         value_template: >
-          {{ expand(states.group.echos) | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+          {{ expand('group.echos') | selectattr('attributes.last_called','eq',true) | map(attribute='entity_id') | first }}
 
 ####################################################
 #                                                                                                    #
@@ -38,17 +38,17 @@
     sensors:
       washroom:
         value_template: >-
-         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}Unoccupied{% else %}Occupied{% endif %}
+         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}mdi:shower{% else %}mdi:hot-tub{% endif %}
+         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 
   - platform: template
     sensors:
       kitchen:
         value_template: >-
-         {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
+         {% if is_state("binary_sensor.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
         icon_template: >-
-         {% if is_state("group.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
+         {% if is_state("binary_sensor.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
 
   - platform: template
     sensors:
@@ -119,7 +119,7 @@
 
   - platform: template
     sensors:
-      kitchen_illuminance:
+      k1_illuminance:
         value_template: >
           {% if states.sensor.front_illuminance.state | float(0) == 0.10 %}
             on
@@ -161,6 +161,9 @@
         value_template: "{{ state_attr('sensor.earthquake_alert', 'mag') }}"
       earthquake_intensity:
         value_template: "{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
+
+
+
 
 
 ####################################################

@@ -19,60 +19,10 @@ sensor.date:
   hidden: true
 sensor.time:
   hidden: true
-sensor.weatherbit_air_quality:
-  hidden: true
-sensor.weatherbit_apparent_temperature:
-  hidden: true
-sensor.weatherbit_beaufort_text:
-  hidden: true
-sensor.weatherbit_beaufort_value:
-  hidden: true
-sensor.weatherbit_cloud_coverage:
-  hidden: true
-sensor.weatherbit_description:
-  hidden: true
-sensor.weatherbit_dewpoint:
-  hidden: true
-sensor.weatherbit_forecast_day_1:
-  hidden: true
-sensor.weatherbit_forecast_day_2:
-  hidden: true
-sensor.weatherbit_forecast_day_3:
-  hidden: true
-sensor.weatherbit_forecast_day_4:
-  hidden: true
-sensor.weatherbit_forecast_day_5:
-  hidden: true
-sensor.weatherbit_forecast_day_6:
-  hidden: true
-sensor.weatherbit_forecast_day_7:
-  hidden: true
-sensor.weatherbit_humidity:
-  hidden: true
-sensor.weatherbit_icon_code:
-  hidden: true
-sensor.weatherbit_pressure:
-  hidden: true
-sensor.weatherbit_rain_today:
-  hidden: true
-sensor.weatherbit_snow:
-  hidden: true
-sensor.weatherbit_solar_radiation:
-  hidden: true
-sensor.weatherbit_temperature:
-  hidden: true
-sensor.weatherbit_uv_index:
-  hidden: true
-sensor.weatherbit_visibility:
-  hidden: true
-sensor.weatherbit_weather_alerts:
-  hidden: true
-sensor.weatherbit_wind_bearing:
-  hidden: true
-sensor.weatherbit_wind_direction:
-  hidden: true
-sensor.weatherbit_wind_speed:
-  hidden: true
+
+sensor.last_alexa:
+  icon: si:amazonalexa
+  
 sensor.lr_condensation_chance:
   friendly_name: Living Room Condensation
   icon: mdi:weather-rainy
@@ -189,6 +139,13 @@ switch.computer_room_curtains:
   icon: mdi:power
   assumed_state: false
 
+switch.momentary_presence_monitor:
+  icon: mdi:crosshairs-gps
+switch.momentary_activate_guest:
+  icon: mdi:account
+switch.momentary_activate_tv:
+  icon: mdi:monitor
+
 switch.living_room_curtains:
   icon: mdi:power
   assumed_state: false
@@ -240,3 +197,15 @@ sensor.hallway:
 sensor.genkan:
   templates:
     icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.washroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.kitchen:
+  templates:
+    icon_color: if (state === 'Open') return 'rgb(255, 255, 0)';
+
+
+
+

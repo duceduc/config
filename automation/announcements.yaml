@@ -66,9 +66,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Alexa Announce Who is Coming Home                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             Alexa Announce Who is Coming Home                                                 
+#                                                                                                              
 #########################################################
 
 - alias: announce who is arriving
@@ -82,21 +82,19 @@
 #      to: 'on'
       to: 'home'
   action:
-    - service: notify.alexa_media
-      data_template:
-        data:
-          type: tts
-        target:
-         - media_player.ai_1
-        message: >
-         {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
-         {% set p = trigger.to_state.attributes.friendly_name %}
-         {% set person = alias.get(p) %}
-         {{ person }}, will be home in about 10 minutes.
+    - service: script.speech_engine_simplified
+      data: 
+        who: notify.alexa_media
+        device: media_player.ai_1
+        message:  >
+          {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
+          {% set p = trigger.to_state.attributes.friendly_name %}
+          {% set person = alias.get(p) %}
+          {{ person }}, will be home in about 10 minutes.
 
-    - condition: state
-      entity_id: light.h_1
-      state: 'off'
+#    - condition: state
+#      entity_id: light.h_1
+#      state: 'off'
     - service: light.turn_on
       entity_id: light.h_1
       data:
@@ -142,6 +140,7 @@
        - binary_sensor.eri_presence
        - binary_sensor.shion_presence
        - binary_sensor.sachiko_presence
+       - binary_sensor.tomokun_presence       
       to: 'on'
   action:
     - delay: 1

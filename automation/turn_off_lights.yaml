@@ -20,7 +20,7 @@
        - light.h_1
       to: 'on'
       for:
-        minutes: 10
+        minutes: 11
   action:
     - service: light.turn_off
       data_template:
@@ -47,6 +47,19 @@
     - service: light.turn_off
       entity_id: light.storage_room
 
+#########################################################
+#                                                                                                              #
+#             Lights out before leaving                                                             #
+#                                                                                                              #
+#########################################################
+
+- alias: 'Lights out Before leaving'
+  trigger:
+    - entity_id: binary_sensor.genkan_doorlock_button 
+      platform: state
+      to: 'on' 
+  action:
+    - service: script.lights_out
 
 #########################################################
 #                                                                                                              #

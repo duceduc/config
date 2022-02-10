@@ -40,6 +40,7 @@
     icon: mdi:home
     entities:
      - binary_sensor.sachiko_presence
+     - binary_sensor.tomokun_presence
 
   bed_sensors:
     name: Bed Sensors
@@ -49,7 +50,7 @@
      - binary_sensor.middle
 
   echos:
-    name: All Amazon Echo's
+    name: All Amazon Echo
     entities:
      - media_player.ai_1
      - media_player.ai_2
@@ -86,6 +87,8 @@
       - binary_sensor.motion_k1_occupancy
       - binary_sensor.motion_k2_occupancy
 
+
+
   home_alarm_motion_sensors:
     name: Home Alarm Motion Sensors
     entities:
@@ -108,7 +111,6 @@
      - switch.ceiling_fan_summer # Ceiling Fan Summer
      - switch.tv_lock # Tv Lock
      - switch.jcom_tv # Jcom tv
-
 
 
 #########################################################

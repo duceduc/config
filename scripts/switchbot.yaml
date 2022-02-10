@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Bot Device TPL                                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Bot Device TPL                                                                             
+#                                                                                                              
 #########################################################
 
 ##### node.js switchbot bot tpl
@@ -20,9 +20,9 @@
             - delay: 1
 
 #########################################################
-#                                                                                                              #
-#             Curtain Device TPL                                                                        #
-#                                                                                                              #
+#                                                                                                              
+#             Curtain Device TPL                                                                        
+#                                                                                                              
 #########################################################
 
 #### nod.js TPL #######
@@ -59,9 +59,9 @@
             - delay: 1
 
 #########################################################
-#                                                                                                              #
-#             Front Room Combined Curtains                                                         #
-#                                                                                                              #
+#                                                                                                              
+#             Front Room Combined Curtains                                                         
+#                                                                                                              
 #########################################################
 
   fr_curtains:
@@ -88,9 +88,9 @@
           position: "{{ position }}"
 
 #########################################################
-#                                                                                                              #
-#             Livingroom Curtain Toggle Switches                                                  #
-#                                                                                                              #
+#                                                                                                              
+#             Livingroom Curtain Toggle Switches                                                  
+#                                                                                                              
 #########################################################
 
   lr_curtain_toggle:
@@ -165,9 +165,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Computer Room Curtain Toggle Switches                                           #
-#                                                                                                              #
+#                                                                                                              
+#             Computer Room Curtain Toggle Switches                                           
+#                                                                                                              
 #########################################################
 
   cr_curtain_toggle:
@@ -239,8 +239,12 @@
         target:
           entity_id: '{{ entity }}'
 
+#########################################################
+#                                                                                                              
+#             Bots Hold Press Mode                                                                     
+#                                                                                                              
+#########################################################
 
-########HOLD PRESS#################
   holdpress_bot:
     sequence:
       - service: mqtt.publish
@@ -252,9 +256,137 @@
           payload: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
 
 
+#########################################################
+#                                                                                                              
+#             Humidifier API                                                                               
+#                                                                                                              
+#########################################################
+
+  humidifier_low:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: 101
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.configure
+        target:
+          entity_id: counter.humidifier_toggle
+        data:
+          value: 2
+        
+  humidifier_med:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: 102
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.configure
+        target:
+          entity_id: counter.humidifier_toggle
+        data:
+          value: 3
+
+  humidifier_high:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: 103
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.reset
+        target:
+          entity_id: counter.humidifier_toggle
+
+  humidifier_auto:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: auto
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.configure
+        target:
+          entity_id: counter.humidifier_toggle
+        data:
+          value: 1
+          
+  humidifier_off:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'turnOff'
+          parameter: default
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.reset
+        target:
+          entity_id: counter.humidifier_toggle
+
+  humidifier_mode:
+    sequence:
+      choose:
+        - conditions: "{{ is_state('counter.humidifier_toggle', '1') }}"
+          sequence:
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sb_humidifier_mode
+                option: Low
+            - service: counter.increment
+              target:
+                entity_id: counter.humidifier_toggle
+   
+                
+        - conditions: "{{ is_state('counter.humidifier_toggle', '2') }}"
+          sequence:
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sb_humidifier_mode
+                option: Med
+            - service: counter.increment
+              target:
+                entity_id: counter.humidifier_toggle
+                
+        - conditions: "{{ is_state('counter.humidifier_toggle', '3') }}"
+          sequence:
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sb_humidifier_mode
+                option: High
+            - service: counter.reset
+              target:
+                entity_id: counter.humidifier_toggle
+                
+      default:                
+        - service: input_select.select_option
+          data_template:
+            entity_id: input_select.sb_humidifier_mode
+            option: Auto
+        - service: counter.increment
+          target:
+            entity_id: counter.humidifier_toggle
+
+  lrh_humidity_intensity_set:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: "{{ states('input_number.lrh_humidity_intensity_set') }}"
+
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

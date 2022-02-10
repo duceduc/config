@@ -12,13 +12,13 @@
       from: 'off'
       to: 'on'
   action:
-    - wait_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'on') }}"
+    - wait_template: "{{ is_state('binary_sensor.motion_security_genkan_occupancy', 'on') }}"
       continue_on_timeout: false
       timeout: 10
     - delay: 1
     - service: camera.snapshot
       data:
-        entity_id: camera.security
+        entity_id: camera.security_genkan
         filename: '/config/www/img/security/{{ now().strftime("%Y%m%d_%H%M%S") }}security_camera.jpg'
     - service: shell_command.clean_security_images
 

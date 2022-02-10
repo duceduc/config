@@ -1,7 +1,4 @@
 # ESP32 NodeMCU
-# [30-83-98-00-A5-B8]
-# [7C-9E-BD-ED-C9-54] OLD
-
 substitutions:
   name: bed-sensor
   platform: ESP32
@@ -16,7 +13,6 @@ wifi:
   ssid: !secret ssid_1  
   password: !secret ssid_pass
   fast_connect : true
-  power_save_mode: none
   manual_ip:
     static_ip: 192.168.1.90
     subnet: 255.255.255.0
@@ -38,6 +34,10 @@ mqtt:
 
 ota:
   password: !secret ota_pass
+
+#esp32_ble_tracker:
+#  scan_parameters:
+#    interval: 20s
 
 esp32_touch:
    setup_mode: false
@@ -81,16 +81,22 @@ binary_sensor:
          return false;
        }
 
+# Presence Detection
+#   - platform: ble_presence
+#     mac_address: ED:5C:C3:1A:97:C6 
+#     id: tms_esp32
+#     name: "tms Presence esp32"
+
 # Remote Control
 remote_receiver:
   pin: 
-    number: GPIO15 # use GPIO16
+    number: GPIO15 # use GPIO16. Was GPIO15
     inverted: True
     mode: INPUT_PULLUP
   dump: raw
 
 remote_transmitter:
-  pin: GPIO2 # use GPIO17
+  pin: GPIO2 # use GPIO17. Was GPIO2
   carrier_duty_percent: 50%
 
 switch:

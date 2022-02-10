@@ -113,6 +113,15 @@
           entity_id:  script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
 
   dev_check_5:
+#      - service: script.dev_check_6  
+    sequence:
+      - condition: template
+        value_template: "{{ states('switch.sb_humidifier') != 'off' }}"
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sb_humidifier
+
+  dev_check_6:
     sequence:
       - condition: template
         value_template: "{{ states('switch.christmas_lights') != 'off' }}"
@@ -213,7 +222,7 @@
 
 #########################################################
 #                                                                                                              #
-#             IOT Desktop                                                                                 #
+#             IOT Link Desktop                                                                           #
 #                                                                                                              #
 #########################################################
 
@@ -224,9 +233,9 @@
       - service: wake_on_lan.send_magic_packet
         data:
           mac: "B4:4B:D6:27:22:55"
-      - service: input_boolean.turn_on
-        data:
-          entity_id: input_boolean.desktop
+#      - service: input_boolean.turn_on
+#        data:
+#          entity_id: input_boolean.desktop
 
   desktop_shutdown:
     alias: "Desktop - Shutdown"
@@ -235,9 +244,9 @@
         data:
           topic: "iotlink/workgroup/desktop-fddl8i4/commands/shutdown"
           payload: ""
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.desktop
+#      - service: input_boolean.turn_off
+#        data:
+#          entity_id: input_boolean.desktop
 
   desktop_hibernate:
     alias: "Desktop Hibernate"

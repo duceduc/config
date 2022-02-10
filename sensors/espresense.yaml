@@ -1,0 +1,106 @@
+####################################################
+#                                                                                                    #
+#                      Livingroom ESPresense                                                #
+#                                                                                                    #
+####################################################
+
+# Duc
+  - platform: mqtt_room
+    name: 'Duc ESPresense'
+    device_id: 'apple:iphone10-3'
+    state_topic: 'espresense/devices/apple:iphone10-3'
+    timeout: 30
+    away_timeout: 120
+
+  - platform: mqtt_room
+    name: 'Duc iWatch ESPresense'
+    device_id: 'apple:watch3-3'
+    state_topic: 'espresense/devices/apple:watch3-3'
+    timeout: 30
+    away_timeout: 120
+
+#  - platform: mqtt_room
+#    name: 'Duc RA ESPresense'
+#    device_id: 'roomAssistant:04ea2071-f457-46d3-97a1-986130691017'
+#    state_topic: 'espresense/devices/roomAssistant:04ea2071-f457-46d3-97a1-986130691017'
+#    timeout: 30
+#    away_timeout: 120
+
+# Eri
+  - platform: mqtt_room
+    name: 'Eri ESPresense'
+    device_id: 'exp:20'
+    state_topic: 'espresense/devices/exp:20'
+    timeout: 30
+    away_timeout: 120
+
+  - platform: mqtt_room
+    name: 'Eri iWatch ESPresense'
+    device_id: 'apple:watch5-9'
+    state_topic: 'espresense/devices/apple:watch5-9'
+    timeout: 30
+    away_timeout: 120
+
+#  - platform: mqtt_room
+#    name: 'Eri RA ESPresense'
+#    device_id: 'roomAssistant:f7ae1827-e0c9-4900-b7e8-ed707674d4a5'
+#    state_topic: 'espresense/devices/roomAssistant:f7ae1827-e0c9-4900-b7e8-ed707674d4a5'
+#    timeout: 30
+#    away_timeout: 120
+
+# Shion Tile
+  - platform: mqtt_room
+    name: 'Shion tms ESPresense'
+    device_id: 'tile:ed5cc31a97c6'
+    state_topic: 'espresense/devices/tile:ed5cc31a97c6'
+    timeout: 30
+    away_timeout: 120
+
+# Shion ISP
+  - platform: mqtt_room
+    name: 'Shion isp ESPresense'
+    device_id: 'apple:iphone7-1'
+    state_topic: 'espresense/devices/apple:iphone7-1'
+    timeout: 30
+    away_timeout: 120
+
+  - platform: mqtt_room
+    name: 'Shion is ESPresense'
+    device_id: 'apple:iphone7-2'
+    state_topic: 'espresense/devices/apple:iphone7-2'
+    timeout: 30
+    away_timeout: 120
+
+
+####################################################
+#                                                                                                    #
+#                      ESPresense Wifi Signal                                                #
+#                                                                                                    #
+####################################################
+
+#  - platform: template
+#    sensors:
+#      kitchen_espresense_wifi_signal:
+#        value_template: "{{ state_attr('binary_sensor.espresense_kitchen', 'rssi') }}"
+
+#  - platform: template
+#    sensors:
+#      livingroom_espresense_wifi_signal:
+#        value_template: "{{ state_attr('binary_sensor.espresense_livingroom', 'rssi') }}"
+
+#  - platform: template
+#    sensors:
+#      masterroom_espresense_wifi_signal:
+#        value_template: "{{ state_attr('binary_sensor.espresense_masterroom', 'rssi') }}"
+
+#  - platform: template
+#    sensors:
+#      shionroom_espresense_wifi_signal:
+#        value_template: "{{ state_attr('binary_sensor.espresense_shionroom', 'rssi') }}"
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

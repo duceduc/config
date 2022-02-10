@@ -1,19 +1,17 @@
 #########################################################
-#                                                                                                              #
-#             Family Greetings                                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Family Greetings                                                                            
+#                                                                                                              
 #########################################################
 
   door_family_greeting:
     alias: Door Family Greetings
     sequence:
-      - service: notify.alexa_media
-        data_template:
-          data:
-            type: tts
-          target:
-          - media_player.ai_2
-          message: >-
+      - service: script.speech_engine_simplified
+        data: 
+          who: notify.alexa_media
+          device: media_player.ai_2
+          message:  >
             {% set alias = {"Duc":"Duck", "Shion":"She-on", "Eri":"Eddie"} %}
             {% set family = state_attr(('group.family_presence'), 'entity_id') %}
             {% set t_family = states.binary_sensor | selectattr('entity_id', 'in', family) | list | count %}
@@ -87,22 +85,20 @@
             {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             Guest Greetings                                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Guest Greetings                                                                            
+#                                                                                                              
 #########################################################
 
   door_guest_greeting:
     alias: Door Guest Greetings
     sequence:
-      - service: notify.alexa_media
-        data_template:
-          data:
-            type: tts
-          target:
-          - media_player.ai_2
-          message: >-
-            {% set alias = {"Sachiko":"sachickgo", "Tomo":"towmow", "Yuri":"you-d"} %}
+      - service: script.speech_engine_simplified
+        data: 
+          who: notify.alexa_media
+          device: media_player.ai_2
+          message:  >
+            {% set alias = {"Sachiko":"sachickgo", "Tomokun":"towmow-goon", "Yuri":"you-d"} %}
             {% set guest = state_attr(('group.guest_presence'), 'entity_id') %}
             {% set t_guest = states.binary_sensor | selectattr('entity_id', 'in', guest) | list | count %}
             {% set n_guest = states.binary_sensor   | selectattr('entity_id', 'in', guest) | selectattr('state','eq','on') | list | count %}
@@ -150,38 +146,52 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Bedtime Annoucement                                                                    #
-#                                                                                                              #
+#                                                                                                              
+#             Bedtime Annoucement                                                                    
+#                                                                                                              
 #########################################################
 
   bedtime_notify:
     alias: Bedtime Notify
     sequence:
-      - service: notify.alexa_media
-        data_template:
-          data:
-            type: tts
-          target:
-          - media_player.ai_1
-          message: "<audio src='https://ha.snailmsg.com/local/alerts/jp/keihin-kawaguchi-tone_02.mp3'/> The time is {{ now().hour }} {{ now().minute }}, she on go to bed."
-# alternative
-#      - service: media_player.play_media
-#        data: 
-#          entity_id: media_player.ai_1
-#          media_content_id: amzn1.ask.skill.2d287396-6f69-4cab-be6e-093568f14ef4
-#          media_content_type: skill 
-    
-      - service: notify.alexa_media
-        data_template:
-          data:
-            type: tts
-          target:
-          - media_player.ai_3
-          message: "<audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>時間は {{ now().hour }} {{ now().minute }}です, シオン、今寝てください."
+      - service: script.speech_engine_simplified
+        data: 
+          who: notify.alexa_media
+          device: media_player.ai_1
+          message:  >
+            <audio src='https://ha.snailmsg.com/local/alerts/jp/keihin-kawaguchi-tone_02.mp3'/>
+            {{ [
+            '',
+            'At the tone,',
+            'Right now',
+            'Now',
+            'A reminder',
+            'It appears'
+            ]|random }}
+             the time is {{ now().hour }} {{ now().minute }}. She on
+            {{ [
+            'please go to bed',
+            'time for bed',
+            'bed. Right now',
+            'hit the hay',
+            'time to turn in for the night',
+            'go to bed',
+            'get going to bed',
+            'get your butt to bed',
+            'get ready for bed',
+            'bedtime'
+            ]|random }}
+            
+      - service: script.speech_engine_simplified
+        data: 
+          who: notify.alexa_media
+          device: media_player.ai_3
+          message:  >
+            <audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>時間は {{ now().hour }} {{ now().minute }}です, シオン、今寝てください.
+
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

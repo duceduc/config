@@ -18,7 +18,7 @@ cards:
 
   - type: weather-forecast
     name: Kawaguchi
-    entity: weather.weatherbit_shimotoda
+    entity: weather.weatherbit
     secondary_info_attribute: humidity
   - type: entities
     entities:
@@ -35,13 +35,13 @@ cards:
         attribute: elevation
         name: Sun Elevation
         icon: mdi:weather-sunset
-
-  - type: picture-entity
-    title: Cam
-    show_header_toggle: false
-    aspect_ratio: 16x9
-    entity: camera.security
-    camera_view: live
+        
+#  - type: picture-entity
+#    title: Cam
+#    show_header_toggle: false
+#    aspect_ratio: 16x9
+#    entity: camera.security_genkan
+#    camera_view: live
 
 
 ####################################################

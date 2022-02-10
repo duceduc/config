@@ -7,9 +7,12 @@
 - alias: 'motion kitchen light auto-on'
   trigger:
     - platform: state
-      entity_id: group.motion_kitchen_occupancy
+      entity_id: binary_sensor.motion_kitchen_occupancy
       to: 'on'
   action:
+#    - wait_template: "{{ is_state('binary_sensor.motion_k1_trigger_occupancy', 'on') }}"
+#      continue_on_timeout: false
+#      timeout: 3 
     - service: light.turn_on
       data_template:
         entity_id: >
@@ -27,18 +30,19 @@
 #                                                                                                              #
 #########################################################
 
+
 - alias: 'motion kitchen lights auto-on'
   trigger:
     - platform: state
-      entity_id: group.motion_kitchen_occupancy
+      entity_id: light.cabinet
       to: 'on'
-      for: '00:03:10'
+      for: '00:02:02'
     - platform: state
-      entity_id: sensor.kitchen_illuminance
+      entity_id: sensor.k1_illuminance
       to: 'on'
   condition:
     - condition: template
-      value_template: "{{ is_state('group.motion_kitchen_occupancy', 'on') }}"
+      value_template: "{{ is_state('light.cabinet', 'on') }}"
   action:
     - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.front_illuminance', 'unavailable') else 'online' }}
 
@@ -52,9 +56,9 @@
 - alias: 'motion kitchen lights auto-off'
   trigger:
     - platform: state
-      entity_id: group.motion_kitchen_occupancy
+      entity_id: binary_sensor.motion_kitchen_occupancy     
       to: 'off'
-      for: '00:00:30'
+      for: '00:02:50'
   action:
     - service: light.turn_off
       entity_id: light.kitchen
@@ -65,3 +69,125 @@
 #             END OF CONFIGURATION FILE                                                          #
 #                                                                                                              #
 #########################################################
+
+
+
+
+- alias: Kitchen Occupancy
+  description: 'Defines occupancy state for room'
+  mode: single  
+  trigger:
+  - platform: time_pattern
+    id: time
+    seconds: '10'
+  - platform: state
+    entity_id: binary_sensor.motion_kitchen_occupancy
+    id: motion
+    to: 'on'
+  condition: []
+  action:
+  - service: python_script.room_occupancy
+    data:
+      roomname: kitchen 
+      entities_toggle: 
+      - binary_sensor.motion_kitchen_occupancy
+      - input_boolean.kitchen_mcl
+      entities_keep: 
+      - sensor.shion_tms_espresense
+      timeout: 3 
+
+- alias: Kitchen Light
+  description: 'toggle light depending on timer state'
+  mode: single  
+  trigger:
+  - platform: state
+    entity_id: timer.kitchen_timer
+    id: 'pre'
+    from: idle
+    to: active
+    
+  - platform: state
+    entity_id: light.cabinet
+    id: 'on'
+    from: 'off'
+    to: 'on'
+    for: '00:02:00'
+  - platform: state
+    entity_id: sensor.k1_illuminance
+    id: 'on'
+    from: 'off'
+    to: 'on'
+    
+  - platform: state
+    entity_id: timer.kitchen_timer
+    id: 'off'
+    from: active
+    to: idle
+  condition: []
+
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'pre'
+      sequence:
+      - service: light.turn_on
+        data_template:
+          entity_id: >
+           {% if is_state('sensor.front_illuminance', 'unavailable') %}
+            light.k_1, light.k_3
+           {% elif states.sensor.front_illuminance.state | float <= 0.10 %}
+            light.k_1
+           {% else %}
+            light.k_1, light.k_3
+           {% endif %}
+         
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      sequence:
+        - condition: template
+          value_template: "{{ is_state('light.cabinet', 'on') }}"
+        - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.front_illuminance', 'unavailable') else 'online' }}
+
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - service: light.turn_off
+        target:
+          entity_id: light.kitchen
+    default: []
+
+#########################################################
+#                                                                                                              #
+#             Override Auto Mode Lights On/Off                                                    #
+#                                                                                                              #
+#########################################################
+
+
+- alias: 'Kitchen MCL Announce State'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.kitchen_mcl
+  action:
+    - service: script.speech_engine_simplified
+      data: 
+        who: notify.alexa_media
+        device: media_player.ai_1
+        message:  >
+          {% set mode = 'automatic' if trigger.to_state.state == 'off' else 'manual' %}
+          <speak> The kitchen lights are now in {{ mode }} mode. </speak>
+
+
+- alias: 'Kitchen MCL Re-Enable'
+  trigger:
+    -  platform: state
+       entity_id: input_boolean.kitchen_mcl
+       to: 'on'
+       for: '01:00:00'
+  action:
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.kitchen_mcl
+
+

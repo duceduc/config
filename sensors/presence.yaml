@@ -52,6 +52,13 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
+# Guest Tomokun
+  - platform: mqtt
+    name: 'Tomokun Genkan'
+    state_topic: 'monitor/genkan/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
 
 ####################################################
 #                                                                                                    #
@@ -107,6 +114,13 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
+# Guest Tomokun
+  - platform: mqtt
+    name: 'Tomokun Shionroom'
+    state_topic: 'monitor/shionroom/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
 
 ####################################################
 #                                                                                                    #
@@ -158,6 +172,14 @@
   - platform: mqtt
     name: 'Sachiko Livingroom'
     state_topic: 'monitor/livingroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Tomokun
+  - platform: mqtt
+    name: 'Tomokun Livingroom'
+    state_topic: 'monitor/livingroom/tomokun'
     value_template: '{{ value_json.confidence }}'
     unit_of_measurement: '%'
     icon: mdi:account
@@ -223,6 +245,15 @@
       - sensor.sachiko_genkan
       - sensor.sachiko_livingroom
       - sensor.sachiko_shionroom
+
+  - platform: min_max
+    name: 'Tomokun Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.tomokun_genkan
+      - sensor.tomokun_livingroom
+      - sensor.tomokun_shionroom
 
 
 ####################################################
