@@ -7,10 +7,9 @@
   door_family_greeting:
     alias: Door Family Greetings
     sequence:
-      - service: script.speech_engine_simplified
+      - service: script.speech_engine
         data: 
-          who: notify.alexa_media
-          device: media_player.ai_2
+          who: ai_2
           message:  >
             {% set alias = {"Duc":"Duck", "Shion":"She-on", "Eri":"Eddie"} %}
             {% set family = state_attr(('group.family_presence'), 'entity_id') %}
@@ -93,10 +92,9 @@
   door_guest_greeting:
     alias: Door Guest Greetings
     sequence:
-      - service: script.speech_engine_simplified
+      - service: script.speech_engine
         data: 
-          who: notify.alexa_media
-          device: media_player.ai_2
+          who: ai_2
           message:  >
             {% set alias = {"Sachiko":"sachickgo", "Tomokun":"towmow-goon", "Yuri":"you-d"} %}
             {% set guest = state_attr(('group.guest_presence'), 'entity_id') %}
@@ -154,10 +152,9 @@
   bedtime_notify:
     alias: Bedtime Notify
     sequence:
-      - service: script.speech_engine_simplified
+      - service: script.speech_engine
         data: 
-          who: notify.alexa_media
-          device: media_player.ai_1
+          who: ai_1
           message:  >
             <audio src='https://ha.snailmsg.com/local/alerts/jp/keihin-kawaguchi-tone_02.mp3'/>
             {{ [
@@ -182,10 +179,9 @@
             'bedtime'
             ]|random }}
             
-      - service: script.speech_engine_simplified
+      - service: script.speech_engine
         data: 
-          who: notify.alexa_media
-          device: media_player.ai_3
+          who: ai_3
           message:  >
             <audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>時間は {{ now().hour }} {{ now().minute }}です, シオン、今寝てください.
 

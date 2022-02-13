@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#            SHELLY DOOR SENSORS                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#            SHELLY DOOR SENSORS                                                                  
+#                                                                                                              
 #########################################################
 
 # Shelly Genkan Door
@@ -40,8 +40,26 @@
     device_class: lock
     qos: 0
 
+
+
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#            SWITCHBOT CONTACT SENSORS                                                                  
+#                                                                                                              
+#########################################################
+
+  - platform: template
+    sensors:
+      genkan_door_lock:
+        friendly_name: "Front Door Lock"
+        device_class: lock
+        value_template: >-
+          {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

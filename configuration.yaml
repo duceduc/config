@@ -12,7 +12,6 @@ wake_on_lan:
 tts:
   - platform: google_translate
     service_name: google_say
-#    cache_dir: /tmp/tts
     time_memory: 300
 
 notify_events:
@@ -33,6 +32,7 @@ input_select: !include input_select.yaml
 input_boolean: !include input_boolean.yaml
 emulated_hue: !include emulated_hue.yaml
 shell_command: !include shell_commands.yaml
+utility_meter: !include utility_meter.yaml
 
 binary_sensor: !include_dir_merge_list binary_sensors/
 automation: !include_dir_merge_list automation/
@@ -62,7 +62,7 @@ http:
 
 recorder:
   db_url: !secret MySQL_login
-  purge_keep_days: 14
+  purge_keep_days: 31
   commit_interval: 10
   exclude:
     domains:
@@ -113,7 +113,6 @@ homekit:
 #                                                                                                              #
 #########################################################
 
-
 rest:
   - resource: !secret switchbot_wohumi_url
     scan_interval: 900
@@ -141,19 +140,6 @@ rest:
         value_template: "{{ value_json.body.humidity }}"
         unit_of_measurement: '%'
         device_class: humidity
-
-
-#  - resource: !secret crt_search
-#    scan_interval: 14400
-#    sensor:
-#      - name: vj ssl cert issued
-#        value_template: "{{ value_json[0].entry_timestamp }}"
-#        device_class: timestamp
-#      - name: vj ssl cert issuer
-#        value_template: "{{ value_json[0].issuer_name }}"
-#      - name: vj ssl cert cn
-#        value_template: "{{ value_json[0].common_name }}"
-
 
 
 #########################################################
@@ -191,35 +177,6 @@ telegram_bot:
      - !secret telegram_chatid
      - !secret telegram_userid
 
-utility_meter:
-  energy_t31_light_and_power_monthly:
-    source: sensor.shelly_t31_total_energy
-    cycle: monthly
-    offset:
-      days: 2
-  energy_t31_light_and_power:
-    source: sensor.shelly_t31_total_energy
-    cycle: daily
-    tariffs:
-     - day
-     - night
-  energy_t41_heating:
-    source: sensor.shelly_t41_total_energy
-    cycle: daily
-    tariffs:
-     - day
-     - night
-
-  energy_washer_power_monthly:
-    source: sensor.shelly_washer_total_energy
-    cycle: monthly
-    offset:
-      days: 2
-
-  energy_washer_daily_power:
-    source: sensor.shelly_washer_total_energy
-    cycle: daily
-
 counter:
   dining_lights_toggle:
     initial: 1
@@ -234,10 +191,10 @@ counter:
   humidifier_toggle:
     initial: 0
     step: 1
-
-
-
-
+#Anniversary
+  anniversary_wedding_years:
+    step: 1
+  
 input_text:
   slack_app_verification_token:
     initial: !secret slack_app_verification_token
@@ -252,7 +209,6 @@ input_text:
 #################
   status_fan_speed:
     name: Status Fan Speed
-
 
 
 fan:

@@ -20,6 +20,13 @@
      - sensor.bottle_can_recycle
      - sensor.pet_clothes_recycle
 
+
+#########################################################
+#                                                                                                              
+#             Presence                                                    
+#                                                                                                              
+#########################################################
+
   all_home:
     name: Whose Home
     icon: mdi:home
@@ -41,6 +48,12 @@
     entities:
      - binary_sensor.sachiko_presence
      - binary_sensor.tomokun_presence
+
+
+
+  external_doors:
+    - binary_sensor.genkan_door_lock
+
 
   bed_sensors:
     name: Bed Sensors
@@ -97,9 +110,9 @@
      - binary_sensor.motion_sr_occupancy
 
 #########################################################
-#                                                                                                              #
-#             Telegram Bot Controllable Devices                                                    #
-#                                                                                                              #
+#                                                                                                              
+#             Telegram Bot Controllable Devices                                                    
+#                                                                                                              
 #########################################################
 
   controllable_devices:

@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#                   MORNING BRIEFING                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#                   MORNING BRIEFING                                                                  
+#                                                                                                              
 #########################################################
 
 
@@ -19,12 +19,15 @@
             <br>
             <b> Today's Weather </b> <br>
             The current temperature is {{state_attr('weather.weatherbit', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit.attributes.forecast[0].temperature }}. <br>
-            The predicted precipitation today is {% if states.weather.weatherbit.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
+            The predicted precipitation today is {% if states.weather.weatherbit.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }} mm at a chance of {{ states.weather.weatherbit.attributes.forecast[0].precipitation_probability }} %. {% endif %} <br>
             <br>
-            <b> Holiday's & Birthdays </b> <br>
+            <b> Holidays & Birthdays </b> <br>
             {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>
             {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %} <br>
-            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %} <br>
+            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}
+            
+            <b> Family Birthdays & Anniversary </b> <br>
+            {% if is_state('sensor.anniversary', '') %} No Family Birthdays or Anniversary coming up. {% else %} {{ states('sensor.anniversary') }}.{% endif %}<br>
             <br>
             <b> A Picture of Us! </b>
           data:
@@ -42,16 +45,18 @@
           title: "Morning Briefing"
           message: >
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
             <b> Today's Weather </b> <br>
             The current temperature is {{state_attr('weather.weatherbit', 'temperature')}} degrees Celsius with a forecast of {{ states.weather.weatherbit.attributes.forecast[0].condition }}. The low temperature today is {{ states.weather.weatherbit.attributes.forecast[0].templow }} degrees Celsius with a high of {{ states.weather.weatherbit.attributes.forecast[0].temperature }}. <br>
-            The predicted precipitation today is {% if states.weather.weatherbit.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }} mm. {% endif %} <br>
+            The predicted precipitation today is {% if states.weather.weatherbit.attributes.forecast[0].precipitation == None %} 0 mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }} mm at a chance of {{ states.weather.weatherbit.attributes.forecast[0].precipitation_probability }} %. {% endif %} <br>
             <br>
-            <b> Holiday's & Birthdays </b> <br>
+            <b> Holidays & Birthdays </b> <br>
             {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>
             {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %} <br>
-            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %} <br>
+            {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}
+            
+            <b> Family Birthdays & Anniversary </b> <br>
+            {% if is_state('sensor.anniversary', '') %} No Family Birthdays or Anniversary coming up. {% else %} {{ states('sensor.anniversary') }}.{% endif %}<br>
             <br>
             <b> A Picture of Us! </b>
           data:
@@ -59,7 +64,7 @@
             - /config/www/img/private/{{ range(1, 25) | random }}.jpg 
 
 ####################################################
-#                                                                                                    #
-#           END OF CONFIGURATION FILE                                                  #
-#                                                                                                    #
+#                                                                                                    
+#           END OF CONFIGURATION FILE                                                  
+#                                                                                                    
 ####################################################

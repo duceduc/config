@@ -1,0 +1,33 @@
+####################################################
+#                                                                                                    
+#                      Stats                                                                 
+#                                                                                                    
+####################################################
+
+  - platform: history_stats
+    name: Front Door Count
+    entity_id: binary_sensor.genkan_door
+    state: 'on'
+    type: count
+    end: '{{ now() }}'
+    duration:
+      days: 7
+
+
+  - platform: history_stats
+    name: Front Door Motion Night Count
+    entity_id: binary_sensor.motion_g1_occupancy
+    state: 'on'
+    type: count
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    duration:
+      hours: 5
+
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

@@ -79,10 +79,9 @@
     from: 'rinse wait'
     to: 'stop'
   action:
-    - service: script.speech_engine_simplified
+    - service: script.speech_engine
       data: 
-        who: notify.alexa_media
-        device: media_player.ai_1
+        who: ai_1
         message:  >
           <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>.. The laundry load has finished. Don't forget to remove the clothes from the machine for drying.
           

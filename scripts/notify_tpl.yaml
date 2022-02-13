@@ -1,0 +1,54 @@
+#########################################################
+#                                                                                                              
+#             Text Notify                                                                             
+#                                                                                                              
+#########################################################
+
+  text_notify:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.text_notifications
+        state: 'on'
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "duc"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.mobile_app_id
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "eri"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_eri
+            state: 'on'
+          sequence:
+          - service: notify.mobile_app_ie
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "isp"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_isp
+            state: 'on'
+          sequence:
+          - service: notify.mobile_app_isp
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

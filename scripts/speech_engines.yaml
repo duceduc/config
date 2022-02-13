@@ -1,29 +1,46 @@
 #########################################################
 #                                                                                                              
-#             Amazon Echo                                                                                 
+#             Speech Engine                                                                             
 #                                                                                                              
 #########################################################
 
-  speech_engine_simplified:
+  speech_engine:
     sequence:
-#      - condition: state
-#        entity_id: binary_sensor.quiet_time
-#        state: 'off'    
+      - condition: template # Quiet time is off
+        value_template: "{{ is_state('binary_sensor.quiet_time', 'off') }}"
+      - condition: template # Not on vacation
+        value_template: "{{ is_state('input_boolean.vacation_mode', 'off') }}"        
       - condition: template # Someone is home
-        value_template: "{{ is_state('input_select.home_mode', 'Home') }}"    
-      - condition: state
-        entity_id: input_boolean.vacation_mode
-        state: 'off'
+        value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
       - service: >-
-           {{ who }}
+           notify.alexa_media_{{ who }}
         data:
           message: >
             {{ message }}
           data:
              type: tts
-          target: >
-            {{ device }}            
 
+
+#########################################################
+#                                                                                                              
+#             Briefings                                                                                 
+#                                                                                                              
+#########################################################
+
+
+  morning_briefing:
+    sequence:
+      - service: script.speech_engine
+        data: 
+          who: ai_4
+          message: !include ../tpl/speech/morning_briefing.yaml
+
+  daily_briefing:
+    sequence:
+      - service: script.speech_engine
+        data: 
+          who: ai_4
+          message: !include ../tpl/speech/daily_briefing.yaml
 
 
 #########################################################

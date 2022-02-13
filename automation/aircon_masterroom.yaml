@@ -162,15 +162,10 @@
     - platform: state
       entity_id: input_boolean.masterroom_mcl
   action:
-    - service: notify.alexa_media
-      data_template:
-        data:
-          type: tts
-        target:
-        - media_player.ai_2
-        message: >
-          {% set mode = 'automatic' if trigger.to_state.state == 'off' else 'manual' %}
-          <speak> Master room light is now in {{ mode }} mode. </speak>
+    - service: script.speech_engine
+      data: 
+        who: ai_2
+        message: !include ../tpl/speech/control_status.yaml
 
 - alias: 'MR MCL Re-Enable'
   trigger:

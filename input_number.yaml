@@ -196,6 +196,24 @@
     max: 100
     step: 1
 
+# use for 30 fade in 
+# https://youtu.be/JpC13mLuiQg?t=436
+  light_wakeup:
+    name: Light Wakeup
+    initial: 8.5
+    min: 8.5
+    max: 255
+    step: 8.5
+
+
+
+
+
+
+
+
+
+
 
 ##################
   duc_watch_present:

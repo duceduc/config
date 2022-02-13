@@ -1,0 +1,63 @@
+>
+  {# Guest Greetings #}
+  {%- macro getReport() -%}
+    {% set alias = {"Sachiko":"sachickgo", "Tomokun":"towmow-goon", "Yuri":"you-d"} %}
+    {% set guest = state_attr(('group.guest_presence'), 'entity_id') %}
+    {% set t_guest = states.binary_sensor | selectattr('entity_id', 'in', guest) | list | count %}
+    {% set n_guest = states.binary_sensor   | selectattr('entity_id', 'in', guest) | selectattr('state','eq','on') | list | count %}
+    {% set guest_home = states.binary_sensor  | selectattr('entity_id', 'in', guest) | selectattr('state','eq','on') | map(attribute='name') | list %}
+    {% set ns = namespace(guests = '') %}
+    {% for i in guest_home %}
+      {% set ns.guests = ns.guests ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
+    {% endfor %}
+    
+    {{ns.guests}}.
+    {{ ( 
+     'Welcome,',
+     'Welcome back,',
+     'Hello,',
+     'Hi,',
+     'Howdy,',
+     'Greetings,',
+     'Long time no see,',
+     'How are things?,',
+     'Hey, What’s up?,',
+     'Salutation,',
+     'Ahoy, matey!,',
+     'Greetings and salutations!,',
+     'Look what the cat dragged in!,',
+     'How have you been?,',
+     'You have made it,',
+     'What’s going on?,',             
+     'Great to have you back,',
+     'Nice to see you back,',
+     'You are are here,',
+     'Happy to see you again,',
+     'Good to see you,',
+     'Glad you are here,',
+     'Glad to see you back,'
+     )|random +(
+     'Hope you had a wonderful day today.',
+     'How was your day?',
+     'Enjoy your stay,',
+     'Enjoy the rest of the day.',
+     'I am glad to see you.'
+     )|random }}  
+
+     
+  {%- endmacro -%}
+
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}
+  {%- macro cleanup(data) -%}
+    {%- for item in data.split("\n")  if item | trim != "" -%}
+      {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  {# a macro to call all macros :)  #}
+  {%- macro mother_of_all_macros() -%}
+    {{ getReport() }}
+  {%- endmacro -%}
+
+  {# Call the macro  #}
+  {{- cleanup(mother_of_all_macros()) -}}

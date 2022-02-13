@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#                   Windows Desktop Notification                                                    #
-#                                                                                                              #
+#                                                                                                              
+#                   Windows Desktop Notification                                                    
+#                                                                                                              
 #########################################################
 
 
@@ -21,9 +21,9 @@
         message: "Time for Shion to go to   school."
 
 #########################################################
-#                                                                                                              #
-#                   Replace Toilet Airfreshener Notification                                         #
-#                                                                                                              #
+#                                                                                                              
+#                   Replace Toilet Airfreshener Notification                                         
+#                                                                                                              
 #########################################################
 
 - alias: "Replace Toilet Airfreshener Notification"
@@ -53,9 +53,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#                   ISP Internet Status                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#                   ISP Internet Status                                                                 
+#                                                                                                              
 #########################################################
 
 - alias: ISP/HA Internet Status Notification
@@ -86,8 +86,9 @@
       data_template:
         message: '{{ status_msg }}'
         
-    - service: notify.mobile_app_id
-      data:
+    - service: script.text_notify
+      data_template:
+        who: 'duc'
         message: '{{ status_msg }}'
         title: '*Internet Status*'
 
@@ -99,9 +100,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#                   Vehicles Delivery Notifications                                                    #
-#                                                                                                              #
+#                                                                                                              
+#                   Vehicles Delivery Notifications                                                    
+#                                                                                                              
 #########################################################
 
 - alias: "Vehicle Delivery Notification"
@@ -129,9 +130,9 @@
           images: []
 
 #########################################################
-#                                                                                                              #
-#      HOLIDAY / BIRTHDAY                                                                            #
-#                                                                                                              #
+#                                                                                                              
+#      HOLIDAY / BIRTHDAY                                                                            
+#                                                                                                              
 #########################################################
 
 - alias: "Holiday and Birthday Notification"
@@ -152,9 +153,9 @@
         title: '{{ states.sensor.holiday.state }}'
 
 #########################################################
-#                                                                                                              #
-#      Samba Snapshot Backup                                                                       #
-#                                                                                                              #
+#                                                                                                              
+#      Samba Snapshot Backup                                                                       
+#                                                                                                              
 #########################################################
 
 - alias: Backup Notifications
@@ -178,9 +179,9 @@
         message: "{{ states('sensor.samba_backup')|lower }}"
 
 #########################################################
-#                                                                                                              #
-#      SSL Certificate Expiry Notification                                                           #
-#                                                                                                              #
+#                                                                                                              
+#      SSL Certificate Expiry Notification                                                           
+#                                                                                                              
 #########################################################
 
 - alias: "VJ SSL Certificate Expiry Notification"
@@ -252,9 +253,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#      Earthquake Alert Notification                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#      Earthquake Alert Notification                                                                  
+#                                                                                                              
 #########################################################
 
 - alias: "Earthquake Alert"
@@ -314,9 +315,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#                   Home Air Quality Notifications                                                    #
-#                                                                                                              #
+#                                                                                                              
+#                   Home Air Quality Notifications                                                    
+#                                                                                                              
 #########################################################
 
 - alias: Home Air Quality Warnings
@@ -368,50 +369,27 @@
 
 
 #########################################################
-#                                                                                                              #
-#                   Lock Genkan Door Announcement                                                #
-#                                                                                                              #
+#                                                                                                              
+#                   Security Report Announcement                                                
+#                                                                                                              
 #########################################################
 
 
-- alias: Lock Genkan Door Announcement
+- alias: Security Report
   initial_state: true
   trigger:
     - platform: time
       at: '21:01:00'
-  condition:
-    - condition: template # Someone is home
-      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # If door is not locked
-      value_template: "{{ is_state('sensor.genkan_doorlock', 'Unlocked') }}"
   action:
-    - service: script.speech_engine_simplified
+    - service: script.speech_engine
       data: 
-        who: notify.alexa_media
-        device: media_player.ai_1
-        message: >
-          <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>.. 
-          {{  [
-          '',
-          'I have detected',
-          'My system detected',
-          'This is a reminder,',
-          'Don\'t forget,',
-          'It appears'
-          ]|random }}
-          the front door is {{ states('sensor.genkan_doorlock') }}. 
-          {{  [
-          'Please',
-          'Remember to',
-          'Last person up don\'t forget to',
-          'This is a reminder to'
-          ]|random }}
-          lock the door before going to bed.
+        who: ai_4
+        message: !include ../tpl/speech/security_report.yaml
 
 
 
 ####################################################
-#                                                                                                    #
-#           END OF CONFIGURATION FILE                                                  #
-#                                                                                                    #
+#                                                                                                    
+#           END OF CONFIGURATION FILE                                                  
+#                                                                                                    
 ####################################################

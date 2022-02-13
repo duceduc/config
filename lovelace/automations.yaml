@@ -324,11 +324,15 @@ cards:
             name: Announce Who is Arriving
             icon: si:amazonalexa
             secondary_info: last-triggered
-          - entity: automation.welcome_home_announcement
-            name: Welcome Home Announcement
+          - entity: automation.welcome_family_announcement
+            name: Welcome Family Announcement
             icon: si:amazonalexa
             secondary_info: last-triggered
-
+          - entity: automation.welcome_guest_announcement
+            name: Welcome Guest Announcement
+            icon: si:amazonalexa
+            secondary_info: last-triggered
+            
       - type: entities
         title: Disable Device Automations
         show_header_toggle: false

@@ -17,10 +17,9 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('group.family_presence', 'on') }}"
   action:
-    - service: script.speech_engine_simplified
+    - service: script.speech_engine
       data: 
-        who: notify.alexa_media
-        device: media_player.ai_1
+        who: ai_1
         message:  >
           <audio src='https://ha.snailmsg.com/local/alerts/en/minecraft-theme.mp3'/>.. The time is {{ now().hour }} {{ now().minute }}, The tv will shutoff in {{ digit }} minutes.
         

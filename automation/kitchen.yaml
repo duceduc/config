@@ -171,13 +171,10 @@
     - platform: state
       entity_id: input_boolean.kitchen_mcl
   action:
-    - service: script.speech_engine_simplified
+    - service: script.speech_engine
       data: 
-        who: notify.alexa_media
-        device: media_player.ai_1
-        message:  >
-          {% set mode = 'automatic' if trigger.to_state.state == 'off' else 'manual' %}
-          <speak> The kitchen lights are now in {{ mode }} mode. </speak>
+        who: ai_1
+        message: !include ../tpl/speech/control_status.yaml
 
 
 - alias: 'Kitchen MCL Re-Enable'
