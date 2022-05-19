@@ -1,0 +1,65 @@
+#########################################################
+#                                                                                                              
+#             Washer                                                                                
+#                                                                                                              
+#########################################################
+
+#  washer_running:
+#    sequence:
+#      - service: mqtt.publish
+#        data:
+#          topic: house/washer/status
+#          payload: running
+#          retain: true
+#
+#  washer_complete:
+#    sequence:
+#      - service: mqtt.publish
+#        data:
+#          topic: house/washer/status
+#          payload: complete
+#          retain: true
+#      - service: mqtt.publish
+#        data:
+#          topic: house/washer/time_complete
+#          payload: '{{ now().timestamp() }}'
+#          retain: true
+#
+#  washer_emptied:
+#    sequence:
+#      - service: mqtt.publish
+#        data:
+#          topic: house/washer/status
+#          payload: idle
+#          retain: true
+#      - service: script.turn_off
+#        entity_id: script.washer_finished_notification_audible
+#      - service: mqtt.publish
+#        data:
+#          topic: house/washer/time_emptied
+#          payload: '{{ now().timestamp() }}'
+#          retain: true
+#
+#
+#
+#  washer_finished_notification_audible:
+#    sequence:
+#      - repeat:
+#          while:
+#            - condition: state
+#              entity_id: sensor.washer_status_m
+#              state: 'complete'
+#          sequence:
+#          - delay:
+#              minutes: 45
+#          - service: script.simplified_washer_audible
+
+
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

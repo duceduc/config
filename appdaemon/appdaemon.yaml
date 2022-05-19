@@ -11,7 +11,7 @@ appdaemon:
       ha_url: http://192.168.1.20:8123
       token: !secret appdaemon_token
       namespace: default
-      
+
 http:
   url: http://127.0.0.1:5050
 hadashboard:

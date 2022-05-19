@@ -4,11 +4,10 @@
 #                                                                                                              
 #########################################################
 
-
 - alias: 'motion washroom auto-on'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_washroom_occupancy 
+      entity_id: binary_sensor.motion_washroom_sensor_occupancy 
       to: 'on'
   action:
     - service: light.turn_on
@@ -17,12 +16,25 @@
 - alias: 'motion washroom auto-off'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_washroom_occupancy 
+      entity_id: binary_sensor.motion_washroom_sensor_occupancy 
       to: 'off'
       for: 00:01:05
   action:
     - service_template: light.turn_{{ 'on' if is_state('light.shower_room', 'on') else 'off' }}
       entity_id: light.w_1
+
+
+
+
+- alias: 'Washroom Manual Light on'
+  trigger:
+    - entity_id: binary_sensor.washer_door_button 
+      platform: state
+      to: 'on' 
+  action:
+    - service: light.turn_on
+      entity_id: light.w_1
+
 
 
 #########################################################
@@ -31,93 +43,142 @@
 #                                                                                                              
 #########################################################
 
-
-- alias: '24hr fan toggle on-off'
-  trigger:
-    - platform: time
-      at: '05:29:00'
-    - platform: time
-      at: '23:00:00'
-  condition:
-    - condition: template # Don't run if on vacation
-      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
-  action:
-    - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:29') else 'off' }}
-      data:
-        entity_id: switch.24hr_fan
-
-- alias: '24hr fan toggle speed'
-  trigger:
-    - platform: time
-      at: '05:29:00'
-    - platform: state
-      entity_id: sensor.period_of_the_day
-      to: 'dusklight'
-  condition:
-    - condition: template # Don't run if on vacation
-      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
-  action:
-    - delay: 60
-    - service: script.holdpress_bot
-      data:
-        bot: '24hr_fan'
-        press: 0
+# CURRENTLY USING #
+#- alias: '24hr fan toggle on-off'
+#  trigger:
+#    - platform: time
+#      at: '05:29:00'
+#    - platform: time
+#      at: '23:00:00'
+#  condition:
+#    - condition: template # Don't run if on vacation
+#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+#  action:
+#    - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:29') else 'off' }}
+#      data:
+#        entity_id: switch.24hr_fan
+#
+#- alias: '24hr fan toggle speed'
+#  trigger:
+#    - platform: time
+#      at: '05:29:00'
+#    - platform: state
+#      entity_id: sensor.period_of_the_day
+#      to: 'dusklight'
+#  condition:
+#    - condition: template # Don't run if on vacation
+#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+#  action:
+#    - delay: 60
+#    - service: script.holdpress_bot
+#      data:
+#        bot: '24hr_fan'
+#        press: 0
 
 
 #########################################################
 #                                                                                                              
-#             Washing Machine Notifcation                                                           
+#             Washing Machine Status                                                           
 #                                                                                                              
 #########################################################
 
-# Notification
-- alias: laundry notification
-  initial_state: true
-  trigger:
-  - platform: state
-    entity_id: input_select.shelly_washer_state
-    from: 'rinse wait'
-    to: 'stop'
-  action:
-    - service: script.speech_engine
-      data: 
-        who: ai_1
-        message:  >
-          <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>.. The laundry load has finished. Don't forget to remove the clothes from the machine for drying.
-          
-#    - condition: template
-#      value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
-#    - service: cover.open_cover
-#      entity_id:
-#       - cover.lr_curtain_lt_curtain
+#- alias: Washer Running
+#  initial_state: true
+#  trigger:
+#    - platform: state
+#      entity_id: sensor.shelly_washer_state
+#      from: 'fill'
+#      to: 'run'
+#  condition:
+#    - condition: numeric_state
+#      entity_id: sensor.shelly_washer_power
+#      above: 3      
+#  action:
+#    - service: script.washer_running
+#
+#- alias: Washer Complete
+#  initial_state: true
+#  trigger:
+#    - platform: state
+#      entity_id: sensor.shelly_washer_state
+#      from: 'wait'
+#      to: 'stop'
+#  condition:
+#    - condition: state
+#      entity_id: sensor.washer_status_m
+#      state: running
+#  action:
+#    - service: script.washer_complete
+#
+#
+## Washer State
+#- alias: Washer Operation
+#  trigger:
+#  - platform: state 
+#    entity_id: sensor.shelly_washer_state
+#  action:
+#    - service: input_select.select_option
+#      data:
+#        entity_id: input_select.shelly_washer_state
+#        option: >
+#          {% set s = states('input_select.shelly_washer_state') %}
+#          {% set fr = trigger.from_state.state %}
+#          {% set to = trigger.to_state.state %}
+#          {% if fr == 'stop' and to == 'fill' %} wash fill
+#          {% elif fr == 'fill' and to == 'run' %} wash
+#          {% elif fr == 'stop' and to == 'run' %} wash
+#          {% elif fr == 'wait' and to == 'pulse' %} dryer
+#          {% elif fr == 'run' and to == 'pulse' and s == 'wash' %} wash spin
+#          {% elif fr == 'pulse' and to == 'run' and s == 'wash spin' %} wash drain
+#          {% elif fr == 'run' and to == 'fill' %} rinse fill
+#          {% elif fr in ['fill', 'run'] and to == 'wait' %} rinse wait
+#          {% elif fr == 'wait' and to == 'run' %} rinse               
+#          {% elif fr == 'run' and to == 'pulse' and s == 'rinse' %} rinse spin
+#          {% elif fr == 'pulse' and to == 'run' and s == 'rinse spin' %} rinse drain
+#          {% elif fr in ['run', 'fill', 'wait', 'unknown'] and to == 'stop' %} stop
+#          {% else %} unknown
+#          {% endif %}
+#
+#
+#
+#- alias: Washer Notification
+#  initial_state: true
+#  trigger:
+#    - platform: state
+#      entity_id: sensor.washer_status_m
+#      from: running
+#      to: complete  
+#  action:
+#    - service: script.turn_on
+#      entity_id: script.washer_finished_notification_audible
+#
+##    - condition: template
+##      value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
+##    - service: cover.open_cover
+##      entity_id:
+##       - cover.lr_curtain_lt_curtain
+#
+#
+#
+#- alias: Washer Emptied
+#  initial_state: true
+#  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.motion_washroom_occupancy
+#      from: 'off'
+#      to: 'on'
+#  condition:
+#    - condition: state
+#      entity_id: sensor.washer_status_m
+#      state: complete
+#  action:
+#    - service: script.washer_emptied
 
-# Washing State
-- alias: Washer Operation
-  trigger:
-  - platform: state 
-    entity_id: sensor.shelly_washer_state
-  action:
-    - service: input_select.select_option
-      data:
-        entity_id: input_select.shelly_washer_state
-        option: >
-          {% set s = states('input_select.shelly_washer_state') %}
-          {% set fr = trigger.from_state.state %}
-          {% set to = trigger.to_state.state %}
-          {% if fr == 'stop' and to == 'fill' %} wash fill
-          {% elif fr == 'fill' and to == 'run' %} wash
-          {% elif fr == 'stop' and to == 'run' %} wash
-          {% elif fr == 'wait' and to == 'pulse' %} dryer
-          {% elif fr == 'run' and to == 'pulse' and s == 'wash' %} wash spin
-          {% elif fr == 'pulse' and to == 'run' and s == 'wash spin' %} wash drain
-          {% elif fr == 'run' and to == 'fill' %} rinse fill
-          {% elif fr in ['fill', 'run'] and to == 'wait' %} rinse wait
-          {% elif fr == 'wait' and to == 'run' %} rinse               
-          {% elif fr == 'run' and to == 'pulse' and s == 'rinse' %} rinse spin
-          {% elif fr == 'pulse' and to == 'run' and s == 'rinse spin' %} rinse drain
-          {% elif fr in ['run', 'fill', 'wait', 'unknown'] and to == 'stop' %} stop
-          {% else %} unknown
-          {% endif %}
+
+
+
+
+
 
 
 #########################################################

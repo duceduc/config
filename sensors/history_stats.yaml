@@ -1,6 +1,6 @@
 ####################################################
 #                                                                                                    
-#                      Stats                                                                 
+#                      Devices                                                                 
 #                                                                                                    
 ####################################################
 
@@ -13,7 +13,6 @@
     duration:
       days: 7
 
-
   - platform: history_stats
     name: Front Door Motion Night Count
     entity_id: binary_sensor.motion_g1_occupancy
@@ -25,6 +24,47 @@
 
 
 
+####################################################
+#                                                                                                    
+#                      Temperature                                                                 
+#                                                                                                    
+####################################################
+
+
+  - platform: statistics
+    name: Outside Temp Stats
+    entity_id: sensor.oa_temperature
+    state_characteristic: mean
+    sampling_size: 500
+
+  - platform: statistics
+    entity_id: sensor.sr_temperature
+    name: "Shion Room Temp Sats"
+    state_characteristic: mean
+  - platform: statistics
+    entity_id: sensor.mr_temperature
+    name: "Master Room Temp Sats"
+    state_characteristic: mean  
+  - platform: statistics
+    entity_id: sensor.toilet_airfreshener_temperature
+    name: "Toilet Room Temp Sats"
+    state_characteristic: mean
+  - platform: statistics
+    entity_id: sensor.lr_temperature
+    name: "Living Room Temp Sats"
+    state_characteristic: mean
+  - platform: statistics
+    entity_id: sensor.meter_temperature
+    name: "Hallway Temp Sats"
+    state_characteristic: mean
+  - platform: min_max
+    name: Inside Temp Stats
+    entity_ids:
+    - sensor.sr_temperature
+    - sensor.mr_temperature
+    - sensor.toilet_airfreshener_temperature
+    - sensor.lr_temperature
+    - sensor.meter_temperature
 
 ####################################################
 #                                                                                                    

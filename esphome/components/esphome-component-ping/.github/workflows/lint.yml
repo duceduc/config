@@ -1,0 +1,43 @@
+---
+name: lint
+on:
+  - pull_request
+  - push
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install pipenv
+        run: |
+          pip install --user pipenv
+
+      - name: Run pipenv
+        run: |
+          pipenv install --dev
+
+      - name: Run black
+        run: |
+          pipenv run black --verbose --check  components
+
+      - name: Run pylint
+        run: |
+          pipenv run pylint -f parseable --persistent=n --rcfile=pylintrc components
+
+      - name: Run flake8
+        run: |
+          pipenv run flake8 components
+
+      - name: Run clang-format style check
+        uses: jidicula/clang-format-action@v4.5.0
+        with:
+          clang-format-version: '11'
+          check-path: 'components'
+          exclude-regex: 'ping/ping_sock.[ch]'

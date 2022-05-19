@@ -12,15 +12,6 @@
     value_template: "{{ value_json.homeassistant.default }}"
     scan_interval: 3600
 
-####################################################
-#                                                                                                    #
-#                   VERSION                                                                     #
-#                                                                                                    #
-####################################################
-
-#https://www.home-assistant.io/components/sensor.version/
-  - platform: version
-    name: Installed Version
 
 ####################################################
 #                                                                                                    #

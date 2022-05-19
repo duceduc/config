@@ -51,19 +51,6 @@
 
 #########################################################
 #                                                                                                              
-#             Enable all Disabled Devices at Midnight                                              
-#                                                                                                              
-#########################################################
-
-- alias: enable devices at midnight
-  trigger:
-    - platform: time
-      at: '01:00:00'
-  action:
-    - service: script.enable_devices
-
-#########################################################
-#                                                                                                              
 #             END OF CONFIGURATION FILE                                                          
 #                                                                                                              
 #########################################################

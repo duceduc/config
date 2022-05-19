@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#            PRESENCE/RSSI - GENKAN                                                      #
-#                                                                                                    #
+#                                                                                                    
+#            PRESENCE/RSSI - GENKAN                                                      
+#                                                                                                    
 ####################################################
 
 # Duc
@@ -61,9 +61,9 @@
     icon: mdi:account
 
 ####################################################
-#                                                                                                    #
-#            PRESENCE/RSSI - SHION ROOM                                               #
-#                                                                                                    #
+#                                                                                                    
+#            PRESENCE/RSSI - SHION ROOM                                               
+#                                                                                                    
 ####################################################
 
 # Duc
@@ -122,10 +122,74 @@
     unit_of_measurement: '%'
     icon: mdi:account
 
+
 ####################################################
-#                                                                                                    #
-#            PRESENCE/RSSI - LIVINGROOM                                               #
-#                                                                                                    #
+#                                                                                                    
+#            PRESENCE/RSSI - MASTER ROOM                                               
+#                                                                                                    
+####################################################
+
+# Duc
+  - platform: mqtt
+    name: 'iD Masterroom'
+    state_topic: 'monitor/masterroom/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - platform: mqtt
+    name: 'iE Masterroom'
+    state_topic: 'monitor/masterroom/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - platform: mqtt
+    name: 'iS Masterroom'
+    state_topic: 'monitor/masterroom/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - platform: mqtt
+    name: 'iSp Masterroom'
+    state_topic: 'monitor/masterroom/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - platform: mqtt
+    name: 'tms Masterroom'
+    state_topic: 'monitor/masterroom/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Sachiko
+  - platform: mqtt
+    name: 'Sachiko Masterroom'
+    state_topic: 'monitor/masterroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Tomokun
+  - platform: mqtt
+    name: 'Tomokun Masterroom'
+    state_topic: 'monitor/masterroom/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+
+####################################################
+#                                                                                                    
+#            PRESENCE/RSSI - LIVINGROOM                                               
+#                                                                                                    
 ####################################################
 
 # Duc
@@ -135,7 +199,7 @@
     value_template: '{{ value_json.confidence }}'
     unit_of_measurement: '%'
     icon: mdi:account
-
+ 
 # Eri
   - platform: mqtt
     name: 'iE Livingroom'
@@ -186,9 +250,9 @@
 
 
 ####################################################
-#                                                                                                    #
-#            PRESENCE - MIN/MAX                                                           #
-#                                                                                                    #
+#                                                                                                    
+#            PRESENCE - MIN/MAX                                                           
+#                                                                                                    
 ####################################################
 
   - platform: min_max
@@ -197,8 +261,9 @@
     round_digits: 0
     entity_ids:
       - sensor.id_genkan
-      - sensor.id_livingroom
+#      - sensor.id_livingroom
       - sensor.id_shionroom
+      - sensor.id_masterroom
 
   - platform: min_max
     name: 'iE Presence'
@@ -206,8 +271,9 @@
     round_digits: 0
     entity_ids:
       - sensor.ie_genkan
-      - sensor.ie_livingroom
+#      - sensor.ie_livingroom
       - sensor.ie_shionroom
+      - sensor.ie_masterroom
 
   - platform: min_max
     name: 'iS Presence'
@@ -217,6 +283,7 @@
       - sensor.is_genkan
       - sensor.is_livingroom
       - sensor.is_shionroom
+      - sensor.is_masterroom
 
   - platform: min_max
     name: 'iSp Presence'
@@ -226,6 +293,7 @@
       - sensor.isp_genkan
       - sensor.isp_livingroom
       - sensor.isp_shionroom
+      - sensor.isp_masterroom
 
   - platform: min_max
     name: 'tms Presence'
@@ -235,6 +303,7 @@
       - sensor.tms_genkan
       - sensor.tms_livingroom
       - sensor.tms_shionroom
+      - sensor.tms_masterroom
 
 # Guests
   - platform: min_max
@@ -245,6 +314,7 @@
       - sensor.sachiko_genkan
       - sensor.sachiko_livingroom
       - sensor.sachiko_shionroom
+      - sensor.sachiko_masterroom
 
   - platform: min_max
     name: 'Tomokun Presence'
@@ -254,12 +324,13 @@
       - sensor.tomokun_genkan
       - sensor.tomokun_livingroom
       - sensor.tomokun_shionroom
-
+      - sensor.tomokun_masterroom
+      
 
 ####################################################
-#                                                                                                    #
-#            Number of People Home                                                         #
-#                                                                                                    #
+#                                                                                                    
+#            Number of People Home                                                         
+#                                                                                                    
 ####################################################
 
   - platform: template
@@ -267,15 +338,25 @@
       n_people_home:
         friendly_name: Number of People Home
         value_template: >-
-          {{ states|selectattr('entity_id','in',
-                      state_attr('group.family_presence','entity_id'))
-                   |selectattr('state','eq','on')|list|count +
-             (1 if is_state('input_boolean.guest_mode','on') else 0) }}
+          {{ expand('group.family_presence')|selectattr('state','equalto','on')|list|length +
+                (1 if is_state('input_boolean.guest_mode','on') else 0) }}
+
+        icon_template: >-
+         {% if is_state("sensor.n_people_home", "0") %} mdi:account-off
+         {% elif is_state("sensor.n_people_home", "1") %} mdi:account
+         {% elif is_state("sensor.n_people_home", "2") %} mdi:account-multiple
+         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group         
+         {% else %} mdi:account-plus {% endif %}
+
+#          {{ states|selectattr('entity_id','in',
+#               state_attr('group.family_presence','entity_id'))
+#               |selectattr('state','eq','on')|list|count +
+#               (1 if is_state('input_boolean.guest_mode','on') else 0) }}
 
 ####################################################
-#                                                                                                    #
-#            Have Guest Status                                                               #
-#                                                                                                    #
+#                                                                                                    
+#            Have Guest Status                                                               
+#                                                                                                    
 ####################################################
 
   - platform: template
@@ -286,25 +367,125 @@
         icon_template: >-
          {% if is_state("input_boolean.guest_mode", "off") %}mdi:account-off{% else %}mdi:account-plus{% endif %}
 
+  - platform: template
+    sensors:
+      duc_location:
+        friendly_name: 'Duc Location'
+        unit_of_measurement: ''
+        value_template: >-
+          {% set person = states.person.duc.state %}
+          {% if person in ['iida','tobu','matsumoto'] %}
+            grocery store
+          {% elif person in ['ario','aeon','lalaport'] %}
+            mall            
+          {% elif person in ['mcdonalds','kfc','mos'] %}
+            lunch takeout
+          {% elif person in ['parents','yuri'] %}
+            relatives
+          {% else %}
+            {% if person in ['not_home'] %}
+              away
+            {% else %}
+              {{ states('person.duc') }}
+            {%- endif %}
+          {%- endif %}
+
+  - platform: template
+    sensors:
+      eri_location:
+        friendly_name: 'Eri Location'
+        unit_of_measurement: ''
+        value_template: >-
+          {% set person = states.person.eri.state %}
+          {% if person in ['iida','tobu','matsumoto'] %}
+            grocery store
+          {% elif person in ['ario','aeon','lalaport'] %}
+            mall            
+          {% elif person in ['mcdonalds','kfc','mos'] %}
+            lunch takeout
+          {% elif person in ['parents','yuri'] %}
+            relatives
+          {% else %}
+            {% if person in ['not_home'] %}
+              away
+            {% else %}
+              {{ states('person.eri') }}
+            {%- endif %}
+          {%- endif %}
+
+  - platform: template
+    sensors:
+      shion_location:
+        friendly_name: 'Shion Location'
+        unit_of_measurement: ''
+        value_template: >-
+          {% set person = states.person.shion.state %}
+          {% if person in ['iida','tobu','matsumoto'] %}
+            grocery store
+          {% elif person in ['ario','aeon','lalaport'] %}
+            mall            
+          {% elif person in ['mcdonalds','kfc','mos'] %}
+            lunch takeout
+          {% elif person in ['parents','yuri'] %}
+            relatives
+          {% else %}
+            {% if person in ['not_home'] %}
+              away
+            {% else %}
+              {{ states('person.shion') }}
+            {%- endif %}
+          {%- endif %}
+
+
+####################################################
+#                                                                                                    
+#            Audio Presence                                                            
+#                                                                                                    
+####################################################
+
+
+#  - platform: mqtt
+#    name: "Room Presence"
+#    state_topic: "house/presence/current_room"
+#    
+#  - platform: template
+#    sensors:
+#      room_audio:
+#        friendly_name: "Room Audio"
+#        value_template: >-
+#          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%}
+#          {%- if last_alexa_called_seconds <= 60 %}  
+#            {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+#          {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
+#            {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
+#              {% if is_state('input_boolean.audible_notifications', 'off') %}
+#                {% if sensor.name == 'motion computerroom occupancy' %}
+#                  computer_room
+#                {% else %}
+#                  living_room      
+#                {%- endif %}
+#              {% else %} 
+#                {% if sensor.name == 'motion computerroom occupancy' %}
+#                  computer_room
+#                {% elif sensor.name in ('motion kitchen occupancy','motion lr occupancy') %}
+#                  living_room
+#                {% elif sensor.name in ('motion sr occupancy', 'motion mr occupancy', 'motion hallway occupancy') %}
+#                  hallway
+#                {% else %}
+#                  living_room
+#                {%- endif %}
+#            {%- endif %}
+#          {% elif is_state('media_player.theater_tv', 'on') %}
+#            theater
+#          {% else %}
+#            {{ states('sensor.room_presence') }}
+#          {% endif %}
+#
 
 
 
 ####################################################
-#                                                                                                    #
-#            Monitor Online Status                                                            #
-#                                                                                                    #
-####################################################
-
-
-
-
-
-
-
-
-
-####################################################
-#                                                                                                    #
-#            END OF CONFIGURATION FILE                                                 #
-#                                                                                                    #
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
 ####################################################

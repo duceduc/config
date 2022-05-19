@@ -105,11 +105,11 @@
         turn_on:
           service: hassio.addon_start
           data:
-            addon: a0d7b954_esphome
+            addon: 5c53de3b_esphome
         turn_off:
           service: hassio.addon_stop
           data:
-            addon: a0d7b954_esphome
+            addon: 5c53de3b_esphome
 
 
 ####################################################

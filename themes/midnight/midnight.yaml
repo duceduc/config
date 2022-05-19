@@ -3,6 +3,7 @@
 #                          MIDNIGHT                                                                                       #
 #                                                                                                                               #
 #################################################################
+# to reload theme using services 'frontend.reload_themes'
 
 midnight:
 
@@ -19,6 +20,15 @@ midnight:
   switch-unchecked-button-color: "#7f848e"
   table-row-background-color: "#2c3139"
   table-row-alternative-background-color: "#424a56"
+  code-editor-background-color: "#2c3139" # (main code page background)
+  code-editor-gutter-color: "#424A56" # (line numbers column background)
+
+ #Input Text
+  input-fill-color: '#424A56'
+  input-ink-color: '#ffffff'
+  input-disabled-ink-color: '#ffffff'
+  input-label-ink-color: '#ffffff'
+  input-disabled-fill-color: '#424A56'
 
   # The items below are some of the default values from 
   # https://github.com/home-assistant/frontend/blob/master/src/resources/ha-style.ts 
@@ -59,9 +69,13 @@ midnight:
 
   #For Person-badge
   severity-1: "#df4c1e" #Default Red Value
+  severity-2: "#ff8000" #Default Orange Value
+  severity-3: "#f4b400" #Default Yellow Value
   severity-4: "#039be5" #Default Blue Value
   severity-5: "#0da035" #Default Green Value
-  severity-3: "#f4b400" #Default Yellow Value
+  severity-6: "#ff33ff" #Default Purple Value
+  severity-7: "#ffcccc" #Default Pink Value
+  severity-8: "#425cfb" #Default Dark Blue Value
 
   #Paper items - These Need to Be removed/repalced based on Breaking Changes in 0.113.0 release notes
   paper-grey-50: "#fafafa" #Default Value

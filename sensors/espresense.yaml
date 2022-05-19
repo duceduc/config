@@ -1,106 +1,107 @@
 ####################################################
-#                                                                                                    #
-#                      Livingroom ESPresense                                                #
-#                                                                                                    #
+#                                                                                                    
+#                     ESPresense                                                
+#                                                                                                    
 ####################################################
+# apple tv shares same id as iphone8, iphone 6+, iphone 6
 
 # Duc
   - platform: mqtt_room
     name: 'Duc ESPresense'
-    device_id: 'apple:iphone10-3'
-    state_topic: 'espresense/devices/apple:iphone10-3'
-    timeout: 30
-    away_timeout: 120
+    device_id: 'apple:1007:11-12'
+    state_topic: 'espresense/devices/apple:1007:11-12'
+#    device_id: 'apple:iphone10-3'
+#    state_topic: 'espresense/devices/apple:iphone10-3'
+    timeout: 60 #30
+    away_timeout: 120 #120
 
   - platform: mqtt_room
     name: 'Duc iWatch ESPresense'
-    device_id: 'apple:watch3-3'
-    state_topic: 'espresense/devices/apple:watch3-3'
-    timeout: 30
+    device_id: 'apple:1005:9-24'
+    state_topic: 'espresense/devices/apple:1005:9-24'
+#    device_id: 'apple:watch3-3'
+#    state_topic: 'espresense/devices/apple:watch3-3'    
+    timeout: 60
     away_timeout: 120
-
-#  - platform: mqtt_room
-#    name: 'Duc RA ESPresense'
-#    device_id: 'roomAssistant:04ea2071-f457-46d3-97a1-986130691017'
-#    state_topic: 'espresense/devices/roomAssistant:04ea2071-f457-46d3-97a1-986130691017'
-#    timeout: 30
-#    away_timeout: 120
 
 # Eri
   - platform: mqtt_room
-    name: 'Eri ESPresense'
-    device_id: 'exp:20'
-    state_topic: 'espresense/devices/exp:20'
-    timeout: 30
+    name: 'Eri ESPresense 101'
+    device_id: 'apple:iphone10-1' # exp:20
+    state_topic: 'espresense/devices/apple:iphone10-1'
+    timeout: 60
     away_timeout: 120
+# Eri
+  - platform: mqtt_room
+    name: 'Eri ESPresense 1006'
+    device_id: 'apple:1006:10-12' 
+    state_topic: 'espresense/devices/apple:1006:10-12'
+    timeout: 60
+    away_timeout: 120
+# Eri
+  - platform: mqtt_room
+    name: 'Eri ESPresense Exp20'
+    device_id: 'exp:20' 
+    state_topic: 'espresense/devices/exp:20'
+    timeout: 60
+    away_timeout: 120
+
+
+  - platform: template
+    sensors:
+      eri_espresense:
+        friendly_name: Eri ESPresense
+        value_template: >-
+          {% if states("sensor.eri_espresense_1006") != "not_home" and states("sensor.eri_espresense_101") == "not_home" %}
+            {{ states("sensor.eri_espresense_1006") }}
+          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+            {{ states("sensor.eri_espresense_101") }}
+          {% elif states("sensor.eri_espresense_exp20") != "not_home" %}
+            {{ states("sensor.eri_espresense_exp20") }}                
+          {% elif states("sensor.eri_espresense_1006") == "not_home"  and states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_exp20") == "not_home" %} 
+            not_home
+          {% endif %}
+
 
   - platform: mqtt_room
     name: 'Eri iWatch ESPresense'
-    device_id: 'apple:watch5-9'
-    state_topic: 'espresense/devices/apple:watch5-9'
-    timeout: 30
+    device_id: 'apple:1005:9-26'
+    state_topic: 'espresense/devices/apple:1005:9-26'    
+#    device_id: 'apple:watch5-9'
+#    state_topic: 'espresense/devices/apple:watch5-9'
+    timeout: 60
     away_timeout: 120
-
-#  - platform: mqtt_room
-#    name: 'Eri RA ESPresense'
-#    device_id: 'roomAssistant:f7ae1827-e0c9-4900-b7e8-ed707674d4a5'
-#    state_topic: 'espresense/devices/roomAssistant:f7ae1827-e0c9-4900-b7e8-ed707674d4a5'
-#    timeout: 30
-#    away_timeout: 120
 
 # Shion Tile
   - platform: mqtt_room
     name: 'Shion tms ESPresense'
     device_id: 'tile:ed5cc31a97c6'
     state_topic: 'espresense/devices/tile:ed5cc31a97c6'
-    timeout: 30
+    timeout: 60
     away_timeout: 120
 
 # Shion ISP
   - platform: mqtt_room
     name: 'Shion isp ESPresense'
+#    device_id: 'apple:1005:9'
+#    state_topic: 'espresense/devices/apple:1005:9'
     device_id: 'apple:iphone7-1'
     state_topic: 'espresense/devices/apple:iphone7-1'
-    timeout: 30
+    timeout: 60
     away_timeout: 120
 
   - platform: mqtt_room
     name: 'Shion is ESPresense'
-    device_id: 'apple:iphone7-2'
+    device_id: 'apple:iphone7-2' # apple:1005:9-12
     state_topic: 'espresense/devices/apple:iphone7-2'
-    timeout: 30
+    timeout: 60
     away_timeout: 120
 
 
-####################################################
-#                                                                                                    #
-#                      ESPresense Wifi Signal                                                #
-#                                                                                                    #
-####################################################
-
-#  - platform: template
-#    sensors:
-#      kitchen_espresense_wifi_signal:
-#        value_template: "{{ state_attr('binary_sensor.espresense_kitchen', 'rssi') }}"
-
-#  - platform: template
-#    sensors:
-#      livingroom_espresense_wifi_signal:
-#        value_template: "{{ state_attr('binary_sensor.espresense_livingroom', 'rssi') }}"
-
-#  - platform: template
-#    sensors:
-#      masterroom_espresense_wifi_signal:
-#        value_template: "{{ state_attr('binary_sensor.espresense_masterroom', 'rssi') }}"
-
-#  - platform: template
-#    sensors:
-#      shionroom_espresense_wifi_signal:
-#        value_template: "{{ state_attr('binary_sensor.espresense_shionroom', 'rssi') }}"
 
 
 ####################################################
-#                                                                                                    #
-#            END OF CONFIGURATION FILE                                                 #
-#                                                                                                    #
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
 ####################################################

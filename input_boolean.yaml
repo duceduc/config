@@ -1,3 +1,8 @@
+ #########################################################
+#                                                                                                              
+#             Misc                                                 
+#                                                                                                              
+#########################################################
 
   wakeup:
     name: 'Enable wakeup light'
@@ -12,14 +17,132 @@
     name: Lights Flash
     icon: mdi:alarm-light
     initial: off
-  guest_mode:
-    name: Guest Mode
-    icon: mdi:home-account
-    initial: off
-  vacation_mode:
-    name: Vacation Mode
+
+#  guest_mode:
+#    name: Guest Mode
+#    icon: mdi:home-account
+#    initial: off
+    
+#  vacation_mode:
+#    name: Vacation Mode
+#    icon: mdi:airplane-takeoff
+#    initial: off
+    
+  randomize_vacation_lights:
     icon: mdi:beach
     initial: off
+  
+ #########################################################
+#                                                                                                              
+#             Presence Detection                                                 
+#                                                                                                              
+#########################################################
+
+# HomeKit
+#  duc_home:
+#    name: Duck
+#    icon: mdi:account
+#  eri_home:
+#    name: Erie
+#    icon: mdi:account
+#  shion_home:
+#    name: Shion_
+#    icon: mdi:account
+
+  duc_travel_monitor:
+    name: Duc Travel Monitor
+
+  eri_travel_monitor:
+    name: Eri Travel Monitor
+
+  washer_finished:
+    name: Washer Finished
+
+# PRESENCE DETECTION
+  duc_presence:
+    name: Duc
+    icon: mdi:account
+  eri_presence:
+    name: Eri
+    icon: mdi:account
+  shion_presence:
+    name: Shion
+    icon: mdi:account
+
+  sachiko_presence:
+    name: Sachiko
+    icon: mdi:account
+  tomokun_presence:
+    name: Tomokun
+    icon: mdi:account
+
+  toggle_guest_presence:
+    name: 'Toggle Guest Presence'
+    icon: mdi:account-convert
+    initial: off
+
+
+ #########################################################
+#                                                                                                              
+#             Devices                                                 
+#                                                                                                              
+#########################################################
+
+
+  shionroom_mcl:
+    name: Motion-Controlled She-on Room Lights
+    initial: off
+
+  masterroom_mcl:
+    name: Motion-Controlled Master Room Lights
+    initial: off
+
+  kitchen_mcl:
+    name: Motion-Controlled Kitchen Lights
+    initial: off
+
+  status_fan_power:
+    name: Status Fan Power
+    icon: mdi:fan
+
+  engage_toilet_airfreshner:
+    name: engage toilet airfreshner
+    icon: mdi:spray  
+    initial: off
+
+
+  ac_lr_unit:
+    name: 'AC LR Unit'
+    icon: mdi:air-conditioner
+  heater_lr_unit:
+    name: 'Heater LR Unit'
+    icon: mdi:air-filter
+
+  ac_mr_unit:
+    name: 'AC MR Unit'
+    icon: mdi:air-conditioner
+  heater_mr_unit:
+    name: 'Heater MR Unit'
+    icon: mdi:air-filter
+
+  ac_sr_unit:
+    name: 'AC SR Unit'
+    icon: mdi:air-conditioner
+  heater_sr_unit:
+    name: 'Heater SR Unit'
+    icon: mdi:air-filter
+
+
+#  sb_humidifier:
+#    name: SB Humidifier
+#    icon: mdi:air-humidifier
+
+#  lrh_humidifier_automation_enable:
+#    name: Humidifier Automation
+#    icon: mdi:av-timer
+#$    initial: off
+
+
   appletv_netflix:
     name: AppleTV Netflix
     icon: si:netflix
@@ -68,108 +191,29 @@
   christmas_lights:
     name: Christmas Lights
     icon: mdi:string-lights
+ 
+ #########################################################
+#                                                                                                              
+#             Notifications                                                 
+#                                                                                                              
+#########################################################
 
-# HomeKit
-  duc_home:
-    name: Duck
-    icon: mdi:account
-  eri_home:
-    name: Erie
-    icon: mdi:account
-  shion_home:
-    name: Shion_
-    icon: mdi:account
-
-# PRESENCE DETECTION
-  duc_presence:
-    name: Duc
-    icon: mdi:account
-  eri_presence:
-    name: Eri
-    icon: mdi:account
-  shion_presence:
-    name: Shion
-    icon: mdi:account
-
-  sachiko_presence:
-    name: Sachiko
-    icon: mdi:account
-  tomokun_presence:
-    name: Tomokun
-    icon: mdi:account
-
-
-  shionroom_mcl:
-    name: Motion-Controlled She-on Room Lights
-    initial: off
-
-  masterroom_mcl:
-    name: Motion-Controlled Master Room Lights
-    initial: off
-
-  kitchen_mcl:
-    name: Motion-Controlled Kitchen Lights
-    initial: off
-
-#####################
-  status_fan_power:
-    name: Status Fan Power
-    icon: mdi:fan
-
-  engage_toilet_airfreshner:
-    name: engage toilet airfreshner
-    icon: mdi:spray  
-    initial: off
-
-
-  ac_lr_unit:
-    name: 'AC LR Unit'
-    icon: mdi:air-conditioner
-  heater_lr_unit:
-    name: 'Heater LR Unit'
-    icon: mdi:air-filter
-
-  ac_mr_unit:
-    name: 'AC MR Unit'
-    icon: mdi:air-conditioner
-  heater_mr_unit:
-    name: 'Heater MR Unit'
-    icon: mdi:air-filter
-
-  ac_sr_unit:
-    name: 'AC SR Unit'
-    icon: mdi:air-conditioner
-  heater_sr_unit:
-    name: 'Heater SR Unit'
-    icon: mdi:air-filter
-
-
-  toggle_guest_presence:
-    name: 'Toggle Guest Presence'
-    icon: mdi:account-convert
-    initial: off
-
-
-  sb_humidifier:
-    name: SB Humidifier
-    icon: mdi:air-humidifier
-
-  lrh_humidifier_automation_enable:
-    name: Humidifier Automation
-    icon: mdi:av-timer
-    initial: off
-
-
+ 
   good_morning_report:
     name: Good Morning Report
     icon: mdi:newspaper
  
- 
- 
- 
+  morning_wakeup_report:
+    name: Wakeup Report
+    icon: mdi:newspaper
+
+  daily_report:
+    name: Daily Report
+    icon: mdi:newspaper
  
   text_notifications:
     name: Text Notifications
+    initial: on
 
   text_notify_duc:
     name: Text Notify Duc
@@ -179,5 +223,58 @@
 
   text_notify_isp:
     name: Text Notify Isp
+
+  audible_notifications:
+    name: Audible Notifications
+
+
+
+
+
+
+ #########################################################
+#                                                                                                              
+#             Weather                                                 
+#                                                                                                              
+#########################################################
+
+
+
+#  freeze_warning:
+#    name: Freeze Warning
+#    icon: mdi:snowflake-alert
+
+
+
+
+
+
+
+ #########################################################
+#                                                                                                              
+#             School                                                 
+#                                                                                                              
+#########################################################
+
+
+  school_in_session:
+    name: School In Session
+    icon: mdi:bus-school
+
+  school_today:
+    name: School Today
+    icon: mdi:bus-school
+
+  school_early_release:
+    name: School Early Release
+    icon: mdi:bus-school
+
+
+
     
-    
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################    

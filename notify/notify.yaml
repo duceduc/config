@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Email                                                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             Email                                                                                          
+#                                                                                                              
 #########################################################
 
   - name: home_assistant
@@ -13,9 +13,9 @@
     encryption: starttls
     username: !secret gmail_email
     password: !secret gmail_pass
+    sender_name: Home Assistant    
     recipient:
       - !secret recipient_1
-    sender_name: Home Assistant
 
   - name: eri
     platform: smtp
@@ -26,9 +26,9 @@
     encryption: starttls
     username: !secret gmail_email
     password: !secret gmail_pass
+    sender_name: Home Assistant    
     recipient:
       - !secret recipient_2
-    sender_name: Home Assistant
 
   - name: jcb
     platform: smtp
@@ -39,27 +39,19 @@
     encryption: starttls
     username: !secret gmail_email
     password: !secret gmail_pass
+    sender_name: Duc Su    
     recipient:
       - !secret recipient_3
-    sender_name: Duc Su
-
-
-
 
   - name: "Agent Desktop"
     platform: hass_agent_notifier
     resource: http://192.168.1.111:5115/notify
 
-########### DELETE WHEN AGENT READY
-  - name: desktop   
-    platform: command_line
-    command: "cat | nc -u 192.168.1.111 514"
-
 
 #########################################################
-#                                                                                                              #
-#             Social Media                                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             Social Media                                                                                 
+#                                                                                                              
 #########################################################
 
   - name: notify-events # viber
@@ -69,10 +61,20 @@
     platform: telegram
     chat_id: !secret telegram_chatid 
 
+
 #########################################################
-#                                                                                                              #
-#             Misc                                                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             Notification for TTS Service                                                                                 
+#                                                                                                              
+#########################################################
+
+
+
+
+#########################################################
+#                                                                                                              
+#             Misc                                                                                          
+#                                                                                                              
 #########################################################
 
   - name: energy_log
@@ -87,7 +89,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

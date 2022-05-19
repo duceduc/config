@@ -96,7 +96,7 @@
       - version_latest
 
   - platform: rest
-    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_esphome/info
+    resource: http://192.168.1.20:8123/api/hassio/addons/5c53de3b_esphome/info
     name: esphome
     value_template: '{{ value_json.data.state }}'
     scan_interval: 60

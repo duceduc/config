@@ -10,6 +10,24 @@ icon: mdi:gauge-full
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
   - type: entities
+    title: Living Room Air Quality
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.ikea_pm25_temperature
+      detail: 3
+    entities:
+      - entity: sensor.ikea_pm25
+        name: Air Quality
+      - entity: sensor.carbon_dioxide
+        name: Carbon Dioxide
+      - entity: sensor.carbon_monoxide
+        name: Carbon Monoxide
+      - type: divider
+      - entity: sensor.ikea_pm25_temperature
+        name: PM25 Temperature
+
+  - type: entities
     title: Power Monitor
     show_header_toggle: false
     footer:
@@ -32,42 +50,23 @@ cards:
         icon: mdi:lightning-bolt
 
   - type: entities
-    title: Living Room Air Quality
-    show_header_toggle: false
-    footer:
-      type: graph
-      entity: sensor.ikea_pm25_temperature
-      detail: 3
-    entities:
-      - entity: sensor.ikea_pm25
-        name: Air Quality
-      - entity: sensor.carbon_dioxide
-        name: Carbon Dioxide
-      - entity: sensor.carbon_monoxide
-        name: Carbon Monoxide
-      - type: divider
-      - entity: sensor.ikea_pm25_temperature
-        name: PM25 Temperature
-
-  - type: entities
     title: Washer Machine
     show_header_toggle: false
     footer:
       type: graph
-      entity: sensor.shelly_washer_power
+      entity: sensor.gosund_washer_power
       detail: 3
     entities:
-      - entity: sensor.shelly_washer_state
+      - entity: sensor.gosund_washer_state
         icon: mdi:washing-machine-alert
-#        icon: mdi:picture-in-picture-top-right
-      - entity: input_select.shelly_washer_state
+      - entity: input_select.gosund_washer_state
         name: Washer Stage
         icon: mdi:washing-machine
       - entity: sensor.energy_washer_power_monthly
         name: Monthly Total Power
         icon: mdi:gauge
       - type: divider
-      - entity: sensor.shelly_washer_power
+      - entity: sensor.gosund_washer_power
         name: Current Power
         icon: mdi:lightning-bolt
 
@@ -127,7 +126,7 @@ cards:
             padding: 0
             type: 'custom:fold-entity-row'
           - entities:
-              - entity: sensor.energy_washer_daily_power
+              - entity: sensor.gosund_washer_daily_energy
                 name: Washing Machine
 
             head:

@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                      Switchbot ESP32 Offline                                              #
-#                                                                                                    #
+#                                                                                                    
+#                      Switchbot ESP32 Offline                                              
+#                                                                                                    
 ####################################################
 # c289d47408fd -T
 # c5c6df9448bc - CR Left *
@@ -13,72 +13,83 @@
 # fab6527b504e - 24 Fan [Battery replaced on 11/15/2021]
 # c9f9186ca30d - hdmi selector
 
-  - platform: mqtt
-    name: 'Switchbot Devices Offline'
-    state_topic: 'switchbotmqtt/esp32/lastwill'
-    value_template: '{{ value }}'
-    icon: mdi:server-network-off
+# CURRENTLY USING
+#  - platform: mqtt
+#    name: 'Switchbot Devices Offline'
+#    state_topic: 'switchbotmqtt/esp32/lastwill'
+#    value_template: '{{ value }}'
+#    icon: mdi:server-network-off
 
 ####################################################
-#                                                                                                    #
-#                      Switchbot Curtain Batteries Average                              #
-#                                                                                                    #
+#                                                                                                    
+#                      Switchbot Curtain Batteries Average                              
+#                                                                                                    
 ####################################################
 
+# CURRENTLY USING
 # Combined Average Battery
-  - platform: template
-    sensors:
-      cr_curtain_batteries:
-        friendly_name: "CR Curtain Batteries"
-        unit_of_measurement: '%'
-        device_class: battery
-        value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int(0) + states('sensor.cr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
+#  - platform: template
+#    sensors:
+#      cr_curtain_batteries:
+#        friendly_name: "CR Curtain Batteries"
+#        unit_of_measurement: '%'
+#        device_class: battery
+#        value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int(0) + states('sensor.cr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
 
+
+
+# CURRENTLY USING
 # Combined Average Battery
-  - platform: template
-    sensors:
-      lr_curtain_batteries:
-        friendly_name: "LR Curtain Batteries"
-        unit_of_measurement: '%'
-        device_class: battery
-        value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int(0) + states('sensor.lr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
+#  - platform: template
+#    sensors:
+#      lr_curtain_batteries:
+#        friendly_name: "LR Curtain Batteries"
+#        unit_of_measurement: '%'
+#        device_class: battery
+#        value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int(0) + states('sensor.lr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
+
+
 
 ####################################################
-#                                                                                                    #
-#                      Switchbot Combined Front Curtains                               #
-#                                                                                                    #
+#                                                                                                    
+#                      Switchbot Combined Front Curtains                               
+#                                                                                                    
 ####################################################
 #{% if is_state('cover.computer_room_curtains', 'open') %}
 #{% elif is_state('cover.living_room_curtains', 'open') %}
 
-  - platform: template
-    sensors:
-      fr_curtains:
-        value_template: >-        
-          {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
-            open
-          {% elif is_state('cover.lr_curtain_lt_curtain', 'open') %}
-            open
-          {% else %}
-            closed
-          {% endif %}
+# CURRENTLY USING
+#  - platform: template
+#    sensors:
+#      fr_curtains:
+#        value_template: >-        
+#          {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
+#            open
+#          {% elif is_state('cover.lr_curtain_lt_curtain', 'open') %}
+#            open
+#          {% else %}
+#            closed
+#          {% endif %}
+
 
 ####################################################
-#                                                                                                    #
-#                      Switchbot Contact Sensor                                           #
-#                                                                                                    #
+#                                                                                                    
+#                      Switchbot Contact Sensor                                           
+#                                                                                                    
 ####################################################
 
-  - platform: template
-    sensors:
-      genkan_doorlock:
-        value_template: >-
-         {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}Locked{% else %}Unlocked{% endif %}
-        icon_template: >-
-         {% if is_state("sensor.genkan_doorlock_contact", "CLOSED") %}mdi:door-open{% else %}mdi:door-closed-lock{% endif %}
+# CURRENTLY USING
+#  - platform: template
+#    sensors:
+#      genkan_doorlock:
+#        value_template: >-
+#         {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}Locked{% else %}Unlocked{% endif %}
+#        icon_template: >-
+#         {% if is_state("sensor.genkan_doorlock_contact", "CLOSED") %}mdi:door-open{% else %}mdi:door-closed-lock{% endif %}
+
 
 ####################################################
-#                                                                                                    #
-#            END OF CONFIGURATION FILE                                                 #
-#                                                                                                    #
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
 ####################################################

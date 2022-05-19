@@ -1,13 +1,17 @@
 #########################################################
-#                                                                                                               #
-#             Main Configuration Settings                                                              #
-#                                                                                                               #
+#                                                                                                               
+#             Main Configuration Settings                                                              
+#                                                                                                               
 #########################################################
 
 default_config:
 python_script:
 momentary:
 wake_on_lan:
+
+google:
+  client_id: !secret google_calendarE_id
+  client_secret: !secret google_calendarE_secret
 
 tts:
   - platform: google_translate
@@ -17,6 +21,7 @@ tts:
 notify_events:
   token: !secret notify_token
 
+zone: !include zones.yaml
 group: !include groups.yaml
 scene: !include scenes.yaml
 timer: !include timers.yaml
@@ -50,7 +55,7 @@ homeassistant:
   time_zone: Asia/Tokyo
   internal_url: !secret internal_url
   customize: !include customize.yaml
-  packages: !include_dir_named integrations
+  packages: !include_dir_named packages
   allowlist_external_dirs:
     - '/config'
 
@@ -62,7 +67,7 @@ http:
 
 recorder:
   db_url: !secret MySQL_login
-  purge_keep_days: 31
+  purge_keep_days: 29
   commit_interval: 10
   exclude:
     domains:
@@ -76,16 +81,11 @@ recorder:
      - sun.sun
      - sensor.date_time
 
-#hacs:
-#  token: !secret HACS_github
-#  appdaemon: true
-#  sidepanel_icon: mdi:alpha-c-box
-
 
 #########################################################
-#                                                                                                              #
-#             Device Tracker                                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Device Tracker                                                                             
+#                                                                                                              
 #########################################################
 
 person:
@@ -96,21 +96,13 @@ person:
   - name: Eri
     id: eri1118
     device_trackers:
-     - device_tracker.eri    
      - device_tracker.ie
 
-homekit:
-  name: Home-Assistant
-  filter:
-    include_entities:
-     - input_boolean.duc_home
-     - input_boolean.eri_home
-     - input_boolean.shion_home
 
 #########################################################
-#                                                                                                              #
-#             Sensor Integrations                                                                       #
-#                                                                                                              #
+#                                                                                                              
+#             Sensor Integrations                                                                       
+#                                                                                                              
 #########################################################
 
 rest:
@@ -141,20 +133,60 @@ rest:
         unit_of_measurement: '%'
         device_class: humidity
 
+# Tomorrowio Pollen Count
+  - resource: !secret tomorrowio_pollen_api
+    scan_interval: 600
+    sensor:
+    ### Pollen - Tree Index
+      - name: "Pollen - Tree Index - Day 0"
+        value_template: "{{ value_json.data.timelines[0].intervals[0]['values']['treeIndex'] }}"
+        json_attributes_path: "$.data.timelines[0].intervals[0].values"
+        json_attributes:
+        - grassIndex
+        - weedIndex
+        - temperature
+      - name: "Pollen - Tree Index - Day 1"
+        value_template: "{{ value_json.data.timelines[0].intervals[1]['values']['treeIndex'] }}"
+        json_attributes_path: "$.data.timelines[0].intervals[1].values"
+        json_attributes:
+        - grassIndex
+        - weedIndex
+        - temperature     
+      - name: "Pollen - Tree Index - Day 2"
+        value_template: "{{ value_json.data.timelines[0].intervals[2]['values']['treeIndex'] }}"
+        json_attributes_path: "$.data.timelines[0].intervals[2].values"
+        json_attributes:
+        - grassIndex
+        - weedIndex
+        - temperature
+      - name: "Pollen - Tree Index - Day 3"
+        value_template: "{{ value_json.data.timelines[0].intervals[3]['values']['treeIndex'] }}"
+        json_attributes_path: "$.data.timelines[0].intervals[3].values"
+        json_attributes:
+        - grassIndex
+        - weedIndex
+        - temperature
+      - name: "Pollen - Tree Index - Day 4"
+        value_template: "{{ value_json.data.timelines[0].intervals[4]['values']['treeIndex'] }}"
+        json_attributes_path: "$.data.timelines[0].intervals[4].values"
+        json_attributes:
+        - grassIndex
+        - weedIndex
+        - temperature
 
 #########################################################
-#                                                                                                              #
-#             Integration                                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#             Integration                                                                                  
+#                                                                                                              
 #########################################################
 
-alarm_control_panel:
-  - platform: manual
-    name: Home Alarm
-    code: !secret alarm_code
-    arming_time: 30
-    delay_time: 30
-    trigger_time: 1
+#alarm_control_panel:
+#  - platform: manual
+#    name: Home Alarm
+#    code: !secret alarm_code
+#    arming_time: 30
+#    delay_time: 30
+#    trigger_time: 1
 
 alexa_media:
   accounts:
@@ -188,17 +220,19 @@ counter:
     restore: true
     icon: mdi:spray
 # humidifier
-  humidifier_toggle:
-    initial: 0
-    step: 1
-#Anniversary
-  anniversary_wedding_years:
-    step: 1
-  
+#  humidifier_toggle:
+#    initial: 0
+#    step: 1
+
 input_text:
   slack_app_verification_token:
     initial: !secret slack_app_verification_token
     mode: password
+
+  room_presence:
+    name: Room Presence
+  
+
 
   alexa_actionable_notification:
     name: Alexa Actionable Notification Holder
@@ -286,13 +320,14 @@ rest_command:
       }
 
 ### Switchbot API Command
-  switchbot_device_command:
-    url: "https://api.switch-bot.com/v1.0/devices/{{ deviceId }}/commands"
-    method: post
-    content_type: "application/json"
-    headers:
-      Authorization: !secret switchbot_api
-    payload: '{ "command": "{{ command }}", "parameter": "{{ parameter }}" }' 
+#  switchbot_device_command:
+#    url: "https://api.switch-bot.com/v1.0/devices/{{ deviceId }}/commands"
+#    method: post
+#    content_type: "application/json"
+#    headers:
+#      Authorization: !secret switchbot_api
+#    payload: '{ "command": "{{ command }}", "parameter": "{{ parameter }}" }' 
+
 
 
 #########################################################
@@ -316,15 +351,15 @@ panel_custom:
     sidebar_icon: mdi:server
     module_url: /local/custom_ui/panel-redirect.js
     config:
-      target: /config/server_control
+      target: /developer-tools/yaml
 
   - name: panel-redirect
-    url_path: redirect-supervisor
-    sidebar_title: Supervisor
+    url_path: redirect-system
+    sidebar_title: System
     sidebar_icon: mdi:home-assistant
     module_url: /local/custom_ui/panel-redirect.js
     config:
-      target: /hassio/dashboard
+      target: /config/system
 
 
 #########################################################

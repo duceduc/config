@@ -5,19 +5,19 @@
 #########################################################
 
 ##### node.js switchbot bot tpl
-  enable_bot_tpl:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ repeat.index % 10 == 0 }}"
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-          sequence:
-            - service: shell_command.{{ bot }}
-            - delay: 1
+#  enable_bot_tpl:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ repeat.index % 10 == 0 }}"
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#          sequence:
+#            - service: shell_command.{{ bot }}
+#            - delay: 1
 
 #########################################################
 #                                                                                                              
@@ -26,37 +26,39 @@
 #########################################################
 
 #### nod.js TPL #######
-  enable_cr_curtain_tpl:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ repeat.index % 10 == 0 }}"
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-          sequence:
-            - service: shell_command.computer_room_curtains_{{ modus }}
-              data_template:
-                position: "{{ position }}"
-            - delay: 1
+#  enable_cr_curtain_tpl:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ repeat.index % 10 == 0 }}"
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#          sequence:
+#            - service: shell_command.computer_room_curtains_{{ modus }}
+#              data_template:
+#                position: "{{ position }}"
+#            - delay: 1
+#
+#  enable_lr_curtain_tpl:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ repeat.index % 10 == 0 }}"
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#          sequence:
+#            - service: shell_command.living_room_curtains_{{ modus }}
+#              data_template:
+#                position: "{{ position }}"
+#            - delay: 1
 
-  enable_lr_curtain_tpl:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ repeat.index % 10 == 0 }}"
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-          sequence:
-            - service: shell_command.living_room_curtains_{{ modus }}
-              data_template:
-                position: "{{ position }}"
-            - delay: 1
+
 
 #########################################################
 #                                                                                                              
@@ -64,28 +66,31 @@
 #                                                                                                              
 #########################################################
 
-  fr_curtains:
-    sequence:
-      - service: "cover.{{ modus }}_cover"
-        target:
-          entity_id:
-          - cover.cr_curtain_lt_curtain
-          - cover.lr_curtain_lt_curtain
-#          - cover.living_room_curtains
-#          - cover.computer_room_curtains
+# CURRENTLY USING
+#  fr_curtains:
+#    sequence:
+#      - service: "cover.{{ modus }}_cover"
+#        target:
+#          entity_id:
+#          - cover.cr_curtain_lt_curtain
+#          - cover.lr_curtain_lt_curtain
+##          - cover.living_room_curtains
+##          - cover.computer_room_curtains
+#
+#  fr_curtains_position:
+#    sequence:
+#      - service: cover.set_cover_position
+#        target:
+#          entity_id:
+#          - cover.cr_curtain_lt_curtain
+#          - cover.lr_curtain_lt_curtain
+##          - cover.living_room_curtains
+##          - cover.computer_room_curtains
+#
+#        data:
+#          position: "{{ position }}"
 
-  fr_curtains_position:
-    sequence:
-      - service: cover.set_cover_position
-        target:
-          entity_id:
-          - cover.cr_curtain_lt_curtain
-          - cover.lr_curtain_lt_curtain
-#          - cover.living_room_curtains
-#          - cover.computer_room_curtains
 
-        data:
-          position: "{{ position }}"
 
 #########################################################
 #                                                                                                              
@@ -93,73 +98,75 @@
 #                                                                                                              
 #########################################################
 
-  lr_curtain_toggle:
-    sequence:
-      - service: script.lr_curtain_toggle_active
-        data:
-          entity: switch.living_room_curtains
-
-  lr_curtain_toggle_active:
-    sequence:
-      - service_template: script.lr_curtain_toggle_active_{{ 'on' if is_state('cover.living_room_curtains', 'closed') else 'off' }}           
-        data_template:
-          entity: '{{ entity }}'
-
-  lr_curtain_toggle_active_on:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-                - condition: template
-                  value_template: "{{ repeat.index % 5 == 0 }}"
-          sequence:
-            - service: switch.turn_on
-              data:
-                entity_id: '{{ entity }}'
-
-  lr_curtain_toggle_active_off:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-                - condition: template
-                  value_template: "{{ repeat.index % 5 == 0 }}"
-          sequence:
-            - service: switch.turn_off
-              data:
-                entity_id: '{{ entity }}'
+#  lr_curtain_toggle:
+#    sequence:
+#      - service: script.lr_curtain_toggle_active
+#        data:
+#          entity: switch.living_room_curtains
+#
+#  lr_curtain_toggle_active:
+#    sequence:
+#      - service_template: script.lr_curtain_toggle_active_{{ 'on' if is_state('cover.living_room_curtains', 'closed') else 'off' }}           
+#        data_template:
+#          entity: '{{ entity }}'
+#
+#  lr_curtain_toggle_active_on:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#                - condition: template
+#                  value_template: "{{ repeat.index % 5 == 0 }}"
+#          sequence:
+#            - service: switch.turn_on
+#              data:
+#                entity_id: '{{ entity }}'
+#
+#  lr_curtain_toggle_active_off:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#                - condition: template
+#                  value_template: "{{ repeat.index % 5 == 0 }}"
+#          sequence:
+#            - service: switch.turn_off
+#              data:
+#                entity_id: '{{ entity }}'
 
 
 #############MQTT#############
-  lr_curtains_toggle:
-    sequence:
-      - service: script.lr_curtains_toggle_mode
-        data:
-          entity: cover.lr_curtain_lt_curtain
 
-  lr_curtains_toggle_mode:
-    sequence:
-      - service_template: script.lr_curtains_toggle_mode_{{ 'on' if is_state('cover.lr_curtain_lt_curtain', 'closed') else 'off' }}           
-        data_template:
-          entity: '{{ entity }}'
-
-  lr_curtains_toggle_mode_on:
-    sequence:
-      - service: cover.open_cover
-        target:
-          entity_id: '{{ entity }}'
-
-  lr_curtains_toggle_mode_off:
-    sequence:
-      - service: cover.close_cover
-        target:
-          entity_id: '{{ entity }}'
+# CURRENTLY USING
+#  lr_curtains_toggle:
+#    sequence:
+#      - service: script.lr_curtains_toggle_mode
+#        data:
+#          entity: cover.lr_curtain_lt_curtain
+#
+#  lr_curtains_toggle_mode:
+#    sequence:
+#      - service_template: script.lr_curtains_toggle_mode_{{ 'on' if is_state('cover.lr_curtain_lt_curtain', 'closed') else 'off' }}           
+#        data_template:
+#          entity: '{{ entity }}'
+#
+#  lr_curtains_toggle_mode_on:
+#    sequence:
+#      - service: cover.open_cover
+#        target:
+#          entity_id: '{{ entity }}'
+#
+#  lr_curtains_toggle_mode_off:
+#    sequence:
+#      - service: cover.close_cover
+#        target:
+#          entity_id: '{{ entity }}'
 
 
 
@@ -170,74 +177,77 @@
 #                                                                                                              
 #########################################################
 
-  cr_curtain_toggle:
-    sequence:
-      - service: script.cr_curtain_toggle_mode
-        data:
-          entity: switch.computer_room_curtains
+#  cr_curtain_toggle:
+#    sequence:
+#      - service: script.cr_curtain_toggle_mode
+#        data:
+#          entity: switch.computer_room_curtains
+#
+#  cr_curtain_toggle_mode:
+#    sequence:
+#      - service_template: script.cr_curtain_toggle_mode_{{ 'on' if is_state('cover.computer_room_curtains', 'closed') else 'off' }}           
+#        data_template:
+#          entity: '{{ entity }}'
+#
+#  cr_curtain_toggle_mode_on:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#                - condition: template
+#                  value_template: "{{ repeat.index % 5 == 0 }}"
+#          sequence:
+#            - service: homeassistant.turn_on
+#              data:
+#                entity_id: '{{ entity }}'
+#
+#  cr_curtain_toggle_mode_off:
+#    sequence:
+#      - repeat:
+#          until:
+#            - condition: or
+#              conditions:
+#                - condition: template
+#                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
+#                - condition: template
+#                  value_template: "{{ repeat.index % 5 == 0 }}"
+#          sequence:
+#            - service: homeassistant.turn_off
+#              data:
+#                entity_id: '{{ entity }}'
 
-  cr_curtain_toggle_mode:
-    sequence:
-      - service_template: script.cr_curtain_toggle_mode_{{ 'on' if is_state('cover.computer_room_curtains', 'closed') else 'off' }}           
-        data_template:
-          entity: '{{ entity }}'
-
-  cr_curtain_toggle_mode_on:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-                - condition: template
-                  value_template: "{{ repeat.index % 5 == 0 }}"
-          sequence:
-            - service: homeassistant.turn_on
-              data:
-                entity_id: '{{ entity }}'
-
-  cr_curtain_toggle_mode_off:
-    sequence:
-      - repeat:
-          until:
-            - condition: or
-              conditions:
-                - condition: template
-                  value_template: "{{ is_state('sensor.switchbot_status', 'ok') }}"
-                - condition: template
-                  value_template: "{{ repeat.index % 5 == 0 }}"
-          sequence:
-            - service: homeassistant.turn_off
-              data:
-                entity_id: '{{ entity }}'
 
 
 
 #############MQTT#############
-  cr_curtains_toggle:
-    sequence:
-      - service: script.cr_curtains_toggle_mode
-        data:
-          entity: cover.cr_curtain_lt_curtain
-
-  cr_curtains_toggle_mode:
-    sequence:
-      - service_template: script.cr_curtains_toggle_mode_{{ 'on' if is_state('cover.cr_curtain_lt_curtain', 'closed') else 'off' }}           
-        data_template:
-          entity: '{{ entity }}'
-
-  cr_curtains_toggle_mode_on:
-    sequence:
-      - service: cover.open_cover
-        target:
-          entity_id: '{{ entity }}'
-
-  cr_curtains_toggle_mode_off:
-    sequence:
-      - service: cover.close_cover
-        target:
-          entity_id: '{{ entity }}'
+# CURRENTLY USING
+#  cr_curtains_toggle:
+#    sequence:
+#      - service: script.cr_curtains_toggle_mode
+#        data:
+#          entity: cover.cr_curtain_lt_curtain
+#
+#  cr_curtains_toggle_mode:
+#    sequence:
+#      - service_template: script.cr_curtains_toggle_mode_{{ 'on' if is_state('cover.cr_curtain_lt_curtain', 'closed') else 'off' }}           
+#        data_template:
+#          entity: '{{ entity }}'
+#
+#  cr_curtains_toggle_mode_on:
+#    sequence:
+#      - service: cover.open_cover
+#        target:
+#          entity_id: '{{ entity }}'
+#
+#  cr_curtains_toggle_mode_off:
+#    sequence:
+#      - service: cover.close_cover
+#        target:
+#          entity_id: '{{ entity }}'
+          
 
 #########################################################
 #                                                                                                              
@@ -245,15 +255,16 @@
 #                                                                                                              
 #########################################################
 
-  holdpress_bot:
-    sequence:
-      - service: mqtt.publish
-        data:
-#          topic: 'switchbotmqtt/bot/{{ bot }}/set'
-#          payload: "{{ press }}"
-#          topic: 'switchbotmqtt/esp32/setHold'
-          topic: 'switchbotmqtt/esp32/holdPress'
-          payload: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
+# CURRENTLY USING
+#  holdpress_bot:
+#    sequence:
+#      - service: mqtt.publish
+#        data:
+##          topic: 'switchbotmqtt/bot/{{ bot }}/set'
+##          payload: "{{ press }}"
+##          topic: 'switchbotmqtt/esp32/setHold'
+#          topic: 'switchbotmqtt/esp32/holdPress'
+#          payload: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
 
 
 #########################################################
@@ -262,127 +273,128 @@
 #                                                                                                              
 #########################################################
 
-  humidifier_low:
-    sequence:
-      - service: rest_command.switchbot_device_command
-        data:
-          deviceId: !secret switchbot_wohumi_id
-          command: 'setMode'
-          parameter: 101
-      - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.configure
-        target:
-          entity_id: counter.humidifier_toggle
-        data:
-          value: 2
-        
-  humidifier_med:
-    sequence:
-      - service: rest_command.switchbot_device_command
-        data:
-          deviceId: !secret switchbot_wohumi_id
-          command: 'setMode'
-          parameter: 102
-      - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.configure
-        target:
-          entity_id: counter.humidifier_toggle
-        data:
-          value: 3
-
-  humidifier_high:
-    sequence:
-      - service: rest_command.switchbot_device_command
-        data:
-          deviceId: !secret switchbot_wohumi_id
-          command: 'setMode'
-          parameter: 103
-      - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.reset
-        target:
-          entity_id: counter.humidifier_toggle
-
-  humidifier_auto:
-    sequence:
-      - service: rest_command.switchbot_device_command
-        data:
-          deviceId: !secret switchbot_wohumi_id
-          command: 'setMode'
-          parameter: auto
-      - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.configure
-        target:
-          entity_id: counter.humidifier_toggle
-        data:
-          value: 1
-          
-  humidifier_off:
-    sequence:
-      - service: rest_command.switchbot_device_command
-        data:
-          deviceId: !secret switchbot_wohumi_id
-          command: 'turnOff'
-          parameter: default
-      - service: input_boolean.turn_off
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.reset
-        target:
-          entity_id: counter.humidifier_toggle
-
-  humidifier_mode:
-    sequence:
-      choose:
-        - conditions: "{{ is_state('counter.humidifier_toggle', '1') }}"
-          sequence:
-            - service: input_select.select_option
-              data_template:
-                entity_id: input_select.sb_humidifier_mode
-                option: Low
-            - service: counter.increment
-              target:
-                entity_id: counter.humidifier_toggle
-   
-                
-        - conditions: "{{ is_state('counter.humidifier_toggle', '2') }}"
-          sequence:
-            - service: input_select.select_option
-              data_template:
-                entity_id: input_select.sb_humidifier_mode
-                option: Med
-            - service: counter.increment
-              target:
-                entity_id: counter.humidifier_toggle
-                
-        - conditions: "{{ is_state('counter.humidifier_toggle', '3') }}"
-          sequence:
-            - service: input_select.select_option
-              data_template:
-                entity_id: input_select.sb_humidifier_mode
-                option: High
-            - service: counter.reset
-              target:
-                entity_id: counter.humidifier_toggle
-                
-      default:                
-        - service: input_select.select_option
-          data_template:
-            entity_id: input_select.sb_humidifier_mode
-            option: Auto
-        - service: counter.increment
-          target:
-            entity_id: counter.humidifier_toggle
-
-  lrh_humidity_intensity_set:
-    sequence:
-      - service: rest_command.switchbot_device_command
-        data:
-          deviceId: !secret switchbot_wohumi_id
-          command: 'setMode'
-          parameter: "{{ states('input_number.lrh_humidity_intensity_set') }}"
+# CURRENTLY USING
+#  humidifier_low:
+#    sequence:
+#      - service: rest_command.switchbot_device_command
+#        data:
+#          deviceId: !secret switchbot_wohumi_id
+#          command: 'setMode'
+#          parameter: 101
+#      - service: input_boolean.turn_on
+#        entity_id: input_boolean.sb_humidifier          
+#      - service: counter.configure
+#        target:
+#          entity_id: counter.humidifier_toggle
+#        data:
+#          value: 2
+#        
+#  humidifier_med:
+#    sequence:
+#      - service: rest_command.switchbot_device_command
+#        data:
+#          deviceId: !secret switchbot_wohumi_id
+#          command: 'setMode'
+#          parameter: 102
+#      - service: input_boolean.turn_on
+#        entity_id: input_boolean.sb_humidifier          
+#      - service: counter.configure
+#        target:
+#          entity_id: counter.humidifier_toggle
+#        data:
+#          value: 3
+#
+#  humidifier_high:
+#    sequence:
+#      - service: rest_command.switchbot_device_command
+#        data:
+#          deviceId: !secret switchbot_wohumi_id
+#          command: 'setMode'
+#          parameter: 103
+#      - service: input_boolean.turn_on
+#        entity_id: input_boolean.sb_humidifier          
+#      - service: counter.reset
+#        target:
+#          entity_id: counter.humidifier_toggle
+#
+#  humidifier_auto:
+#    sequence:
+#      - service: rest_command.switchbot_device_command
+#        data:
+#          deviceId: !secret switchbot_wohumi_id
+#          command: 'setMode'
+#          parameter: auto
+#      - service: input_boolean.turn_on
+#        entity_id: input_boolean.sb_humidifier          
+#      - service: counter.configure
+#        target:
+#          entity_id: counter.humidifier_toggle
+#        data:
+#          value: 1
+#          
+#  humidifier_off:
+#    sequence:
+#      - service: rest_command.switchbot_device_command
+#        data:
+#          deviceId: !secret switchbot_wohumi_id
+#          command: 'turnOff'
+#          parameter: default
+#      - service: input_boolean.turn_off
+#        entity_id: input_boolean.sb_humidifier          
+#      - service: counter.reset
+#        target:
+#          entity_id: counter.humidifier_toggle
+#
+#  humidifier_mode:
+#    sequence:
+#      choose:
+#        - conditions: "{{ is_state('counter.humidifier_toggle', '1') }}"
+#          sequence:
+#            - service: input_select.select_option
+#              data_template:
+#                entity_id: input_select.sb_humidifier_mode
+#                option: Low
+#            - service: counter.increment
+#              target:
+#                entity_id: counter.humidifier_toggle
+#   
+#                
+#        - conditions: "{{ is_state('counter.humidifier_toggle', '2') }}"
+#          sequence:
+#            - service: input_select.select_option
+#              data_template:
+#                entity_id: input_select.sb_humidifier_mode
+#                option: Med
+#            - service: counter.increment
+#              target:
+#                entity_id: counter.humidifier_toggle
+#                
+#        - conditions: "{{ is_state('counter.humidifier_toggle', '3') }}"
+#          sequence:
+#            - service: input_select.select_option
+#              data_template:
+#                entity_id: input_select.sb_humidifier_mode
+#                option: High
+#            - service: counter.reset
+#              target:
+#                entity_id: counter.humidifier_toggle
+#                
+#      default:                
+#        - service: input_select.select_option
+#          data_template:
+#            entity_id: input_select.sb_humidifier_mode
+#            option: Auto
+#        - service: counter.increment
+#          target:
+#            entity_id: counter.humidifier_toggle
+#
+#  lrh_humidity_intensity_set:
+#    sequence:
+#      - service: rest_command.switchbot_device_command
+#        data:
+#          deviceId: !secret switchbot_wohumi_id
+#          command: 'setMode'
+#          parameter: "{{ states('input_number.lrh_humidity_intensity_set') }}"
 
 
 #########################################################

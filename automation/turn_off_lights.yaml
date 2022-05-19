@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Turn Off Lights If Left On                                                                #
-#                                                                                                              #
+#                                                                                                              
+#             Turn Off Lights If Left On                                                                
+#                                                                                                              
 #########################################################
 
 
@@ -48,9 +48,9 @@
       entity_id: light.storage_room
 
 #########################################################
-#                                                                                                              #
-#             Lights out before leaving                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Lights out before leaving                                                             
+#                                                                                                              
 #########################################################
 
 - alias: 'Lights out Before leaving'
@@ -62,7 +62,7 @@
     - service: script.lights_out
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

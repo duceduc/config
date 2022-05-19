@@ -1,45 +1,42 @@
 #########################################################
-#                                                                                                              #
-#            PRESENCE DETECTION [GEO/BLE]                                                      #
-#                                                                                                              #
+#                                                                                                              
+#            PRESENCE DETECTION [GEO/BLE]                                                      
+#                                                                                                              
 #########################################################
 
-# GEO Location Detection
-  - platform: template
-    sensors:
-      duc_home:
-        friendly_name: 'Duc'
-        device_class: presence
-        value_template: >-
-          {{ is_state('input_boolean.duc_home', 'on') }}
-        icon_template: >-
-          {% if is_state('binary_sensor.duc_home','on') %} mdi:home-account
-          {% else %} mdi:home-outline
-          {% endif %}
-
+## GEO Location Detection
 #  - platform: template
 #    sensors:
-      eri_home:
-        friendly_name: 'Eri'
-        device_class: presence
-        value_template: >- 
-          {{ is_state('input_boolean.eri_home', 'on') }}
-        icon_template: >-
-          {% if is_state('binary_sensor.eri_home','on') %} mdi:home-account
-          {% else %} mdi:home-outline
-          {% endif %}
+#      duc_home:
+#        friendly_name: 'Duc'
+#        device_class: presence
+#        value_template: >-
+#          {{ is_state('input_boolean.duc_home', 'on') }}
+#        icon_template: >-
+#          {% if is_state('binary_sensor.duc_home','on') %} mdi:home-account
+#          {% else %} mdi:home-outline
+#          {% endif %}
+#
+#      eri_home:
+#        friendly_name: 'Eri'
+#        device_class: presence
+#        value_template: >- 
+#          {{ is_state('input_boolean.eri_home', 'on') }}
+#        icon_template: >-
+#          {% if is_state('binary_sensor.eri_home','on') %} mdi:home-account
+#          {% else %} mdi:home-outline
+#          {% endif %}
+#
+#      shion_home:
+#        friendly_name: 'Shion'
+#        device_class: presence
+#        value_template: >- 
+#          {{ is_state('input_boolean.shion_home', 'on') }}
+#        icon_template: >-
+#          {% if is_state('binary_sensor.shion_home','on') %} mdi:home-account
+#          {% else %} mdi:home-outline
+#          {% endif %}
 
-#  - platform: template
-#    sensors:
-      shion_home:
-        friendly_name: 'Shion'
-        device_class: presence
-        value_template: >- 
-          {{ is_state('input_boolean.shion_home', 'on') }}
-        icon_template: >-
-          {% if is_state('binary_sensor.shion_home','on') %} mdi:home-account
-          {% else %} mdi:home-outline
-          {% endif %}
 
 # Local BLE Detection [Family]
   - platform: template
@@ -101,7 +98,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

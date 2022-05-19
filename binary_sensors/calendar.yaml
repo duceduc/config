@@ -17,7 +17,7 @@
 
   - platform: tod
     name: Morning
-    after: '06:00'
+    after: '05:00'
     before: '08:30'
 
   - platform: tod
@@ -29,6 +29,11 @@
     name: Evening
     after: '17:00'
     before: '22:00'
+
+  - platform: tod
+    name: Overnight
+    after: '18:00'
+    before: '06:00'
 
   - platform: tod
     name: Quiet time

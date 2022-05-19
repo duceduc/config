@@ -1,0 +1,598 @@
+
+###############################################################################
+#   @author         :   Duc SU 
+#   @date           :   03/03/2022
+#   @package        :   Switchbot
+#   @description    :   All the Switchbot related stuff. Built from https://community.home-assistant.io/t/switchbot-bot-curtain-meter-contact-motion-mqtt-esp32-bridge-local-control/286468 AND a little of API for humidifier
+###############################################################################
+# cr window contact: battery replaced on 3/23/2022
+# lr window contact: battery replaced on 3/23/2022
+
+
+input_boolean:
+  sb_humidifier:
+    name: SB Humidifier
+    icon: mdi:air-humidifier
+  lrh_humidifier_automation_enable:
+    name: Humidifier Automation
+    icon: mdi:av-timer
+    initial: off
+
+counter:
+  humidifier_toggle:
+    initial: 0
+    step: 1
+
+input_select:
+  sb_humidifier_mode:
+    name: SB Humidifier Mode
+    icon: mdi:air-humidifier
+    options:
+      - 'Off'
+      - Auto
+      -  Low
+      - Med
+      - High
+
+input_number:
+  lrh_humidity_low_set:
+    name: Humidity Low Set Point
+    icon: mdi:thermometer
+    initial: 30
+    min: 0
+    max: 100
+    step: 1
+  lrh_humidity_high_set:
+    name: Humidity High Set Point
+    icon: mdi:thermometer
+    initial: 60
+    min: 0
+    max: 100
+    step: 1
+  lrh_humidity_intensity_set:
+    name: Humidifier Intensity
+    icon: mdi:water-plus
+    min: 34
+    max: 100
+    step: 1
+
+binary_sensor:
+  - platform: template
+    sensors:
+      genkan_doorlock:
+        friendly_name: "Front Door Lock"
+        device_class: lock
+        value_template: >-
+          {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+      washer_door:
+        friendly_name: "Washer Door"
+        device_class: door
+        value_template: >-
+          {% if states('sensor.washer_door_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+
+      computerroom_window:
+        friendly_name: "Computer Room Window"
+        device_class: window
+        value_template: >-
+          {% if states('sensor.cr_window_contact').lower() in ['closed', 'timeout'] %}off{% else %}on{% endif %}
+      livingroom_window:
+        friendly_name: "Livingroom Window"
+        device_class: window
+        value_template: >-
+          {% if states('sensor.lr_window_contact').lower() in ['closed', 'timeout'] %}off{% else %}on{% endif %}
+
+
+sensor:
+  - platform: mqtt
+    name: 'Switchbot Devices Offline'
+    state_topic: 'switchbotmqtt/esp32/lastwill'
+    value_template: '{{ value }}'
+    icon: mdi:server-network-off
+  - platform: template
+    sensors:
+      cr_curtain_batteries:
+        friendly_name: "CR Curtain Batteries"
+        unit_of_measurement: '%'
+        device_class: battery
+        value_template: "{{ ((states('sensor.cr_curtain_lt_battery')|int(0) + states('sensor.cr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
+  - platform: template
+    sensors:
+      lr_curtain_batteries:
+        friendly_name: "LR Curtain Batteries"
+        unit_of_measurement: '%'
+        device_class: battery
+        value_template: "{{ ((states('sensor.lr_curtain_lt_battery')|int(0) + states('sensor.lr_curtain_rt_battery')|int(0)) /2)|int(0) }}"
+
+  - platform: template
+    sensors:
+      fr_curtains:
+        value_template: >-        
+          {% if is_state('cover.cr_curtain_rt_curtain', 'open') or is_state('cover.lr_curtain_rt_curtain', 'open') %}
+            open
+          {% else %}
+            closed
+          {% endif %}
+
+  - platform: template
+    sensors:
+      genkan_doorlock:
+        value_template: >-
+         {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}Locked{% else %}Unlocked{% endif %}
+        icon_template: >-
+         {% if is_state("sensor.genkan_doorlock_contact", "CLOSED") %}mdi:door-open{% else %}mdi:door-closed-lock{% endif %}
+
+switch:
+  - platform: template
+    switches:
+     computer_room_curtain:
+       friendly_name: 'Computer Room Curtain'
+       value_template: >-
+         {% if states('sensor.cr_curtain_rt_position')|float(0) < 10 %}
+           on
+         {% else %}
+           off
+         {% endif %}
+       turn_on:
+         - service: cover.open_cover
+           data:
+             entity_id: cover.cr_curtain_lt_curtain
+       turn_off:
+         - service: cover.close_cover
+           data:
+             entity_id: cover.cr_curtain_lt_curtain
+       icon_template: >-
+         {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
+           mdi:blinds-open
+         {% else %}
+            mdi:blinds
+         {% endif %}
+
+  - platform: template
+    switches:
+     living_room_curtain:
+       friendly_name: 'Living Room Curtain'
+       value_template: >-
+         {% if states('sensor.lr_curtain_rt_position')|float(0) < 10 %}
+           on
+         {% else %}
+           off
+         {% endif %}
+       turn_on:
+         - service: cover.open_cover
+           data:
+             entity_id: cover.lr_curtain_lt_curtain
+       turn_off:
+         - service: cover.close_cover
+           data:
+             entity_id: cover.lr_curtain_lt_curtain
+       icon_template: >-
+         {% if is_state('cover.lr_curtain_lt_curtain', 'open') %}
+           mdi:blinds-open
+         {% else %}
+            mdi:blinds
+         {% endif %}
+
+  - platform: template
+    switches:
+      24hr_fan:
+        friendly_name: '24hr Fan'
+        value_template: "{{ states('input_boolean.washroom_fan') }}"
+        turn_on:
+          - service: script.holdpress_bot
+            data:
+              bot: '24hr_fan'
+              press: 0
+#          - service: switch.turn_on
+#            entity_id: switch.24hr_fan_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.washroom_fan
+        turn_off:
+          - service: script.holdpress_bot
+            data:
+              bot: '24hr_fan'
+              press: 3
+#          - service: switch.turn_on
+#            entity_id: switch.24hr_fan_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.washroom_fan
+        icon_template: >-
+          {% if is_state('input_boolean.washroom_fan', 'on') %}
+             mdi:fan
+          {% else %}
+             mdi:fan-off
+          {% endif %}
+
+      floor_heat:
+        friendly_name: 'Floor Heat'
+        value_template: "{{ states('input_boolean.floor_heat') }}"
+        turn_on:
+          - service: switch.turn_on
+            entity_id: switch.floor_heat_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.floor_heat
+        turn_off:
+          - service: switch.turn_on
+            entity_id: switch.floor_heat_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.floor_heat
+        icon_template: >-
+          {% if is_state('input_boolean.floor_heat', 'on') %}
+             mdi:radiator
+          {% else %}
+             mdi:radiator-off
+          {% endif %}
+
+      jcom_tv:
+        friendly_name: 'Jcom Tv'
+        value_template: "{{ states('input_boolean.jcom_tv') }}"
+        turn_on:
+          - service: switch.turn_on
+            entity_id: switch.jcom_tv_box_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.jcom_tv
+        turn_off:
+          - service: switch.turn_on
+            entity_id: switch.jcom_tv_box_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.jcom_tv
+        icon_template: >-
+          {% if is_state('input_boolean.jcom_tv', 'on') %}
+             mdi:monitor
+          {% else %}
+             mdi:monitor-off
+          {% endif %}
+
+      tv_lock:
+        friendly_name: 'Tv Lock'
+        value_template: "{{ states('input_boolean.tv_lock') }}"
+        turn_on:
+          - service: switch.turn_on
+            entity_id: switch.hdmi_selector_switch
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.tv_lock
+        turn_off:
+          - service: switch.turn_on
+            entity_id: switch.hdmi_selector_switch
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.tv_lock
+        icon_template: >-
+          {% if is_state('input_boolean.tv_lock', 'on') %}
+             mdi:monitor-lock
+          {% else %}
+             mdi:monitor
+          {% endif %}
+
+  - platform: template
+    switches:
+      sb_humidifier:
+        friendly_name: SB Humidifier
+        value_template: "{{ states('input_boolean.sb_humidifier') }}"
+        turn_on:
+          - service: input_select.select_option
+            data_template:
+              entity_id: input_select.sb_humidifier_mode
+              option: High
+          
+        turn_off:
+          - service: input_select.select_option
+            data_template:
+              entity_id: input_select.sb_humidifier_mode
+              option: 'Off'
+          
+        icon_template: >-
+          {% if is_state('input_boolean.sb_humidifier', 'on') %}
+             mdi:air-humidifier
+          {% else %}
+             mdi:air-humidifier-off
+          {% endif %}
+
+      sb_humidifier_mode:
+        friendly_name: SB Humidifier Mode
+        value_template: "{{ states('input_boolean.sb_humidifier') }}"
+        turn_on:
+          - service: script.toggle
+            entity_id: script.humidifier_mode
+        turn_off:
+          - service: script.toggle
+            entity_id: script.humidifier_mode
+        icon_template: >-
+          {% if is_state('input_boolean.sb_humidifier', 'on') %}
+             mdi:air-purifier
+          {% else %}
+             mdi:air-humidifier-off
+          {% endif %}
+
+cover:
+  - platform: template
+    covers:
+      fr_curtains:
+        friendly_name: "Front Room Curtains"
+        open_cover:
+          service: script.fr_curtains
+          data:
+            modus: "open"
+        close_cover:
+          service: script.fr_curtains
+          data:
+            modus: "close"
+        stop_cover:
+          service: script.fr_curtains
+          data:
+            modus: "stop"
+        set_cover_position:
+          service: script.fr_curtains_position
+          data:
+            position: "{{position}}"
+        value_template: "{{is_state('sensor.fr_curtains', 'open')}}"
+        icon_template: >-
+          {% if is_state('sensor.fr_curtains', 'open') %}
+            mdi:window-open
+          {% else %}
+            mdi:window-closed
+          {% endif %}
+
+script:
+  fr_curtains:
+    sequence:
+      - service: "cover.{{ modus }}_cover"
+        target:
+          entity_id:
+          - cover.cr_curtain_lt_curtain
+          - cover.lr_curtain_lt_curtain
+  fr_curtains_position:
+    sequence:
+      - service: cover.set_cover_position
+        target:
+          entity_id:
+          - cover.cr_curtain_lt_curtain
+          - cover.lr_curtain_lt_curtain
+        data:
+          position: "{{ position }}"
+
+  lr_curtains_toggle:
+    sequence:
+      - service: script.lr_curtains_toggle_mode
+        data:
+          entity: cover.lr_curtain_lt_curtain
+  lr_curtains_toggle_mode:
+    sequence:
+      - service_template: script.lr_curtains_toggle_mode_{{ 'on' if is_state('cover.lr_curtain_lt_curtain', 'closed') else 'off' }}           
+        data_template:
+          entity: '{{ entity }}'
+  lr_curtains_toggle_mode_on:
+    sequence:
+      - service: cover.open_cover
+        target:
+          entity_id: '{{ entity }}'
+  lr_curtains_toggle_mode_off:
+    sequence:
+      - service: cover.close_cover
+        target:
+          entity_id: '{{ entity }}'
+
+  cr_curtains_toggle:
+    sequence:
+      - service: script.cr_curtains_toggle_mode
+        data:
+          entity: cover.cr_curtain_lt_curtain
+  cr_curtains_toggle_mode:
+    sequence:
+      - service_template: script.cr_curtains_toggle_mode_{{ 'on' if is_state('cover.cr_curtain_lt_curtain', 'closed') else 'off' }}           
+        data_template:
+          entity: '{{ entity }}'
+  cr_curtains_toggle_mode_on:
+    sequence:
+      - service: cover.open_cover
+        target:
+          entity_id: '{{ entity }}'
+  cr_curtains_toggle_mode_off:
+    sequence:
+      - service: cover.close_cover
+        target:
+          entity_id: '{{ entity }}'
+
+  holdpress_bot:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: 'switchbotmqtt/esp32/holdPress'
+          payload: "{\"id\":\"{{ bot }}\", \"hold\":\"{{ press }}\"}"
+
+  humidifier_low:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: 101
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.configure
+        target:
+          entity_id: counter.humidifier_toggle
+        data:
+          value: 2
+        
+  humidifier_med:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: 102
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.configure
+        target:
+          entity_id: counter.humidifier_toggle
+        data:
+          value: 3
+
+  humidifier_high:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: 103
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.reset
+        target:
+          entity_id: counter.humidifier_toggle
+
+  humidifier_auto:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: auto
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.configure
+        target:
+          entity_id: counter.humidifier_toggle
+        data:
+          value: 1
+          
+  humidifier_off:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'turnOff'
+          parameter: default
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.sb_humidifier          
+      - service: counter.reset
+        target:
+          entity_id: counter.humidifier_toggle
+
+  humidifier_mode:
+    sequence:
+      choose:
+        - conditions: "{{ is_state('counter.humidifier_toggle', '1') }}"
+          sequence:
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sb_humidifier_mode
+                option: Low
+            - service: counter.increment
+              target:
+                entity_id: counter.humidifier_toggle
+        - conditions: "{{ is_state('counter.humidifier_toggle', '2') }}"
+          sequence:
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sb_humidifier_mode
+                option: Med
+            - service: counter.increment
+              target:
+                entity_id: counter.humidifier_toggle
+        - conditions: "{{ is_state('counter.humidifier_toggle', '3') }}"
+          sequence:
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sb_humidifier_mode
+                option: High
+            - service: counter.reset
+              target:
+                entity_id: counter.humidifier_toggle  
+      default:                
+        - service: input_select.select_option
+          data_template:
+            entity_id: input_select.sb_humidifier_mode
+            option: Auto
+        - service: counter.increment
+          target:
+            entity_id: counter.humidifier_toggle
+
+  lrh_humidity_intensity_set:
+    sequence:
+      - service: rest_command.switchbot_device_command
+        data:
+          deviceId: !secret switchbot_wohumi_id
+          command: 'setMode'
+          parameter: "{{ states('input_number.lrh_humidity_intensity_set') }}"
+
+automation:
+  - alias: '24hr fan toggle on-off'
+    trigger:
+      - platform: time
+        at: '05:29:00'
+      - platform: time
+        at: '23:00:00'
+    condition:
+      - condition: template # Don't run if on vacation
+        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+    action:
+      - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:29') else 'off' }}
+        data:
+          entity_id: switch.24hr_fan
+
+  - alias: '24hr fan toggle speed'
+    trigger:
+      - platform: time
+        at: '05:29:00'
+      - platform: state
+        entity_id: sensor.period_of_the_day
+        to: 'dusklight'
+    condition:
+      - condition: template # Don't run if on vacation
+        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+    action:
+      - delay: 60
+      - service: script.holdpress_bot
+        data:
+          bot: '24hr_fan'
+          press: 0
+
+  - alias: 'Open Front Curtains at Sunrise'
+    trigger:
+      - entity_id: sensor.period_of_the_day
+        platform: state
+        to:
+         - 'dawnlight'
+         - 'daylight'
+    condition:
+      - condition: template # Someone is home
+        value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+      - condition: template # Not in Vacation
+        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+    action:
+      - service: cover.set_cover_position
+        data:
+          position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 100 {% endif %}'
+          entity_id:
+          - cover.fr_curtains
+
+  - alias: 'Close Front Curtains at Sunset'
+    trigger:
+      - entity_id: sensor.period_of_the_day
+        platform: state
+        to:
+         - 'dusklight'
+         - 'nightlight'
+    condition:
+      - condition: template 
+        value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"
+      - condition: template # Not in Vacation
+        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
+    action:
+      - service: cover.set_cover_position
+        data:
+          position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 0 {% endif %}'
+          entity_id:
+          - cover.fr_curtains
+
+rest_command:
+  switchbot_device_command:
+    url: "https://api.switch-bot.com/v1.0/devices/{{ deviceId }}/commands"
+    method: post
+    content_type: "application/json"
+    headers:
+      Authorization: !secret switchbot_api
+    payload: '{ "command": "{{ command }}", "parameter": "{{ parameter }}" }'
+    
+          

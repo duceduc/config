@@ -1,73 +1,133 @@
 #########################################################
-#                                                                                                              #
-#             Security Camera                                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Security Camera                                                                            
+#                                                                                                              
 #########################################################
 
 
-- alias: 'Security Camera Snapshot'
+#  - alias: 'Security MDF Camera Snapshot'
+#    mode: queued
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.mdf_illuminance
+#        below: 0.55
+#    action:
+#      - delay: 2
+#      - service: camera.snapshot
+#        data:
+#          entity_id: camera.security_genkan
+#          filename: '/config/www/img/security/{{ now().strftime("%Y%m%d_%H%M%S") }}security_mdf_camera.jpg'
+#      - service: shell_command.clean_security_images
+
+
+
+#########################################################
+#                                                                                                              
+#             Alarm Triggered                                                                            
+#                                                                                                              
+#########################################################
+
+#- alias: 'Trigger alarm while armed away'
+#  trigger:
+#    - platform: state
+#      entity_id:
+#       - binary_sensor.motion_lr_occupancy
+#       - binary_sensor.motion_mr_occupancy
+#       - binary_sensor.motion_sr_occupancy
+#      to: 'on'
+#  condition:
+#    - condition: template 
+#      value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"
+#  action:
+#    - service: script.alarm_light_flash
+#
+#    - service: notify.home_assistant
+#      data_template:
+#        title: "{{ trigger.to_state.attributes.friendly_name }} Alarm Triggered Notification"
+#        message: >
+#          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+#          <br>
+#          <b> Motion Alarm Triggered  </b> <br>
+#          The {{ trigger.to_state.attributes.friendly_name }} sensor has been triggered while no one is home.
+#          <br>
+#        data:
+#          images: []
+#
+#- alias: 'Return Alarm to normal when alarm Disarmed'
+#  trigger:
+#    - platform: state
+#      entity_id: alarm_control_panel.home_alarm
+#      to: "disarmed"
+#  action:
+#    - service: script.returntonormal
+#      data:
+#        entity: light.ntl_1
+#
+
+
+#########################################################
+#                                                                                                              
+#             Randomize Vacation Lights                                                                            
+#                                                                                                              
+#########################################################
+
+
+- alias: Randomize Vacation Lights
   trigger:
-    - platform: state
-      entity_id: binary_sensor.genkan_door
-      from: 'off'
-      to: 'on'
-  action:
-    - wait_template: "{{ is_state('binary_sensor.motion_security_genkan_occupancy', 'on') }}"
-      continue_on_timeout: false
-      timeout: 10
-    - delay: 1
-    - service: camera.snapshot
-      data:
-        entity_id: camera.security_genkan
-        filename: '/config/www/img/security/{{ now().strftime("%Y%m%d_%H%M%S") }}security_camera.jpg'
-    - service: shell_command.clean_security_images
-
-
-#########################################################
-#                                                                                                              #
-#             Alarm Triggered                                                                            #
-#                                                                                                              #
-#########################################################
-
-- alias: 'Trigger alarm while armed away'
-  trigger:
-    - platform: state
-      entity_id:
-       - binary_sensor.motion_lr_occupancy
-       - binary_sensor.motion_mr_occupancy
-       - binary_sensor.motion_sr_occupancy
-      to: 'on'
+  - platform: state
+    entity_id: input_boolean.randomize_vacation_lights
   condition:
-    - condition: template 
-      value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"
-  action:
-    - service: script.alarm_light_flash
-
-    - service: notify.home_assistant
-      data_template:
-        title: "{{ trigger.to_state.attributes.friendly_name }} Alarm Triggered Notification"
-        message: >
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          <b> Motion Alarm Triggered  </b> <br>
-          The {{ trigger.to_state.attributes.friendly_name }} sensor has been triggered while no one is home.
-          <br>
-        data:
-          images: []
-
-- alias: 'Return Alarm to normal when alarm Disarmed'
-  trigger:
-    - platform: state
-      entity_id: alarm_control_panel.home_alarm
-      to: "disarmed"
-  action:
-    - service: script.returntonormal
+    - condition: state
+      entity_id: input_boolean.vacation_mode
+      state: 'on'
+  action: 
+    - service_template: >
+        {% if is_state('input_boolean.randomize_vacation_lights', 'on' )%} script.turn_on {% else %}
+           script.turn_off
+        {% endif %}
+ 
       data:
-        entity: light.ntl_1
+        entity_id: script.randomize_vacation_lights   
+
+- alias: Run Vacation Lights
+  trigger:
+    - platform: sun
+      event: sunset
+      id: sundown
+    - platform: sun
+      event: sunrise
+      id: sunup
+    - platform: state
+      entity_id: input_boolean.vacation_mode
+      id: cancel
+      from: 'on'
+      to: 'off'
+  action:
+    - choose:
+      - conditions:
+        - condition: trigger
+          id: sundown
+        - condition: state
+          entity_id: input_boolean.vacation_mode
+          state: 'on'
+        sequence:
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.randomize_vacation_lights
+      - conditions:
+        - condition: or
+          conditions:
+          - condition: trigger
+            id: sunup
+          - condition: trigger
+            id: cancel
+        sequence:
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.randomize_vacation_lights
+
 
 
 #########################################################
 #                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

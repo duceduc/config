@@ -70,7 +70,7 @@
         target:
           entity_id: light.shion_room
         data:
-          brightness: '{% if states.sensor.rear_illuminance.state | float(0) >= 0.24 %} 250 {% else %} 160 {% endif %}'          
+          brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.24 %} 250 {% else %} 160 {% endif %}'          
     - conditions:
       - condition: trigger
         id: 'off'
@@ -111,7 +111,7 @@
     - service: light.turn_on
       entity_id: light.shion_room
       data:
-        brightness: '{% if states.sensor.rear_illuminance.state | float(0) >= 0.24 %} 250 {% else %} 160 {% endif %}'
+        brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.24 %} 250 {% else %} 160 {% endif %}'
 
 - alias: 'motion shion room auto-off'
   trigger:
@@ -163,6 +163,9 @@
   trigger:
     - platform: state
       entity_id: input_boolean.shionroom_mcl
+  condition:
+    - condition: template
+      value_template: "{{ is_state('input_boolean.audible_notifications', 'on') }}"          
   action:
     - service: script.speech_engine
       data: 

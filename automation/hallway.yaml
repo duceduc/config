@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Hallway Light                                                                                #
-#                                                                                                              #
+#                                                                                                              
+#             Hallway Light                                                                                
+#                                                                                                              
 #########################################################
 
 - alias: 'motion hallway auto-on'
@@ -27,10 +27,40 @@
       data:
         entity_id: light.h_2
 
+
 #########################################################
-#                                                                                                              #
-#             Turn on Genkan For Eri During Workdays                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Genkan Light & LR only at night                                                       
+#                                                                                                              
+#########################################################
+
+- alias: 'motion genkan auto-on'
+  trigger:
+   - platform: state
+     entity_id: binary_sensor.motion_g1_occupancy
+     to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id: light.h_1
+      data:
+        brightness: 200
+
+- alias: 'motion genkan auto-off'
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_g1_occupancy
+    to: 'off'
+    for: '00:01:00'
+  action:  
+  - service: light.turn_off
+    data:
+      entity_id: light.h_1
+
+
+#########################################################
+#                                                                                                              
+#             Turn on Genkan For Eri During Workdays                                            
+#                                                                                                              
 #########################################################
 
 - alias: 'turn on genkan for eri'
@@ -58,37 +88,9 @@
 #    data:
 #      entity_id: light.h_1
 
-#########################################################
-#                                                                                                              #
-#             Genkan Light & LR only at night                                                       #
-#                                                                                                              #
-#########################################################
-
-- alias: 'motion genkan auto-on'
-  trigger:
-   - platform: state
-     entity_id: binary_sensor.motion_g1_occupancy
-     to: 'on'
-  action:
-    - service: light.turn_on
-      entity_id: light.h_1
-      data:
-        brightness: 200
-
-- alias: 'motion genkan auto-off'
-  trigger:
-  - platform: state
-    entity_id: binary_sensor.motion_g1_occupancy
-    to: 'off'
-    for: '00:01:00'
-  action:  
-  - service: light.turn_off
-    data:
-      entity_id: light.h_1
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################
-

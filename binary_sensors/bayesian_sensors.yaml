@@ -8,29 +8,28 @@
     prior: 0.6
     name: Shion at School Baysn
     probability_threshold: 0.92
- #   device_class: presence
     observations:
-      - platform: 'template'
+      - platform: template
         value_template: "{{ states('sensor.period_of_the_day').lower() in ['daylight', 'dusklight'] }}"
         prob_given_true: 0.8
         prob_given_false: 0.3
 
-      - platform: 'state'
-        entity_id: 'sensor.date_weekend'
-        to_state: 'weekday'        
+      - platform: state
+        entity_id: sensor.date_weekend
+        to_state: 'weekday'
         prob_given_true: 0.8
         prob_given_false: 0.3
 
-      - platform: 'template'
-        value_template: "{{ is_state('sensor.holiday', '') or states('sensor.holiday').lower() in ['eri personal day', 'eri birthday', 'duc birthday', 'sachiko Birthday', 'summer begins', 'winter begins', 'spring begins', ' begins'] }}"
+      - platform: state
+        entity_id: calendar.holidays_in_japan
+        to_state: 'off' 
         prob_given_true: 0.8
         prob_given_false: 0.3
 
-      - platform: 'template'
-        value_template: "{{ states('sensor.holiday').lower() in ['shion school day'] }}"
+      - platform: template
+        value_template: "{{ states('sensor.school_event').lower() in ['shion school day'] }}"
         prob_given_true: 0.9
         prob_given_false: 0.3
-
 
 
 #########################################################

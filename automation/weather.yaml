@@ -1,0 +1,48 @@
+#########################################################
+#                                                                                                              
+#             Weather                                                                              
+#                                                                                                              
+#########################################################
+
+
+#  - alias: Forecast Low Near Freezing
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.wbio_overnight_low
+#        below: 1.6
+#      - platform: numeric_state
+#        entity_id: sensor.wbio_current_temperature
+#        below: 1.6
+#    condition:
+#      - condition: state
+#        entity_id: input_boolean.freeze_warning
+#        state: 'off'
+#    action:
+#      - service: input_boolean.turn_on
+#        entity_id: input_boolean.freeze_warning
+#  
+#  - alias: Forecast Low Above Freezing
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.wbio_overnight_low
+#        above: 0.5
+#    condition:
+#      - condition: state
+#        entity_id: input_boolean.freeze_warning
+#        state: 'on'
+#      - condition: numeric_state
+#        entity_id: sensor.wbio_overnight_low
+#        above: 1.6
+#    action:
+#      - service: input_boolean.turn_off
+#        entity_id: input_boolean.freeze_warning
+      
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################
+

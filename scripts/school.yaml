@@ -1,0 +1,32 @@
+#########################################################
+#                                                                                                              
+#             School                                                                               
+#                                                                                                              
+#########################################################
+
+  school_in_session:
+    sequence:
+    - condition: state
+      entity_id: input_boolean.school_in_session
+      state: 'off'
+    - service: input_boolean.turn_on
+      entity_id: input_boolen.school_in_session
+
+  school_year_over:
+    sequence:
+    - condition: state
+      entity_id: input_boolean.school_in_session
+      state: 'on'
+    - condition: template
+      value_template: >
+        {{ states('input_datetime.school_last_day') == now().strftime("%Y-%m-%d") }}
+    - service: input_boolean.turn_off
+      entity_id: input_boolen.school_in_session
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

@@ -10,17 +10,13 @@
     unit_of_measurement: "°C"
     value_template: '{{ value | multiply(0.001) | round(1) }}'
 
-  - platform: sql
-    db_url: !secret MySQL_login
-    queries:
-      - name: 'recorder_db'
-        query: 'SELECT table_schema "database", Round(Sum(data_length + index_length) / 1024 / 1024, 1) "value" FROM information_schema.tables WHERE table_schema="jnzufwmy_hassio" GROUP BY table_schema;'
-        column: 'value'
-        unit_of_measurement: MB
-
-  - platform: filesize
-    file_paths:
-      - /config/home-assistant_v2.db
+#  - platform: sql
+#    db_url: !secret MySQL_login
+#    queries:
+#      - name: 'recorder_db'
+#        query: 'SELECT table_schema "database", Round(Sum(data_length + index_length) / 1024 / 1024 / 1024, 1) "value" FROM information_schema.tables WHERE table_schema="jnzufwmy_ha" GROUP BY table_schema;'
+#        column: 'value'
+#        unit_of_measurement: GB
 
 # HA Servers
   - platform: systemmonitor
@@ -38,10 +34,17 @@
   - platform: uptime
     name: Time Online
 
-
-
-
-
+# Converted to GB using HASS.Agent Integration
+  - platform: template
+    sensors:
+      desktop_fddl8i4_storage_c_used_space_gb:
+        value_template: >-
+         {% if states('sensor.desktop_fddl8i4_storage_c_used_space')| int(0) < 1024 %}
+           {{ states('sensor.desktop_fddl8i4_storage_c_used_space') }}
+         {% else %}
+           {{ '%.1f'|format(states('sensor.desktop_fddl8i4_storage_c_used_space')|float / 1024) }}
+         {% endif %}
+        unit_of_measurement: "GB"
 
 
 ####################################################

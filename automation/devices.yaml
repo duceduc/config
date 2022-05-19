@@ -85,7 +85,7 @@
     - condition: template # Duc is home
       value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
     - condition: template # PC is not on
-      value_template: "{{ not is_state('binary_sensor.desktop_connected', 'on') }}"
+      value_template: "{{ not is_state('binary_sensor.desktop_status', 'on') }}"
   action:
     - service: script.desktop_wol
 

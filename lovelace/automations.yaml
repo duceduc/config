@@ -229,8 +229,8 @@ cards:
         title: Maintenances
         show_header_toggle: false
         entities:
-          - entity: automation.laundry_notification
-            name: Laundry Notification
+          - entity: automation.washer_notification
+            name: Washer Notification
             icon: mdi:washing-machine-alert
             secondary_info: last-triggered
           - entity: automation.clean_nozzle_filters
@@ -243,7 +243,6 @@ cards:
         show_header_toggle: false
         entities:
           - entity: input_boolean.vacation_mode
-            icon: mdi:beach
             name: Vacation
           - entity: input_boolean.guest_mode
             icon: mdi:alien
@@ -278,15 +277,11 @@ cards:
             name: Workout
             icon: mdi:weight-lifter
             secondary_info: last-triggered 
-          - entity: automation.morning_briefing_duc
-            name: Morning Briefing - Duc
+          - entity: automation.morning_briefings
+            name: Morning Briefings
             icon: mdi:notebook-edit
             secondary_info: last-triggered
-          - entity: automation.morning_briefing_eri
-            name: Morning Briefing - Eri
-            icon: mdi:notebook-edit
 
-            secondary_info: last-triggered
           - entity: automation.backup_config_github
             name: Backup Config to Github
             icon: mdi:github
@@ -316,8 +311,8 @@ cards:
             icon: mdi:hail
             secondary_info: last-triggered
 
-          - entity: automation.security_camera_snapshot
-            name: Snapshot at Genkan
+          - entity: automation.security_mdf_camera_snapshot
+            name: Snapshot at MDF
             icon: mdi:camera
             secondary_info: last-triggered
           - entity: automation.announce_who_is_arriving

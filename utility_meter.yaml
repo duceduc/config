@@ -24,14 +24,14 @@
      - night
 
   energy_washer_power_monthly:
-    source: sensor.shelly_washer_total_energy
+    source: sensor.gosund_washer_total_energy
     cycle: monthly
     offset:
       days: 2
 
-  energy_washer_daily_power:
-    source: sensor.shelly_washer_total_energy
-    cycle: daily
+#  energy_washer_daily_power:
+#    source: sensor.shelly_washer_total_energy
+#    cycle: daily
 
   hourly_frontdoor_count:
     source: sensor.front_door_count

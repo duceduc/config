@@ -10,7 +10,7 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid_1  
+  ssid: !secret ssid1
   password: !secret ssid_pass
   fast_connect : true
   manual_ip:
@@ -19,7 +19,6 @@ wifi:
     gateway: 192.168.1.1
 
 captive_portal:
-
 logger:
 
 #status_led:
@@ -35,57 +34,53 @@ mqtt:
 ota:
   password: !secret ota_pass
 
-#esp32_ble_tracker:
-#  scan_parameters:
-#    interval: 20s
-
 esp32_touch:
-   setup_mode: false
+  setup_mode: false
 
 sensor:
-   - platform: wifi_signal
-     name: $name wifi signal
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
 
 binary_sensor:
-   - platform: status
-     name: $name status
-   - platform: esp32_touch
-     name: 'Top'
-     pin: GPIO14
-     threshold: 30
-     id: top
-     filters:
-       - delayed_off: 1s
-   - platform: esp32_touch
-     name: 'Middle'
-     pin: GPIO33
-     threshold: 24
-     id: middle
-     filters:
-       - delayed_off: 1s
-   - platform: esp32_touch
-     name: 'Bottom'
-     pin: GPIO27
-     threshold: 31
-     id: bottom
-     filters:
-       - delayed_off: 1s
-   - platform: template
-     name: $name
-     lambda: |-
-       if (id(top).state ||
-           id(middle).state ||
-           id(bottom).state) {
-         return true;
-       } else {
-         return false;
-       }
-
-# Presence Detection
-#   - platform: ble_presence
-#     mac_address: ED:5C:C3:1A:97:C6 
-#     id: tms_esp32
-#     name: "tms Presence esp32"
+  - platform: status
+    name: $name status
+  - platform: esp32_touch
+    name: 'Top'
+    pin: GPIO14
+    threshold: 30
+    id: top
+    filters:
+      - delayed_off: 1s
+  - platform: esp32_touch
+    name: 'Middle'
+    pin: GPIO33
+    threshold: 24
+    id: middle
+    filters:
+      - delayed_off: 1s
+  - platform: esp32_touch
+    name: 'Bottom'
+    pin: GPIO27
+    threshold: 31
+    id: bottom
+    filters:
+      - delayed_off: 1s
+  - platform: template
+    name: $name
+    lambda: |-
+      if (id(top).state ||
+          id(middle).state ||
+          id(bottom).state) {
+        return true;
+      } else {
+        return false;
+      }
 
 # Remote Control
 remote_receiver:

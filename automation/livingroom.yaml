@@ -4,25 +4,25 @@
 #                                                                                                              #
 #########################################################
 
-
-- alias: 'Open Front Curtains at Sunrise'
-  trigger:
-    - entity_id: sensor.period_of_the_day
-      platform: state
-      to:
-       - 'dawnlight'
-       - 'daylight'
-  condition:
-    - condition: template # Someone is home
-      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # Not in Vacation
-      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
-  action:
-    - service: cover.set_cover_position
-      data:
-        position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 100 {% endif %}'
-        entity_id:
-        - cover.fr_curtains
+# CURRENTLY USING #
+#- alias: 'Open Front Curtains at Sunrise'
+#  trigger:
+#    - entity_id: sensor.period_of_the_day
+#      platform: state
+#      to:
+#       - 'dawnlight'
+#       - 'daylight'
+#  condition:
+#    - condition: template # Someone is home
+#      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+#    - condition: template # Not in Vacation
+#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+#  action:
+#    - service: cover.set_cover_position
+#      data:
+#        position: '{% if is_state("sensor.period_of_the_day", "dawnlight") %} 50 {% else %} 100 {% endif %}'
+#        entity_id:
+#        - cover.fr_curtains
 
 
 #########################################################
@@ -31,24 +31,25 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'Close Front Curtains at Sunset'
-  trigger:
-    - entity_id: sensor.period_of_the_day
-      platform: state
-      to:
-       - 'dusklight'
-       - 'nightlight'
-  condition:
-    - condition: template 
-      value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"
-    - condition: template # Not in Vacation
-      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
-  action:
-    - service: cover.set_cover_position
-      data:
-        position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 0 {% endif %}'
-        entity_id:
-        - cover.fr_curtains
+# CURRENTLY USING #
+#- alias: 'Close Front Curtains at Sunset'
+#  trigger:
+#    - entity_id: sensor.period_of_the_day
+#      platform: state
+#      to:
+#       - 'dusklight'
+#       - 'nightlight'
+#  condition:
+#    - condition: template 
+#      value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"
+#    - condition: template # Not in Vacation
+#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
+#  action:
+#    - service: cover.set_cover_position
+#      data:
+#        position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 0 {% endif %}'
+#        entity_id:
+#        - cover.fr_curtains
 
 #########################################################
 #                                                                                                              #
@@ -59,7 +60,7 @@
 - alias: 'computer room lights auto-on'
   trigger:
     - platform: numeric_state
-      entity_id: sensor.front_illuminance
+      entity_id: sensor.rear_illuminance
       above: 0.21
       below: 0.24
   condition:  
@@ -79,7 +80,7 @@
 - alias: 'livingroom lights auto-on'
   trigger:
     - platform: numeric_state
-      entity_id: sensor.front_illuminance
+      entity_id: sensor.rear_illuminance
       above: 0.21
       below: 0.24    
   condition:
@@ -104,9 +105,15 @@
 
 - alias: 'front area lights auto-off'
   trigger:
-    - platform: numeric_state
-      entity_id: sensor.front_illuminance
-      below: 0.16
+#    - platform: numeric_state
+#      entity_id: sensor.rear_illuminance
+#      below: 0.16
+    - platform: template
+      value_template: "{% if states('sensor.rear_illuminance') | float(0) < 0.16 and
+                                 states('sensor.rear_illuminance') != 'unavailable' and
+                                 states('sensor.time') > '06:14' %} true
+                               {% else %} false
+                               {% endif %}"
   condition:      
     - condition: template  # If guest is present, do not turn off
       value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"

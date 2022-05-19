@@ -6,7 +6,9 @@
 # motion_c1 - [replaced battery on 12/4 ]
 # motion_s1 - [replaced battery on 12/4 ]
 # motion_g1 - [replaced battery on 12/8 ]
-# motion_k1 - [replaced battery on 12/10 ]
+
+# aio wemos: [batt installed on 2/15]
+# shower dimmer:  [batt installed on 2/23]
 
 title: Data
 path: data
@@ -14,16 +16,15 @@ icon:  mdi:home-analytics
 background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
 cards:
 
-
   - type: custom:decluttering-card
     template: person_card_new
     variables:
-      - entity: person.duc
+      - entity: sensor.duc_location #person.duc
       - name: Duc
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
       - work_sensor: sensor.duc_destinations
-      - home_sensor: sensor.duc_to_home_waze
+      - home_sensor: sensor.duc_ett_home
       - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-duc.png
       - show_entity_picture: true
@@ -48,12 +49,12 @@ cards:
   - type: custom:decluttering-card
     template: person_card_new
     variables:
-      - entity: person.eri
+      - entity: sensor.eri_location # person.eri 
       - name: Eri
       - battery_level: sensor.ie_battery_level
       - battery_state: sensor.ie_battery_state      
       - work_sensor: sensor.eri_destinations
-      - home_sensor: sensor.eri_to_home_waze
+      - home_sensor: sensor.eri_ett_home
       - work_icon: mdi:train
       - entity_picture: /local/img/people/avatar-eri.png
       - show_entity_picture: true
@@ -66,22 +67,21 @@ cards:
     variables:
       - title: Home Status
       - entity_1: sensor.n_people_home
-      - name_1: At Home
+      - name_1: Count
       - entity_2: input_select.home_mode
       - name_2: Status
       - entity_3: sensor.guest_mode
       - name_3: Guest
 
-
   - type: custom:decluttering-card
     template: person_card_new
     variables:
-      - entity: person.shion
+      - entity: sensor.shion_location # person.shion
       - name: Shion
       - battery_level: sensor.id_battery_level
       - battery_state: sensor.id_battery_state      
       - work_sensor: sensor.shion_destinations
-      - home_sensor: sensor.shion_to_home_waze
+      - home_sensor: sensor.shion_ett_home
       - work_icon: mdi:chair-school
       - entity_picture: /local/img/people/avatar-shion.png
       - show_entity_picture: true
@@ -89,22 +89,62 @@ cards:
           action: more-info
           haptic: light
 
+  - type: custom:decluttering-card
+    template: five_sensors_tpl
+    variables:
+      - title: Garbage Collection
+      - entity_1: sensor.combustible_waste
+      - name_1: Combustible
+      - entity_2: sensor.plastic_recycle
+      - name_2: Plastic
+      - entity_3: sensor.metal_paper_recycle
+      - name_3: Metal
+      - entity_4: sensor.bottle_can_recycle
+      - name_4: Bottle
+      - entity_5: sensor.pet_clothes_recycle
+      - name_5: Clothes
+
 
   - type: custom:decluttering-card
     template: five_sensors_tpl
     variables:
-      - title: Motion Detection Status
-      - entity_1: sensor.genkan
-      - name_1: Genkan
-      - entity_2: sensor.hallway
-      - name_2: Hallway
-      - entity_3: sensor.toilet
-      - name_3: Toilet
-      - entity_4: sensor.washroom
-      - name_4: Washroom
-      - entity_5: sensor.kitchen
-      - name_5: Kitchen
+      - title: Motion Detection Hallway
+      - entity_1: sensor.security_mdf
+      - name_1: MDF
+      - entity_2: sensor.security_genkan
+      - name_2: Genkan
+      - entity_3: sensor.genkan
+      - name_3: Genkan      
+      - entity_4: sensor.hallway
+      - name_4: Hallway
+      - entity_5: sensor.toilet
+      - name_5: Restroom
 
+  - type: custom:decluttering-card
+    template: three_sensors_tpl
+    variables:
+      - title: Motion Detection Kitchen
+      - entity_1: sensor.kitchen
+      - name_1: Kitchen
+      - entity_2: sensor.storageroom
+      - name_2: Storage      
+      - entity_3: sensor.washroom
+      - name_3: Washroom
+
+  - type: custom:decluttering-card
+    template: five_sensors_tpl
+    variables:
+      - title: Motion Detection Rooms
+      - entity_1: sensor.masterroom
+      - name_1: Master     
+      - entity_2: sensor.shionroom
+      - name_2: Shion
+      - entity_3: sensor.livingroom
+      - name_3: Living
+      - entity_4: sensor.computerroom
+      - name_4: Computer
+      - entity_5: sensor.closet
+      - name_5: Closet
 
   - type: custom:decluttering-card
     template: server_tpl
@@ -114,7 +154,6 @@ cards:
       - entity_2: sensor.ns1_disk_use
       - entity_3: sensor.ns1_cpu_usage
       - entity_4: sensor.ns1_temperature
-
 
   - type: custom:decluttering-card
     template: server_tpl
@@ -165,10 +204,15 @@ cards:
     template: server_tpl
     variables:
       - title: desktop
-      - entity_1: sensor.desktop_fddl8i4_memory_usage
-      - entity_2: sensor.desktop_fddl8i4_storage_c_usage
-      - entity_3: sensor.desktop_fddl8i4_cpu_usage
-      - entity_4: sensor.desktop_cpu_temperature
+      - entity_1: sensor.desktop_fddl8i4_memoryusage
+      - entity_2: sensor.desktop_fddl8i4_storage_c_used_space_gb
+      - entity_3: sensor.desktop_fddl8i4_cpuload
+      - entity_4: sensor.desktop_fddl8i4_cpu_temperature      
+#      - entity_1: sensor.desktop_fddl8i4_memory_usage
+#      - entity_2: sensor.desktop_fddl8i4_storage_c_usage
+#      - entity_3: sensor.desktop_fddl8i4_cpu_usage
+#      - entity_4: sensor.desktop_cpu_temperature
+
 
   - type: custom:decluttering-card
     template: server_tpl
@@ -209,153 +253,6 @@ cards:
       - entity: sensor.ha_cpu_temperature
         name: CPU Temperature
         icon: mdi:thermometer
-
-  - type: custom:decluttering-card
-    template: five_sensors_tpl
-    variables:
-      - title: Garbage Collection
-      - entity_1: sensor.combustible_waste
-      - name_1: Combustible
-      - entity_2: sensor.plastic_recycle
-      - name_2: Plastic
-      - entity_3: sensor.metal_paper_recycle
-      - name_3: Metal
-      - entity_4: sensor.bottle_can_recycle
-      - name_4: Bottle
-      - entity_5: sensor.pet_clothes_recycle
-      - name_5: Clothes
-
-  - type: vertical-stack
-    cards:
-      - type: entities
-        title: Device Battery Status
-        state_color: true
-        entities:
-          - entity: sensor.devices_with_low_battery
-            name: Battery Check
-          - entities:
-              - entity: sensor.master_dimmer_battery
-                name: Master Room Dimmer
-              - entity: sensor.shion_room_battery
-                name: Shion Room
-              - entity: sensor.shion_dimmer_battery
-                name: Shion Room Dimmer
-              - entity: sensor.computer_room_battery
-                name: Computer Room
-              - entity: sensor.cr_curtains_battery
-                name: Computer Room Dimmer
-              - entity: sensor.aio_controller_battery
-                name: Aio Controller
-              - entity: sensor.living_room_battery
-                name: Livingroom
-              - entity: sensor.lr_curtains_battery
-                name: Livingroom Dimmer
-              - entity: sensor.shower_room_battery
-                name: Shower Room Dimmer
-              - entity: sensor.kitchen_dimmer_battery
-                name: Kitchen Dimmer
-                
-            head:
-              label: Controllers | Dimmers
-              type: section
-            padding: 0
-            type: 'custom:fold-entity-row'
-          - entities:
-              - entity: sensor.motion_k1_battery
-                name: Kitchen Sink
-              - entity: sensor.motion_k2_battery
-                name: Kitchen Counter
-              - entity: sensor.motion_c1_battery
-                name: Master Closet                   
-              - entity: sensor.motion_s1_battery
-                name: Pantry Room                                   
-            head:
-              label: Motion Sensors
-              type: section
-            padding: 0
-            type: 'custom:fold-entity-row'
-          - entities:
-              - entity: sensor.genkan_door_battery
-                name: Genkan Door
-              - entity: sensor.hallway_door_battery
-                name: Hallway Door
-              - entity: sensor.master_door_battery
-                name: Master Door
-              - entity: sensor.shion_door_battery
-                name: Shion Door
-            head:
-              label: Door Sensors
-              type: section
-            padding: 0
-            type: 'custom:fold-entity-row'
-          - entities:
-              - entity: sensor.cr_curtain_batteries
-                name: Computer Room Curtains
-              - entity: sensor.lr_curtain_batteries
-                name: Livingroom Curtains
-              - entity: sensor.meter_battery
-                name: Thermometer
-              - entity: sensor.jcom_tv_box_battery
-                name: Jcom Tv Box
-              - entity: sensor.floor_heat_battery
-                name: Floor Heater
-              - entity: sensor.24hr_fan_battery
-                name: 24hr Fan
-              - entity: sensor.hdmi_selector_battery
-                name: HDMI Selector
-              - entity: sensor.genkan_doorlock_battery
-                name: Genkan Doorlock                
-            head:
-              label: Switchbots
-              type: section
-            padding: 0
-            type: 'custom:fold-entity-row'
-        show_header_toggle: false
-        style: |
-          ha-card {
-          }
-
-  - type: entities
-    title: Other Automations
-    show_header_toggle: false
-    entities:
-      - head:
-        label: Uptime Status
-        type: section
-      - entity: sensor.time_online
-        name: Last Restart
-      - entity: sensor.last_boot
-        name: Last Boot
-      - entity: sensor.ms1_updates
-        name: RPI's Updates
-
-      - head:
-        label: Add-On Status
-        type: section
-      - entity: switch.sambabackup
-        name: Samba Backup 
-        icon: mdi:server-plus
-      - entity: switch.portainer
-        name: Portainer
-        icon: mdi:server-plus
-      - entity: switch.mosquitto
-        name: Mosquitto MQTT
-        icon: mdi:server-plus
-      - entity: switch.zigbee2mqtt
-        name: Zigbee2MQTT
-        icon: mdi:server-plus
-      - entity: switch.samba
-        name: Samba
-        icon: mdi:server-plus
-      - entity: switch.ssh
-        name: SSH
-        icon: mdi:server-plus
-      - entity: switch.appdaemon
-        name: AppDaemon
-        icon: mdi:server-plus
-      - entity: switch.esphome
-        name: ESPHome
-        icon: mdi:server-plus
 
   - type: vertical-stack
     cards:
@@ -399,6 +296,162 @@ cards:
           - entity: sensor.lights_count
             name: Number of Lights
             icon: mdi:lightbulb
+
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Device Battery Status
+        state_color: true
+        entities:
+          - entity: sensor.devices_with_low_battery
+            name: Battery Check
+          - entities:
+              - entity: sensor.master_dimmer_battery
+                name: Master Room Dimmer
+              - entity: sensor.shion_room_battery
+                name: Shion Room
+              - entity: sensor.shion_dimmer_battery
+                name: Shion Room Dimmer
+              - entity: sensor.computer_room_battery
+                name: Computer Room
+              - entity: sensor.cr_curtains_battery
+                name: Computer Room Dimmer
+              - entity: sensor.aio_controller_battery
+                name: Aio Controller
+              - entity: sensor.living_room_battery
+                name: Livingroom
+              - entity: sensor.lr_curtains_battery
+                name: Livingroom Dimmer
+              - entity: sensor.shower_room_battery
+                name: Shower Room Dimmer
+              - entity: sensor.kitchen_dimmer_battery
+                name: Kitchen Dimmer
+                
+            head:
+              label: Controllers | Dimmers
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: sensor.motion_security_battery
+                name: Front Door Motion Monitor
+              - entity: sensor.motion_c1_battery
+                name: Master Closet                   
+              - entity: sensor.motion_s1_battery
+                name: Pantry Room                                   
+            head:
+              label: Motion Sensors
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: sensor.genkan_door_battery
+                name: Genkan Door
+              - entity: sensor.hallway_door_battery
+                name: Hallway Door
+              - entity: sensor.master_door_battery
+                name: Master Door
+              - entity: sensor.shion_door_battery
+                name: Shion Door
+            head:
+              label: Door Sensors
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: sensor.cr_curtain_batteries
+                name: Computer Room Curtains
+              - entity: sensor.cr_window_battery
+                name: Computer Room Window                
+              - entity: sensor.lr_curtain_batteries
+                name: Livingroom Curtains
+              - entity: sensor.lr_window_battery
+                name: Livingroom Window                  
+              - entity: sensor.meter_battery
+                name: Thermometer
+              - entity: sensor.jcom_tv_box_battery
+                name: Jcom Tv Box
+              - entity: sensor.floor_heat_battery
+                name: Floor Heater
+              - entity: sensor.24hr_fan_battery
+                name: 24hr Fan
+              - entity: sensor.hdmi_selector_battery
+                name: HDMI Selector
+              - entity: sensor.genkan_doorlock_battery
+                name: Genkan Doorlock
+
+            head:
+              label: Switchbots
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+        show_header_toggle: false
+        style: |
+          ha-card {
+          }
+          
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Other Automations
+        state_color: true
+        entities:
+          - head:
+            label: Uptime Status
+            type: section
+          - entity: sensor.time_online
+            name: Last Restart
+          - entity: sensor.last_boot
+            name: Last Boot
+          - entity: sensor.ms1_updates
+            name: RPI's Updates
+          - entities:
+              - entity: switch.sambabackup
+                name: Samba Backup 
+                icon: mdi:server-plus
+              - entity: switch.portainer
+                name: Portainer
+                icon: mdi:server-plus
+              - entity: switch.mosquitto
+                name: Mosquitto MQTT
+                icon: mdi:server-plus
+              - entity: switch.zigbee2mqtt
+                name: Zigbee2MQTT
+                icon: mdi:server-plus
+              - entity: switch.samba
+                name: Samba
+                icon: mdi:server-plus
+              - entity: switch.ssh
+                name: SSH
+                icon: mdi:server-plus
+              - entity: switch.appdaemon
+                name: AppDaemon
+                icon: mdi:server-plus
+              - entity: switch.esphome
+                name: ESPHome
+                icon: mdi:server-plus
+            head:
+              label: Add-On Status
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+            
+          - entities:
+              - entity: input_boolean.zigbee_permit_join
+                name: Zigbee Join Permit
+              - entity: sensor.motion_cr1_battery
+                name: Computer Room
+                                 
+            head:
+              label: Enable Service
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+        show_header_toggle: false
+        style: |
+          ha-card {
+          }
+
 
 ####################################################
 #                                                                                                    #

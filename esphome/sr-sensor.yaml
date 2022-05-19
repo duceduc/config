@@ -10,18 +10,17 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid_1
+  ssid: !secret ssid1
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
   reboot_timeout: 0s
   manual_ip:
-    static_ip: 192.168.1.92
+    static_ip: 192.168.1.99 # old don't use 192.168.1.92
     subnet: 255.255.255.0
     gateway: 192.168.1.1
 
 captive_portal:
-
 logger:
 
 api:
@@ -41,6 +40,12 @@ sensor:
 
   - platform: wifi_signal
     name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
 
 binary_sensor:
   - platform: status
@@ -50,4 +55,9 @@ binary_sensor:
     pin: D6 # Use D5 D6 D7. No luck with D1 D5
     name: 'motion sr occupancy'
     device_class: motion
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart
 

@@ -1,8 +1,9 @@
 #########################################################
-#                                                                                                              #
-#             Motion Triggered                                                                           #
-#                                                                                                              #
+#                                                                                                              
+#             Motion Triggered                                                                           
+#                                                                                                              
 #########################################################
+
 
 - alias: 'motion kitchen light auto-on'
   trigger:
@@ -16,18 +17,18 @@
     - service: light.turn_on
       data_template:
         entity_id: >
-         {% if is_state('sensor.front_illuminance', 'unavailable') %}
+         {% if is_state('sensor.rear_illuminance', 'unavailable') %}
             light.k_1, light.k_3
-         {% elif states.sensor.front_illuminance.state | float <= 0.10 %}
+         {% elif states.sensor.rear_illuminance.state | float <= 0.10 %}
             light.k_1
          {% else %}
             light.k_1, light.k_3
          {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             Turn on All Lights                                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             Turn on All Lights                                                                          
+#                                                                                                              
 #########################################################
 
 
@@ -44,13 +45,13 @@
     - condition: template
       value_template: "{{ is_state('light.cabinet', 'on') }}"
   action:
-    - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.front_illuminance', 'unavailable') else 'online' }}
+    - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.rear_illuminance', 'unavailable') else 'online' }}
 
 
 #########################################################
-#                                                                                                              #
-#             Turn off All Lights When No Motion                                                   #
-#                                                                                                              #
+#                                                                                                              
+#             Turn off All Lights When No Motion                                                   
+#                                                                                                              
 #########################################################
 
 - alias: 'motion kitchen lights auto-off'
@@ -65,10 +66,12 @@
 
 
 #########################################################
-#                                                                                                               #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                               
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################
+
+
 
 
 
@@ -81,20 +84,22 @@
     id: time
     seconds: '10'
   - platform: state
-    entity_id: binary_sensor.motion_kitchen_occupancy
+#    entity_id: binary_sensor.motion_kitchen_occupancy
+    entity_id: group.motion_kitchen_occupancy    
     id: motion
     to: 'on'
+
   condition: []
   action:
   - service: python_script.room_occupancy
     data:
       roomname: kitchen 
       entities_toggle: 
-      - binary_sensor.motion_kitchen_occupancy
+      - group.motion_kitchen_occupancy      
       - input_boolean.kitchen_mcl
-      entities_keep: 
-      - sensor.shion_tms_espresense
-      timeout: 3 
+#      entities_keep: 
+#      - sensor.eri_espresense
+      timeout: 3 # in minutes
 
 - alias: Kitchen Light
   description: 'toggle light depending on timer state'
@@ -134,9 +139,9 @@
       - service: light.turn_on
         data_template:
           entity_id: >
-           {% if is_state('sensor.front_illuminance', 'unavailable') %}
+           {% if is_state('sensor.rear_illuminance', 'unavailable') %}
             light.k_1, light.k_3
-           {% elif states.sensor.front_illuminance.state | float <= 0.10 %}
+           {% elif states.sensor.rear_illuminance.state | float <= 0.10 %}
             light.k_1
            {% else %}
             light.k_1, light.k_3
@@ -148,7 +153,7 @@
       sequence:
         - condition: template
           value_template: "{{ is_state('light.cabinet', 'on') }}"
-        - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.front_illuminance', 'unavailable') else 'online' }}
+        - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.rear_illuminance', 'unavailable') else 'online' }}
 
     - conditions:
       - condition: trigger
@@ -160,9 +165,9 @@
     default: []
 
 #########################################################
-#                                                                                                              #
-#             Override Auto Mode Lights On/Off                                                    #
-#                                                                                                              #
+#                                                                                                              
+#             Override Auto Mode Lights On/Off                                                   
+#                                                                                                              
 #########################################################
 
 
@@ -170,6 +175,9 @@
   trigger:
     - platform: state
       entity_id: input_boolean.kitchen_mcl
+  condition:
+    - condition: template
+      value_template: "{{ is_state('input_boolean.audible_notifications', 'on') }}"          
   action:
     - service: script.speech_engine
       data: 
@@ -188,3 +196,28 @@
       entity_id: input_boolean.kitchen_mcl
 
 
+#########################################################
+#                                                                                                              
+#             Storage                                                    
+#                                                                                                              
+#########################################################
+
+
+- alias: 'turn off storage room'
+  trigger:
+  - entity_id: light.storage_room
+    platform: state
+    to: 'on'
+    for: '00:08:00'
+  action:  
+  - service: light.turn_off
+    data:
+      entity_id: light.str_1
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

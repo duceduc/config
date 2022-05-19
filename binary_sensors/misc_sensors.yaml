@@ -4,14 +4,11 @@
 #                                                                                                              
 #########################################################
 
-  - platform: mqtt
-    name: "Desktop - Connected"
-    state_topic: "iotlink/workgroup/desktop-fddl8i4/lwt"
-    value_template: "{{ value }}"
-    payload_on: "ON"
-    payload_off: "OFF"
-    device_class: "connectivity"
-    qos: 1
+  - platform: ping
+    name: "Desktop Status"
+    host: 192.168.1.111
+    scan_interval: 20 
+    count: 5
 
   - platform: threshold
     name: Devices with low battery
@@ -22,6 +19,17 @@
     name: ms1 updates
     entity_id: sensor.ms1_updates
     upper: 0.5
+
+
+  - platform: template
+    sensors:
+      replace_toilet_airfreshener:
+       value_template: >
+         {% if states('counter.toilet_airfreshener')| int(0) >= 350 %}
+           on
+         {% else %}
+           off
+         {% endif %}       
 
 ####################################################
 #                                                                                                    
@@ -53,9 +61,9 @@
   - platform: template
     sensors:
       freeze_warning:
-        value_template: "{{ states.weather.weatherbit.attributes.forecast[0].templow | float(0) <= 0 }}"
-
-
+        value_template: >
+           {% if is_state("input_boolean.freeze_warning", "on") %} on {% else %} off {% endif %}
+           
 
 #########################################################
 #                                                                                                              

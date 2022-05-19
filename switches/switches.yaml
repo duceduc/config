@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                    Momentary Switches                                                    #
-#                                                                                                    #
+#                                                                                                    
+#                    Momentary Switches                                                    
+#                                                                                                    
 ####################################################
 
   - platform: momentary
@@ -24,9 +24,9 @@
 
 
 ####################################################
-#                                                                                                    #
-#                    Internet Kill Switches                                                    #
-#                                                                                                    #
+#                                                                                                    
+#                    Internet Kill Switches                                                    
+#                                                                                                    
 ####################################################
 
 
@@ -52,11 +52,31 @@
 
 
 
+####################################################
+#                                                                                                    
+#                    Tasmota
+#                                                                                                    
+####################################################
+
+
+#  - platform: mqtt
+#    name: "Washer"
+#    state_topic: "tasmota/washer_plug/RESULT"  
+#    value_template: "{{ value_json.POWER }}"
+#    command_topic: "tasmota/washer_plug/POWER"
+#    payload_on: "ON"
+#    payload_off: "OFF"
+#    availability_topic: "tasmota/washer_plug/LWT"
+#    payload_available: "Online"
+#    payload_not_available: "Offline"
+#    qos: 1
+#    retain: false
+
 
 ####################################################
-#                                                                                                    #
-#                    Customize Switches                                                     #
-#                                                                                                    #
+#                                                                                                    
+#                    Customize Switches                                                     
+#                                                                                                    
 ####################################################
 
 # Christmas Light Switch
@@ -87,13 +107,14 @@
     switches:
      desktop:
        friendly_name: 'Desktop'
-       value_template: "{{ states('binary_sensor.desktop_connected') }}"
+       value_template: "{{ states('binary_sensor.desktop_status') }}"
        turn_on:
          - service: script.desktop_wol
        turn_off:
-         - service: script.desktop_shutdown
+         - service: switch.turn_on
+           entity_id: switch.desktop_fddl8i4_shutdown
        icon_template: >-
-         {% if is_state('binary_sensor.desktop_connected', 'on') %}
+         {% if is_state('binary_sensor.desktop_status', 'on') %}
             mdi:desktop-mac-dashboard
          {% else %}
             mdi:desktop-mac
@@ -101,9 +122,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Emulated Aircon Switches                                                              #
-#                                                                                                              #
+#                                                                                                              
+#             Emulated Aircon Switches                                                              
+#                                                                                                              
 #########################################################
 
   - platform: template
@@ -269,7 +290,7 @@
 
 
 ####################################################
-#                                                                                                    #
-#          END OF CONFIGURATION FILE                                                   #
-#                                                                                                    #
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
 ####################################################

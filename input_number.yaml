@@ -172,29 +172,32 @@
 
 
 ##################
-  lrh_humidity_low_set:
-    name: Humidity Low Set Point
-    icon: mdi:thermometer
-    initial: 30
-    min: 0
-    max: 100
-    step: 1
+#  lrh_humidity_low_set:
+#    name: Humidity Low Set Point
+#    icon: mdi:thermometer
+#    initial: 30
+#    min: 0
+#    max: 100
+#    step: 1
+#
+#
+#  lrh_humidity_high_set:
+#    name: Humidity High Set Point
+#    icon: mdi:thermometer
+#    initial: 60
+#    min: 0
+#    max: 100
+#    step: 1
+#
+#  lrh_humidity_intensity_set:
+#    name: Humidifier Intensity
+#    icon: mdi:water-plus
+#    min: 34
+#    max: 100
+#    step: 1
 
 
-  lrh_humidity_high_set:
-    name: Humidity High Set Point
-    icon: mdi:thermometer
-    initial: 60
-    min: 0
-    max: 100
-    step: 1
 
-  lrh_humidity_intensity_set:
-    name: Humidifier Intensity
-    icon: mdi:water-plus
-    min: 34
-    max: 100
-    step: 1
 
 # use for 30 fade in 
 # https://youtu.be/JpC13mLuiQg?t=436
@@ -207,23 +210,23 @@
 
 
 
-
-
-
-
-
-
-
-
-##################
-  duc_watch_present:
-    name: Duc Watch Present
+## TEST
+  rssi_present:
+    name: RSSI present threshold
+    initial: -75
     min: -100
-    max: 0
-
-  duc_watch_not_present:
-    name: Duc Watch Not Present
+    max: -40
+    step: 1
+    unit_of_measurement: dBm
+    
+  rssi_not_present:
+    name: RSSI not-present threshold
+    initial: -86
     min: -100
-    max: 0
+    max: -40
+    step: 1
+    unit_of_measurement: dBm
+
+
 
     

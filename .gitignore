@@ -37,3 +37,4 @@ secrets.yaml
 web_hooks.yaml
 known_devices.yaml
 shell_commands.yaml
+zones.yaml

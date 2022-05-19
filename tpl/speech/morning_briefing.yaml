@@ -42,9 +42,9 @@
       </p>
       
       <p>
-        It is currently {{states.sensor.weatherbit_weather_description.state }} and {{states.sensor.oa_temperature.state|round}} degrees in Kawagoodchi. 
+        It is currently {{states.sensor.wbio_current_forecast.state }} and {{states.sensor.oa_temperature.state|round}} degrees in Kawagoodchi. 
       </p>
-      
+
       <p>
         {% if states.sensor.weatherbit_weather_alerts.state | int > 0 %}
           There are currently {{states.sensor.weatherbit_weather_alerts.state }} active weather alerts for our area.
@@ -70,9 +70,21 @@
             'The rest of the day should be,',
             'Todays forecast should be,'
         ]|random }}
-          {{ states.weather.weatherbit.state }}. 
+          {{ states.sensor.wbio_current_condition.state }}. 
         </p>
-        
+
+      <p>
+        {% if states.sensor.pollen_tree.state | int > 1 %}
+        {{ [
+         'Todays pollen count is Level, CT.',
+         'The current pollen count is Level, CT',
+         'Make sure you have your mask today, the pollen level is at CT.',
+         'Pollen level CT is expected today in Japan.',
+         'Japans pollen count level is at CT today.'
+         ]| random | replace('CT', states('sensor.pollen_tree')) }}
+        {% endif %}
+      </p>
+
         <p>
           {% if is_state('sensor.date_dayoftheweek', 'Sunday') %}
             {% if now().strftime('%H')|int > 17 %}
@@ -91,26 +103,67 @@
         {% if is_state('sensor.christmas_countdown','0') %}
           Merry Christmas Everyone!
         {% endif %}
-        {% if states('sensor.anniversary').lower() in ['today is wedding anniversary'] %}
-          Happy Anniversary! It's been an amazing {{ states.counter.anniversary_wedding_years.state }} years!
+        {% if is_state('sensor.anniversary_our_wedding','0') %}
+          Happy Anniversary! It been an amazing {{ states.sensor.anniversary_our_wedding.attributes.years }} years!
         {% endif %}
         </p>
-        
+
         <p>
-          {% if is_state('sensor.date_weekday', 'on') %}
+          {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) %}
+            {% if is_state('sensor.school_start_days2go', '0') %}
+                Today is the first day of school! 
+              {% else %}
+                {{ [ 'Today is a school day.',
+                  'It is a school day. '
+                ] | random }}
+              {% endif %}
+            Pickup today will be at {{(state_attr('input_datetime.school_day_end', 'timestamp') | int | timestamp_custom('%I:%M %p', False)) }}.
+            {% if 'After School Care' in states('sensor.school_event') %}
+              But will be at the After School Day Care.
+            {% endif %} 
+            {% if 'Walking Home' in states('sensor.school_event') %}
+              But Sheon will be walking home from school.
+            {% endif %}
+            {% if states.sensor.school_end_days2go.state | int == 0 -%}
+              But today is the last day of School! 
+            {%- endif %}
+          {% endif %}
+          {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) and 'After School Care' not in states('sensor.school_event') %}
+            {% if is_state('sensor.school_lunch', 'Nothing') %}
+              I am not sure what the school menu is for today, so plan on She on taking his lunch 
+            {% else %}
+              Today's school lunch is {{ states.sensor.school_lunch.state }}, lets hope She on is not too picky on his plate.
+            {% endif %}
+          {% endif %}
+
+          {% if states.sensor.school_end_days2go.state | int == -1 -%}
+            Today is the first day of Summer Break! 
+          {%- endif %}
+
+          {% if 'School Off' in states('sensor.school_event') and  is_state('input_boolean.school_today', 'off') %}
+            There is no school today.
+          {% endif %} 
+
+          {% if is_state('calendar.shion_events', 'on') %}
+            Shion has {{ states.calendar.shion_events.attributes.message }} today as well!
+          {% endif %}
+        </p>
+
+        <p>
+          {% if is_state('sensor.date_weekday', 'on') and is_state('calendar.holidays_in_japan', 'off') %}
              {%- if states.sensor.duc_destinations.state|round > 45 %}
                Traffic to jcb office appears heavy than normnal.
              {% else %}
                Traffic to the jcb office is normal.
              {% endif %}
-             Currently it will take {{states.sensor.duc_destinations.state|round}} minutes to get to the jcb office.
+             Currently it will take {{states.sensor.duc_destinations.state|round}} minutes to get to the office.
 
              {%- if states.sensor.eri_destinations.state|round > 55 %}
                Traffic to kawasaki costco appears heavy than normnal.
              {% else %}
                Traffic to the kawasaki costco is normal.
              {% endif %}
-             Currently it will take {{states.sensor.eri_destinations.state|round}} minutes to get to the kawasaki costco.
+             Currently it will take {{states.sensor.eri_destinations.state|round}} minutes to get to costco.
           {% endif %}
       </p>
       

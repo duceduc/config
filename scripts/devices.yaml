@@ -55,20 +55,25 @@
           - lights
 
 #########################################################
-#                                                                                                              #
-#             Turn Off Devices If Left On: No One Home                                          #
-#                                                                                                              #
+#                                                                                                              
+#             Turn Off Devices If Left On: No One Home                                          
+#                                                                                                              
 #########################################################
 
-  dev_check:
+  appliances_off:
     sequence:
-      - service: script.dev_check_1
+      - service: script.aclr_off
         data_template:
           room: 'lr'
+      - condition: template
+        value_template: "{{ states('switch.sb_humidifier') != 'off' }}"
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sb_humidifier
 
-  dev_check_1:
+  aclr_off:
     sequence:
-      - service: script.dev_check_2
+      - service: script.acmr_off
         data_template:
           room: 'mr'
       - condition: template
@@ -78,9 +83,9 @@
           entity_id: input_select.{{ room }}_ac_mode
           option: 'Off'
 
-  dev_check_2:
+  acmr_off:
     sequence:
-      - service: script.dev_check_3
+      - service: script.acsr_off
         data_template:
           room: 'sr'
       - condition: template
@@ -90,9 +95,9 @@
           entity_id: input_select.{{ room }}_ac_mode
           option: 'Off'
 
-  dev_check_3:
+  acsr_off:
     sequence:
-      - service: script.dev_check_4
+      - service: script.cr_off
       - condition: template
         value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
       - service: input_select.select_option
@@ -100,11 +105,11 @@
           entity_id: input_select.{{ room }}_ac_mode
           option: 'Off'
 
-  dev_check_4:
+  cr_off:
     sequence:
-      - service: script.dev_check_5
+#      - service: script.xmas_off
       - condition: template
-        value_template: '{{ states("sensor.front_illuminance")| float(0) >= 0.20 }}'
+        value_template: '{{ states("sensor.rear_illuminance")| float(0) >= 0.20 }}'
       - service: light.turn_off
         data:
           entity_id: light.computer_room, light.living_room
@@ -112,16 +117,7 @@
         data_template:
           entity_id:  script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
 
-  dev_check_5:
-#      - service: script.dev_check_6  
-    sequence:
-      - condition: template
-        value_template: "{{ states('switch.sb_humidifier') != 'off' }}"
-      - service: switch.turn_off
-        data:
-          entity_id: switch.sb_humidifier
-
-  dev_check_6:
+  xmas_off:
     sequence:
       - condition: template
         value_template: "{{ states('switch.christmas_lights') != 'off' }}"
@@ -130,9 +126,9 @@
           entity_id: switch.christmas_lights
 
 #########################################################
-#                                                                                                              #
-#             Enable Devices at midnight                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Enable Devices at midnight                                                             
+#                                                                                                              
 #########################################################
 
   enable_devices:
@@ -156,10 +152,12 @@
         data:
           entity_id: switch.is_internet, switch.isp_internet, switch.switch_internet
 
+
+
 #########################################################
-#                                                                                                              #
-#             Toilet Seat Heater/Cleaning                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Toilet Seat Heater/Cleaning                                                             
+#                                                                                                              
 #########################################################
 
   toilet_seat_low_heat:
@@ -205,9 +203,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Tv Source                                                                                   #
-#                                                                                                              #
+#                                                                                                              
+#             Tv Source                                                                                   
+#                                                                                                              
 #########################################################
 
   tv_source:
@@ -221,9 +219,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             IOT Link Desktop                                                                           #
-#                                                                                                              #
+#                                                                                                              
+#             Desktop WOL                                                                       
+#                                                                                                              
 #########################################################
 
 
@@ -233,40 +231,7 @@
       - service: wake_on_lan.send_magic_packet
         data:
           mac: "B4:4B:D6:27:22:55"
-#      - service: input_boolean.turn_on
-#        data:
-#          entity_id: input_boolean.desktop
 
-  desktop_shutdown:
-    alias: "Desktop - Shutdown"
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: "iotlink/workgroup/desktop-fddl8i4/commands/shutdown"
-          payload: ""
-#      - service: input_boolean.turn_off
-#        data:
-#          entity_id: input_boolean.desktop
-
-  desktop_hibernate:
-    alias: "Desktop Hibernate"
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: "iotlink/workgroup/desktop-fddl8i4/commands/hibernate"
-          payload: ""
-
-  desktop_shion_class:
-    alias: "Desktop Shion Class"
-    sequence:
-      - service: mqtt.publish
-        data:
-          topic: "iotlink/workgroup/desktop-fddl8i4/commands/run"
-          payload: '{ "command": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe", "args": "https://scratch.mit.edu", "path": "C:\\Program Files (x86)\\Google\\Chrome\\Application", "user": "", "visible": true, "fallback": true }'
-      - service: mqtt.publish
-        data:
-          topic: "iotlink/workgroup/desktop-fddl8i4/commands/run"
-          payload: '{ "command": "C:\\Users\\Duc\\AppData\\Roaming\\Zoom\\bin\\Zoom.exe", "path": "C:\\Users\\Duc\\AppData\\Roaming\\Zoom\\bin\\", "user": "", "visible": true, "fallback": true }'
 
 
 #########################################################

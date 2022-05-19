@@ -18,6 +18,7 @@
 ####################################################
 # other: USJ 34.665662588421704, 135.43233819808833
 # other:  Hotel Keihan Universal Tower 34.666553838658366, 135.43807812517124
+# other: Yokohama Royal Park 35.455399803928515, 139.63117593861773
   - platform: template
     sensors:
       duc_destination_waze:
@@ -29,7 +30,7 @@
             {%- elif is_state("input_select.duc_destination_waze", "jcb") -%}
               35.70841730186669, 139.89219249812402
             {%- elif is_state("input_select.duc_destination_waze", "others") -%}
-              34.666553838658366, 135.43807812517124
+              35.455399803928515, 139.63117593861773
             {%- else -%}
               Unknown
             {%- endif %}
@@ -45,7 +46,7 @@
             {%- elif is_state("input_select.eri_destination_waze", "costcokisa") -%}
               35.42739226293078, 139.91645121235445
             {%- elif is_state("input_select.eri_destination_waze", "others") -%}
-              34.666553838658366, 135.43807812517124             
+              35.455399803928515, 139.63117593861773            
             {%- else -%}
               Unknown
             {%- endif %}
@@ -57,7 +58,7 @@
             {%- elif is_state("input_select.shion_destination_waze", "school") -%}
               35.81214930237013, 139.71171706362946
             {%- elif is_state("input_select.shion_destination_waze", "others") -%}
-              34.666553838658366, 135.43807812517124             
+              35.455399803928515, 139.63117593861773           
             {%- else -%}
               Unknown
             {%- endif %}

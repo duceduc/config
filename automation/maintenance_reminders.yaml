@@ -50,18 +50,50 @@
 
 #########################################################
 #                                                                                                              #
-#             Update Zigbee Devices Network Map                                                 #
+#             Sensors that need a little push                                                 
 #                                                                                                              #
 #########################################################
 
+- alias: Daily Entity Refresh
+  trigger:
+  - platform: time
+    at: '17:00:00'
+  action:
+    - service: homeassistant.update_entity
+      entity_id: sensor.school_tomorrow
 
-#- alias: 'Update Zigbee Map'
-#  trigger:
-#    platform: time_pattern
-#    minutes: '/10'
-#    seconds: 00
-#  action:
-#    service: zigbee2mqtt_networkmap.update
+- alias: Good Night
+  initial_state: true
+  trigger:
+    - platform: time
+      at: '22:30:00'
+  action:
+    - service: script.turn_on
+      entity_id: script.school_year_over
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.school_today
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.audible_notifications
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.good_morning_report
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.morning_wakeup_report
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.daily_report        
+    - service: script.reset_earthquake_one_day_count
+    - service: script.enable_devices
+    
+    - service: script.text_notify
+      data:
+        who: duc
+        message: >-
+          {{ [ 
+            "Good Night from Lions Mansion. ", 
+            "Time to shut down this party. Good Night from Lions Mansion. ",
+            "I'm feeling tired. Think I'll take a quick nap. Good Night!",
+            "Things are getting quiet. Time to say Good Night.",
+            "We have come to the end of our broadcast day. Oh, who am I kidding. I''ll be up all night watching over Lions Mansion. " 
+            ] | random }}
 
 
 #########################################################

@@ -103,20 +103,24 @@
     </p>
 
     <p>
-       {%- if is_state('sensor.shelly_washer_state', 'stop') %}
+       {%- if is_state('sensor.washer_status_m', 'complete') %}
          The washing machine completed its cycle 
-         {% set seconds = now().timestamp() - as_timestamp(states.input_select.shelly_washer_state.last_changed) %}
-         {% set hours = seconds / 60 %}
+         {% set seconds = (now() - states.sensor.washer_status_m.last_changed).seconds %}
          {% if (seconds / ( 60 * 60 )) | int == 1 %}
            over an hour ago.
+           {{ [
+           'Do not forget to rotate the clothes.', 
+           'Was someone going to rotate the laundry?',
+           'Once you rotate the laundry I will stop reminding you to do it. So if you want me to stop. Its up to you.'
+           ] | random }}
          {% elif (seconds / ( 60 * 60 )) | int > 1 and (seconds / ( 60 * 60 )) | int < 6 %}
            over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
            {{ [
            'Much longer and you are going to need to wash them again.', 
            'Someone needs to rotate the laundry.',
-           'Do not forget about the closthes in the washing machine.',
+           'Do not forget about the clothes in the washing machine.',
            'Surely you did not mean to forget about the clothes. Mistakes happen. But you can still fix it.',
-           'Do you like your clothes smeling like mildew? Becasue that is what is happening right now.'
+           'Do you like your clothes smelling like mildew? Becasue that is what is happening right now.'
            ] | random }}
          {% elif (seconds / ( 60 * 60 )) | int > 6 %}
            over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
@@ -124,7 +128,7 @@
            'That is a crazy amount of time.', 
            'Did you decide you want those clothes to suffer?',
            'You might as well just rewash those clothes.',
-           'I can smell the mildew virtually.',
+           'I can smell the mildew. Virtually that is.',
            'Surely you did not mean to forget about the clothes.'
            ] | random }}
          {% else %}
@@ -137,6 +141,14 @@
          {% endif %}
        {% endif %}
        </p>
+
+    <p>
+    {%- if is_state('sensor.front_door_motion_away_count','0') %}
+      While you were gone there was no motion detected at the front door.
+    {% else %}
+      While you were out I detected motion at the front door {{ states.sensor.front_door_motion_away_count.state | int }} times.
+    {% endif %}
+    </p>
 
        
   {%- endmacro -%}

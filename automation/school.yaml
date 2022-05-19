@@ -1,0 +1,50 @@
+#########################################################
+#                                                                                                              
+#             School                                                                                       
+#                                                                                                              
+#########################################################
+
+  - alias: School today
+    initial_state: true
+    trigger:
+    - platform: time
+      at: '05:00:00'
+    condition:
+    - condition: template
+      value_template: >
+        {%- if as_timestamp(strptime(state_attr('calendar.shion_school', 'start_time'), '%Y-%m-%d %H:%M:%S')) | timestamp_custom("%Y-%m-%d") == now().strftime("%Y-%m-%d") %}
+          true
+        {%- endif -%}
+    action:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: >
+            {{ 'Home School' in states('sensor.school_event') }}
+        sequence:
+        - service: input_boolean.turn_on
+          entity_id: input_boolen.school_early_release
+        - service: input_datetime.set_datetime
+          target:
+            entity_id: input_datetime.school_day_end
+          data:
+            time: "15:15:00"
+      default:
+      - service: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.school_day_end
+        data:
+          time: "18:15:00" 
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.school_today  
+    - service: script.turn_on
+      entity_id: script.school_in_session
+    
+    
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

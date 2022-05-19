@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Announcements                                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Announcements                                                                            
+#                                                                                                              
 #########################################################
 
 # Alexa Remind Shion to Go to Bed Starting at 9pm
@@ -64,6 +64,118 @@
       entity_id: timer.looper
 
 
+#########################################################
+#                                                                                                              
+#             Audio on Notification                                                
+#                                                                                                              
+#########################################################
+
+
+- alias: Turn On Audible Notifications
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.audible_notification_on', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  action:
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.audible_notifications
+
+# Turn off audible notifications if they have't been turned off yet. 
+- alias: Turn Off Audible Notifications
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.audible_notification_off', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: input_boolean.audible_notifications
+      state: 'on'
+  action:
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.audible_notifications
+
+
+
+
+#########################################################
+#                                                                                                              
+#             Shion Calendar Events                                                
+#                                                                                                              
+#########################################################
+
+- alias: Shion Event Starting Soon
+  trigger:
+  - platform: state
+    entity_id: calendar.shion_events
+    attribute: offset_reached
+    to: True
+  action:
+    - service: script.status_annc
+      data:
+        who: ai_1
+        call_interuption: 1
+        call_shion_events: 1
+
+- alias: School Pickup Reminder  
+  trigger:
+#    - platform: time
+#      at: input_datetime.school_day_start_reminder
+    - platform: time
+      at: input_datetime.school_day_end_reminder
+  condition:
+    - condition: state
+      entity_id: calendar.shion_school
+      attribute: offset_reached
+      state: True
+  action:
+    - service: script.status_annc
+      data:
+        who: "{{ states('sensor.room_presence') }}"
+        call_interuption: 1
+        call_school_pickup_reminder: 1
+    - service: script.text_notify
+      data_template:
+        who: duc
+        message: It's almost time to head for school.
+
+
+#########################################################
+#                                                                                                              
+#             Calendar Appointments                                                
+#                                                                                                              
+#########################################################
+
+- alias: Appointments Reminder
+  trigger:
+  - platform: state
+    entity_id: calendar.appointments
+    attribute: offset_reached
+    to: True
+  action:
+    - service: script.status_annc
+      data:
+        who: ai_1
+        call_interuption: 1
+        call_appointments: 1
+
+#########################################################
+#                                                                                                              
+#             Calendar Reminders                                                
+#                                                                                                              
+#########################################################
+
+- alias: Calendar Reminder
+  trigger:
+  - platform: state
+    entity_id: calendar.reminders
+    attribute: offset_reached
+    to: True
+  action:
+    - service: script.status_annc
+      data:
+        who: ai_1
+        call_interuption: 1
+        call_reminders: 1
 
 #########################################################
 #                                                                                                              
@@ -71,41 +183,52 @@
 #                                                                                                              
 #########################################################
 
+#Make sure to enable this automation when done testing.
 - alias: announce who is arriving
   trigger:
     - platform: state
       entity_id: 
-#        - binary_sensor.duc_home # using apple tv
-#        - binary_sensor.eri_home # using apple tv
-        - device_tracker.duc
-        - device_tracker.eri
-#      to: 'on'
+       - device_tracker.duc
+       - device_tracker.eri
       to: 'home'
   action:
-    - service: script.speech_engine
-      data: 
-        who: ai_1
-        message:  >
-          {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
-          {% set p = trigger.to_state.attributes.friendly_name %}
-          {% set person = alias.get(p) %}
-          {{ person }}, will be home in about 10 minutes.
-
-#    - condition: state
-#      entity_id: light.h_1
-#      state: 'off'
-    - service: light.turn_on
-      entity_id: light.h_1
-      data:
-        brightness: 200
-    - delay: '00:10:00'
-    - service: light.turn_off
-      entity_id: light.h_1
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ is_state('input_select.home_mode', 'Away') or is_state('input_select.home_mode', 'Vacation') }}"
+          sequence:
+            - service: input_select.select_option
+              entity_id: input_select.home_mode
+              data:
+                option: 'Returning'
+            - service: script.standby
+      default:  
+        - service: script.speech_engine
+          data: 
+            who: "{{ states('sensor.room_audio') }}"
+            message: >
+              {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
+              {% set p = trigger.to_state.attributes.friendly_name %}
+              {% set person = alias.get(p) %}
+                {{ person }}, will be home in about 10 minutes.
+        - service: light.turn_on
+          entity_id: light.h_1
+          data:
+            brightness: 200
+        - service: input_boolean.turn_off
+          data:
+            entity_id: >
+             {% if trigger.to_state.attributes.friendly_name == 'Eri' %}
+                input_boolean.eri_travel_monitor
+             {% elif trigger.to_state.attributes.friendly_name == 'Duc' %}
+                input_boolean.duc_travel_monitor
+             {% else %}
+             {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             Momentary Switch Trigger                                                               #
-#                                                                                                              #
+#                                                                                                              
+#             Momentary Switch Trigger                                                               
+#                                                                                                              
 #########################################################
 
 
@@ -160,10 +283,8 @@
     - condition: template 
       value_template: "{{ not is_state('switch.momentary_activate_guest', 'on') }}" 
     - condition: template 
-      value_template: "{{ states.sensor.front_illuminance.state | float > 0.22 }}" 
+      value_template: "{{ states.sensor.rear_illuminance.state | float(0) > 0.22 }}" 
     - service: script.turn_on_lr_lights
-
-
 
 
 #########################################################
@@ -192,7 +313,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

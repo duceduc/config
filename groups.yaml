@@ -27,6 +27,11 @@
 #                                                                                                              
 #########################################################
 
+  family:
+    - person.duc
+    - person.eri
+    - person.shion
+
   all_home:
     name: Whose Home
     icon: mdi:home
@@ -50,9 +55,18 @@
      - binary_sensor.tomokun_presence
 
 
-
   external_doors:
-    - binary_sensor.genkan_door_lock
+    - binary_sensor.genkan_doorlock
+    - binary_sensor.computerroom_window
+    - binary_sensor.livingroom_window
+
+  vacation_lights:
+    entities:
+      - light.cabinet
+      - light.computer_room
+      - light.living_room
+      - light.shion_room
+      - light.master_room
 
 
   bed_sensors:
@@ -97,10 +111,17 @@
   motion_kitchen_occupancy:
     name: Motion Kitchen Occupancy
     entities:
-      - binary_sensor.motion_k1_occupancy
-      - binary_sensor.motion_k2_occupancy
+      - binary_sensor.motion_kitchen_occupancy
+      - binary_sensor.motion_kitchen2_occupancy
 
-
+  occupancy:
+    - binary_sensor.motion_kitchen_occupancy
+    - binary_sensor.motion_lr_occupancy
+    - binary_sensor.motion_mr_occupancy
+    - binary_sensor.motion_sr_occupancy
+    - binary_sensor.motion_hallway_occupancy
+    - binary_sensor.motion_computerroom_occupancy
+      
 
   home_alarm_motion_sensors:
     name: Home Alarm Motion Sensors
@@ -127,7 +148,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

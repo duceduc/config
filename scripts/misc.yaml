@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Testing Script                                                                               #
-#                                                                                                              #
+#                                                                                                              
+#             Testing Script                                                                               
+#                                                                                                              
 #########################################################
 
 
@@ -25,9 +25,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Shelly EM                                                                                    #
-#                                                                                                              #
+#                                                                                                              
+#             Shelly EM                                                                                    
+#                                                                                                              
 #########################################################
 
   reset_cumulative_cost:
@@ -41,17 +41,34 @@
       data_template:
         date: "{{ as_timestamp(now())|timestamp_custom('%Y-%m-%d') }}"
 
-
-
-
-
-
 #########################################################
-#                                                                                                              #
-#            Set Custom Device Tracker Location                                                  #
-#                                                                                                              #
+#                                                                                                              
+#            Earthquake One Day Count                                                  
+#                                                                                                              
 #########################################################
 
+  update_earthquake_one_day_count:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/one_day_count
+          payload_template: "{{ states.sensor.earthquake_one_day_count.state | int + 1 }}"
+          retain: true
+          
+          
+  reset_earthquake_one_day_count:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/one_day_count
+          payload_template: 0
+          retain: true
+
+#########################################################
+#                                                                                                              
+#            Set Custom Device Tracker Location                                                  
+#                                                                                                              
+#########################################################
 
   set_device_tracker_shion_home:
     alias: Set Device Tracker Shion Home
@@ -85,9 +102,8 @@
           - '35.81214930237013'
           - '139.71171706362946'
 
-
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

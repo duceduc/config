@@ -8,9 +8,17 @@ esphome:
   name: $name
   platform: $platform
   board: $board
+  libraries:
+   - ESP8266WiFi
+   - https://github.com/akaJes/AsyncPing#95ac7e4
+
+external_components:
+  - source:
+      type: local
+      path: components/esphome-component-ping/components
 
 wifi:
-  ssid: !secret ssid_1
+  ssid: !secret ssid3
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
@@ -19,24 +27,51 @@ wifi:
     static_ip: 192.168.1.93
     subnet: 255.255.255.0
     gateway: 192.168.1.1
+  ap:
+    ssid: Ping
+    password: !secret ota_pass
 
 captive_portal:
-
 logger:
 
-mqtt:
-  topic_prefix: esphome/$name
-  discovery: false
-  broker: 192.168.1.20
-  username: !secret mqtt_user
-  password: !secret mqtt_pass
-
+api:
+  password: !secret ota_pass
 ota:
   password: !secret ota_pass
 
 sensor:
   - platform: wifi_signal
     name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+  - platform: ping
+    # IP address of the target
+    ip_address: 8.8.8.8
+    # number of packets to send
+    num_attempts: 17
+    # the timeout. however, this is not what you usually expect from `ping`
+    # implementation: the timeout is also the interval to send packets. if you
+    # set this value to 10 sec, and the network is fine (no packet loss), then
+    # the component sends a packet at 10 sec interval, and the total time to
+    # finish would be 10 sec * num_attempts = 10 * 17 = 170 sec.
+    timeout: 1sec
+
+    loss:
+      name: $name Packet loss
+
+    latency:
+      name: $name Latency
+      # this should be 3 as the value is float, unit is sec, and the raw
+      # values are in ms.
+      accuracy_decimals: 3
+
+    # the interval for checking the sensors. defaults to 60s.
+    update_interval: 30s
 
 binary_sensor:
   - platform: gpio
@@ -44,3 +79,10 @@ binary_sensor:
     name: 'motion $name occupancy'
     device_class: motion
 
+  - platform: status
+    name: "$name status"
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart    

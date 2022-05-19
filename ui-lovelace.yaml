@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                    LOVELACE CONFIG                                                        #
-#                                                                                                    #
+#                                                                                                    
+#                    LOVELACE CONFIG                                                        
+#                                                                                                    
 ####################################################
 
 
@@ -30,9 +30,9 @@ views:
 
 
 ####################################################
-#                                                                                                    #
-#                    DECLUTTERING TPL                                                       #
-#                                                                                                    #
+#                                                                                                    
+#                    DECLUTTERING TPL                                                       
+#                                                                                                    
 ####################################################
 
 
@@ -341,7 +341,7 @@ decluttering_templates:
                     </ha-icon><span>${states['[[work_sensor]]'].state} mins</span>`
                 ]]]
       state:
-        - value: "not_home"
+        - value: 'away'
           styles:
             card:
               - opacity: 0.6
@@ -351,24 +351,43 @@ decluttering_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-5)
-        - value: "Duc Work"
+        - value: "jcb"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-4)
-        - value: "Eri Work"
+
+        - value: "costco hq"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)
-        - value: "School"
+        - value: "school"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)
 
+        - value: "lunch takeout"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-2)
+              
+        - value: "mall"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-8)
+
+        - value: "grocery store"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-6)
+        - value: "relatives"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-7)
 
 
 
 ####################################################
-#                                                                                                    #
-#          END OF CONFIGURATION FILE                                                   #
-#                                                                                                    #
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
 ####################################################

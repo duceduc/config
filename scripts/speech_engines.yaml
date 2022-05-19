@@ -6,20 +6,36 @@
 
   speech_engine:
     sequence:
-      - condition: template # Quiet time is off
+      - service: mqtt.publish
+        data_template:
+          topic: 'house/alexa/lastmsg'
+          payload: 'This message is from {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}. {{ message | striptags | truncate(220)}}'
+          retain: true
+      - service: mqtt.publish
+        data_template:
+          topic: 'house/alexa/lastloc'
+          payload: '{{ who }}'    
+      - condition: template
         value_template: "{{ is_state('binary_sensor.quiet_time', 'off') }}"
-      - condition: template # Not on vacation
+      - condition: template 
         value_template: "{{ is_state('input_boolean.vacation_mode', 'off') }}"        
-      - condition: template # Someone is home
+      - condition: template 
         value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
       - service: >-
-           notify.alexa_media_{{ who }}
+          {% if who in ['ai_1', 'living_room', 'media_player.ai_1'] %}
+             notify.alexa_media_ai_1      
+          {% elif who in ['ai_2', 'hallway', 'media_player.ai_2']  %}
+             notify.alexa_media_ai_2
+          {% elif who in ['ai_3']  %}
+             notify.alexa_media_ai_3            
+          {% else %}
+             notify.alexa_media_ai_4
+          {% endif %}      
         data:
           message: >
             {{ message }}
           data:
              type: tts
-
 
 #########################################################
 #                                                                                                              
@@ -35,12 +51,36 @@
           who: ai_4
           message: !include ../tpl/speech/morning_briefing.yaml
 
+  morning_wakeup_report:
+    sequence:
+      - service: script.alexa_alert
+        data: 
+          who: ai_4
+          message: !include ../tpl/speech/morning_wakeup_report.yaml
+
   daily_briefing:
     sequence:
       - service: script.speech_engine
         data: 
           who: ai_4
           message: !include ../tpl/speech/daily_briefing.yaml
+
+  nightly_briefing:
+    sequence:
+      - service: script.speech_engine
+        data: 
+          who: ai_1
+          message: !include ../tpl/speech/nightly_briefing.yaml
+
+
+
+
+  event_briefing:
+    sequence:
+      - service: script.speech_engine
+        data: 
+          who: ai_4
+          message: !include ../tpl/speech/event_briefing.yaml
 
 
 #########################################################

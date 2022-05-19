@@ -1,237 +1,241 @@
 ####################################################
-#                                                                                                    #
-#                    Switchbot Curtain Device Source                                    #
-#                                                                                                    #
+#                                                                                                    
+#                    Switchbot Curtain Device Source                                    
+#                                                                                                    
 ####################################################
 # External Integration Due to BT out of range
 # Restart BLE is not responding. Path /etc/systemd/system
 # Restart: sudo systemctl restart bots.service
 
-  - platform: command_line
-    switches:
-      computer_room_curtains:
-        friendly_name: Computer Room Curtains
-        command_on: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=open"'
-        command_off: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=close"'
-        command_state: 'true'
-        value_template: "{{ states('sensor.cr_curtain_left_position') | float(0) < 90 }}"  
-
-      living_room_curtains:
-        friendly_name: Living Room Curtains
-        command_on: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=open"'
-        command_off: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=close"'
-        command_state: 'true'
-        value_template: "{{ states('sensor.lr_curtain_left_position') | float(0) < 90 }}"  
-
-####################################################
-#                                                                                                    #
-#                    Switchbot CR Curtains Emulated Hue                                #
-#                                                                                                    #
-####################################################
-
-  - platform: template
-    switches:
-     computer_room_curtain:
-       friendly_name: 'Computer Room Curtain'
-       value_template: >-
-         {% if states('sensor.cr_curtain_lt_position')|float(0) < 10 %}
-           on
-         {% else %}
-           off
-         {% endif %}
-       turn_on:
-         - service: cover.open_cover
-           data:
-             entity_id: cover.cr_curtain_lt_curtain
-       turn_off:
-         - service: cover.close_cover
-           data:
-             entity_id: cover.cr_curtain_lt_curtain
-       icon_template: >-
-         {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
-           mdi:blinds-open
-         {% else %}
-            mdi:blinds
-         {% endif %}
+#  - platform: command_line
+#    switches:
+#      computer_room_curtains:
+#        friendly_name: Computer Room Curtains
+#        command_on: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=open"'
+#        command_off: 'curl -k "http://192.168.1.30:5004/?id=c5c6df9448bc&cmd=close"'
+#        command_state: 'true'
+#        value_template: "{{ states('sensor.cr_curtain_left_position') | float(0) < 90 }}"  
+#
+#      living_room_curtains:
+#        friendly_name: Living Room Curtains
+#        command_on: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=open"'
+#        command_off: 'curl -k "http://192.168.1.30:5004/?id=e2b3c5c10dcc&cmd=close"'
+#        command_state: 'true'
+#        value_template: "{{ states('sensor.lr_curtain_left_position') | float(0) < 90 }}" 
 
 ####################################################
-#                                                                                                    #
-#                    Switchbot LR Curtains Emulated Hue                                #
-#                                                                                                    #
+#                                                                                                    
+#                    Switchbot CR Curtains Emulated Hue                                
+#                                                                                                    
 ####################################################
 
-  - platform: template
-    switches:
-     living_room_curtain:
-       friendly_name: 'Living Room Curtain'
-       value_template: >-
-         {% if states('sensor.lr_curtain_lt_position')|float(0) < 10 %}
-           on
-         {% else %}
-           off
-         {% endif %}
-       turn_on:
-         - service: cover.open_cover
-           data:
-             entity_id: cover.lr_curtain_lt_curtain
-       turn_off:
-         - service: cover.close_cover
-           data:
-             entity_id: cover.lr_curtain_lt_curtain
-       icon_template: >-
-         {% if is_state('cover.lr_curtain_lt_curtain', 'open') %}
-           mdi:blinds-open
-         {% else %}
-            mdi:blinds
-         {% endif %}
+# CURRENTLY USING
+#  - platform: template
+#    switches:
+#     computer_room_curtain:
+#       friendly_name: 'Computer Room Curtain'
+#       value_template: >-
+#         {% if states('sensor.cr_curtain_lt_position')|float(0) < 10 %}
+#           on
+#         {% else %}
+#           off
+#         {% endif %}
+#       turn_on:
+#         - service: cover.open_cover
+#           data:
+#             entity_id: cover.cr_curtain_lt_curtain
+#       turn_off:
+#         - service: cover.close_cover
+#           data:
+#             entity_id: cover.cr_curtain_lt_curtain
+#       icon_template: >-
+#         {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
+#           mdi:blinds-open
+#         {% else %}
+#            mdi:blinds
+#         {% endif %}
 
 ####################################################
-#                                                                                                    #
-#                    Switchbot Bots MQTT Emulated Hue                                #
-#                                                                                                    #
+#                                                                                                    
+#                    Switchbot LR Curtains Emulated Hue                                
+#                                                                                                    
 ####################################################
 
-  - platform: template
-    switches:
-      24hr_fan:
-        friendly_name: '24hr Fan'
-        value_template: "{{ states('input_boolean.washroom_fan') }}"
-        turn_on:
-          - service: script.holdpress_bot
-            data:
-              bot: '24hr_fan'
-              press: 0
+# CURRENTLY USING
+#  - platform: template
+#    switches:
+#     living_room_curtain:
+#       friendly_name: 'Living Room Curtain'
+#       value_template: >-
+#         {% if states('sensor.lr_curtain_lt_position')|float(0) < 10 %}
+#           on
+#         {% else %}
+#           off
+#         {% endif %}
+#       turn_on:
+#         - service: cover.open_cover
+#           data:
+#             entity_id: cover.lr_curtain_lt_curtain
+#       turn_off:
+#         - service: cover.close_cover
+#           data:
+#             entity_id: cover.lr_curtain_lt_curtain
+#       icon_template: >-
+#         {% if is_state('cover.lr_curtain_lt_curtain', 'open') %}
+#           mdi:blinds-open
+#         {% else %}
+#            mdi:blinds
+#         {% endif %}
+
+
+
+####################################################
+#                                                                                                    
+#                    Switchbot Bots MQTT Emulated Hue                                
+#                                                                                                    
+####################################################
+
+# CURRENTLY USING
+#  - platform: template
+#    switches:
+#      24hr_fan:
+#        friendly_name: '24hr Fan'
+#        value_template: "{{ states('input_boolean.washroom_fan') }}"
+#        turn_on:
+#          - service: script.holdpress_bot
+#            data:
+#              bot: '24hr_fan'
+#              press: 0
+##          - service: switch.turn_on
+##            entity_id: switch.24hr_fan_switch
+#          - service: input_boolean.turn_on
+#            entity_id: input_boolean.washroom_fan
+#        turn_off:
+#          - service: script.holdpress_bot
+#            data:
+#              bot: '24hr_fan'
+#              press: 3
+##          - service: switch.turn_on
+##            entity_id: switch.24hr_fan_switch
+#          - service: input_boolean.turn_off
+#            entity_id: input_boolean.washroom_fan
+#        icon_template: >-
+#          {% if is_state('input_boolean.washroom_fan', 'on') %}
+#             mdi:fan
+#          {% else %}
+#             mdi:fan-off
+#          {% endif %}
+#
+#      floor_heat:
+#        friendly_name: 'Floor Heat'
+#        value_template: "{{ states('input_boolean.floor_heat') }}"
+#        turn_on:
 #          - service: switch.turn_on
-#            entity_id: switch.24hr_fan_switch
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.washroom_fan
-        turn_off:
-          - service: script.holdpress_bot
-            data:
-              bot: '24hr_fan'
-              press: 3
+#            entity_id: switch.floor_heat_switch
+#          - service: input_boolean.turn_on
+#            entity_id: input_boolean.floor_heat
+#        turn_off:
 #          - service: switch.turn_on
-#            entity_id: switch.24hr_fan_switch
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.washroom_fan
-        icon_template: >-
-          {% if is_state('input_boolean.washroom_fan', 'on') %}
-             mdi:fan
-          {% else %}
-             mdi:fan-off
-          {% endif %}
-
-      floor_heat:
-        friendly_name: 'Floor Heat'
-        value_template: "{{ states('input_boolean.floor_heat') }}"
-        turn_on:
-          - service: switch.turn_on
-            entity_id: switch.floor_heat_switch
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.floor_heat
-        turn_off:
-          - service: switch.turn_on
-            entity_id: switch.floor_heat_switch
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.floor_heat
-        icon_template: >-
-          {% if is_state('input_boolean.floor_heat', 'on') %}
-             mdi:radiator
-          {% else %}
-             mdi:radiator-off
-          {% endif %}
-
-      jcom_tv:
-        friendly_name: 'Jcom Tv'
-        value_template: "{{ states('input_boolean.jcom_tv') }}"
-        turn_on:
-          - service: switch.turn_on
-            entity_id: switch.jcom_tv_box_switch
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.jcom_tv
-        turn_off:
-          - service: switch.turn_on
-            entity_id: switch.jcom_tv_box_switch
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.jcom_tv
-        icon_template: >-
-          {% if is_state('input_boolean.jcom_tv', 'on') %}
-             mdi:monitor
-          {% else %}
-             mdi:monitor-off
-          {% endif %}
-
-      tv_lock:
-        friendly_name: 'Tv Lock'
-        value_template: "{{ states('input_boolean.tv_lock') }}"
-        turn_on:
-          - service: switch.turn_on
-            entity_id: switch.hdmi_selector_switch
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.tv_lock
-        turn_off:
-          - service: switch.turn_on
-            entity_id: switch.hdmi_selector_switch
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.tv_lock
-        icon_template: >-
-          {% if is_state('input_boolean.tv_lock', 'on') %}
-             mdi:monitor-lock
-          {% else %}
-             mdi:monitor
-          {% endif %}
-
+#            entity_id: switch.floor_heat_switch
+#          - service: input_boolean.turn_off
+#            entity_id: input_boolean.floor_heat
+#        icon_template: >-
+#          {% if is_state('input_boolean.floor_heat', 'on') %}
+#             mdi:radiator
+#          {% else %}
+#             mdi:radiator-off
+#          {% endif %}
+#
+#      jcom_tv:
+#        friendly_name: 'Jcom Tv'
+#        value_template: "{{ states('input_boolean.jcom_tv') }}"
+#        turn_on:
+#          - service: switch.turn_on
+#            entity_id: switch.jcom_tv_box_switch
+#          - service: input_boolean.turn_on
+#            entity_id: input_boolean.jcom_tv
+#        turn_off:
+#          - service: switch.turn_on
+#            entity_id: switch.jcom_tv_box_switch
+#          - service: input_boolean.turn_off
+#            entity_id: input_boolean.jcom_tv
+#        icon_template: >-
+#          {% if is_state('input_boolean.jcom_tv', 'on') %}
+#             mdi:monitor
+#          {% else %}
+#             mdi:monitor-off
+#          {% endif %}
+#
+#      tv_lock:
+#        friendly_name: 'Tv Lock'
+#        value_template: "{{ states('input_boolean.tv_lock') }}"
+#        turn_on:
+#          - service: switch.turn_on
+#            entity_id: switch.hdmi_selector_switch
+#          - service: input_boolean.turn_on
+#            entity_id: input_boolean.tv_lock
+#        turn_off:
+#          - service: switch.turn_on
+#            entity_id: switch.hdmi_selector_switch
+#          - service: input_boolean.turn_off
+#            entity_id: input_boolean.tv_lock
+#        icon_template: >-
+#          {% if is_state('input_boolean.tv_lock', 'on') %}
+#             mdi:monitor-lock
+#          {% else %}
+#             mdi:monitor
+#          {% endif %}
 
 ####################################################
-#                                                                                                    #
-#                    Switchbot API Custom Switches                                      #
-#                                                                                                    #
+#                                                                                                    
+#                    Switchbot API Custom Switches                                      
+#                                                                                                    
 ####################################################
 
-  - platform: template
-    switches:
-      sb_humidifier:
-        friendly_name: SB Humidifier
-        value_template: "{{ states('input_boolean.sb_humidifier') }}"
-        turn_on:
-          - service: input_select.select_option
-            data_template:
-              entity_id: input_select.sb_humidifier_mode
-              option: High
-          
-        turn_off:
-          - service: input_select.select_option
-            data_template:
-              entity_id: input_select.sb_humidifier_mode
-              option: 'Off'
-          
-        icon_template: >-
-          {% if is_state('input_boolean.sb_humidifier', 'on') %}
-             mdi:air-humidifier
-          {% else %}
-             mdi:air-humidifier-off
-          {% endif %}
-
-      sb_humidifier_mode:
-        friendly_name: SB Humidifier Mode
-        value_template: "{{ states('input_boolean.sb_humidifier') }}"
-        turn_on:
-          - service: script.toggle
-            entity_id: script.humidifier_mode
-        turn_off:
-          - service: script.toggle
-            entity_id: script.humidifier_mode
-        icon_template: >-
-          {% if is_state('input_boolean.sb_humidifier', 'on') %}
-             mdi:air-purifier
-          {% else %}
-             mdi:air-humidifier-off
-          {% endif %}
-
+# CURRENTLY USING
+#  - platform: template
+#    switches:
+#      sb_humidifier:
+#        friendly_name: SB Humidifier
+#        value_template: "{{ states('input_boolean.sb_humidifier') }}"
+#        turn_on:
+#          - service: input_select.select_option
+#            data_template:
+#              entity_id: input_select.sb_humidifier_mode
+#              option: High
+#          
+#        turn_off:
+#          - service: input_select.select_option
+#            data_template:
+#              entity_id: input_select.sb_humidifier_mode
+#              option: 'Off'
+#          
+#        icon_template: >-
+#          {% if is_state('input_boolean.sb_humidifier', 'on') %}
+#             mdi:air-humidifier
+#          {% else %}
+#             mdi:air-humidifier-off
+#          {% endif %}
+#
+#      sb_humidifier_mode:
+#        friendly_name: SB Humidifier Mode
+#        value_template: "{{ states('input_boolean.sb_humidifier') }}"
+#        turn_on:
+#          - service: script.toggle
+#            entity_id: script.humidifier_mode
+#        turn_off:
+#          - service: script.toggle
+#            entity_id: script.humidifier_mode
+#        icon_template: >-
+#          {% if is_state('input_boolean.sb_humidifier', 'on') %}
+#             mdi:air-purifier
+#          {% else %}
+#             mdi:air-humidifier-off
+#          {% endif %}
 
 ####################################################
-#                                                                                                    #
-#          END OF CONFIGURATION FILE                                                   #
-#                                                                                                    #
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
 ####################################################
  

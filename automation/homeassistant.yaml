@@ -13,23 +13,6 @@
         entity_id: switch.update_github
 
 
-
-#########################################################
-#                                                                                                              
-#                   Counter                                                           
-#                                                                                                              
-#########################################################
-
-
-  - alias: 'Anniversary Wedding Counter'
-    trigger:
-      platform: template
-      value_template: "{{ states('sensor.anniversary').lower() in ['today is wedding anniversary'] }}"
-    action:
-      - service: counter.increment
-        entity_id: counter.anniversary_wedding_years
-
-
 ####################################################
 #                                                                                                    
 #                    SENSOR BATTERY LOW                                                 
@@ -41,8 +24,7 @@
     trigger:
       - platform: numeric_state
         entity_id:
-          - sensor.motion_k1_battery
-          - sensor.motion_k2_battery
+          - sensor.motion_security_battery
           - sensor.aio_controller_battery
           - sensor.shion_room_battery
           - sensor.computer_room_battery
@@ -62,12 +44,65 @@
 
           - sensor.motion_s1_battery
           - sensor.motion_c1_battery
-        below: 21
+        below: 6
     action:
-      service: notify.notify_events
-      data_template:
-        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 20 percent."
+      - service: notify.notify_events
+        data_template:
+          message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 5 percent."
 
+
+#########################################################
+#                                                                                                              
+#                  Startup Automation to update some sensor after reboot                                                       
+#                                                                                                              
+#########################################################
+
+  - alias: startup automations
+    initial_state: true
+    trigger:
+      - platform: homeassistant
+        event: start
+    action:
+      - delay: 25
+      - service: automation.trigger
+        entity_id: automation.presence_restart_daily
+
+
+  - alias: Refresh special event sensors
+    initial_state: true
+    trigger:
+      - platform: time
+        at: '00:00:01'
+      - platform: homeassistant
+        event: start
+    action:
+      - service: python_script.special_events
+        data:
+          name: Duc
+          type: birthday
+          date: !secret duc_bday
+      - service: python_script.special_events
+        data:
+          name: Eri
+          type: birthday
+          date: !secret eri_bday
+      - service: python_script.special_events
+        data:
+          name: Shion
+          type: birthday
+          date: !secret shion_bday
+      - service: python_script.special_events
+        data:
+          name: Our wedding
+          type: anniversary
+          date: !secret wed_anniversary
+      - service: python_script.special_events
+        data:
+          name: Golden Week
+          type: holiday
+          date: '29/04/2022'
+
+          
 #########################################################
 #                                                                                                              
 #                  TEMPLATE SENSOR UPDATE                                                       
@@ -108,9 +143,9 @@
       - condition: template
         value_template: "{{ trigger.from_state.state != 'unavailable' }}"
     action:
-      service: notify.notify_events #Viber
-      data:
-        message: "Home Assistant Version {{ states.sensor.hassio_version.state }} is available!"
+      - service: notify.notify_events #Viber
+        data:
+          message: "Home Assistant Version {{ states.sensor.hassio_version.state }} is available!"
 
 
 #########################################################
@@ -137,6 +172,27 @@
           notification_id: >
             {{ trigger.event.data.service_data.notification_id }}
 
+# Suppress esp32 cam desktop login error
+  - alias: persistent_notification_clear_ip
+    mode: single 
+    trigger:
+      - platform: state
+        entity_id: persistent_notification.http_login
+        to: notifying
+    condition:
+      - condition: template 
+        value_template: >
+          {% if states.persistent_notification.http_login.state is defined %}
+            {% set str= state_attr('persistent_notification.http_login', 'message') %}
+            {% set ip=(str|regex_findall_index('[\d.]+')) %}
+              {{ ip in ['192.168.1.111'] }}
+          {% else %}
+            false
+          {% endif %}
+    action:
+      - service: persistent_notification.dismiss
+        data:
+          notification_id: http-login
 
 #########################################################
 #                                                                                                              
@@ -154,8 +210,6 @@
         addon: 15d21743_samba_backup
         input: restore-sensor
 
-
-
 #########################################################
 #                                                                                                              
 #             Set Location of device_tracker_shion on Startup                                 
@@ -168,6 +222,7 @@
       event: start
     action:
       - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
+
 
 
 ####################################################

@@ -65,24 +65,22 @@
       - The (e00f) is turned (e00s)
       - She on is (e05s) sleeping in his bed
       - She ons birthday is (e15s) from now
-      - The (e02f) is turned (e02s)
       - The (e18f) is (e18$) micrograms per cubic meter
       - The (e19f) is (e19$) parts per million
       - The (e20f) is (e20$) parts per million
 
-      - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
 #       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
 
 
-  sb_humidifier_mode:
-    name: SB Humidifier Mode
-    icon: mdi:air-humidifier
-    options:
-      - 'Off'
-      - Auto
-      -  Low
-      - Med
-      - High
+#  sb_humidifier_mode:
+#    name: SB Humidifier Mode
+#    icon: mdi:air-humidifier
+#    options:
+#      - 'Off'
+#      - Auto
+#      -  Low
+#      - Med
+#      - High
 
 
   lr_ac_mode:
@@ -130,23 +128,23 @@
       - Silent Heat
       - Normal Humidifier
 
-  shelly_washer_state:
-    name: Washer State
-    icon: mdi:washing-machine
-    options:
-     - 'stop'
-     - 'wash fill'
-     - 'wash'
-     - 'wash spin'
-     - 'wash drain'
-     - 'rinse fill'
-     - 'rinse wait'
-     - 'rinse'
-     - 'rinse spin'
-     - 'rinse drain'
-     - 'unknown'
-     - 'soak'
-     - 'dryer'
+#  shelly_washer_state:
+#    name: Washer State
+#    icon: mdi:washing-machine
+#    options:
+#     - 'stop'
+#     - 'wash fill'
+#     - 'wash'
+#     - 'wash spin'
+#     - 'wash drain'
+#     - 'rinse fill'
+#     - 'rinse wait'
+#     - 'rinse'
+#     - 'rinse spin'
+#     - 'rinse drain'
+#     - 'unknown'
+#     - 'soak'
+#     - 'dryer'
 
   home_mode:
     name: Home Mode

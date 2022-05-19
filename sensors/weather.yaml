@@ -1,0 +1,138 @@
+####################################################
+#                                                                                                    
+#                      TEMPERATURE                                                           
+#                                                                                                    
+####################################################
+# DHT Integration
+#  - platform: dht
+#    sensor: DHT22
+#    pin: D4
+#    name: mdf
+#    scan_interval: 60
+#    monitored_conditions:
+#     - temperature
+#     - humidity
+
+# ds1 server DHT22 GPIO#4 [backup to use if esp32cam failed]
+#  - platform: mqtt
+#    name: 'MDF Temperature'
+#    state_topic: 'system-sensors/sensor/ds1/dht22/temperature'
+#    value_template: '{{ value }}'
+#    unit_of_measurement: '°C'
+
+#  - platform: mqtt
+#    name: 'MDF Humidity'
+#    state_topic: 'system-sensors/sensor/ds1/dht22/humidity'
+#    value_template: '{{ value }}'
+#    unit_of_measurement: '%'
+
+####################################################
+#                                                                                                    
+#                      Kawaguchi Temperature                                       
+#                                                                                                    
+####################################################
+
+#  - platform: template
+#    sensors:
+#      clothing_forecast:
+#        friendly_name: "Clothing Forecast"
+#        unit_of_measurement: ''
+#        value_template: >-
+#            {%- if states('sensor.wbio_daytime_temperature')|int > 17 %}
+#              {%- if states('sensor.wbio_daytime_temperature')|int < 26 %}
+#                Nice
+#              {% elif states('sensor.wbio_daytime_temperature')|int > 35 %}
+#                Hot
+#              {% else %}
+#                Toasty
+#              {%- endif %}
+#            {% elif states('sensor.wbio_daytime_temperature')|int < 17 %}
+#              {%- if states('sensor.wbio_daytime_temperature')|int < 0 %}
+#                Freezing
+#              {% elif states('sensor.wbio_daytime_temperature')|int > 10 %}
+#                Chilly
+#              {% else %}
+#                Cold
+#              {%- endif %}
+#            {% else %}
+#              Unknown
+#            {%- endif %}
+#      wbio_current_forecast:
+#        friendly_name: 'Current Forecast'
+#        value_template: "{{states.sensor.weatherbit_weather_description.state }}"
+#      wbio_current_rain_forecast:
+#        friendly_name: 'Current Rain Chance'
+#        value_template: "{{ states.weather.weatherbit.attributes.forecast[0].precipitation_probability }}"
+#        unit_of_measurement: '%'
+#    
+#      wbio_current_temperature:
+#        friendly_name: 'Current Temperature'
+#        value_template: "{{ states.weather.weatherbit.attributes.temperature }}"
+#        device_class: temperature
+#      wbio_daytime_temperature:
+#        friendly_name: 'Daytime Temperature'
+#        value_template: >-
+#            {{ states.weather.weatherbit.attributes.forecast[0].temperature }}
+#    
+#      wbio_current_condition: 
+#        friendly_name: 'Current Condition'
+#        value_template: "{{ states.weather.weatherbit.attributes.alt_condition }}"    
+#      wbio_current_humidity:
+#        friendly_name: "Current Humidity"
+#        value_template: "{{ states.weather.weatherbit.attributes.humidity }}"      
+#      wbio_current_visibility:
+#        friendly_name: "Current Visibility"
+#        value_template: "{{ states.weather.weatherbit.attributes.visibility }}"    
+#      wbio_current_windspeed:
+#        friendly_name: "Current Windspeed"
+#        value_template: "{{ states.weather.weatherbit.attributes.wind_speed }}"    
+#      wbio_overnight_low:
+#        friendly_name: "Overnight Low"
+#        unit_of_measurement: ''
+#        value_template: '{{ states.weather.weatherbit.attributes.forecast[0].templow }}'
+#
+#      nws_overnight_forecast:
+#        friendly_name: "Overnight Forecast"
+#        unit_of_measurement: ''
+#        value_template: '{{ states.weather.weatherbit.attributes.forecast[0].condition }}'
+#            
+#      wbio_forecast_tomorrow:
+#        friendly_name: "Forecast Tomorrow"
+#        unit_of_measurement: ''
+#        value_template: >-
+#             {{ states.weather.weatherbit.attributes.forecast[1].temperature }}
+#      wbio_forecast_rain_tomorrow:
+#        friendly_name: "Rain Chance Tomorrow"
+#        unit_of_measurement: '%'
+#        value_template: >-
+#            {{ states.weather.weatherbit.attributes.forecast[1].precipitation_probability }}
+#      wbio_forecast_tomorrow_night:
+#        friendly_name: "Forecast Tomorrow Night"
+#        unit_of_measurement: ''
+#        value_template: >-
+#           {{ states.weather.weatherbit.attributes.forecast[1].templow }}
+#      wbio_forecast_rain_tomorrow_night:
+#        friendly_name: "Rain Chance Tomorrow Night"
+#        unit_of_measurement: '%'
+#        value_template: >-
+#            {{ states.weather.weatherbit.attributes.forecast[2].precipitation_probability }}
+#
+#
+#  - platform: template
+#    sensors:
+#      oa_feels_like:
+#        friendly_name: 'Outside Feels Like'
+#        unit_of_measurement: "°C"
+#        value_template: >
+#          {% set temp = states('sensor.oa_temperature')|float(0) %}
+#          {% set humidity = states('sensor.oa_humidity')|float(0) %}
+#          {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
+
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

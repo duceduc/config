@@ -13,20 +13,18 @@ esphome:
 
 wifi:
 #  use_address: aio_wemos.local
-  ssid: !secret ssid_1
+  ssid: !secret ssid1
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none
-#  manual_ip:
-#    static_ip: 192.168.1.95
-#    subnet: 255.255.255.0
-#    gateway: 192.168.1.1
+  manual_ip:
+    static_ip: 192.168.1.95
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
   
 captive_portal:
-
 logger:
 
-# Uncomment this if you use Home Assistant
 api:
   password: !secret ota_pass
 ota:
@@ -54,10 +52,16 @@ sensor:
 
   - platform: wifi_signal
     name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
 
   - platform: adc
     pin: A0
-    name: 'rear Illuminance'
+    name: 'front illuminance'
     unit_of_measurement: lux
     update_interval: 20s
 
@@ -76,3 +80,10 @@ binary_sensor:
     pin: GPIO4
     name: 'motion g2 occupancy'
     device_class: motion
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart
+
+    

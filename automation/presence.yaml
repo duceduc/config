@@ -1,73 +1,121 @@
 #########################################################
-#                                                                                                              #
-#            Presence - Family                                                                          #
-#                                                                                                              #
+#                                                                                                              
+#            Presence - Family                                                                          
+#                                                                                                             
 #########################################################
 
-# Duc
+# Duc combing both monitor and espresense detections
 - alias: Presence Duc On
   trigger:
     - platform: numeric_state
       entity_id: sensor.id_presence
       above: 10
+    - platform: template
+      value_template: "{{ states('sensor.duc_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom'] }}"
+      
+  condition:
+    - condition: template
+      value_template: "{{ states('sensor.duc_espresense') != 'not_home' }}"
+      
   action:
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.duc_presence
 - alias: Presence Duc Off
+  mode: restart
   trigger:
     - platform: numeric_state
       entity_id: sensor.id_presence
       below: 10
+    - platform: state
+      entity_id: sensor.duc_espresense
+      to: 'not_home'
+      
+  condition:
+    - condition: template
+      value_template: "{{ states('sensor.id_presence')| float(0) == 0.0 }}"   
+    - condition: template
+      value_template: "{{ is_state('sensor.duc_espresense', 'not_home') }}"   
+
   action:
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.duc_presence
 
-# Eri
+
+# Eri combing both monitor and espresense detections
 - alias: Presence Eri On
   trigger:
     - platform: numeric_state
       entity_id: sensor.ie_presence
       above: 10
+    - platform: template
+      value_template: "{{ states('sensor.eri_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom'] }}"
+      
+  condition:
+    - condition: template
+      value_template: "{{ states('sensor.eri_espresense') != 'not_home' }}"
+
   action:
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.eri_presence
 - alias: Presence Eri Off
+  mode: restart
   trigger:
     - platform: numeric_state
       entity_id: sensor.ie_presence
       below: 10
+    - platform: state
+      entity_id: sensor.eri_espresense
+      to: 'not_home'
+
+  condition:      
+    - condition: template
+      value_template: "{{ states('sensor.ie_presence')| float(0) == 0.0 }}"   
+    - condition: template
+      value_template: "{{ is_state('sensor.eri_espresense', 'not_home') }}"   
+      
   action:
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.eri_presence
 
-# Shion
-- alias: Presence Shioin On
+# Shion combing both monitor and espresense detections
+- alias: Presence Shion On
   trigger:
     - platform: numeric_state
       entity_id: sensor.tms_presence
       above: 10
+    - platform: template
+      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom'] }}"
+  condition:
+    - condition: template
+      value_template: "{{ states('sensor.shion_tms_espresense') != 'not_home' }}"            
   action:
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.shion_presence
-- alias: Presence Shioin Off
+- alias: Presence Shion Off
   trigger:
     - platform: numeric_state
       entity_id: sensor.tms_presence
       below: 10
+    - platform: state
+      entity_id: sensor.shion_tms_espresense
+      to: 'not_home'
+  condition:
+    - condition: template
+      value_template: "{{ is_state('sensor.shion_tms_espresense', 'not_home') }}"      
   action:
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.shion_presence
 
 #########################################################
-#                                                                                                              #
-#            Presence - Guests                                                                         #
-#                                                                                                              #
+#                                                                                                              
+#            Presence - Guests                                                                         
+#                                                                                                              
 #########################################################
 
 
@@ -140,15 +188,14 @@
       data:
         message: "Guest Mode is turned {{ states('input_boolean.guest_mode') }}."
         title: "*Guest Mode Status*"
-        
 
 #########################################################
-#                                                                                                              #
-#             Momentary Switch Trigger                                                               #
-#                                                                                                              #
+#                                                                                                              
+#            Arrival | Departure                                                                         
+#                                                                                                             
 #########################################################
-
 - alias: Monentary Presence Monitor Trigger
+  mode: restart
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_g1_occupancy
@@ -158,14 +205,7 @@
     - service: switch.turn_on
       data:
         entity_id: switch.momentary_presence_monitor
-
-#########################################################
-#                                                                                                              #
-#            Arrival | Departure                                                                         #
-#                                                                                                             #
-#########################################################
-
-
+###
 - alias: Presence Scan Arrival
   trigger:
     - platform: state
@@ -188,20 +228,25 @@
     - condition: template
       value_template: "{{ is_state('switch.momentary_presence_monitor', 'on') }}"
   action:  
-    - delay: '00:02:00'
-    - service: mqtt.publish
-      data_template:
-        topic: monitor/scan/depart
-    - delay: '00:00:30'
-    - service: mqtt.publish
-      data_template:
-        topic: monitor/scan/depart
+    - delay: '00:01:25'
+    - service: script.monitor_depart
+
+    
+#    - service: mqtt.publish
+#      data_template:
+#        topic: monitor/scan/depart
+#    - delay: '00:01:00'
+#    - service: mqtt.publish
+#      data_template:
+#        topic: monitor/scan/depart
+
+
 
 
 #########################################################
-#                                                                                                              #
-#            Restart Monitor                                                                              #
-#                                                                                                              #
+#                                                                                                              
+#            Restart Monitor                                                                              
+#                                                                                                              
 #########################################################
 
 - alias: Presence Restart Daily
@@ -217,9 +262,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#            Away|Home|Returning|Vacation status                                              #
-#                                                                                                              #
+#                                                                                                              
+#            Away|Home|Returning|Vacation status                                              
+#                                                                                                              
 #########################################################
 
 # Home
@@ -238,6 +283,7 @@
       entity_id: input_select.home_mode
       data:
         option: 'Home'
+    - service: script.standby
 
 # Away
 - alias: Home Mode - Leaving
@@ -245,7 +291,7 @@
     - platform: numeric_state
       entity_id: sensor.n_people_home
       below: 1
-      for: 3
+      for: 60
   condition:
     - condition: template
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
@@ -257,32 +303,19 @@
       entity_id: input_select.home_mode
       data:
         option: 'Away'
-    - service: script.dev_check # turn off any devices that were left on
-    - service: notify.mobile_app_id
-      data:
+    - service: script.appliances_off # turn off any devices that were left on
+    - service: script.text_notify
+      data: 
+        who: duc
         message: "There are {{ states('sensor.n_people_home') }} people at home now."
         title: '*Home Status*'
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.sentry_mode
 
+        
 # Returning
-- alias: Home Mode - Returning
-  trigger:
-    - platform: state
-      entity_id: 
-#        - binary_sensor.duc_home
-#        - binary_sensor.eri_home
-        - device_tracker.duc
-        - device_tracker.eri
-        - device_tracker.shion        
-#      to: 'on'
-      to: 'home'
-  condition:
-    - condition: template
-      value_template: "{{ is_state('input_select.home_mode', 'Away') or is_state('input_select.home_mode', 'Vacation') }}"
-  action:
-    - service: input_select.select_option
-      entity_id: input_select.home_mode
-      data:
-        option: 'Returning'
+## [See announcements.yaml announcing whose coming home]
+##
 
 # Vacation
 - alias: Home Mode - Vacation
@@ -298,6 +331,9 @@
             entity_id: input_select.home_mode
             data:
               option: 'Vacation'
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.sentry_mode
+              
       - conditions: >
            {{ states.input_boolean.vacation_mode.state == 'off' and
               states.sensor.n_people_home.state | int(0)  < 1 }}
@@ -314,12 +350,13 @@
             entity_id: input_select.home_mode
             data:
               option: 'Home'
+          - service: script.standby
 
 
 #########################################################
-#                                                                                                              #
-#            Set Custom Device Tracker Location                                                  #
-#                                                                                                              #
+#                                                                                                              
+#            Set Custom Device Tracker Location                                                  
+#                                                                                                              
 #########################################################
 
 - alias: Set tms Tile Location
@@ -333,7 +370,7 @@
 - alias: Set Location Waze
   trigger:
     - platform: numeric_state
-      entity_id: sensor.duc_to_work_waze, sensor.eri_to_work_waze, sensor.shion_to_school_waze
+      entity_id: sensor.shion_to_school_waze, sensor.duc_to_work_waze, sensor.eri_to_work_waze
       below: 3
   action:
     choose:
@@ -356,12 +393,52 @@
           - service: device_tracker.see
             data:
               dev_id: shion
-              location_name: "School"
+              location_name: "school"
 
+
+
+####################################################
+#                                                                                                    
+#            Turn off Travel Monitor Alerts                                            
+#                                                                                                    
+####################################################
+
+
+- id: family_has_arrived
+  alias: Family Has arrived
+  trigger:
+  - platform: zone
+    entity_id: person.duc
+    zone: zone.home
+    event: enter
+    id: duc
+  - platform: zone
+    entity_id: person.eri
+    zone: zone.home
+    event: enter
+    id: eri
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: duc
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        entity_id: input_boolean.duc_travel_monitor
+    - conditions:
+      - condition: trigger
+        id: eri
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        entity_id: input_boolean.eri_travel_monitor
+    default: []
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

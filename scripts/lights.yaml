@@ -1,17 +1,5 @@
 #########################################################
 #                                                                                                              
-#             Template                                                                    
-#                                                                                                              
-#########################################################
-
-
-
-
-
-
-
-#########################################################
-#                                                                                                              
 #             Motion Kitchen Lights                                                                    
 #                                                                                                              
 #########################################################
@@ -36,11 +24,11 @@
       - service: light.turn_on
         data_template:
           entity_id: >
-            {% if states.sensor.front_illuminance.state | float <= 0.10 %}
+            {% if states.sensor.rear_illuminance.state | float <= 0.10 %}
                light.k_1, light.k_3
-            {% elif states.sensor.front_illuminance.state | float <= 0.13 %}
+            {% elif states.sensor.rear_illuminance.state | float <= 0.13 %}
                light.k_1, light.k_3, light.k_5
-            {% elif states.sensor.front_illuminance.state | float <= 0.18 %}
+            {% elif states.sensor.rear_illuminance.state | float <= 0.18 %}
                light.k_1, light.k_3, light.counter
             {% elif now().hour > 22 or now().hour < 5 %}
                light.k_1, light.k_3
@@ -256,7 +244,8 @@
         value_template: "{{ is_state('switch.momentary_activate_tv', 'on') }}"
       - service: script.desktop_wol
       - condition: template # Is NOT daylight
-        value_template: "{{ not is_state('sensor.period_of_the_day', 'daylight') }}"
+#        value_template: "{{ not is_state('sensor.period_of_the_day', 'daylight') }}"      
+        value_template: "{{ is_state('binary_sensor.evening', 'on') }}"
       - condition: template # Eri not home
         value_template: "{{ is_state('binary_sensor.eri_presence', 'off') and (now() - states.binary_sensor.eri_presence.last_changed).total_seconds() > 1*60 }}"        
       - service: switch.turn_on
@@ -299,7 +288,7 @@
       - repeat:
           until:
             - condition: template
-              value_template: "{{ is_state('alarm_control_panel.home_alarm', 'disarmed') }}"
+              value_template: "{{ is_state('input_boolean.sentry_mode', 'off') }}"
           sequence:
             - service: light.toggle
               data:
@@ -307,6 +296,10 @@
                 color_name: red
                 brightness: 254
             - delay: 2
+      - service: script.returntonormal
+        data:
+          entity: light.ntl_1
+            
 
 #########################################################
 #                                                                                                              
@@ -388,6 +381,37 @@
       - service: counter.reset
         target:
           entity_id: counter.dining_lights_toggle
+
+
+#########################################################
+#                                                                                                              
+#             Randomize Vacation Lights                                                               
+#                                                                                                              
+#########################################################
+
+
+  randomize_vacation_lights:
+    sequence:
+      - repeat:
+          until:
+            - condition: state
+              entity_id: sun.sun
+              state: 'above_horizon'
+          sequence:
+            - service: script.text_notify
+              data:
+                who: duc
+                message: Running Vacation Lights
+            - service: homeassistant.toggle
+              data:
+                entity_id: >
+                  {{ expand('group.vacation_lights') | map(attribute='entity_id') | list | random }}
+            - delay:
+                minutes: '{{ range(1,3) | random | int }}'
+      - service: homeassistant.turn_off
+        entity_id: group.vacation_lights
+    mode: single
+
 
 #########################################################
 #                                                                                                              

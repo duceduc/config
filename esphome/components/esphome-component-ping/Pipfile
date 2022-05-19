@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+esphome = "2022.3.1"
+
+[dev-packages]
+pylint = "2.8.2"
+flake8 = "3.9.2"
+black = "21.7b0"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

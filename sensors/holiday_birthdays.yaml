@@ -48,44 +48,40 @@
 
 ####################################################
 #                                                                                                    
-#                      Anniversaries                                          
+#                      Lunch                                               
 #                                                                                                    
 ####################################################
 
-
   - platform: command_line
-    name: Anniversary
+    name: School Lunch
     command: 'cat /config/www/data/days.json'
     value_template: >
       {% set today = now().month  ~ '/' ~ now().day  %}
-      {% set tomorrow = (as_timestamp(now())+86400*1)| timestamp_custom("%-m")~ '/' ~(as_timestamp(now())+86400*1)| timestamp_custom("%-d")%}
-      {% set in_a_week = (as_timestamp(now())+86400*7)| timestamp_custom("%-m")~ '/' ~(as_timestamp(now())+86400*7)| timestamp_custom("%-d")%}
-      
-      {% set anniversary_today =  value_json.MAJOR_JP.anniversary[ today ] %}
-      {% set anniversary_tomorrow =  value_json.MAJOR_JP.anniversary[ tomorrow ] %}
-      {% set anniversary_in_a_week =  value_json.MAJOR_JP.anniversary[ in_a_week ] %}
-      
-      {% if anniversary_today | trim != "" %}
-        {% set notification = "Today is " + anniversary_today %}
-      {% endif %}
-      
-      {% if anniversary_tomorrow | trim != "" %}
-        {% if notification | trim == "" %}
-          {% set notification = "Tomorrow is " + anniversary_tomorrow %}
-        {% else %}
-          {% set notification = notification + " and tomorrow is " + anniversary_tomorrow %}
-        {% endif %}
-      {% endif %}
-      
-      {% if anniversary_in_a_week | trim != "" %}
-        {% if notification | trim == "" %}
-          {% set notification = "In a week is " + anniversary_in_a_week %}
-        {% else %}
-          {% set notification = notification + " and in a week is " + anniversary_in_a_week %}
-        {% endif %}
-      {% endif %}
-      
-      {{notification}}
+      {% set lunch =  value_json.MAJOR_JP.lunch[ today ] %}
+      {%- if lunch %}
+        {{ lunch  }}
+      {% else %}
+        Nothing
+      {%- endif %}
+    scan_interval: 14400
+
+####################################################
+#                                                                                                    
+#                      Events                                               
+#                                                                                                    
+####################################################
+
+  - platform: command_line
+    name: School Event
+    command: 'cat /config/www/data/days.json'
+    value_template: >
+      {% set today = now().month  ~ '/' ~ now().day  %}
+      {% set event =  value_json.MAJOR_JP.events[ today ] %}
+      {%- if event %}
+        {{ event  }}
+      {% else %}
+        Nothing
+      {%- endif %}
     scan_interval: 14400
 
 

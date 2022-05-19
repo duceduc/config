@@ -48,13 +48,14 @@
 #                                                                                                              
 #########################################################
 
-  - platform: template
-    sensors:
-      genkan_door_lock:
-        friendly_name: "Front Door Lock"
-        device_class: lock
-        value_template: >-
-          {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+# CURRENTLY USING
+#  - platform: template
+#    sensors:
+#      genkan_door_lock:
+#        friendly_name: "Front Door Lock"
+#        device_class: lock
+#        value_template: >-
+#          {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
 
 
 

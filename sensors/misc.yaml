@@ -4,9 +4,21 @@
 #                                                                                                    #
 ####################################################
 
-  - platform: season
-
-  - platform: moon
+  - platform: imap_email_content
+    server: imap.mail.yahoo.com
+    name: is_payday
+    port: 993
+    username: !secret recipient_3
+    password: !secret recipient_3_password
+    folder: External
+    senders:
+     - cibadmin@shinseibank.com
+    value_template: >-
+      {% if 'Information from Transfer' in subject %}
+        on
+      {% else %}
+        off
+      {% endif %}
 
 ####################################################
 #                                                                                                    #
@@ -25,57 +37,82 @@
 #            Icon Tpl                                                                             #
 #                                                                                                    #
 ####################################################
-
+# Hallway
   - platform: template
     sensors:
-      sleeping:
+      security_mdf:
         value_template: >-
-         {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}
+         {% if states('sensor.mdf_illuminance')| float(0) > 0.8 %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("group.bed_sensors", "on") %}mdi:bed{% else %}mdi:bed-outline{% endif %}
-
-  - platform: template
-    sensors:
-      washroom:
+         {% if states('sensor.mdf_illuminance')| float(0) > 0.8 %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+      security_genkan:
         value_template: >-
-         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}Off{% else %}On{% endif %}
+         {% if is_state("binary_sensor.motion_security_occupancy", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.motion_washroom_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-
-  - platform: template
-    sensors:
-      kitchen:
-        value_template: >-
-         {% if is_state("binary_sensor.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
-
-  - platform: template
-    sensors:
-      hallway:
-        value_template: >-
-         {% if is_state("binary_sensor.motion_hallway_occupancy", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.motion_hallway_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-
-  - platform: template
-    sensors:
+         {% if is_state("binary_sensor.motion_security_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
       genkan:
         value_template: >-
          {% if is_state("binary_sensor.motion_g1_occupancy", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
          {% if is_state("binary_sensor.motion_g1_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-
-  - platform: template
-    sensors:
+      hallway:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_hallway_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_hallway_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
       toilet:
         value_template: >-
          {% if is_state("binary_sensor.motion_tr1_occupancy", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
          {% if is_state("binary_sensor.motion_tr1_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-
-  - platform: template
-    sensors:
+# Kitchen
+      kitchen:
+        value_template: >-
+         {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
+        icon_template: >-
+         {% if is_state("group.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
+      storageroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_s1_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_s1_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+      washroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_washroom_sensor_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_washroom_sensor_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+# Rooms
+      masterroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_mr_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_mr_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+      shionroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_sr_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_sr_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+      livingroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_lr_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_lr_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+      computerroom:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_computerroom_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_computerroom_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+      closet:
+        value_template: >-
+         {% if is_state("binary_sensor.motion_c1_occupancy", "off") %}Off{% else %}On{% endif %}
+        icon_template: >-
+         {% if is_state("binary_sensor.motion_c1_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+# Misc
+      sleeping:
+        value_template: >-
+         {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}
+        icon_template: >-
+         {% if is_state("group.bed_sensors", "on") %}mdi:bed{% else %}mdi:bed-outline{% endif %}
       24hr_fan:
         value_template: >-
          {% if is_state("input_boolean.washroom_fan", "off") %}Off{% else %}On{% endif %}
@@ -121,11 +158,11 @@
     sensors:
       k1_illuminance:
         value_template: >
-          {% if states.sensor.front_illuminance.state | float(0) == 0.10 %}
+          {% if states.sensor.rear_illuminance.state | float(0) == 0.10 %}
             on
-          {% elif states.sensor.front_illuminance.state | float(0) == 0.13 %}
+          {% elif states.sensor.rear_illuminance.state | float(0) == 0.13 %}
             on
-          {% elif states.sensor.front_illuminance.state | float(0) == 0.18 %}
+          {% elif states.sensor.rear_illuminance.state | float(0) == 0.18 %}
             on
           {% else %}
             off
@@ -163,6 +200,9 @@
         value_template: "{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
 
+  - platform: mqtt
+    name: earthquake_one_day_count
+    state_topic: "house/earthquake/one_day_count"
 
 
 

@@ -1,59 +1,73 @@
 ####################################################
-#                                                                                                    #
-#            MQTT Motion Sensors                                                                                #
-#                                                                                                    #
+#                                                                                                    
+#            MQTT Motion Sensors                                                                                
+#                                                                                                    
 ####################################################
 
   - platform: mqtt
-    name: "Motion Washroom Occupancy"
-    state_topic: "esphome/washroom-sensor/binary_sensor/motion_washroom-sensor_occupancy/state"
+    name: "motion kitchen occupancy"
+    state_topic: "switchbotmqtt/esp32/motion/motion_kitchen_occupancy"
     value_template: '{{ value }}'
     payload_on: "ON"
-    qos: 1
-    device_class: motion
-
-  - platform: mqtt
-    name: "Motion Kitchen Occupancy"
-    state_topic: "switchbotmqtt/esp32/contact/motion_kitchen_occupancy"
-    value_template: '{{ value }}'
-    payload_on: "ON"
-    qos: 1
+    qos: 0
     device_class: motion
 
 
   - platform: mqtt
-    name: "Motion G1 Occupancy"
+    name: "motion g1 occupancy"
     state_topic: "esphome/hallway-sensor/binary_sensor/motion_g1_occupancy/state"
     value_template: '{{ value }}'
     payload_on: "ON"
-    qos: 1
+    qos: 0
     device_class: motion
 
   - platform: mqtt
-    name: "Motion Hallway Occupancy"
+    name: "motion hallway occupancy"
     state_topic: "esphome/hallway-sensor/binary_sensor/motion_hallway_occupancy/state"
     value_template: '{{ value }}'
     payload_on: "ON"
-    qos: 1
+    qos: 0
+    device_class: motion
+
+  - platform: mqtt
+    name: "motion computerroom occupancy"
+    state_topic: "esphome/computerroom-sensor/binary_sensor/motion_computerroom_occupancy/state"
+    value_template: '{{ value }}'
+    payload_on: "ON"
+    qos: 0
+    device_class: motion
+
+  - platform: mqtt
+    name: "motion kitchen2 occupancy"
+    state_topic: "esphome/kitchen-sensor/binary_sensor/motion_kitchen2_occupancy/state"
+    value_template: '{{ value }}'
+    payload_on: "ON"
+    qos: 0
     device_class: motion
 
 
+####################################################
+#                                                                                                    
+#            MQTT ESP Device Connectivities                                                                            
+#                                                                                                    
+####################################################
 
 
+  - platform: mqtt
+    name: "hallway sensor status"
+    state_topic: "esphome/hallway-sensor/status"
+    value_template: '{{ value }}'
+    payload_on: "online"
+    qos: 0
+    device_class: connectivity
 
-
-## DELTET
-#  - platform: mqtt
-#    name: "Motion HR Occupancy"
-#    state_topic: "esphome/hr-sensor/binary_sensor/motion_hr-sensor_occupancy/state"
-#    value_template: '{{ value }}'
-#    payload_on: "ON"
-#    qos: 1
-#    device_class: motion
-
-
-
-
+  - platform: mqtt
+    name: "computerroom sensor status"
+    state_topic: "esphome/computerroom-sensor/status"
+    value_template: '{{ value }}'
+    payload_on: "online"
+    qos: 0
+    device_class: connectivity
 
 
 
@@ -64,7 +78,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                      
+#                                                                                                              
 #########################################################
