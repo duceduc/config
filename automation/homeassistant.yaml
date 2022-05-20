@@ -9,9 +9,9 @@
       platform: time
       at: '18:00:00'
     action:
-      - service: shell_command.update_github    
-#      - service: homeassistant.turn_on
-#        entity_id: switch.update_github
+#      - service: shell_command.update_github    
+      - service: homeassistant.turn_on
+        entity_id: switch.update_github
 
 
 ####################################################
