@@ -4,7 +4,6 @@
 #                                                                                                    
 ####################################################
 
-
 custom_header:
   compact_mode: true
   button_text:
@@ -14,20 +13,21 @@ custom_header:
   shadow: on
   chevrons: false
 
-title: DS
-icon: mdi:home
-background: "center / cover no-repeat url('/local/img/wallpaper/midnight.jpg') fixed"
+#title: DS
+#icon: mdi:home
+background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
 views:
 
-  - !include lovelace/data.yaml
-  - !include lovelace/climate.yaml
-  - !include lovelace/switches.yaml
-  - !include lovelace/rooms.yaml
-  - !include lovelace/weather.yaml
-  - !include lovelace/automations.yaml
-  - !include lovelace/energy.yaml
-  - !include lovelace/signals.yaml
-
+  - !include lovelace/dashboards/overview/data.yaml
+  - !include lovelace/dashboards/overview/climate.yaml
+  - !include lovelace/dashboards/overview/switches.yaml
+  - !include lovelace/dashboards/overview/rooms.yaml
+  - !include lovelace/dashboards/overview/floorplan.yaml
+  - !include lovelace/dashboards/overview/weather.yaml
+  - !include lovelace/dashboards/overview/automations.yaml
+  - !include lovelace/dashboards/overview/energy.yaml
+  - !include lovelace/dashboards/overview/chores.yaml
+  - !include lovelace/dashboards/overview/signals.yaml
 
 ####################################################
 #                                                                                                    
@@ -38,7 +38,7 @@ views:
 
 # climate.yaml
 decluttering_templates:
-  temperature _tpl:
+  temperature_tpl:
     card:
         type: entities
         title: '[[title]]'
@@ -210,9 +210,6 @@ decluttering_templates:
             name: CPU Temperature
             icon: mdi:thermometer
 
-
-
-
 # data.yaml
   person_card_new:
     default:
@@ -383,7 +380,6 @@ decluttering_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-7)
-
 
 
 ####################################################

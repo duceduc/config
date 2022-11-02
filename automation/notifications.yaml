@@ -31,11 +31,12 @@
     - condition: template # there is school today
       value_template: "{{ is_state('input_boolean.school_today', 'on') }}"      
   action:
-    - service: script.text_notify
+    - service: script.text_notify_image
       data_template:
         who: 'desktop'
         title: 'School Time'
         message: "Time for Shion to go to school."
+        image: "http://homeassistant.local:8123/local/img/misc/school-bell.png"
 
 - alias: bed time notification
   trigger:
@@ -208,15 +209,13 @@
       data:
         who: duc
         title: 'Payday'
-        message: "You've got paid."
-
-
-
-
-
-
-
-
+        message: >-
+          {{ [ 
+            "You've got paid.", 
+            "Fund's in the bank.",
+            "A deposit has been issued.",
+            "It's payday." 
+            ] | random }}
 
 
 #########################################################
@@ -438,6 +437,58 @@
         name: '{{ trigger.to_state.attributes.friendly_name }} Warning'
         message: '{{ warn_msg }}'
 
+- alias: Central Night Cooling Notification
+  trigger:
+    - platform: state
+      entity_id:
+       - binary_sensor.central_night_cooling
+      to: "on"
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"  
+  action:
+    - service: script.text_notify
+      data:
+        who: duc
+        title: Night Cooling possible
+        message: Open Windows to cool down the rooms
+  mode: single
+
+- alias: Washing Machine Water Detection Notification
+  trigger:
+    - platform: state
+      entity_id:
+       - binary_sensor.washer_water_leak
+      to: "on"
+  action:
+    - service: script.text_notify
+      data:
+        who: duc
+        title: Water Leak Detected
+        message: Water Detected around the washing machine area.
+    - service: script.text_notify
+      data:
+        who: viber
+        title: Water Leak Detected
+        message: Water Detected around the washing machine area.        
+    - service: script.email_notify
+      data:
+        who: duc      
+        title: "Water Leak Detected"
+        message: >-
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          There may have been a water leak around the washing machine area. Action is require as soon as possible. <br>
+          <br>        
+  mode: single
+
+
+
+
+
+
+
+
 
 #########################################################
 #                                                                                                              
@@ -456,7 +507,7 @@
       data: 
         who: "{{ states('sensor.room_presence') }}"
         message: !include ../tpl/speech/security_report.yaml
-
+        voice: "{{ states('input_select.jarvis_voice') }}"
 
 
 ####################################################

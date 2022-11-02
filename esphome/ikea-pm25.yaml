@@ -1,8 +1,8 @@
-# ESP8266 NodeMCU....
+# ESP8266 NodeMCU.... 98-CD-AC-30-E9-4F
 substitutions:
   name: ikea-pm25
   platform: ESP8266
-  board: d1_mini
+  board: nodemcuv2 # d1_mini
 
 esphome:
   name: $name
@@ -10,7 +10,7 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid1
+  ssid: !secret ssid3
   password: !secret ssid_pass
   fast_connect : true
   power_save_mode: none

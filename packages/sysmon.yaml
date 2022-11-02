@@ -5,14 +5,15 @@
 #   @description    :   A collection of Home Assistant and Pi Sensors. Using ws1 server to perform test every 30mins.
 ###############################################################################
 
-sensor:
-  - platform: mqtt
-    name: "Speedtest Result"
-    state_topic: "house/speedtest/result"
-    json_attributes_topic: "house/speedtest/result"    
-    json_attributes_template: "{{ value_json.attributes | tojson }}"
-    value_template: "{{ value_json.state }}"
+mqtt:
+  sensor:
+    - name: "Speedtest Result"
+      state_topic: "house/speedtest/result"
+      json_attributes_topic: "house/speedtest/result"    
+      json_attributes_template: "{{ value_json.attributes | tojson }}"
+      value_template: "{{ value_json.state }}"
 
+sensor:
   - platform: template
     sensors:
 # Speedtest Results

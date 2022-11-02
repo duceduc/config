@@ -1,4 +1,4 @@
-# ESP8266 NodeMCU....
+# ESP8266 NodeMCU.... C4-5B-BE-70-E0-FF
 substitutions:
   name: washroom-sensor
   platform: ESP8266
@@ -24,9 +24,10 @@ wifi:
   power_save_mode: none
   reboot_timeout: 0s  
   manual_ip:
-    static_ip: 192.168.1.93
+    static_ip: 192.168.1.73
     subnet: 255.255.255.0
     gateway: 192.168.1.1
+
   ap:
     ssid: Ping
     password: !secret ota_pass

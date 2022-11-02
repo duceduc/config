@@ -2,10 +2,10 @@
   {# Security Report #}
   {%- macro getReport() -%}
     <p>
-    <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>..
+    <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>
     
     {%- if states.group.external_doors.state == 'off' %}
-      All external doors and locks are currently secured. No actions required.
+      <break time="1s"/> All external doors and locks are currently secured. No actions required.
     {% else %}
       {% set open_doors = expand('group.external_doors')| selectattr('state', 'eq', 'on') | map(attribute='name')|join(' and ') %}
       {% set open_door_count = expand('group.external_doors') | selectattr('state', 'eq', 'on') | list | count %}

@@ -1,0 +1,86 @@
+###############################################################################
+#   @author         :   Duc Su 
+#   @date           :   08/13/2022
+#   @package        :   Camera
+#   @description    :   All the Camera related stuff 
+###############################################################################
+
+#######################################################################
+# Using the HACS Arlo Integration
+# If you see the cloudflare error in the logs uncomment the user_agent line and try that
+#
+# Also, Don't forget to add the Camera section below.  
+
+input_boolean:
+  balcony_motion:
+    name: Balcony Motion
+    icon: mdi:motion-sensor
+
+  security_cameras:
+    name: Security Cameras
+    icon: mdi:video-wireless
+
+
+script:
+  balcony_motion:
+    sequence:
+    - condition: state
+      entity_id: input_boolean.balcony_motion
+      state: 'off' 
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.balcony_motion
+    - delay: '00:01:00'
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.balcony_motion
+
+automation:
+  # Camera MDF
+  - alias: 'Security MDF Camera Snapshot'
+    mode: queued
+    max_exceeded: silent
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.mdf_illuminance
+        below: 0.55
+    condition:
+      - condition: state
+        entity_id: input_boolean.security_cameras
+        state: 'on'
+    action:
+      - delay: 2
+      - service: camera.snapshot
+        data:
+          entity_id: camera.security_mdf
+          filename: '/config/www/img/security/mdf/{{ now().strftime("%Y%m%d_%H%M%S") }}security_mdf_camera.jpg'
+      - service: shell_command.clean_security_images
+
+  # Camera Balcony
+  - alias: 'Security Balcony Camera Snapshot'
+    mode: queued
+    max_exceeded: silent
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.motion_balcony_occupancy
+        from: 'off'
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: input_boolean.security_cameras
+        state: 'on'
+    action:
+      - service: camera.snapshot
+        data:
+          entity_id: camera.security_balcony
+          filename: '/config/www/img/security/balcony/{{ now().strftime("%Y%m%d_%H%M%S") }}security_balcony_camera.jpg'
+      - service: shell_command.clean_balcony_images
+
+
+
+
+
+
+
+
+
+
+

@@ -9,6 +9,7 @@
       - service: script.speech_engine
         data:
           who: '{{ who }}'
+          voice: "{{ states('input_select.jarvis_voice') }}"
           message: >-
             {% macro greeting() %}
               <p>
@@ -102,6 +103,16 @@
                 'It will be freezing cold tonight. I would bring in the plants but I lack legs. And Arms. So I am forced to rely on you. Do not let me down.'
               ] | random }}
               {% endif %}
+            {% endmacro %}
+
+
+            {% macro secure_dish() %}
+            {{ [
+              'Do not forget to close the dish cabinent.', 
+              'Someone forgot to close the dish cabinent. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
+              'Even though there is no earthquake <break time="1s"/> yet, you should secure the kitchen cabinent doors.',
+              'You might want to close the kitchen cabinet.'
+              ] | random }}
             {% endmacro %}
 
             {% macro shion_events() %}
@@ -371,6 +382,9 @@
               {% if call_house_party_protocol_disabled == 1 %}
                 {{ house_party_protocol_disabled() }}
               {% endif %}
+              {% if call_secure_dish == 1 %}
+                {{ secure_dish() }}
+              {% endif %}
               
               {{ welcome_home }}
 
@@ -413,6 +427,7 @@
 #    - service: script.speech_engine
 #      data: 
 #        who: "{{ states('sensor.room_presence') }}"
+#        voice: "{{ states('input_select.jarvis_voice') }}"
 #        message: >
 #          {{ [
 #            'Pardon me, ',

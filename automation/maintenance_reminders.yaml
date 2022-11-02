@@ -79,21 +79,26 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.morning_wakeup_report
     - service: input_boolean.turn_off
-      entity_id: input_boolean.daily_report        
+      entity_id: input_boolean.daily_report
     - service: script.reset_earthquake_one_day_count
     - service: script.enable_devices
-    
-    - service: script.text_notify
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.jcom_tv
+
+    - service: script.text_notify_image
       data:
-        who: duc
-        message: >-
+        who: amber
+        image: >-
+          {{ [ "/config/www/img/misc/off.jpg",
+               "/config/www/img/misc/clock.jpg"] | random }}
+        caption: >-
           {{ [ 
-            "Good Night from Lions Mansion. ", 
-            "Time to shut down this party. Good Night from Lions Mansion. ",
-            "I'm feeling tired. Think I'll take a quick nap. Good Night!",
-            "Things are getting quiet. Time to say Good Night.",
-            "We have come to the end of our broadcast day. Oh, who am I kidding. I''ll be up all night watching over Lions Mansion. " 
-            ] | random }}
+          "Good Night from Lions Mansion. ", 
+          "Time to shut down this party. Good Night from Lions Mansion. ",
+          "I'm feeling tired. Think I'll take a quick nap. Good Night!",
+          "Things are getting quiet. Time to say Good Night.",
+          "We have come to the end of our broadcast day. Oh, who am I kidding. I''ll be up all night watching over Lions Mansion. " 
+          ] | random }}
 
 
 #########################################################

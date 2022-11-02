@@ -45,9 +45,7 @@
       {% endif %}
 
 
-      {% if states.sensor.weatherbit_weather_alerts.state | int > 0 %}
-        There are currently {{states.sensor.weatherbit_weather_alerts.state }} active weather alerts for our area.
-      {% endif %}
+
 
       .Based on the forecasted high temperature, 
       {% if is_state('binary_sensor.morning','on') %}
@@ -141,10 +139,10 @@
          {% endif %}
          Currently it will take {{states.sensor.duc_destinations.state|round}} minutes to get to the office.
 
-         {%- if states.sensor.eri_destinations.state|round > 55 %}
-           Traffic to kawasaki costco appears heavy than normnal.
+         {%- if states.sensor.eri_destinations.state|round > 67 %}
+           Traffic to costco headquarter appears heavy than normnal.
          {% else %}
-           Traffic to the kawasaki costco is normal.
+           Traffic to the costco headquarter is normal.
          {% endif %}
          Currently it will take {{states.sensor.eri_destinations.state|round}} minutes to get to costco.
       {% endif %}

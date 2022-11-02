@@ -54,6 +54,7 @@
 #                                                                                                              
 #########################################################
 
+# Free Basic 300 msg/ month
   - name: notify-events # viber
     platform: notify_events
 

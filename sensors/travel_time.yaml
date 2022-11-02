@@ -4,12 +4,6 @@
 #                                                                                                    #
 ####################################################
 
- # Eri
-#  - platform: waze_travel_time
-#    name: Eri Destinations
-#    origin: device_tracker.ie
-#    destination: sensor.eri_destination_waze
-#    region: 'EU'
 
 ####################################################
 #                                                                                                    #

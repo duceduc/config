@@ -8,5 +8,7 @@
         set_level:
 
   - platform: switch
-    name: Ceiling Fan Lights
-    entity_id: switch.ceiling_fan_lights
+    name: Ceiling Fan Light
+    entity_id: switch.ceiling_fan_light
+
+

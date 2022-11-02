@@ -38,17 +38,17 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'toggle jcom tv box'
-  trigger:
-    - platform: state
-      entity_id: input_boolean.jcom_tv_box
-      from: 'off'
-      to: 'on'
-  action:
-    - service: switch.turn_on
-      entity_id: switch.jcom_tv_box
-    - service: input_boolean.toggle
-      entity_id: input_boolean.jcom_tv_box
+#- alias: 'toggle jcom tv box'
+#  trigger:
+#    - platform: state
+#      entity_id: input_boolean.jcom_tv_box
+#      from: 'off'
+#      to: 'on'
+#  action:
+#    - service: switch.turn_on
+#      entity_id: switch.jcom_tv_box
+#    - service: input_boolean.toggle
+#      entity_id: input_boolean.jcom_tv_box
 
 #########################################################
 #                                                                                                              #
@@ -56,17 +56,17 @@
 #                                                                                                              #
 #########################################################
 
-- alias: 'toggle floor heater'
-  trigger:
-    - platform: state
-      entity_id: input_boolean.floor_heater
-      from: 'off'
-      to: 'on'
-  action:
-    - service: switch.turn_on
-      entity_id: switch.floor_heater
-    - service: input_boolean.toggle
-      entity_id: input_boolean.floor_heater
+#- alias: 'toggle floor heater'
+#  trigger:
+#    - platform: state
+#      entity_id: input_boolean.floor_heater
+#      from: 'off'
+#      to: 'on'
+#  action:
+#    - service: switch.turn_on
+#      entity_id: switch.floor_heater
+#    - service: input_boolean.toggle
+#      entity_id: input_boolean.floor_heater     
 
 #########################################################
 #                                                                                                              #
@@ -87,7 +87,7 @@
     - condition: template # PC is not on
       value_template: "{{ not is_state('binary_sensor.desktop_status', 'on') }}"
   action:
-    - service: script.desktop_wol
+    - service: script.desktop_wol_on
 
 
 #########################################################

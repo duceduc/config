@@ -19,17 +19,18 @@
   condition:
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
+    - condition: template # mcl is off
+      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"      
+      
   action:
   - service: python_script.room_occupancy
     data:
       roomname: shionroom 
       entities_toggle: # entities that can mark a room as occupied
       - binary_sensor.motion_sr_occupancy
-      - input_boolean.shionroom_mcl      
       entities_keep: # entities that can keep a room occupied
       - binary_sensor.middle
 #      - sensor.eri_espresense
-#      - sensor.duc_espresense
       timeout: 2 # timeout of the room, timer gets set to this
 
 - alias: Shionroom Light
@@ -47,7 +48,7 @@
     from: active
     to: idle
   - platform: state
-    entity_id: light.shion_room
+    entity_id: light.shion
     id: 'off'
     from: 'on'    
     to: 'off'
@@ -68,21 +69,20 @@
       sequence:
       - service: light.turn_on
         target:
-          entity_id: light.shion_room
+          entity_id: light.shion
         data:
-          brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.24 %} 250 {% else %} 160 {% endif %}'          
+          brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.50 %} 250 {% else %} 160 {% endif %}'          
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
       - service: light.turn_off
         target:
-          entity_id: light.shion_room  
+          entity_id: light.shion
       - service: timer.finish
         target:
           entity_id: timer.shionroom_timer
     default: []
-
 
 
 
@@ -96,7 +96,7 @@
       to: 'on'
   condition:
     - condition: state
-      entity_id: light.shion_room
+      entity_id: light.shion
       state: 'off'
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
@@ -109,9 +109,9 @@
 
   action:
     - service: light.turn_on
-      entity_id: light.shion_room
-      data:
-        brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.24 %} 250 {% else %} 160 {% endif %}'
+      data_template:
+        entity_id: light.shion
+        brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.50 %} 250 {% else %} 160 {% endif %}'
 
 - alias: 'motion shion room auto-off'
   trigger:
@@ -128,7 +128,7 @@
       value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
   action:
     - service: light.turn_off
-      entity_id: light.shion_room
+      entity_id: light.shion
 
 #########################################################
 #                                                                                                              #
@@ -139,7 +139,7 @@
 - alias: 'SR light turned off'
   trigger:
     - platform: state
-      entity_id: light.shion_room
+      entity_id: light.shion
       from: 'on'
       to: 'off'
   action:
@@ -149,7 +149,7 @@
 - alias: 'SR light turned on'
   trigger:
     - platform: state
-      entity_id: light.shion_room
+      entity_id: light.shion
       from: 'off'
       to: 'on'
   condition:
@@ -167,9 +167,10 @@
     - condition: template
       value_template: "{{ is_state('input_boolean.audible_notifications', 'on') }}"          
   action:
-    - service: script.speech_engine
+    - service: script.speech_engine_echo
       data: 
         who: ai_3
+        voice: "{{ states('input_select.jarvis_voice') }}"
         message:  >
           {% set mode = '自動' if trigger.to_state.state == 'off' else 'マニュアル' %}
           <speak> シオンルームライトが {{ mode }} モードになりました。 </speak>

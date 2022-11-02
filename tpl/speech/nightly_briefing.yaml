@@ -21,11 +21,11 @@
       {% endif %}
 
       {% if states.sensor.christmas_countdown.state | int(0) == 1 %}
-      Tomorrow is Christmas. It is practically here!  Santa is coming tonight! Do not forget the cookies!
+      Tomorrow is Christmas. <break time="1s"/> It is practically here! <break time="1s"/> Santa is coming tonight! Do not forget the cookies!
       {% elif states.sensor.christmas_countdown.state | int(0) < 31 %}
       There are only {{states.sensor.christmas_countdown.state}} days until christmas.
       {{ [ 'All I want for Christmas, is a hippopotamus.',
-      'Hey Skylar, I know what you are getting for Christmas. But I am not telling.',
+      'Hey sheon, I know what you are getting for Christmas. But I am not telling.',
       'Do not forget to put something under the tree for your favorite smarthome.',
       'It is starting to smell a lot like Christmas. Or it could be the christmas tree is on fire.',
       'I do not want to be a smarthome. I want to be a dentist.',
@@ -59,6 +59,7 @@
           someone else would have to pick up.
         {% endif %}  
       </p>
+      
       <p>
          {% if states.sensor.holiday_golden_week.state | int(0) == 1 %}
            Oh, and there is just one more sleep until the next Golden Week Holiday! 

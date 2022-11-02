@@ -1,17 +1,14 @@
 #########################################################
-#                                                                                                               
-#             Main Configuration Settings...                                                
-#                                                                                                               
+#                            
+#             Main Configuration Settings...                     
+#                                                 
 #########################################################
 
 default_config:
 python_script:
 momentary:
 wake_on_lan:
-
-google:
-  client_id: !secret google_calendarE_id
-  client_secret: !secret google_calendarE_secret
+lovelace_gen:
 
 tts:
   - platform: google_translate
@@ -38,6 +35,8 @@ input_boolean: !include input_boolean.yaml
 emulated_hue: !include emulated_hue.yaml
 shell_command: !include shell_commands.yaml
 utility_meter: !include utility_meter.yaml
+template: !include template.yaml
+automation blueprint: !include automations.yaml
 
 binary_sensor: !include_dir_merge_list binary_sensors/
 automation: !include_dir_merge_list automation/
@@ -45,6 +44,12 @@ sensor: !include_dir_merge_list sensors/
 switch: !include_dir_merge_list switches/
 notify: !include_dir_merge_list notify/
 script: !include_dir_merge_named scripts/
+
+mqtt:
+ sensor: !include_dir_merge_list mqtt/sensors/
+ binary_sensor: !include_dir_merge_list mqtt/binary_sensors/
+# cover: !include_dir_merge_list mqtt/cover/
+# certificate: auto
 
 homeassistant:
   name: Home
@@ -65,27 +70,11 @@ http:
   trusted_proxies:
     - 192.168.1.15  #Ngnix
 
-recorder:
-  db_url: !secret MySQL_login
-  purge_keep_days: 29
-  commit_interval: 10
-  exclude:
-    domains:
-     - group
-     - automation
-     - camera
-     - media_player
-     - scene
-     - script
-    entities:
-     - sun.sun
-     - sensor.date_time
-
 
 #########################################################
-#                                                                                                              
-#             Device Tracker                                                                             
-#                                                                                                              
+#                                                                                           
+#             Device Tracker                                                              
+#
 #########################################################
 
 person:
@@ -98,10 +87,9 @@ person:
     device_trackers:
      - device_tracker.ie
 
-
 #########################################################
 #                                                                                                              
-#             Sensor Integrations                                                                       
+#             Sensor Integrations                                                     
 #                                                                                                              
 #########################################################
 
@@ -176,38 +164,23 @@ rest:
 
 #########################################################
 #                                                                                                              
-#             Integration                                                                                  
+#             Integration                                                         
 #                                                                                                              
 #########################################################
 
-#alarm_control_panel:
-#  - platform: manual
-#    name: Home Alarm
-#    code: !secret alarm_code
-#    arming_time: 30
-#    delay_time: 30
-#    trigger_time: 1
+spotcast:
+  sp_dc: !secret duc_sp_dc
+  sp_key: !secret duc_sp_key
+#  country: US #optional, added in 3.6.24
 
-alexa_media:
-  accounts:
-    - email: !secret amazon_user
-      password: !secret amazon_password
-      url: amazon.com
-      include_devices:
-       - Ai.1
-       - Ai.2
-       - Ai.3
-       - Ai.4
-# Find Amazon dot name
-# https://alexa.amazon.com/api/devices-v2/device
-# reaunthenicate issue - enter random string and hit submit to refresh visable captacha.
 
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_apikey
-    allowed_chat_ids:
-     - !secret telegram_chatid
-     - !secret telegram_userid
+
+#media_player: 
+#  name: "agent mediaplayer"
+#  platform: hass_agent_mediaplayer
+#  host: 192.168.1.111
+#  port: 5115
+
 
 counter:
   dining_lights_toggle:
@@ -232,18 +205,14 @@ input_text:
   room_presence:
     name: Room Presence
   
-
-
   alexa_actionable_notification:
     name: Alexa Actionable Notification Holder
     max: 255
     initial: '{"text": "This is a test of the alexa actions custom skill. Did it work?", "event": "actionable.skill.test"}'
 
-
 #################
   status_fan_speed:
     name: Status Fan Speed
-
 
 fan:
   - platform: template
@@ -290,9 +259,7 @@ fan:
                 device: Yuasa Fan
                 command: speed
 
-
 #################
-
 
 rest_command:
   slack_api:
@@ -319,21 +286,10 @@ rest_command:
         "attachments": {{ attachments if (attachments is defined) else '[]' }}
       }
 
-### Switchbot API Command
-#  switchbot_device_command:
-#    url: "https://api.switch-bot.com/v1.0/devices/{{ deviceId }}/commands"
-#    method: post
-#    content_type: "application/json"
-#    headers:
-#      Authorization: !secret switchbot_api
-#    payload: '{ "command": "{{ command }}", "parameter": "{{ parameter }}" }' 
-
-
-
 #########################################################
-#                                                                                                              #
-#             Panel Redirect                                                                              #
-#                                                                                                              #
+#                                                                                                              
+#             Panel Redirect                                                  
+#                                                                                                              
 #########################################################
 
 panel_custom:
@@ -363,7 +319,7 @@ panel_custom:
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                   
+#                                                                                                              
 #########################################################

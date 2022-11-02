@@ -45,25 +45,7 @@
         It is currently {{states.sensor.wbio_current_forecast.state }} and {{states.sensor.oa_temperature.state|round}} degrees in Kawagoodchi. 
       </p>
 
-      <p>
-        {% if states.sensor.weatherbit_weather_alerts.state | int > 0 %}
-          There are currently {{states.sensor.weatherbit_weather_alerts.state }} active weather alerts for our area.
-          The National Weather Service Has issued,
-          {% if states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[5] is defined %}
-            a {{ states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[5] }}.
-          {% elif states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[4] is defined %}
-          a {{ states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[4] }}.
-          {% elif states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[3] is defined %}
-            a {{ states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[3] }}.
-          {% elif states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[2] is defined %}
-            a {{ states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[2] }}.
-          {% elif states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[1] is defined %}
-            a {{ states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[1] }}.
-          {% else %}
-            a {{ states.sensor.nws_alerts.attributes.spoken_desc.split('\n\n-\n\n')[0] }}.
-          {% endif %}
-        {% endif %}
-      </p>
+
       
       <p>
         {{ [
@@ -158,10 +140,10 @@
              {% endif %}
              Currently it will take {{states.sensor.duc_destinations.state|round}} minutes to get to the office.
 
-             {%- if states.sensor.eri_destinations.state|round > 55 %}
-               Traffic to kawasaki costco appears heavy than normnal.
+             {%- if states.sensor.eri_destinations.state|round > 67 %}
+               Traffic to the costco headquarter appears heavy than normnal.
              {% else %}
-               Traffic to the kawasaki costco is normal.
+               Traffic to the costco headquarter is normal.
              {% endif %}
              Currently it will take {{states.sensor.eri_destinations.state|round}} minutes to get to costco.
           {% endif %}

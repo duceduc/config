@@ -1,0 +1,37 @@
+
+photoshop:
+photo cooling filter (82):10
+hue sat: -37
+
+
+crop: 1700 px, space + up key 4 times
+
+dropshadow: 
+opacity - 55
+angle 105
+7 5 8
+blending options - check layer mask hides effects
+
+--
+light multipler:
+
+****
+topDown - 1
+
+wash - 34
+toilet - 20
+storage - 26
+sink - 34
+shower - 14
+shioin - 70
+nightlight - 38
+master - 46
+living - 86
+lamp - 42
+kitchen2 - 50
+kitchen1 - 50
+hallway - 66
+genkan - 20
+fan light - 72
+computer - 92
+closet - 30

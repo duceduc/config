@@ -1,0 +1,83 @@
+-== Watchman Report ==- 
+
+-== Missing 1 service(s) from 135 found in your config:
++--------------------------------+---------+--------------------------------------------------------------+
+| Service ID                     | State   | Location                                                     |
++--------------------------------+---------+--------------------------------------------------------------+
+| script.desktop_shutdown        | missing | automation/telegram_bot.yaml:41                              |
++--------------------------------+---------+--------------------------------------------------------------+
+
+-== Missing 52 entity(ies) from 893 found in your config:
++--------------------------------+---------+--------------------------------------------------------------+
+| Entity ID                      | State   | Location                                                     |
++--------------------------------+---------+--------------------------------------------------------------+
+| switch.sp1_0                   | unavail | groups.yaml:93                                               |
+| switch.sp2_0                   | unavail | groups.yaml:94                                               |
+| switch.sp3_0                   | unavail | groups.yaml:95                                               |
+| binary_sensor.motion_lr_occupa | missing | groups.yaml:122                                              |
+| ncy                            |         |                                                              |
+| sensor.lr_temperature          | missing | input_select.yaml:38                                         |
+| sensor.shion_birthday          | missing | input_select.yaml:51                                         |
+| sensor.duc_livingroom_proximit | unknown | packages/monitor_presence.yaml:39,39                         |
+| y                              |         |                                                              |
+| sensor.eri_livingroom_proximit | unknown | packages/monitor_presence.yaml:73,73                         |
+| y                              |         |                                                              |
+| sensor.name                    | missing | packages/monitor_presence.yaml:127,133,135,137               |
+| media_player.theater_tv        | missing | packages/monitor_presence.yaml:143                           |
+| script.lr_curtains_toggle_mode | missing | packages/switchbot.yaml:365                                  |
+| _                              |         |                                                              |
+| script.cr_curtains_toggle_mode | missing | packages/switchbot.yaml:386                                  |
+| _                              |         |                                                              |
+| switch.turn_                   | missing | packages/switchbot.yaml:536                                  |
+| group.chore_tasks              | unknown | packages/chores.yaml:17                                      |
+| sensor.is_payday               | unknown | automation/notifications.yaml:200,203,205                    |
+| light.turn_                    | missing | automation/washroom.yaml:49                                  |
+| sensor.tms_presence            | unknown | automation/presence.yaml:88,102                              |
+| script.set_device_tracker_shio | missing | automation/presence.yaml:368                                 |
+| n_                             |         |                                                              |
+| script.sr_ac_fan               | missing | automation/aircon_shionroom.yaml:213                         |
+| binary_sensor.lr_sensor_dht_st | missing | automation/aircon_livingroom.yaml:112                        |
+| atus                           |         |                                                              |
+| script.desktop_shutdown        | missing | automation/slack_interactive.yaml:29                         |
+| script.motion_kitchen_lights_i | missing | automation/kitchen.yaml:48,152                               |
+| lluminance_                    |         |                                                              |
+| camera.security_entrance       | unavail | lovelace/weather.yaml:26                                     |
+| media_player.living_room       | missing | lovelace/rooms.yaml:113                                      |
+| sensor.nws_alerts              | missing | tpl/speech/morning_briefing.yaml:52,53,54,55,56,57,58,59,60, |
+|                                |         | 61,63                                                        |
+| sensor.vacation_days2go        | unavail | tpl/speech/nightly_briefing.yaml:70,70,70,71,72,74           |
+| sensor.id_genkan               | unknown | sensors/presence.yaml:267                                    |
+| sensor.ie_genkan               | unknown | sensors/presence.yaml:277                                    |
+| sensor.is_genkan               | unknown | sensors/presence.yaml:287                                    |
+| sensor.is_livingroom           | unknown | sensors/presence.yaml:288                                    |
+| sensor.isp_genkan              | unknown | sensors/presence.yaml:297                                    |
+| sensor.isp_livingroom          | unknown | sensors/presence.yaml:298                                    |
+| sensor.tms_genkan              | unknown | sensors/presence.yaml:307                                    |
+| sensor.tms_livingroom          | unknown | sensors/presence.yaml:308                                    |
+| sensor.tms_shionroom           | unknown | sensors/presence.yaml:309                                    |
+| sensor.tms_masterroom          | unknown | sensors/presence.yaml:310                                    |
+| sensor.sachiko_genkan          | unknown | sensors/presence.yaml:318                                    |
+| sensor.sachiko_livingroom      | unknown | sensors/presence.yaml:319                                    |
+| sensor.tomokun_genkan          | unknown | sensors/presence.yaml:328                                    |
+| sensor.tomokun_livingroom      | unknown | sensors/presence.yaml:329                                    |
+| light.hallway                  | missing | sensors/wakup.yaml:46                                        |
+| script.lr_ac_heat_toggle_activ | missing | scripts/aircons.yaml:110                                     |
+| e_                             |         |                                                              |
+| script.lr_ac_cool_toggle_activ | missing | scripts/aircons.yaml:135                                     |
+| e_                             |         |                                                              |
+| remote.living_room             | missing | scripts/media.yaml:13,19,25,31,41,47,53,59,66                |
+| media_player.plex_plex_for_ios | unavail | scripts/misc.yaml:22                                         |
+| _id                            |         |                                                              |
+| script.lr_lights_fadein_       | missing | scripts/devices.yaml:129                                     |
+| script.cr_lights_fadein_       | missing | scripts/devices.yaml:129                                     |
+| script.dining_lights_mode_     | missing | scripts/lights.yaml:390                                      |
+| binary_sensor.garage_door      | missing | scripts/status_annc.yaml:82                                  |
+| sensor.home_to_zoo             | missing | scripts/status_annc.yaml:182                                 |
+| sensor.home_to_summit          | missing | scripts/status_annc.yaml:188,193                             |
+| sensor.general_waste           | missing | custom_components/garbage_collection/services.yaml:9,21,33,4 |
+|                                |         | 8,60                                                         |
++--------------------------------+---------+--------------------------------------------------------------+
+
+-== Report created on 15 Aug 2022 05:16:45
+-== Parsed 183 files in 1.40s., ignored 0 files 
+-== Generated in: 0.04s. Validated in: 0.01s.

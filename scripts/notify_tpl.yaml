@@ -76,6 +76,51 @@
               message: '{{ message }}'
 
 
+
+  text_notify_image:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.text_notifications
+        state: 'on'
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "desktop"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.agent_desktop
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                image: '{{ image }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "amber"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.amberthebot
+            data_template:
+              message: >-
+                {{ message}} # optional
+              data:
+                photo: 
+                   - file: >-
+                        {{ image }}
+                     caption: >-
+                       {{ caption }}
+
+
+
+
+
+
+
+
 #########################################################
 #                                                                                                              
 #             Text Alert                                                                             

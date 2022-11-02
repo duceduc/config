@@ -11,6 +11,18 @@ appdaemon:
       ha_url: http://192.168.1.20:8123
       token: !secret appdaemon_token
       namespace: default
+    MQTT:
+      type: mqtt
+      namespace: mqtt
+      client_host: 192.168.1.20
+      client_port: 1883
+      ca_cert: mqtt-ca.crt # remove if expired. ssl folder
+      client_cert: mqtt-server.crt # remove if expired. ssl folder
+      client_key: mqtt-server.key # remove if expired. ssl folder
+      client_user: !secret mqtt_user
+      client_password: !secret mqtt_pass
+      will_topic: online/appdaemon  
+      birth_topic: online/appdaemon
 
 http:
   url: http://127.0.0.1:5050

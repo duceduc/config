@@ -11,16 +11,6 @@
      - input_boolean.wakeup_weekends
      - input_select.wakeup_select
 
-  garbage_collection:
-    name: Garbage Collection
-    entities:
-     - sensor.combustible_waste
-     - sensor.plastic_recycle
-     - sensor.metal_paper_recycle
-     - sensor.bottle_can_recycle
-     - sensor.pet_clothes_recycle
-
-
 #########################################################
 #                                                                                                              
 #             Presence                                                    
@@ -54,6 +44,10 @@
      - binary_sensor.sachiko_presence
      - binary_sensor.tomokun_presence
 
+  cooking_time:
+    - binary_sensor.morning_cooking
+    - binary_sensor.afternoon_cooking    
+    - binary_sensor.evening_cooking
 
   external_doors:
     - binary_sensor.genkan_doorlock
@@ -62,12 +56,12 @@
 
   vacation_lights:
     entities:
-      - light.cabinet
-      - light.computer_room
-      - light.living_room
-      - light.shion_room
-      - light.master_room
-
+     - light.cabinet
+     - light.counter
+     - light.computer
+     - light.living
+     - light.shion
+     - light.master
 
   bed_sensors:
     name: Bed Sensors
@@ -112,16 +106,19 @@
     name: Motion Kitchen Occupancy
     entities:
       - binary_sensor.motion_kitchen_occupancy
-      - binary_sensor.motion_kitchen2_occupancy
+      - binary_sensor.motion_cabinet_occupancy
+
+  hallway_motion:
+    - binary_sensor.motion_hallway_occupancy
+    - binary_sensor.motion_g1_occupancy   
 
   occupancy:
     - binary_sensor.motion_kitchen_occupancy
-    - binary_sensor.motion_lr_occupancy
+    - binary_sensor.lr_radar_movement
     - binary_sensor.motion_mr_occupancy
     - binary_sensor.motion_sr_occupancy
     - binary_sensor.motion_hallway_occupancy
     - binary_sensor.motion_computerroom_occupancy
-      
 
   home_alarm_motion_sensors:
     name: Home Alarm Motion Sensors
@@ -139,7 +136,7 @@
   controllable_devices:
     name: Controllable Devices
     entities:
-     - light.computer_room # Computer Room
+     - light.computer # Computer Room
      - switch.desktop # Desktop
      - switch.yuasa_fan # Fan
      - switch.ceiling_fan_summer # Ceiling Fan Summer

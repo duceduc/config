@@ -72,7 +72,6 @@
 #                                                                                                              #
 #########################################################
 
-
 - alias: 'Control Devices'
   initial_state: 'on'
   trigger:

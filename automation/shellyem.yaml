@@ -40,12 +40,13 @@
     data:
       entity_id: input_select.select_theme
       option: midnight
-  - service: utility_meter.select_tariff ###### Tariff change to night
-    data:
+  - service: select.select_option ###### Tariff change to night from utility_meter.select_tariff 
+    target:
       entity_id:
-      - utility_meter.energy_t31_light_and_power
-      - utility_meter.energy_t41_heating
-      tariff: night
+      - select.energy_t31_light_and_power
+      - select.energy_t41_heating
+    data:
+      option: 'night'
 
 - alias: 'Set Light Theme At Sunrise'
   initial_state: true
@@ -57,13 +58,13 @@
     data:
       entity_id: input_select.select_theme
       option: default_ha
-  - service: utility_meter.select_tariff ###### Tariff change to day
-    data:
+  - service: select.select_option ###### Tariff change to day from utility_meter.select_tariff 
+    target:
       entity_id:
-      - utility_meter.energy_t31_light_and_power
-      - utility_meter.energy_t41_heating
-      tariff: day
-
+      - select.energy_t31_light_and_power
+      - select.energy_t41_heating
+    data:
+      option: 'day'
 
 #########################################################
 #                                                                                                              #

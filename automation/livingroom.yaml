@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Open Front Curtains                                                                      #
-#                                                                                                              #
+#                                              
+#             Open Front Curtains
+#                                        
 #########################################################
 
 # CURRENTLY USING #
@@ -26,9 +26,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Close Front Curtains                                                                      #
-#                                                                                                              #
+#                                                                                                              
+#             Close Front Curtains
+#                                                                                                              
 #########################################################
 
 # CURRENTLY USING #
@@ -52,83 +52,114 @@
 #        - cover.fr_curtains
 
 #########################################################
-#                                                                                                              #
-#             Automate Livingroom Lights via Photo Sensor                                     #
-#                                                                                                              #
+#                                                                                                              
+#             Automate Front Area Lights via Photolight Sensor                                     
+#                                                                                                              
 #########################################################
 
 - alias: 'computer room lights auto-on'
   trigger:
     - platform: numeric_state
-      entity_id: sensor.rear_illuminance
-      above: 0.21
-      below: 0.24
+      entity_id: sensor.lr_radar_illuminance
+      above: 0.38
+      below: 0.51
   condition:  
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # is daylight
-      value_template: "{{ is_state('sensor.period_of_the_day', 'daylight') }}"
-    - condition: template # is NOT on already
-      value_template: "{{ states('light.computer_room') != 'on' }}"
     - condition: template # Not in Vacation
-      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
   action:
-    - service_template: script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+#    - service_template: script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+#      data:
+#        entity: computer
+    - service: script.tradfri_transition
       data:
-        entity: computer_room
+        entity_id: light.computer
+        color_temp: 143
+        transition: "{{ (( states.input_number.wakeup_duration.state | float(0) * 60 * 2 )| round ) | int(0) }}"
+        brightness: '{{ 151 if now().hour > 7 and now().hour < 16 else 254 }}'
+#      entity_id: light.computer
+  mode: restart
+
 
 - alias: 'livingroom lights auto-on'
   trigger:
     - platform: numeric_state
-      entity_id: sensor.rear_illuminance
-      above: 0.21
-      below: 0.24    
+      entity_id: sensor.lr_radar_illuminance
+      above: 0.38
+      below: 0.51
   condition:
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-    - condition: template # is daylight
-      value_template: "{{ is_state('sensor.period_of_the_day', 'daylight') }}"
-    - condition: template # is NOT on already
-      value_template: "{{ states('light.living_room') != 'on' }}"
-    - condition: or
-      conditions:
-        - condition: template # is the weekend or
-          value_template: "{{ is_state('sensor.date_weekday', 'off') }}" 
-        - condition: template # is a holiday
-          value_template: "{{ states('sensor.holiday')| trim != '' }}"
     - condition: template # Not in Vacation
-      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"        
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+    - condition: or # don't turn on weekdays
+      conditions:
+        - condition: template
+          value_template: "{{ is_state('sensor.date_weekday', 'off') }}"
+        - condition: template
+          value_template: "{{ states('sensor.holiday')| trim != '' }}"
   action:
-    - service_template: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+#    - service_template: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+#      data:
+#        entity: living
+    - service: script.tradfri_transition
       data:
-        entity: living_room
+        entity_id: light.living
+        color_temp: 143
+        transition: "{{ (( states.input_number.wakeup_duration.state | float(0) * 60 * 2 )| round ) | int(0) }}"
+        brightness: '{{ 151 if now().hour > 7 and now().hour < 16 else 254 }}'
+#      entity_id: light.living
+  mode: restart
+
 
 - alias: 'front area lights auto-off'
   trigger:
-#    - platform: numeric_state
-#      entity_id: sensor.rear_illuminance
-#      below: 0.16
     - platform: template
-      value_template: "{% if states('sensor.rear_illuminance') | float(0) < 0.16 and
-                                 states('sensor.rear_illuminance') != 'unavailable' and
-                                 states('sensor.time') > '06:14' %} true
-                               {% else %} false
-                               {% endif %}"
+      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.29 and
+                                 states('sensor.lr_radar_illuminance') != 'unavailable' and
+                                 states('sensor.time') >= '06:00' }}"                      
+    - platform: template
+      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.29 and
+                                 states('sensor.lr_radar_illuminance') != 'unavailable' }}"
+
   condition:      
     - condition: template  # If guest is present, do not turn off
       value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
-  action:
-    - service: light.turn_off
-      entity_id:
-       -  light.computer_room
-       -  light.living_room
-    - service: script.turn_off
-      data_template:
-        entity_id: script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
 
+  action:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ states('sensor.time') > '06:00' }}"
+          sequence:
+            - service: light.turn_off
+              entity_id: light.computer, light.living
+            - service: script.turn_off
+              data_template:
+                entity_id: script.tradfri_transition
+
+        - conditions:
+            - condition: template
+              value_template: "{{ states('sensor.date_weekday') == 'off' }}"
+          sequence:
+            - service: light.turn_off
+              entity_id: light.computer, light.living           
+            - service: script.turn_off
+              data_template:
+                entity_id: script.tradfri_transition         
+         
+      default:
+        - service: light.turn_off
+          entity_id: light.computer
+        - service: script.turn_off
+          data_template:
+            entity_id: script.tradfri_transition
+  mode: restart
+            
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

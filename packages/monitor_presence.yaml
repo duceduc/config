@@ -77,10 +77,42 @@ binary_sensor:
           {% endif %}
 
 
-sensor:
-  - platform: mqtt
-    name: "Room Presence"
-    state_topic: "house/presence/current_room"
+mqtt:
+  sensor:
+    - name: "Room Presence"
+      state_topic: "house/presence/current_room"
+
+    - name: 'Duc Masterroom Proximity'
+      state_topic: 'monitor/masterroom/id/rssi'
+      value_template: '{{ value }}'
+      unit_of_measurement: 'level'
+
+    - name: 'Duc Shionroom Proximity'
+      state_topic: 'monitor/shionroom/id/rssi'
+      value_template: '{{ value }}'
+      unit_of_measurement: 'level'
+
+    - name: 'Duc Livingroom Proximity'
+      state_topic: 'monitor/livingroom/id/rssi'
+      value_template: '{{ value }}'
+      unit_of_measurement: 'level'
+
+    - name: 'Eri Masterroom Proximity' 
+      state_topic: 'monitor/masterroom/ie/rssi'
+      value_template: '{{ value }}'
+      unit_of_measurement: 'level'
+
+    - name: 'Eri Shionroom Proximity'
+      state_topic: 'monitor/shionroom/ie/rssi'
+      value_template: '{{ value }}'
+      unit_of_measurement: 'level'
+
+    - name: 'Eri Livingroom Proximity'
+      state_topic: 'monitor/livingroom/ie/rssi'
+      value_template: '{{ value }}'
+      unit_of_measurement: 'level'
+    
+sensor:    
   - platform: template
     sensors:
       room_audio:
@@ -100,7 +132,7 @@ sensor:
               {% else %} 
                 {% if sensor.name == 'motion computerroom occupancy' %}
                   computer_room
-                {% elif sensor.name in ('motion kitchen occupancy','motion lr occupancy') %}
+                {% elif sensor.name in ('motion kitchen occupancy','LR Radar Movement') %}
                   living_room
                 {% elif sensor.name in ('motion sr occupancy', 'motion mr occupancy', 'motion hallway occupancy') %}
                   hallway
@@ -114,22 +146,6 @@ sensor:
             {{ states('sensor.room_presence') }}
           {% endif %}
 
-
-  - platform: mqtt
-    state_topic: 'monitor/masterroom/id/rssi'
-    value_template: '{{ value }}'
-    unit_of_measurement: 'level'
-    name: 'Duc Masterroom Proximity'
-  - platform: mqtt
-    state_topic: 'monitor/shionroom/id/rssi'
-    value_template: '{{ value }}'
-    unit_of_measurement: 'level'
-    name: 'Duc Shionroom Proximity'
-  - platform: mqtt
-    state_topic: 'monitor/livingroom/id/rssi'
-    value_template: '{{ value }}'
-    unit_of_measurement: 'level'
-    name: 'Duc Livingroom Proximity'
   - platform: template
     sensors:
       duc_home_location:
@@ -145,21 +161,6 @@ sensor:
             not_home
           {% endif %}
 
-  - platform: mqtt
-    state_topic: 'monitor/masterroom/ie/rssi'
-    value_template: '{{ value }}'
-    unit_of_measurement: 'level'
-    name: 'Eri Masterroom Proximity'
-  - platform: mqtt
-    state_topic: 'monitor/shionroom/ie/rssi'
-    value_template: '{{ value }}'
-    unit_of_measurement: 'level'
-    name: 'Eri Shionroom Proximity'
-  - platform: mqtt
-    state_topic: 'monitor/livingroom/ie/rssi'
-    value_template: '{{ value }}'
-    unit_of_measurement: 'level'
-    name: 'Eri Livingroom Proximity'
   - platform: template
     sensors:
       eri_home_location:
@@ -174,7 +175,6 @@ sensor:
           {% else %}
             not_home
           {% endif %}
-
 
 automation:
   - alias: Set Room Presence
@@ -210,7 +210,7 @@ automation:
       - service: script.status_annc
         data:
           who: "{{ states('sensor.room_audio') }}"
-          speech_message: "Eddie has arrived at work."
+          speech_message: "Just a quick heads up. Eddie has arrived at work."
 
   - alias: Eri Leaves Costco Notification
     initial_state: true
@@ -220,6 +220,11 @@ automation:
         zone: zone.costco_hq
         entity_id: person.eri
     action:
+      - service: script.text_notify
+        data:
+          who: duc
+          title: "*Notification*"
+          message: "Eri has left work."
       - service: input_boolean.turn_on
         entity_id: input_boolean.eri_travel_monitor
       - service: script.status_annc
@@ -227,32 +232,6 @@ automation:
           who: "{{ states('sensor.room_audio') }}"
           call_interuption: 1
           call_eri_location: 1
-      - service: script.text_notify
-        data:
-          who: duc
-          title: "*Notification*"
-          message: "Eri has left work."
-
-##
-  - alias: Shion Home Notification
-    initial_state: true
-    trigger:
-      - platform: state
-        entity_id: person.shion
-        to: 'home'
-    condition:
-      - condition: template # Is a school day
-        value_template: "{{ is_state('calendar.shion_school', 'on') }}"
-      - condition: template # No afterschool
-        value_template: "{{ is_state('sensor.school_event', 'Home School') }}"     
-        
-    action:
-      - service: script.text_notify
-        data:
-          who: duc
-          title: "*Notification*"
-          message: "Shion is home from school."
-
 
 ##
   - alias: Duc Arrives at Jcb Notification
@@ -268,7 +247,7 @@ automation:
       - service: script.status_annc
         data:
           who: "{{ states('sensor.room_audio') }}"
-          speech_message: "Duck has arrived at work."
+          speech_message: "I do not mean to intrude, but, Duck has arrived at work."
 
   - alias: Duc Leaves Jcb Notification
     initial_state: true
@@ -278,6 +257,11 @@ automation:
         zone: zone.jcb
         entity_id: person.duc
     action:
+      - service: script.text_notify
+        data:
+          who: duc
+          title: "*Notification*"
+          message: "Duc has left work."
       - service: input_boolean.turn_on
         entity_id: input_boolean.duc_travel_monitor
       - service: script.status_annc
@@ -285,10 +269,22 @@ automation:
           who: "{{ states('sensor.room_audio') }}"
           call_interuption: 1
           call_duc_location: 1
+
+##
+  - alias: Shion Home Notification
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: person.shion
+        to: 'home'
+    condition:
+      - condition: template # Is a school day
+        value_template: "{{ is_state('calendar.shion_school', 'on') }}"
+      - condition: template # No afterschool
+        value_template: "{{ is_state('sensor.school_event', 'Home School') }}"
+    action:
       - service: script.text_notify
         data:
           who: duc
           title: "*Notification*"
-          message: "Duc has left work."
-
-
+          message: "Shion is home from school."

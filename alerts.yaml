@@ -16,12 +16,12 @@
     data:
       type: tts
     notifiers:
-     - notify_events
+     - amberthebot
      - alexa_media_ai_4
 
   duc_heading_home:
     name: Duc is headed home
-    message: "Duck will be home in {{state_attr('sensor.eri_ett_home','duration') | round}} minutes."
+    message: "Duck will be home in {{state_attr('sensor.duc_ett_home','duration') | round}} minutes."
     entity_id: input_boolean.duc_travel_monitor
     state: "on"
     repeat: 20
@@ -30,7 +30,7 @@
     data:
       type: tts
     notifiers:
-     - notify_events
+     - amberthebot
      - alexa_media_ai_4
 
 #########################################################
@@ -41,14 +41,15 @@
 
   rpi_updates:
     name: Raspberry Pi Updates Alert
-    entity_id: binary_sensor.ms1_updates
-    title: "{{ states('sensor.ms1_updates') }} Raspberry Pi Updates Available"
-    message: "There are {{ states('sensor.ms1_updates') }} updates available for the Raspberry Pi servers"
+    entity_id: binary_sensor.ws1_updates
+    title: "{{ states('sensor.ws1_updates') }} Raspberry Pi Updates Available"
+    message: "There are {{ states('sensor.ws1_updates') }} updates available for the Raspberry Pi servers"
     state: 'on'
     can_acknowledge: true
     repeat: 720
     notifiers:
-      - 'notify_events'
+     - 'amberthebot'
+#     - 'notify_events'
 
   replace_toilet_airfreshener:
     name: Replace Toilet Airfreshener Alert

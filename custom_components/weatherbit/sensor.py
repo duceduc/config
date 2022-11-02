@@ -6,56 +6,53 @@ from dataclasses import dataclass
 
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     DEGREE,
-    DEVICE_CLASS_AQI,
-    DEVICE_CLASS_HUMIDITY,
-    DEVICE_CLASS_PRESSURE,
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_TIMESTAMP,
-    TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import StateType
-from homeassistant.util.distance import (
-    convert as dist_convert,
+from homeassistant.util.unit_conversion import (
+    SpeedConverter,
+    DistanceConverter,
+    TemperatureConverter,
     LENGTH_MILLIMETERS,
     LENGTH_INCHES,
-)
-from homeassistant.util.speed import (
-    convert as wind_convert,
     SPEED_METERS_PER_SECOND,
     SPEED_KILOMETERS_PER_HOUR,
     SPEED_MILES_PER_HOUR,
+    TEMP_FAHRENHEIT,
+    TEMP_CELSIUS,
 )
-from homeassistant.util.temperature import celsius_to_fahrenheit
 from homeassistant.components.weather import (
-    ATTR_FORECAST_PRECIPITATION,
+    ATTR_FORECAST_NATIVE_PRECIPITATION,
     ATTR_FORECAST_PRECIPITATION_PROBABILITY,
-    ATTR_FORECAST_TEMP,
-    ATTR_FORECAST_TEMP_LOW,
+    ATTR_FORECAST_NATIVE_TEMP,
+    ATTR_FORECAST_NATIVE_TEMP_LOW,
     ATTR_FORECAST_TIME,
     ATTR_FORECAST_WIND_BEARING,
-    ATTR_FORECAST_WIND_SPEED,
+    ATTR_FORECAST_NATIVE_WIND_SPEED,
 )
-from pyweatherbitdata.data import AlertDescription, ForecastDetailDescription
+
+# from pyweatherbitdata.data import AlertDescription, ForecastDetailDescription
+from pyweatherbitdata.data import ForecastDetailDescription
 from .const import (
-    ATTR_ALERTS_CITY_NAME,
-    ATTR_ALERT_DESCRIPTION_EN,
-    ATTR_ALERT_DESCRIPTION_LOC,
-    ATTR_ALERT_EFFECTIVE,
-    ATTR_ALERT_ENDS,
-    ATTR_ALERT_EXPIRES,
-    ATTR_ALERT_ONSET,
-    ATTR_ALERT_REGIONS,
-    ATTR_ALERT_SEVERITY,
-    ATTR_ALERT_TITLE,
-    ATTR_ALERT_URI,
-    ATTR_ALERTS,
+    # ATTR_ALERTS_CITY_NAME,
+    # ATTR_ALERT_DESCRIPTION_EN,
+    # ATTR_ALERT_DESCRIPTION_LOC,
+    # ATTR_ALERT_EFFECTIVE,
+    # ATTR_ALERT_ENDS,
+    # ATTR_ALERT_EXPIRES,
+    # ATTR_ALERT_ONSET,
+    # ATTR_ALERT_REGIONS,
+    # ATTR_ALERT_SEVERITY,
+    # ATTR_ALERT_TITLE,
+    # ATTR_ALERT_URI,
+    # ATTR_ALERTS,
     ATTR_AQI_LEVEL,
     ATTR_FORECAST_CLOUDINESS,
     ATTR_FORECAST_SNOW,
@@ -68,7 +65,7 @@ from .const import (
 from .entity import WeatherbitEntity
 from .models import WeatherBitEntryData
 
-_KEY_ALERTS = "alerts"
+# _KEY_ALERTS = "alerts"
 _KEY_AQI = "aqi"
 
 
@@ -93,7 +90,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="temp",
         name="Air Temperature",
-        device_class=DEVICE_CLASS_TEMPERATURE,
+        device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=TEMP_CELSIUS,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
@@ -102,7 +99,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="app_temp",
         name="Apparent Temperature",
-        device_class=DEVICE_CLASS_TEMPERATURE,
+        device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=TEMP_CELSIUS,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
@@ -111,7 +108,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="slp",
         name="Sea Level Pressure",
-        device_class=DEVICE_CLASS_PRESSURE,
+        device_class=SensorDeviceClass.PRESSURE,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="pressure",
         extra_attributes=False,
@@ -120,7 +117,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         key="humidity",
         name="Relative Humidity",
         native_unit_of_measurement="%",
-        device_class=DEVICE_CLASS_HUMIDITY,
+        device_class=SensorDeviceClass.HUMIDITY,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
         extra_attributes=False,
@@ -128,7 +125,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="pres",
         name="Station Pressure",
-        device_class=DEVICE_CLASS_PRESSURE,
+        device_class=SensorDeviceClass.PRESSURE,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="pressure",
         extra_attributes=False,
@@ -154,6 +151,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="wind_spd",
         name="Wind Speed",
+        device_class=SensorDeviceClass.SPEED,
         icon="mdi:weather-windy-variant",
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="length",
@@ -163,6 +161,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         key="wind_spd_kmh",
         name="Wind Speed (km/h)",
         icon="mdi:weather-windy-variant",
+        device_class=SensorDeviceClass.SPEED,
         native_unit_of_measurement="km/h",
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
@@ -172,6 +171,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         key="wind_spd_knots",
         name="Wind Speed (knots)",
         icon="mdi:tailwind",
+        device_class=SensorDeviceClass.SPEED,
         native_unit_of_measurement="knots",
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
@@ -197,7 +197,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="dewpt",
         name="Dew Point",
-        device_class=DEVICE_CLASS_TEMPERATURE,
+        device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=TEMP_CELSIUS,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
@@ -214,6 +214,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         key="vis",
         name="Visibility",
         icon="mdi:eye",
+        device_class=SensorDeviceClass.DISTANCE,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="distance",
         extra_attributes=False,
@@ -222,6 +223,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         key="precip",
         name="Precipitation",
         icon="mdi:weather-rainy",
+        device_class=SensorDeviceClass.DISTANCE,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="precipitation",
         extra_attributes=False,
@@ -230,6 +232,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         key="snow",
         name="Snow",
         icon="mdi:snowflake",
+        device_class=SensorDeviceClass.DISTANCE,
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="precipitation",
         extra_attributes=False,
@@ -254,7 +257,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
     WeatherBitSensorEntityDescription(
         key="aqi",
         name="Air Quality Index",
-        device_class=DEVICE_CLASS_AQI,
+        device_class=SensorDeviceClass.AQI,
         native_unit_of_measurement="AQI",
         state_class=STATE_CLASS_MEASUREMENT,
         unit_type="none",
@@ -274,7 +277,7 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         name="Observation Time",
         icon="mdi:clock",
         unit_type="none",
-        device_class=DEVICE_CLASS_TIMESTAMP,
+        device_class=SensorDeviceClass.TIMESTAMP,
         extra_attributes=False,
     ),
     WeatherBitSensorEntityDescription(
@@ -285,13 +288,13 @@ SENSOR_TYPES: tuple[WeatherBitSensorEntityDescription, ...] = (
         unit_type="none",
         extra_attributes=False,
     ),
-    WeatherBitSensorEntityDescription(
-        key="alerts",
-        name="Weather Alerts",
-        icon="mdi:alert",
-        unit_type="none",
-        extra_attributes=True,
-    ),
+    # WeatherBitSensorEntityDescription(
+    #     key="alerts",
+    #     name="Weather Alerts",
+    #     icon="mdi:alert",
+    #     unit_type="none",
+    #     extra_attributes=True,
+    # ),
     WeatherBitSensorEntityDescription(
         key="forecast_day_1",
         name="Forecast Day 1",
@@ -417,8 +420,8 @@ class WeatherbitSensor(WeatherbitEntity, SensorEntity):
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
 
-        if self.entity_description.key == _KEY_ALERTS:
-            return getattr(self.coordinator.data, "alert_count")
+        # if self.entity_description.key == _KEY_ALERTS:
+        #     return getattr(self.coordinator.data, "alert_count")
 
         if self.entity_description.is_forecast_item:
             self.forecast_data = getattr(self.forecast_coordinator.data, "forecast")
@@ -446,43 +449,43 @@ class WeatherbitSensor(WeatherbitEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return the sensor state attributes."""
-        if self.entity_description.key == _KEY_ALERTS:
-            data = []
-            count = 1
-            alerts: AlertDescription = getattr(
-                self.coordinator.data, self.entity_description.key
-            )
-            for item in alerts:
-                data.append(
-                    {
-                        f"Alert No {count}": "-------------------",
-                        ATTR_ALERT_TITLE: item.title,
-                        ATTR_ALERT_SEVERITY: item.severity,
-                        ATTR_ALERT_EFFECTIVE: item.effective_utc,
-                        ATTR_ALERT_ONSET: item.onset_utc,
-                        ATTR_ALERT_ENDS: item.ends_utc,
-                        ATTR_ALERT_EXPIRES: item.expires_utc,
-                        ATTR_ALERT_URI: item.uri,
-                        ATTR_ALERTS_CITY_NAME: item.city_name,
-                        ATTR_ALERT_REGIONS: item.regions,
-                        ATTR_ALERT_DESCRIPTION_EN: item.en_description,
-                        ATTR_ALERT_DESCRIPTION_LOC: item.loc_description,
-                    }
-                )
-                count += 1
-            return {
-                **super().extra_state_attributes,
-                ATTR_ALERTS: data,
-            }
+        # if self.entity_description.key == _KEY_ALERTS:
+        #     data = []
+        #     count = 1
+        #     alerts: AlertDescription = getattr(
+        #         self.coordinator.data, self.entity_description.key
+        #     )
+        #     for item in alerts:
+        #         data.append(
+        #             {
+        #                 f"Alert No {count}": "-------------------",
+        #                 ATTR_ALERT_TITLE: item.title,
+        #                 ATTR_ALERT_SEVERITY: item.severity,
+        #                 ATTR_ALERT_EFFECTIVE: item.effective_utc,
+        #                 ATTR_ALERT_ONSET: item.onset_utc,
+        #                 ATTR_ALERT_ENDS: item.ends_utc,
+        #                 ATTR_ALERT_EXPIRES: item.expires_utc,
+        #                 ATTR_ALERT_URI: item.uri,
+        #                 ATTR_ALERTS_CITY_NAME: item.city_name,
+        #                 ATTR_ALERT_REGIONS: item.regions,
+        #                 ATTR_ALERT_DESCRIPTION_EN: item.en_description,
+        #                 ATTR_ALERT_DESCRIPTION_LOC: item.loc_description,
+        #             }
+        #         )
+        #         count += 1
+        #     return {
+        #         **super().extra_state_attributes,
+        #         ATTR_ALERTS: data,
+        #     }
         if self.entity_description.is_forecast_item:
             _wind_spd = (
-                wind_convert(
+                SpeedConverter.convert(
                     self.day_data.wind_spd,
                     SPEED_METERS_PER_SECOND,
                     SPEED_MILES_PER_HOUR,
                 )
                 if not self.hass.config.units.is_metric
-                else wind_convert(
+                else SpeedConverter.convert(
                     self.day_data.wind_spd,
                     SPEED_METERS_PER_SECOND,
                     SPEED_KILOMETERS_PER_HOUR,
@@ -491,36 +494,42 @@ class WeatherbitSensor(WeatherbitEntity, SensorEntity):
             _temp = (
                 self.day_data.max_temp
                 if self.hass.config.units.is_metric
-                else celsius_to_fahrenheit(self.day_data.max_temp)
+                else TemperatureConverter.convert(
+                    self.day_data.max_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                )
             )
             _temp_low = (
                 self.day_data.min_temp
                 if self.hass.config.units.is_metric
-                else celsius_to_fahrenheit(self.day_data.min_temp)
+                else TemperatureConverter.convert(
+                    self.day_data.max_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                )
             )
             _precip = (
                 self.day_data.precip
                 if self.hass.config.units.is_metric
-                else dist_convert(
+                else DistanceConverter.convert(
                     self.day_data.precip, LENGTH_MILLIMETERS, LENGTH_INCHES
                 )
             )
             _snow = (
                 self.day_data.snow
                 if self.hass.config.units.is_metric
-                else dist_convert(self.day_data.snow, LENGTH_MILLIMETERS, LENGTH_INCHES)
+                else DistanceConverter.convert(
+                    self.day_data.snow, LENGTH_MILLIMETERS, LENGTH_INCHES
+                )
             )
             return {
                 **super().extra_state_attributes,
                 ATTR_FORECAST_TIME: self.day_data.utc_time,
-                ATTR_FORECAST_TEMP: _temp,
-                ATTR_FORECAST_TEMP_LOW: _temp_low,
-                ATTR_FORECAST_PRECIPITATION: round(_precip, 3),
+                ATTR_FORECAST_NATIVE_TEMP: _temp,
+                ATTR_FORECAST_NATIVE_TEMP_LOW: _temp_low,
+                ATTR_FORECAST_NATIVE_PRECIPITATION: round(_precip, 3),
                 ATTR_FORECAST_PRECIPITATION_PROBABILITY: self.day_data.pop,
                 ATTR_FORECAST_SNOW: round(_snow, 3),
                 ATTR_FORECAST_CLOUDINESS: self.day_data.clouds,
                 ATTR_FORECAST_WEATHER_TEXT: self.day_data.weather_text,
-                ATTR_FORECAST_WIND_SPEED: round(_wind_spd, 2),
+                ATTR_FORECAST_NATIVE_WIND_SPEED: round(_wind_spd, 2),
                 ATTR_FORECAST_WIND_BEARING: self.day_data.wind_dir,
             }
         if self.entity_description.key == _KEY_AQI:

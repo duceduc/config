@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Living Room Air Conditioning                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Living Room Air Conditioning                                                            
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Room Aircon'
@@ -24,9 +24,9 @@
       {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             AM Schedule Auto Timer                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             AM Schedule Auto Timer                                                                 
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Aircon AM Schedule'
@@ -52,7 +52,7 @@
     entity_id: binary_sensor.hallway_door
     state: 'off'
   - condition: state
-    entity_id: binary_sensor.lr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+    entity_id: binary_sensor.lr_radar_status # only if temperature sensor is available - prevents glitching when unavailable
     state: 'on'    
   - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
     conditions:
@@ -81,9 +81,9 @@
         {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             PM Schedule Auto Timer                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             PM Schedule Auto Timer                                                                 
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Aircon PM Schedule'
@@ -138,9 +138,9 @@
         {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             Turn Aircon Off At Time                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#             Turn Aircon Off At Time                                                                  
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Aircon AM Off'
@@ -186,9 +186,9 @@
       option: 'Off'
 
 #########################################################
-#                                                                                                              #
-#             Manual Adjust Temperature                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Manual Adjust Temperature                                                             
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Room Aircon Cool Temperature Adjust'
@@ -223,9 +223,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Powerful Cool On                                                                           #
-#                                                                                                              #
+#                                                                                                              
+#             Powerful Cool On                                                                           
+#                                                                                                              
 #########################################################
 
 
@@ -279,9 +279,9 @@
       option: "Normal Cool"
 
 #########################################################
-#                                                                                                              #
-#             Powerful Heat On                                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             Powerful Heat On                                                                          
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Powerful Heat Off'
@@ -334,9 +334,9 @@
       option: "Powerful Heat"
 
 #########################################################
-#                                                                                                              #
-#             Auto Set AM Living Room Heating Set Point                                        #
-#                                                                                                              #
+#                                                                                                              
+#             Auto Set AM Living Room Heating Set Point                                        
+#                                                                                                              
 #########################################################
 
 - alias: 'LR Heating Seasonal Adjustment AM'
@@ -367,9 +367,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Auto Set PM Living Room Heating Set Point                                        #
-#                                                                                                              #
+#                                                                                                              
+#             Auto Set PM Living Room Heating Set Point                                        
+#                                                                                                              
 #########################################################
 
 
@@ -395,9 +395,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Switchbot Humidifier                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             Switchbot Humidifier                                                                 
+#                                                                                                              
 #########################################################
 
 - alias: 'SB Humidifier'
@@ -517,7 +517,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

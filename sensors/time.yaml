@@ -36,13 +36,6 @@
             mdi:weather-sunny
           {% endif %}
 
-  - platform: template
-    sensors:
-      disable_device_time:
-        value_template: >-
-          {% set wday = states('input_datetime.weekday_disable_device_time') %}
-          {% set wend = states('input_datetime.weekend_disable_device_time') %}
-          {% if is_state("sensor.date_weekday", "on") %} {{wday}} {% else %} {{wend}} {% endif %}
       today_is:
         friendly_name: 'Today is'
         value_template: "{{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}"

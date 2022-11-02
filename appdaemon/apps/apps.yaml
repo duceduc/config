@@ -6,12 +6,23 @@
 #                                                                                                              
 #########################################################
 
+#living_room:
+#  module: controllerx
+#  class: E1810Controller
+#  controller: sensor.living_room_action
+#  integration: z2m
+#  light: light.living_room
+
 living_room:
   module: controllerx
-  class: E1810Controller
-  controller: sensor.living_room_action
-  integration: z2m
-  light: light.living_room
+  class: E1810Z2MLightController
+  controller: living_room
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: living
+    mode: mqtt
 
 living_room_curtains:
   module: controllerx
@@ -32,7 +43,7 @@ aio_living_room:
   class: E1810Controller
   controller: sensor.aio_controller_action
   integration: z2m
-  light: light.living_room
+  light: light.living
   merge_mapping:
     brightness_up_click:
       service: script.turn_on
@@ -42,7 +53,7 @@ aio_living_room:
     brightness_down_click:
       service: light.toggle
       data:
-        entity_id: light.living_room
+        entity_id: light.living
 
     arrow_left_click:
       service: script.turn_on
@@ -66,21 +77,106 @@ aio_living_room:
       service: light.turn_off
       data:
         entity_id:
-        - light.living_room
-        - light.ceiling_fan_lights
+        - light.living
+        - light.ceiling_fan_light
 
 #########################################################
 #                                                                                                              
-#             Shower Room                                                                                
+#             Wash Room                                                                                
 #                                                                                                              
 #########################################################
+
+#shower_room:
+#  module: controllerx
+#  class: E1743Controller
+#  controller: sensor.shower_room_click
+#  integration: z2m
+#  light: light.shower
+
 
 shower_room:
   module: controllerx
-  class: E1743Controller
-  controller: sensor.shower_room_click
-  integration: z2m
-  light: light.shower_room
+  class: E1743Z2MLightController
+  controller: shower_room
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: shower
+    mode: mqtt
+
+
+#################
+
+
+sink_cool_on:
+  module: controllerx
+  class: E1743Z2MLightController
+  controller: sink_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: sink_cool
+    mode: mqtt
+  actions: ["on$2"]  
+  mapping:
+    "on$2": "on"  
+
+
+sink_cool_off:
+  module: controllerx
+  class: E1743Z2MLightController
+  controller: sink_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: w_4
+    mode: mqtt
+  actions: ["on$2"]  
+  mapping:
+    "on$2": "off"  
+
+
+sink_warm_on:
+  module: controllerx
+  class: E1743Z2MLightController
+  controller: sink_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: w_4
+    mode: mqtt
+  actions: ["off$2"]
+  mapping:
+    "off$2": "on"  
+
+sink_warm_off:
+  module: controllerx
+  class: E1743Z2MLightController
+  controller: sink_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: sink_cool
+    mode: mqtt
+  actions: ["off$2"]
+  mapping:
+    "off$2": "off"  
+
+sink_lights:
+  module: controllerx
+  class: E1743Z2MLightController
+  controller: sink_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: sink_all
+    mode: mqtt
 
 
 
@@ -91,21 +187,21 @@ shower_room:
 #########################################################
 
 
-kitchen:
-  module: controllerx
-  class: E1743Controller
-  controller: sensor.kitchen_dimmer_click
-  integration: z2m
-  light: light.kitchen
-  merge_mapping:
-    "on":
-      service: input_boolean.turn_on
-      data:
-        entity_id: input_boolean.kitchen_mcl
-    "off":
-      service: input_boolean.turn_off
-      data:
-        entity_id: input_boolean.kitchen_mcl
+#kitchen:
+#  module: controllerx
+#  class: E1743Controller
+#  controller: sensor.kitchen_dimmer_click
+#  integration: z2m
+#  light: light.kitchen
+#  merge_mapping:
+#    "on":
+#      service: input_boolean.turn_on
+#      data:
+#        entity_id: input_boolean.kitchen_mcl
+#    "off":
+#      service: input_boolean.turn_off
+#      data:
+#        entity_id: input_boolean.kitchen_mcl
 
 
 
@@ -115,12 +211,23 @@ kitchen:
 #                                                                                                              
 #########################################################
 
+#computer_room:
+#  module: controllerx
+#  class: E1810Controller
+#  controller: sensor.computer_room_action
+#  integration: z2m
+#  light: light.computer_room
+
 computer_room:
   module: controllerx
-  class: E1810Controller
-  controller: sensor.computer_room_action
-  integration: z2m
-  light: light.computer_room
+  class: E1810Z2MLightController
+  controller: computer_room
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: computer
+    mode: mqtt
 
 computer_room_curtains:
   module: controllerx
@@ -142,19 +249,45 @@ computer_room_curtains:
 #                                                                                                              
 #########################################################
 
+#shion_room:
+#  module: controllerx
+#  class: E1810Controller
+#  controller: sensor.shion_room_action
+#  integration: z2m
+#  light: light.shion_room
+
+#shion_dimmer:
+#  module: controllerx
+#  class: E1743Controller
+#  controller: sensor.shion_dimmer_click
+#  integration: z2m
+#  light: light.shion_room
+
+
+
 shion_room:
   module: controllerx
-  class: E1810Controller
-  controller: sensor.shion_room_action
-  integration: z2m
-  light: light.shion_room
+  class: E1810Z2MLightController
+  controller: shion_room
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: shion
+    mode: mqtt
 
 shion_dimmer:
   module: controllerx
-  class: E1743Controller
-  controller: sensor.shion_dimmer_click
-  integration: z2m
-  light: light.shion_room
+  class: E1743Z2MLightController
+  controller: shion_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: shion
+    mode: mqtt
+
+
 
 #########################################################
 #                                                                                                              
@@ -162,30 +295,48 @@ shion_dimmer:
 #                                                                                                              
 #########################################################
 
+#master_dimmer:
+#  module: controllerx
+#  class: E1743Controller
+#  controller: sensor.master_dimmer_click
+#  integration: z2m
+#  light: light.m_1
+#  merge_mapping:
+#    brightness_stop:
+#      service: light.turn_on
+#      data:
+#        entity_id: light.master
+#    "off":
+#      service: light.turn_off
+#      data:
+#        entity_id:
+#        - light.master
+
 master_dimmer:
   module: controllerx
-  class: E1743Controller
-  controller: sensor.master_dimmer_click
-  integration: z2m
-  light: light.m_1
+  class: E1743Z2MLightController
+  controller: master_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: m_1
+    mode: mqtt
+  actions: ["on"] # Only allows "on" action for this config
+
+master_light:
+  module: controllerx
+  class: E1743Z2MLightController
+  controller: master_dimmer
+  integration:
+    name: z2m
+    listen_to: mqtt
+  light:
+    name: master
+    mode: mqtt
+  excluded_actions: ["on"] # Excluding "on" because it is managed by the other config
   merge_mapping:
-    brightness_stop:
-      service: light.turn_on
-      data:
-        entity_id: light.master_room
-    "off":
-      service: light.turn_off
-      data:
-        entity_id:
-         - light.master_room
-
-
-#########################################################
-#                                                                                                              
-#             ESPresense IPS                                                                             
-#                                                                                                              
-#########################################################
-
+    "on$2": "on"
 
 
 #########################################################

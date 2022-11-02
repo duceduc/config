@@ -24,28 +24,35 @@
     scan_interval: 300
     unit_of_measurement: kWh
 
-  - platform: mqtt
-    name: "Tariff 31 Power"
-    state_topic: "shellies/shellyem-06209A/emeter/0/power"
-    value_template: '{{ value|round(1) }}'
-    qos: 1
-    unit_of_measurement: "W"
-    icon: mdi:gauge
 
-  - platform: mqtt
-    name: "Tariff 41 Power"
-    state_topic: "shellies/shellyem-06209A/emeter/1/power"
-    value_template: '{{ value|round(1) }}'
-    qos: 1
-    unit_of_measurement: "W"
-    icon: mdi:gauge
 
-  - platform: mqtt
-    name: "Mains Voltage"
-    state_topic: "shellies/shellyem-06209A/emeter/0/voltage"
-    qos: 1
-    unit_of_measurement: "V"
-    icon: mdi:flash
+
+#  - platform: mqtt
+#    name: "Tariff 31 Power"
+#    state_topic: "shellies/shellyem-06209A/emeter/0/power"
+#    value_template: '{{ value|round(1) }}'
+#    qos: 1
+#    unit_of_measurement: "W"
+#    icon: mdi:gauge
+#
+#  - platform: mqtt
+#    name: "Tariff 41 Power"
+#    state_topic: "shellies/shellyem-06209A/emeter/1/power"
+#    value_template: '{{ value|round(1) }}'
+#    qos: 1
+#    unit_of_measurement: "W"
+#    icon: mdi:gauge
+#
+#  - platform: mqtt
+#    name: "Mains Voltage"
+#    state_topic: "shellies/shellyem-06209A/emeter/0/voltage"
+#    qos: 1
+#    unit_of_measurement: "V"
+#    icon: mdi:flash
+
+
+
+
 
   - platform: statistics
     name: 'Power Stats'
@@ -159,49 +166,38 @@
 ####################################################
 
 
-#  - platform: rest
-#    name: "Shelly Washer Total Energy"
-#    resource: http://192.168.1.91/status
-#    username: ''
-#    password: ''
-#    authentication: basic
-#    value_template: '{{ (value_json.meters.0.total | float /1000)|round(3) }}' # Wh to kWh
-#    scan_interval: 300 # no point updating faster than this. The Shelly only updates every 5 minutes
-#    unit_of_measurement: kWh
-
+#Gosund plug -  192.168.1.78
 #  - platform: mqtt
-#    name: "Shelly Washer Power"
-#    state_topic: "shellies/shellyplugu1-AAF6E1/relay/0/power"
-#    value_template: '{{ value|round(1) }}'
+#    name: "Gosund Washer Power"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Power }}"
 #    qos: 1
 #    unit_of_measurement: "W"
 #    icon: mdi:gauge
-
-
-#Gosund plug -  192.168.1.78 or .238
-  - platform: mqtt
-    name: "Gosund Washer Power"
-    state_topic: "tasmota/washer_plug/SENSOR"
-    value_template: "{{ value_json['ENERGY'].Power }}"
-    qos: 1
-    unit_of_measurement: "W"
-    icon: mdi:gauge
-
-  - platform: mqtt
-    name: "Gosund Washer Total Energy"
-    state_topic: "tasmota/washer_plug/SENSOR"
-    value_template: "{{ value_json['ENERGY'].Total }}"
-    qos: 1
-    unit_of_measurement: kWh
-    icon: mdi:gauge
-
-  - platform: mqtt
-    name: "Gosund Washer Daily Energy"
-    state_topic: "tasmota/washer_plug/SENSOR"
-    value_template: "{{ value_json['ENERGY'].Today }}"
-    qos: 1
-    unit_of_measurement: kWh
-    icon: mdi:gauge
+#
+#  - platform: mqtt
+#    name: "Gosund Washer Total Energy"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Total }}"
+#    qos: 1
+#    unit_of_measurement: kWh
+#    icon: mdi:gauge
+#
+#  - platform: mqtt
+#    name: "Gosund Washer Daily Energy"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Today }}"
+#    qos: 1
+#    unit_of_measurement: kWh
+#    icon: mdi:gauge
+#
+#  - platform: mqtt
+#    name: "Gosund Washer Yesterday Energy"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Yesterday }}"
+#    qos: 1
+#    unit_of_measurement: kWh
+#    icon: mdi:gauge
 
 
 

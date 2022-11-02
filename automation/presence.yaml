@@ -219,6 +219,7 @@
       data_template:
         topic: monitor/scan/arrive
 
+
 - alias: Presence Scan Departure
   trigger:
     - platform: state

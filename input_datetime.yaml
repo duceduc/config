@@ -6,7 +6,7 @@
   lrh_ac_am_off_time:
     name: AM Off Time
     has_time: true
-    initial: '07:00'
+    initial: '07:25'
   lrh_ac_pm_on_time:
     name: PM On Time
     has_time: true
@@ -22,11 +22,11 @@
   lr_ac_am_on_time:
     name: AM On Time
     has_time: true
-    initial: '05:00'
+    initial: '04:00'
   lr_ac_am_off_time:
     name: AM Off Time
     has_time: true
-    initial: '06:00'
+    initial: '07:25'
   lr_ac_pm_on_time:
     name: PM On Time
     has_time: true
@@ -34,7 +34,7 @@
   lr_ac_pm_off_time:
     name: PM Off Time
     has_time: true
-    initial: '19:00'
+    initial: '20:00'
 #####
   mr_ac_am_on_time:
     name: AM On Time
@@ -80,20 +80,20 @@
 #                                                                                                              
 #########################################################
 
-  tv_lock_time:
-    name: TV Lock Time
-    has_time: true
-    initial: '21:25'
+#  tv_lock_time:
+#    name: TV Lock Time
+#    has_time: true
+#    initial: '21:25'
 
-  weekday_disable_device_time:
-    name: Weekday Disable Device Time
-    has_time: true
-    initial: '21:15'
+#  weekday_disable_device_time:
+#    name: Weekday Disable Device Time
+#    has_time: true
+#    initial: '21:15'
 
-  weekend_disable_device_time:
-    name: Weekend Disable Device Time
-    has_time: true
-    initial: '22:15'
+#  weekend_disable_device_time:
+#    name: Weekend Disable Device Time
+#    has_time: true
+#    initial: '22:15'
 
 
 #########################################################
@@ -166,7 +166,21 @@
     name: Nightly Briefing
     has_date: false
     has_time: true
-    
+
+  shion_nightly_report:
+    name: Shion Nightly Report
+    has_date: false
+    has_time: true
+  shion_school_bedtime:
+    name: Shion School Bedtime
+    has_date: false
+    has_time: true
+  shion_bedtime_holiday:
+    name: Shion Bedtime Holiday
+    has_date: false
+    has_time: true
+
+
   event_briefing:
     name: Event Briefing
     has_date: false

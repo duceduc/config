@@ -1,0 +1,69 @@
+###############################################################################
+#   @author           :   Duc Su 
+#   @date              :   08/14/2022
+#   @package        :   Database
+#   @description    :   Recorder and Logger Configurations 
+###############################################################################
+
+recorder:
+  db_url: !secret MySQL_login
+  purge_keep_days: 5
+#  commit_interval: 10
+  exclude:
+    domains:
+      - group
+      - automation
+      - camera
+      - media_player
+      - scene
+      - script
+      - updater     
+    entities:
+      - sun.sun
+      - sensor.date_time
+      - sensor.date
+      - sensor.time_online
+      - sensor.moon
+      - sensor.month_is
+      - sensor.time
+      - sensor.today_is
+      - sensor.time_utc
+      - sensor.last_boot # Comes from 'systemmonitor' sensor platform
+      - sensor.devices_with_low_battery
+      
+logbook:
+  include:
+    domains:
+      - media_player
+      - automation
+      - script
+      - light
+      - switch
+      - device_tracker
+      - input_boolean
+      - person
+
+# Lets try to make the logs less chatty and more fine tuned.       
+logger:
+  default: error
+  logs:
+    homeassistant.core: warning
+    homeassistant.loader: error
+    homeassistant.components.recorder: error # to spot db issues
+    homeassistant.config_entries: error
+    homeassistant.setup: error 
+    homeassistant.helpers.entity: critical
+    homeassistant.components.automation: error
+    homeassistant.components.waze_travel_time: error
+    homeassistant.components.statistics.sensor: critical
+    homeassistant.helpers.event: critical
+
+history:
+  include:
+    domains:
+      - sensor
+      - switch
+      - media_player
+      - light
+      - scene
+      - automation

@@ -20,6 +20,7 @@ wifi:
 
 captive_portal:
 logger:
+#  level: VERBOSE
 
 #status_led:
 #  pin: GPIO2
@@ -86,13 +87,13 @@ binary_sensor:
 remote_receiver:
   pin: 
     number: GPIO15 # use GPIO16. Was GPIO15
-    inverted: True
+    inverted: true
     mode: INPUT_PULLUP
   dump: raw
 
 remote_transmitter:
   pin: GPIO2 # use GPIO17. Was GPIO2
-  carrier_duty_percent: 50%
+  carrier_duty_percent: 66%
 
 switch:
   - platform: template

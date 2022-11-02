@@ -38,10 +38,10 @@
       wakeup_map:
         value_template: >
           {% set mapper =
-            { 'Shion Room':'light.shion_room',
-              'Computer Room':'light.computer_room',
-              'Master Room':'light.master_room',
-              'Living Room':'light.living_room',
+            { 'Shion Room':'light.shion',
+              'Computer Room':'light.computer',
+              'Master Room':'light.master',
+              'Living Room':'light.living',
               'Kitchen':'light.kitchen',
               'Hallway':'light.hallway' } %}
           {% set state = states('input_select.wakeup_select') %}

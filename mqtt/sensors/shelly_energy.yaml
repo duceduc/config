@@ -1,0 +1,71 @@
+####################################################
+#                                                                                                    #
+#                      SHELLY EM                                                               #
+#                                                                                                    #
+####################################################
+
+
+  - name: "Tariff 31 Power"
+    state_topic: "shellies/shellyem-06209A/emeter/0/power"
+    value_template: '{{ value|round(1) }}'
+    qos: 1
+    unit_of_measurement: "W"
+    icon: mdi:gauge
+
+  - name: "Tariff 41 Power"
+    state_topic: "shellies/shellyem-06209A/emeter/1/power"
+    value_template: '{{ value|round(1) }}'
+    qos: 1
+    unit_of_measurement: "W"
+    icon: mdi:gauge
+
+  - name: "Mains Voltage"
+    state_topic: "shellies/shellyem-06209A/emeter/0/voltage"
+    qos: 1
+    unit_of_measurement: "V"
+    icon: mdi:flash
+
+
+
+####################################################
+#
+#                      Shelly Smart Plug
+#
+####################################################
+
+#Gosund plug -  192.168.1.78
+#  - name: "Gosund Washer Power"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Power }}"
+#    qos: 1
+#    unit_of_measurement: "W"
+#    icon: mdi:gauge
+#
+#  - name: "Gosund Washer Total Energy"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Total }}"
+#    qos: 1
+#    unit_of_measurement: kWh
+#    icon: mdi:gauge
+#
+#  - name: "Gosund Washer Daily Energy"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Today }}"
+#    qos: 1
+#    unit_of_measurement: kWh
+#    icon: mdi:gauge
+#
+#  - name: "Gosund Washer Yesterday Energy"
+#    state_topic: "tasmota/washer_plug/SENSOR"
+#    value_template: "{{ value_json['ENERGY'].Yesterday }}"
+#    qos: 1
+#    unit_of_measurement: kWh
+#    icon: mdi:gauge
+
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

@@ -1,0 +1,10 @@
+
+
+body {
+    font-family: "Oswald-Light", sans-serif;
+} 
+
+html {
+    font-family: "Oswald-Light", sans-serif;
+	--paper-font-common-base_-_font-family: 'Oswald-Light', sans-serif;
+}

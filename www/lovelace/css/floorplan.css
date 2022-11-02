@@ -1,0 +1,228 @@
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to: {
+    opacity: 1;
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 15000;
+  }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+
+
+@-webkit-keyframes rotation {
+		from {
+				-webkit-transform: rotate(0deg);
+		}
+		to {
+				-webkit-transform: rotate(359deg);
+		}
+}
+
+g#entities .st0 {
+  transform-origin: center;
+}
+
+g#entities .st0 {
+  fill: #424242;
+  opacity: .2;
+  -webkit-animation: rotation 2s infinite linear;
+}
+
+
+.fan-off {
+  fill: #424242 !important;
+  fill: #FF8C00 !important;
+
+}
+
+
+
+@keyframes speaker-pulse {
+  0% {
+    filter: unset;
+    stroke-width: 1;
+    stroke-opacity: 1;
+  }
+  100% {
+    filter: unset;
+    stroke-width: 6;
+    stroke-opacity: 0;
+  }
+}
+@keyframes active-pulse {
+  0% {
+    filter: unset;
+    stroke-opacity: 1;
+    stroke-width: 1px;
+      filter:blur(1px);
+  }
+  15% {
+    stroke-opacity: 1;
+  }
+  100% {
+    filter: unset;
+    stroke-opacity: 0.1;
+    stroke-width: 15px;
+      filter:blur(2px);
+  }
+}
+@keyframes tv-glare {
+  0% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
+
+
+
+svg, svg * {
+  pointer-events: all !important;
+  cursor: auto !important;
+}
+
+svg path {
+  fill: inherit;
+  stroke: inherit;
+  stroke-width: inherit;
+}
+
+
+#light-overlays image {
+  display: none;
+  mix-blend-mode: lighten;
+  animation: 0.75s fade-in linear forwards;
+}
+
+#light-overlays image.light-on {
+    display: block;
+    
+}
+
+
+/*
+Hide Stroke and Fill
+*/
+
+#areas  {
+   fill: none;
+   stroke: transparent;
+   stroke-width: 0;   
+}
+
+g#entities #light\.sink_all, g#entities #light\.master_lamp {
+   fill: none;
+   stroke: transparent;
+   stroke-width: 0;   
+}
+
+g#entities #binary_sensor\.washer_water_leak {
+   stroke: transparent;
+   stroke-width: 0;   
+}
+
+g#entities .power-on {
+    stroke: #FF10F0;
+    stroke-dasharray: 6;
+  
+}
+
+
+#areas .motion-on
+{
+ 	fill: #ff00002e;
+ 	stroke: #ff000087;
+ 	stroke-width: 3px;
+ 	stroke-opacity: 1;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
+
+
+/*
+Warning Lights
+*/
+
+g#entities .detect-on
+{
+ 	fill: #ff00002e;
+ 	stroke: #ff000087;
+ 	stroke-opacity: .1;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
+
+g#entities .washer-running, g#entities .status-cool
+{
+ 	fill: #1589FF ;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
+
+g#entities .status-heat, g#entities .washer-drying 
+{
+ 	fill: #FF8C00 ;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
+
+g#entities .status-fan
+{
+ 	fill: #9932CC ;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
+
+
+#areas .light-on {
+  stroke-width: 4px;
+  stroke-opacity: 1;
+  stroke: #a58ee1;
+}
+
+
+
+g path:active, g use:active, .light-on:active, g#entities > g:active path:not(.touch-area) {
+	stroke: #9ed8ff99 !important;
+	stroke-width: 4px;
+	stroke-opacity: 0.7;
+}
+
+/* g#entities ellipse */
+g#entities path {
+	stroke: var(--paper-item-icon-color);
+	stroke-width: 1px;
+	stroke-opacity: 1;
+	fill: none;
+}
+
+
+
+g#entities .light-on {
+	stroke: var(--paper-item-icon-active-color);
+}
+
+
+
+
+.static-temp, .static-temp tspan {
+  text-shadow: 2px 2px 5px #120c04;
+}
+
+

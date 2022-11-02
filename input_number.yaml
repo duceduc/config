@@ -31,7 +31,7 @@
   lr_ac_cool_temp_set:
     name: Cool If Greater Than
     icon: mdi:thermometer
-    initial: 32
+    initial: 28
     min: 0
     max: 40
     step: 1

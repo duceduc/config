@@ -18,3 +18,28 @@ class TS0044LightController(LightController):
             "4_double": Light.CLICK_BRIGHTNESS_UP,
             "4_hold": Light.CLICK_BRIGHTNESS_DOWN,
         }
+
+
+class TS0044FLightController(LightController):
+    def get_z2m_actions_mapping(self) -> DefaultActionsMapping:
+        return {
+            "on": Light.TOGGLE,
+            "off": Light.TOGGLE,
+            "brightness_step_up": Light.CLICK_BRIGHTNESS_UP,
+            "brightness_step_down": Light.CLICK_BRIGHTNESS_DOWN,
+        }
+
+
+class TS0043LightController(LightController):
+    def get_z2m_actions_mapping(self) -> DefaultActionsMapping:
+        return {
+            "1_single": Light.TOGGLE,
+            "1_double": Light.CLICK_BRIGHTNESS_UP,
+            "1_hold": Light.CLICK_BRIGHTNESS_DOWN,
+            "2_single": Light.TOGGLE,
+            "2_double": Light.CLICK_BRIGHTNESS_UP,
+            "2_hold": Light.CLICK_BRIGHTNESS_DOWN,
+            "3_single": Light.TOGGLE,
+            "3_double": Light.CLICK_BRIGHTNESS_UP,
+            "3_hold": Light.CLICK_BRIGHTNESS_DOWN,
+        }

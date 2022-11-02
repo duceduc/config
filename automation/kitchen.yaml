@@ -17,9 +17,9 @@
     - service: light.turn_on
       data_template:
         entity_id: >
-         {% if is_state('sensor.rear_illuminance', 'unavailable') %}
+         {% if is_state('sensor.lr_radar_illuminance', 'unavailable') %}
             light.k_1, light.k_3
-         {% elif states.sensor.rear_illuminance.state | float <= 0.10 %}
+         {% elif states.sensor.lr_radar_illuminance.state | float <= 0.10 %}
             light.k_1
          {% else %}
             light.k_1, light.k_3
@@ -39,13 +39,13 @@
       to: 'on'
       for: '00:02:02'
     - platform: state
-      entity_id: sensor.k1_illuminance
+      entity_id: sensor.kt_illuminance
       to: 'on'
   condition:
     - condition: template
       value_template: "{{ is_state('light.cabinet', 'on') }}"
   action:
-    - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.rear_illuminance', 'unavailable') else 'online' }}
+    - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.lr_radar_illuminance', 'unavailable') else 'online' }}
 
 
 #########################################################
@@ -57,12 +57,12 @@
 - alias: 'motion kitchen lights auto-off'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_kitchen_occupancy     
+      entity_id: binary_sensor.motion_kitchen_occupancy
       to: 'off'
       for: '00:02:50'
   action:
     - service: light.turn_off
-      entity_id: light.kitchen
+      entity_id: light.cabinet, light.counter # light.kitchen
 
 
 #########################################################
@@ -70,11 +70,6 @@
 #             END OF CONFIGURATION FILE                                                          
 #                                                                                                              
 #########################################################
-
-
-
-
-
 
 - alias: Kitchen Occupancy
   description: 'Defines occupancy state for room'
@@ -84,22 +79,25 @@
     id: time
     seconds: '10'
   - platform: state
-#    entity_id: binary_sensor.motion_kitchen_occupancy
     entity_id: group.motion_kitchen_occupancy    
     id: motion
     to: 'on'
-
-  condition: []
+  condition:
+    - condition: template # mcl is off
+      value_template: "{{ is_state('input_boolean.kitchen_mcl', 'off') }}"
+    - condition: template # Guest mode is off
+      value_template: "{{ is_state('input_boolean.guest_mode', 'off') }}"      
   action:
   - service: python_script.room_occupancy
     data:
       roomname: kitchen 
       entities_toggle: 
       - group.motion_kitchen_occupancy      
-      - input_boolean.kitchen_mcl
+#      - input_boolean.kitchen_mcl
 #      entities_keep: 
 #      - sensor.eri_espresense
-      timeout: 3 # in minutes
+      timeout: "{{ 3 if is_state('group.cooking_time', 'on') else 2 }}" # in minutes
+
 
 - alias: Kitchen Light
   description: 'toggle light depending on timer state'
@@ -116,9 +114,9 @@
     id: 'on'
     from: 'off'
     to: 'on'
-    for: '00:02:00'
+    for: '00:01:00'
   - platform: state
-    entity_id: sensor.k1_illuminance
+    entity_id: sensor.kt_illuminance
     id: 'on'
     from: 'off'
     to: 'on'
@@ -139,12 +137,12 @@
       - service: light.turn_on
         data_template:
           entity_id: >
-           {% if is_state('sensor.rear_illuminance', 'unavailable') %}
-            light.k_1, light.k_3
-           {% elif states.sensor.rear_illuminance.state | float <= 0.10 %}
-            light.k_1
+           {% if is_state('binary_sensor.lr_radar_status', 'off') %}
+              light.k_1, light.k_3
+           {% elif states.sensor.lr_radar_illuminance.state | float <= 0.15 %}
+              light.k_1
            {% else %}
-            light.k_1, light.k_3
+              light.k_1, light.k_3
            {% endif %}
          
     - conditions:
@@ -153,7 +151,7 @@
       sequence:
         - condition: template
           value_template: "{{ is_state('light.cabinet', 'on') }}"
-        - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('sensor.rear_illuminance', 'unavailable') else 'online' }}
+        - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('binary_sensor.lr_radar_status', 'off') else 'online' }}
 
     - conditions:
       - condition: trigger
@@ -161,7 +159,7 @@
       sequence:
       - service: light.turn_off
         target:
-          entity_id: light.kitchen
+          entity_id: light.cabinet, light.counter # light.kitchen
     default: []
 
 #########################################################
@@ -183,6 +181,7 @@
       data: 
         who: ai_1
         message: !include ../tpl/speech/control_status.yaml
+        voice: "{{ states('input_select.jarvis_voice') }}"
 
 
 - alias: 'Kitchen MCL Re-Enable'
@@ -196,23 +195,6 @@
       entity_id: input_boolean.kitchen_mcl
 
 
-#########################################################
-#                                                                                                              
-#             Storage                                                    
-#                                                                                                              
-#########################################################
-
-
-- alias: 'turn off storage room'
-  trigger:
-  - entity_id: light.storage_room
-    platform: state
-    to: 'on'
-    for: '00:08:00'
-  action:  
-  - service: light.turn_off
-    data:
-      entity_id: light.str_1
 
 
 

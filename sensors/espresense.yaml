@@ -8,7 +8,7 @@
 # Duc
   - platform: mqtt_room
     name: 'Duc ESPresense'
-    device_id: 'apple:1007:11-12'
+    device_id: 'apple:1007:11-12' # ID e929fe00d0bf
     state_topic: 'espresense/devices/apple:1007:11-12'
 #    device_id: 'apple:iphone10-3'
 #    state_topic: 'espresense/devices/apple:iphone10-3'
@@ -31,14 +31,14 @@
     state_topic: 'espresense/devices/apple:iphone10-1'
     timeout: 60
     away_timeout: 120
-# Eri
+# Eri Not Reliable node
   - platform: mqtt_room
     name: 'Eri ESPresense 1006'
     device_id: 'apple:1006:10-12' 
     state_topic: 'espresense/devices/apple:1006:10-12'
     timeout: 60
     away_timeout: 120
-# Eri
+# Eri Not Reliable node
   - platform: mqtt_room
     name: 'Eri ESPresense Exp20'
     device_id: 'exp:20' 
@@ -46,21 +46,38 @@
     timeout: 60
     away_timeout: 120
 
-
+#          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+#            {{ states("sensor.eri_espresense_101") }}
   - platform: template
     sensors:
       eri_espresense:
         friendly_name: Eri ESPresense
-        value_template: >-
+        value_template: >-      
           {% if states("sensor.eri_espresense_1006") != "not_home" and states("sensor.eri_espresense_101") == "not_home" %}
             {{ states("sensor.eri_espresense_1006") }}
           {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
-            {{ states("sensor.eri_espresense_101") }}
+            {{ states("sensor.eri_espresense_101") }}            
           {% elif states("sensor.eri_espresense_exp20") != "not_home" %}
             {{ states("sensor.eri_espresense_exp20") }}                
           {% elif states("sensor.eri_espresense_1006") == "not_home"  and states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_exp20") == "not_home" %} 
             not_home
+          {% else %}
+            unknown          
           {% endif %}
+
+
+#          {% if states("sensor.eri_espresense_101") != "not_home" %}
+#            {{ states("sensor.eri_espresense_101") }}
+#          {% elif states("sensor.eri_espresense_1006") != "not_home" %}
+#            {{ states("sensor.eri_espresense_1006") }}
+#          {% elif states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+#            not_home
+#          {% else %}
+#            unknown
+#          {% endif %}
+
+
+
 
 
   - platform: mqtt_room

@@ -1,4 +1,4 @@
-# ESP32 CAM
+# ESP32 CAM... 10-52-1C-62-EC-48
 substitutions:
   name: security-mdf
   platform: ESP32
@@ -12,15 +12,14 @@ esphome:
 wifi:
   ssid: !secret ssid1
   password: !secret ssid_pass
-  fast_connect : true
-  power_save_mode: none
-  reboot_timeout: 0s
-  manual_ip:
-    static_ip: 192.168.1.94
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
+#  fast_connect : true
+#  power_save_mode: none
+#  reboot_timeout: 0s
+#  manual_ip:
+#    static_ip: 192.168.1.94
+#    subnet: 255.255.255.0
+#    gateway: 192.168.1.1
 
-# Fallback portal 
 captive_portal:
 logger:
 

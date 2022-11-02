@@ -33,11 +33,43 @@ input_boolean:
     name: Security Issue
     icon: mdi:alert-circle-outline
 
-sensor:
-#  - platform: authenticated
-  - platform: mqtt
-    name: front_door_motion_away_count
-    state_topic: "house/front_door_motion/away_count"
+mqtt:
+  sensor:
+    - name: front_door_motion_away_count
+      state_topic: "house/front_door_motion/away_count"
+
+binary_sensor:
+  - platform: template
+    sensors:
+      computerroom_window_triggered:
+        value_template: >
+          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+          {% if is_state("binary_sensor.computerroom_window", "on") and sentry_mode == "on" %} 
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      livingroom_window_triggered:
+        value_template: >
+          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+          {% if is_state("binary_sensor.livingroom_window", "on") and sentry_mode == "on" %} 
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      genkan_door_triggered:
+        value_template: >
+          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+          {% if is_state("binary_sensor.genkan_door", "on") and sentry_mode == "on" %} 
+            true
+          {% else %}
+            false
+          {% endif %}
+
+
+
 
 automation:
   #############################################
@@ -68,6 +100,7 @@ automation:
 #              - service: script.speech_engine
 #                data_template:
 #                  who: "{{ states.sensor.room_audio.state }}"
+#                  voice: "{{ states('input_select.jarvis_voice') }}" 
 #                  message: >
 #                    {{ [
 #                    "I was unable to activate genkan door protocol due to an open door.",
@@ -79,6 +112,7 @@ automation:
           - service: script.speech_engine
             data_template:
               who: "{{ states.sensor.room_audio.state }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
               message: >
                 {{ [
                 "Lions door protocol has been activated.",
@@ -92,6 +126,8 @@ automation:
               who: "duc"
               title: "Security Armed"
               message: "Security System has been armed."
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.security_cameras
           - service: script.turn_on
             entity_id: script.reset_front_door_motion_count
 
@@ -119,6 +155,7 @@ automation:
               - service: script.speech_engine
                 data_template:
                   who: "{{ states.sensor.room_audio.state }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
                   message: >
                     {{ [
                     "Lions door protocol has been deactivated.",
@@ -152,7 +189,7 @@ automation:
     initial_state: true
     trigger:
       - platform: time
-        at: 04:55:00
+        at: 04:30:00
     condition:
       condition: or
       conditions:
@@ -226,6 +263,7 @@ automation:
       - service: script.speech_engine
         data_template:
           who: "{{ states.sensor.room_audio.state }}"
+          voice: "{{ states('input_select.jarvis_voice') }}"
           message: >
             {{ [
             "Guest Mode has been enabled.",
@@ -261,6 +299,7 @@ automation:
               - service: script.status_annc
                 data:
                   who: "{{ states.sensor.room_presence.state }}"
+#                  voice: "{{ states('input_select.jarvis_voice') }}"
                   call_interuption: 1
                   call_snark_door_motion: 1
                   speech_message: >
@@ -292,8 +331,8 @@ automation:
       - platform: state
         entity_id:
           - binary_sensor.genkan_door
-#          - binary_sensor.computerroom_window
-#          - binary_sensor.livingroom_window
+          - binary_sensor.computerroom_window
+          - binary_sensor.livingroom_window
         to: "on"
     condition:
       - condition: state
@@ -328,25 +367,6 @@ automation:
         entity_id: script.security_response
       - service: script.alarm_light_flash
 
-  #############################################
-
-  #############################################
-  # Camera MDF
-  - alias: 'Security MDF Camera Snapshot'
-    mode: queued
-    trigger:
-      - platform: numeric_state
-        entity_id: sensor.mdf_illuminance
-        below: 0.55
-    action:
-      - delay: 2
-      - service: camera.snapshot
-        data:
-          entity_id: camera.security_mdf
-          filename: '/config/www/img/security/{{ now().strftime("%Y%m%d_%H%M%S") }}security_mdf_camera.jpg'
-      - service: shell_command.clean_security_images
-
-
 script:
 
   standby:
@@ -357,6 +377,8 @@ script:
         entity_id: script.disarm_security
       - service: script.turn_on
         entity_id: script.cancel_security_alarm
+      - service: script.turn_on
+        entity_id: script.cancel_security_camera
       - service: script.turn_on
         entity_id: script.cancel_lockdown_issue
       - service: script.turn_on
@@ -389,6 +411,16 @@ script:
         state: "on"
       - service: input_boolean.turn_off
         entity_id: input_boolean.security_alarm
+
+  # If  camera is on, turn it off
+  cancel_security_camera:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.security_cameras
+        state: "on"
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.security_cameras
+
 
   # if there are lockdown issues, turn them off
   cancel_lockdown_issue:
@@ -436,11 +468,13 @@ script:
               - service: script.speech_engine
                 data_template:
                   who: "{{ states.sensor.room_audio.state }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
                   message: !include ../tpl/speech/already_done.yaml
         default:
           - service: script.speech_engine
             data_template:
               who: "{{ states.sensor.room_audio.state }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
               message: !include ../tpl/speech/interjections.yaml
           - delay:
               seconds: 5
@@ -459,11 +493,13 @@ script:
               - service: script.speech_engine
                 data_template:
                   who: "{{ states.sensor.room_audio.state }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
                   message: !include ../tpl/speech/already_done.yaml
         default:
           - service: script.speech_engine
             data_template:
               who: "{{ states.sensor.room_audio.state }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
               message: !include ../tpl/speech/interjections.yaml
           - delay:
               seconds: 5
@@ -474,8 +510,8 @@ script:
     sequence:
       - service: script.turn_on
         entity_id: script.standby
-      - service: script.turn_on
-        entity_id: script.welcome_briefing
+#      - service: script.turn_on
+#        entity_id: script.welcome_briefing # need to create this script. see slacker lab sample
 
   # Called via Alexa routine...adds a little interaction
   activate_guest_mode:
@@ -489,11 +525,13 @@ script:
               - service: script.speech_engine
                 data_template:
                   who: "{{ states.sensor.room_audio.state }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
                   message: !include ../tpl/speech/already_done.yaml
         default:
           - service: script.speech_engine
             data_template:
               who: "{{ states.sensor.room_audio.state }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
               message: !include ../tpl/speech/interjections.yaml
           - delay:
               seconds: 2

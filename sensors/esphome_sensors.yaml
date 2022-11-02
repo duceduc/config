@@ -4,33 +4,36 @@
 #                                                                                                    #
 ####################################################
 
-  - platform: mqtt
-    name: 'Computerroom Sensor Wifi Signal'
-    state_topic: "esphome/computerroom-sensor/sensor/computerroom_wifi_signal/state"
-    value_template: '{{ value }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:signal
+#  - platform: mqtt
+#    name: 'Computerroom Sensor Wifi Signal'
+#    state_topic: "esphome/computerroom-sensor/sensor/computerroom_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
 
-  - platform: mqtt
-    name: 'Hallway Sensor Wifi Signal'
-    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_wifi_signal/state"
-    value_template: '{{ value }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:signal
+#  - platform: mqtt
+#    name: 'Kitchen Sensor Wifi Signal'
+#    state_topic: "esphome/kitchen-sensor/sensor/kitchen2_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
 
-  - platform: mqtt
-    name: 'MDF Sensor Wifi Signal'
-    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_wifi_signal/state"
-    value_template: '{{ value }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:signal
 
-  - platform: mqtt
-    name: 'Kitchen Sensor Wifi Signal'
-    state_topic: "esphome/kitchen-sensor/sensor/kitchen2_wifi_signal/state"
-    value_template: '{{ value }}'
-    unit_of_measurement: 'dBm'
-    icon: mdi:signal
+
+# latest update ###
+#  - platform: mqtt
+#    name: 'Hallway Sensor Wifi Signal'
+#    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+#
+#  - platform: mqtt
+#    name: 'MDF Sensor Wifi Signal'
+#    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
 
 ####################################################
 #                                                                                                    #
@@ -38,20 +41,20 @@
 #                                                                                                    #
 ####################################################
 
-
-  - platform: mqtt
-    name: 'Hallway Illuminance'
-    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_illuminance/state"
-    value_template: '{{ value }}'
-    unit_of_measurement: 'lux'
-    icon: mdi:gamma
-
-  - platform: mqtt
-    name: 'mdf Illuminance'
-    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_illuminance/state"
-    value_template: '{{ value }}'
-    unit_of_measurement: 'lux'
-    icon: mdi:gamma
+# latest update ##
+#  - platform: mqtt
+#    name: 'Hallway Illuminance'
+#    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_illuminance/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'lux'
+#    icon: mdi:gamma
+#
+#  - platform: mqtt
+#    name: 'mdf Illuminance'
+#    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_illuminance/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'lux'
+#    icon: mdi:gamma
 
 
 

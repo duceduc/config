@@ -10,7 +10,7 @@
   - platform: time
     at: '16:50:00'
   - platform: time
-    at: '19:00:00'
+    at: '18:20:00'
     
   action:  
     choose:

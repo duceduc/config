@@ -15,21 +15,23 @@
       {{ delivery }}
 
 
-#  - platform: imap_email_content
-#    server: imap.mail.yahoo.com
-#    name: payday
-#    port: 993
-#    username: !secret recipient_3
-#    password: !secret recipient_3_password
-#    folder: External
-#    senders:
-#      - cibadmin@shinseibank.com
-#    value_template: >-
-#      {% if 'Transfer Initiator' in subject %}
-#        payday
-#      {% else %}
-#        not_payday
-#      {% endif %}
+## Your package has been delivered
+
+  - platform: imap_email_content
+    server: imap.mail.yahoo.com
+    name: is_payday
+    port: 993
+    username: !secret recipient_3
+    password: !secret recipient_3_password
+    folder: External
+    senders:
+     - cibadmin@shinseibank.com
+    value_template: >-
+      {% if 'Information from Transfer' in subject %}
+        on
+      {% else %}
+        off
+      {% endif %}
 
 
 ####################################################

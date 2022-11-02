@@ -11,8 +11,6 @@
     - automation
   expose_by_default: false
   exposed_domains:
-#    - input_boolean
-#    - script
     - light
   entities:
     input_boolean.lights_flash:
@@ -25,9 +23,14 @@
       name: 'Appletv Plex'
       hidden: false
 
+#####
     light.alexa_virtual:
       name: Dummy Light
       hidden: false
+    light.kitchen:
+      name: Kitchen
+      hidden: false
+
 
 #####
     script.turn_on_all_fans:
@@ -38,8 +41,8 @@
       hidden: false
 
 
-########
-    switch.ceiling_fan_lights:
+#####
+    switch.ceiling_fan_light:
       name: 'Ceiling Fan Lights'
       hidden: false
     switch.ceiling_fan_summer:

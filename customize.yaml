@@ -1,24 +1,6 @@
 sensor.hacs:
   icon: mdi:alpha-c-box
   hidden: true
-sensor.ai_1_next_alarm:
-  hidden: true
-sensor.ai_1_next_timer:
-  hidden: true
-sensor.ai_1_next_reminder:
-  hidden: true
-sensor.this_device_next_alarm:
-  hidden: true
-sensor.this_device_next_timer:
-  hidden: true
-sensor.this_device_next_reminder:
-  hidden: true
-sun.sun:
-  hidden: true
-sensor.date:
-  hidden: true
-sensor.time:
-  hidden: true
 
 sensor.last_alexa:
   icon: si:amazonalexa
@@ -46,22 +28,25 @@ sensor.mqtt_ssl_cert_expiry:
 sensor.ha_ssl_cert_expiry:
   icon: mdi:file-certificate
 
+sensor.lr_radar_illuminance:
+  friendly_name: Rear illuminance
+sensor.ikea_pm25:
+  friendly_name: Air Quality
+
+
+
+
+
+
+
+
+
+
 group.wakeuplight:
   name: Wakeup Light
   control: hidden
-group.lights_flash:
-  name: Switches
-  control: hidden
 
-group.garbage_collection:
-  name: Garbage Collection
-  control: hidden
-group.birthdays:
-  name: Birthdays
-  control: hidden
-group.reminders:
-  name: Birthdays
-  control: hidden
+
 group.bed_sensors:
   device_class: problem
 switch.ceiling_fan_summer:
@@ -131,13 +116,9 @@ switch.flush_small:
   friendly_name: Flush Small
 switch.flush_big:
   friendly_name: Flush Big
-switch.heat_seat:
-  friendly_name: Heat Toilet Seat
+
 switch.heat_water:
   friendly_name: Heat Toilet Water
-switch.computer_room_curtains:
-  icon: mdi:power
-  assumed_state: false
 
 switch.momentary_presence_monitor:
   icon: mdi:crosshairs-gps
@@ -146,9 +127,6 @@ switch.momentary_activate_guest:
 switch.momentary_activate_tv:
   icon: mdi:monitor
 
-switch.living_room_curtains:
-  icon: mdi:power
-  assumed_state: false
   
 person.duc:
   entity_picture: /local/img/people/avatar-duc.png
@@ -156,8 +134,6 @@ person.eri:
   entity_picture: /local/img/people/avatar-eri.png
 person.shion:
   entity_picture: /local/img/people/avatar-shion.png
-person.kiki:
-  entity_picture: /local/img/people/avatar-kiki.png
       
 cover.fr_curtains:
   assumed_state: true
@@ -205,6 +181,15 @@ sensor.washroom:
 sensor.kitchen:
   templates:
     icon_color: if (state === 'Open') return 'rgb(255, 255, 0)';
+
+sensor.masterroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.shionroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
 
 sensor.pollen_tree:
   templates:

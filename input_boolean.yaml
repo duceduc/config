@@ -151,14 +151,7 @@
     name: Appletv Plex
     icon: mdi:plex
     initial: off
-  child_mode:
-    name: Child Mode
-    icon: mdi:account-key
-    initial: off
 
-  tv_lock:
-    name: Tv Lock
-    icon: mdi:monitor-lock
 
   desktop:
     name: Desktop
@@ -269,9 +262,9 @@
     name: School Early Release
     icon: mdi:bus-school
 
+  shion_awake:
+    name: Shion Awake
 
-
-    
 
 #########################################################
 #                                                                                                              

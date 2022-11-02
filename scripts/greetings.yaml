@@ -10,6 +10,7 @@
       - service: script.speech_engine
         data: 
           who: ai_2
+          voice: "{{ states('input_select.jarvis_voice') }}"
           message:  >
             {% set alias = {"Duc":"Duck", "Shion":"She-on", "Eri":"Eddie"} %}
             {% set family = state_attr(('group.family_presence'), 'entity_id') %}
@@ -96,7 +97,7 @@
              'The current livingroom temperature is TT degrees ',
              'The temperature in the livingroom is TT degrees ',
              'TT degrees is what my system is detecting in the livingroom currently'
-             ]| random | replace('TT', states('sensor.lr_temperature')) }}
+             ]| random | replace('TT', states('sensor.lr_radar_temperature')) }}
 
             {{ [
              '.The humidity is TT %.',
@@ -157,6 +158,7 @@
       - service: script.speech_engine
         data: 
           who: ai_2
+          voice: "{{ states('input_select.jarvis_voice') }}"
           message:  >
             {% set alias = {"Sachiko":"sachickgo", "Tomokun":"towmow-goon", "Yuri":"you-d"} %}
             {% set guest = state_attr(('group.guest_presence'), 'entity_id') %}
@@ -210,7 +212,7 @@
 #             Bedtime Annoucement                                                                    
 #                                                                                                              
 #########################################################
-# the time is {{ now().hour }} {{ now().minute }}. Sheon
+# the time is {{ now().hour }} {{ now().minute }}. She on
 
   bedtime_notify:
     alias: Bedtime Notify
@@ -218,8 +220,10 @@
       - service: script.speech_engine
         data: 
           who: ai_1
-          message:  >
+          voice: "{{ states('input_select.jarvis_voice') }}"          
+          message: >
             <audio src='https://ha.snailmsg.com/local/alerts/jp/keihin-kawaguchi-tone_02.mp3'/>
+            
             {{ [
             '',
             'At the tone,',
@@ -228,7 +232,7 @@
             'A reminder',
             'It appears'
             ]|random }}
-             the time is {{ states('sensor.human_time') }}. Sheon
+             the time is {{ states('sensor.human_time') }}. She on
             {{ [
             'please go to bed',
             'time for bed',
@@ -242,11 +246,12 @@
             'bedtime'
             ]|random }}
             
-      - service: script.speech_engine
-        data: 
-          who: ai_3
-          message:  >
-            <audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>時間は {{ now().hour }} {{ now().minute }}です, シオン、今寝てください.
+#      - service: script.speech_engine
+#        data: 
+#          who: ai_3
+#          voice: "{{ states('input_select.jarvis_voice') }}"
+#          message:  >
+#            <audio src='soundbank://soundlibrary/alarms/beeps_and_bloops/buzz_01'/>時間は {{ now().hour }} {{ now().minute }}です, シオン、今寝てください.
 
 #########################################################
 #                                                                                                              

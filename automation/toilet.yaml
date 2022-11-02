@@ -33,11 +33,11 @@
 
 #########################################################
 #                                                                                                              
-#             Engage Toilet Air Freshner                                                               
+#             Enable Toilet Air Freshner                                                               
 #                                                                                                              
 #########################################################
 
-- alias: 'Engage Toilet Air freshner'
+- alias: 'Enable Toilet Air freshner'
   trigger:
     platform: state
     entity_id: input_boolean.engage_toilet_airfreshner
@@ -109,8 +109,13 @@
   condition:
     - condition: template # Is not summer
       value_template: "{{ not is_state('sensor.season', 'summer') }}"
-    - condition: template # Only run if not sensor is on
+    - condition: template # Only run if sensor is on
       value_template: "{{ not is_state('binary_sensor.oa_dht_sensor_status', 'off') }}"
+
+    - condition: template # delay turning off too fast
+      value_template: >
+        {%- set last_toilet_heat_off_seconds = (now() - as_local(states.script.toilet_seat_off_heat.last_updated )).seconds -%}
+        {%- if last_toilet_heat_off_seconds >= 300 %} true {% else %} false {% endif %}      
 
 #    - condition: template # Only run if not in Unavailable or Unknown
 #      value_template: "{{ states('sensor.oa_temperature') not in ['Unavailable', 'Unknown'] }}"

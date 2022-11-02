@@ -32,11 +32,6 @@
 
   - platform: command_line
     switches:
-      switch_internet:
-        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.102"
-        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.102"
-        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.102"
-        value_template: '{{ value == "1" }}'
 
       is_internet:
         command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
@@ -50,6 +45,11 @@
         command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.104"
         value_template: '{{ value == "1" }}'
 
+      switch_internet:
+        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.102"
+        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.102"
+        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.102"
+        value_template: '{{ value == "1" }}'
 
 
 ####################################################
@@ -109,13 +109,12 @@
        friendly_name: 'Desktop'
        value_template: "{{ states('binary_sensor.desktop_status') }}"
        turn_on:
-         - service: script.desktop_wol
+         - service: script.desktop_wol_on
        turn_off:
-         - service: switch.turn_on
-           entity_id: switch.desktop_fddl8i4_shutdown
+         - service: script.desktop_wol_off       
        icon_template: >-
          {% if is_state('binary_sensor.desktop_status', 'on') %}
-            mdi:desktop-mac-dashboard
+            mdi:monitor-dashboard
          {% else %}
             mdi:desktop-mac
          {% endif %}

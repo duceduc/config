@@ -1,0 +1,95 @@
+###############################################################################
+#   @author           :   Duc Su 
+#   @date              :   08/14/2022
+#   @package        :   Disable Devices
+#   @description    :   Time sensitive chores arund the house.
+###############################################################################
+
+input_datetime:
+  weekday_lock_tv:
+    name: Weekday Lock Tv
+    has_time: true
+    initial: '21:25'
+
+  weekend_lock_tv:
+    name: Weekend Lock Tv
+    has_time: true
+    initial: '21:55'
+
+  weekday_disable_internet:
+    name: Weekday Disable Internet
+    has_time: true
+    initial: '21:15'
+
+  weekend_disable_internet:
+    name: Weekend Disable Interent
+    has_time: true
+    initial: '21:45'
+
+input_boolean:
+  lock_tv:
+    name: Lock Tv
+    icon: mdi:television-off
+    initial: off
+
+sensor:
+  - platform: template
+    sensors:
+      lock_tv:
+        value_template: >-
+          {% set wend = states('input_datetime.weekend_lock_tv') %}        
+          {% set wday = states('input_datetime.weekday_lock_tv') %}
+          {% if states("sensor.date_dayoftheweek").lower() in ["friday", "saturday"] %} {{wend}} {% else %} {{wday}} {% endif %}    
+      disable_internet:
+        value_template: >-
+          {% set wend = states('input_datetime.weekend_disable_internet') %}        
+          {% set wday = states('input_datetime.weekday_disable_internet') %}
+          {% if states("sensor.date_dayoftheweek").lower() in ["friday", "saturday"] %} {{wend}} {% else %} {{wday}} {% endif %}
+
+automation:
+  - alias: enable tv lock
+    variables:
+      digit: 5
+    trigger:
+      - platform: template
+        value_template: '{{ states.sensor.time.state == states.sensor.lock_tv.state[0:5] }}'
+    condition:
+      - condition: template # Tv Lock is on
+        value_template: "{{ is_state('input_boolean.lock_tv', 'on') }}"
+      - condition: template # Someone is home
+        value_template: "{{ is_state('group.family_presence', 'on') }}"
+      - condition: template # Eri is in shion room
+        value_template: "{{ is_state('sensor.eri_espresense', 'shionroom') }}"           
+    action:
+      - service: script.speech_engine
+        data:
+          who: ai_1
+          voice: "{{ states('input_select.jarvis_voice') }}"
+          message:  >
+            <audio src='https://ha.snailmsg.com/local/alerts/en/minecraft-theme.mp3'/><break time="1s"/>
+            {{ [
+            '',
+            'At the tone,',
+            'Right now',
+            'Now',
+            'A reminder',
+            'It appears'
+            ]|random }}
+             the time is {{ states('sensor.human_time') }}.            
+            The tv will shutoff in {{ digit }} minutes.
+      - delay:
+          minutes: "{{ digit }}"
+      - service: switch.turn_on
+        entity_id: switch.tv_lock
+
+  - alias: disable iphone internet
+    trigger:
+      - platform: template
+        value_template: "{{ states.sensor.time.state == states.sensor.disable_internet.state[0:5] }}"
+    action:
+      - condition: template
+        value_template: "{{ not is_state('switch.is_internet', 'on') or not is_state('switch.isp_internet', 'on') }}"
+      - service: switch.turn_on
+        entity_id: switch.is_internet, switch.switch_internet # switch.isp_internet
+
+

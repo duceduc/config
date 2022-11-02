@@ -23,7 +23,7 @@
       <b> A Picture of Us! </b>   
   trigger:
     - platform: time
-      at: '06:00:00'
+      at: input_datetime.morning_report
   action:
     - service: script.email_notify_image
       data:
@@ -102,7 +102,7 @@
       to: 'on'
   condition:
     - condition: time
-      after: '06:15:00'
+      after: input_datetime.morning_report
       before: '08:30:00'
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
@@ -128,7 +128,7 @@
       to: 'on'
   condition:
     - condition: time
-      after: '12:00:00'
+      after: input_datetime.daily_report
       before: '15:00:00'
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
@@ -139,6 +139,26 @@
     - service: script.daily_briefing
     - service: input_boolean.turn_on
       entity_id: input_boolean.daily_report
+
+
+#########################################################
+#                                                                                                              
+#             Sunset Briefing                                                                   
+#                                                                                                              
+#########################################################
+
+- alias: Enable Cameras at Sunset
+  initial_state: true
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: "-00:03:00"
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"      
+  action:
+    - service: script.sundown_briefing
+
 
 #########################################################
 #                                                                                                              

@@ -1,6 +1,6 @@
 #########################################################
 #                                                                                                              
-#             Announcements                                                                            
+#             Announcements                                
 #                                                                                                              
 #########################################################
 
@@ -8,14 +8,18 @@
 - alias: Bedtime Start Announcements
   trigger:
     - platform: time
-      at: '21:00:00'
+      at: input_datetime.shion_nightly_report
+  condition:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
     - service: timer.start
       entity_id: timer.looper
 ###
 - alias: Bedtime Stop Announcements
   trigger:
-    - entity_id: group.bed_sensors
+#    - entity_id: group.bed_sensors
+    - entity_id: binary_sensor.middle
       for: '00:00:30'
       from: 'off'
       platform: state
@@ -57,7 +61,8 @@
         entity_id: timer.looper
   condition:
     - condition: state
-      entity_id: group.bed_sensors
+#      entity_id: group.bed_sensors
+      entity_id: binary_sensor.middle
       state: 'off'
   action:
     - service: timer.start
@@ -130,7 +135,7 @@
   action:
     - service: script.status_annc
       data:
-        who: "{{ states('sensor.room_presence') }}"
+        who: "{{ states('sensor.room_audio') }}"
         call_interuption: 1
         call_school_pickup_reminder: 1
     - service: script.text_notify
@@ -188,8 +193,8 @@
   trigger:
     - platform: state
       entity_id: 
-       - device_tracker.duc
-       - device_tracker.eri
+        - device_tracker.duc
+        - device_tracker.eri
       to: 'home'
   action:
     - choose:
@@ -202,18 +207,29 @@
               data:
                 option: 'Returning'
             - service: script.standby
+            - service: input_boolean.turn_off
+              data:
+                entity_id: >
+                 {% if trigger.to_state.attributes.friendly_name == 'Eri' %}
+                    input_boolean.eri_travel_monitor
+                 {% elif trigger.to_state.attributes.friendly_name == 'Duc' %}
+                    input_boolean.duc_travel_monitor
+                 {% else %}
+                 {% endif %}
+                 
       default:  
         - service: script.speech_engine
           data: 
             who: "{{ states('sensor.room_audio') }}"
+            voice: "{{ states('input_select.jarvis_voice') }}"
             message: >
               {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
               {% set p = trigger.to_state.attributes.friendly_name %}
               {% set person = alias.get(p) %}
                 {{ person }}, will be home in about 10 minutes.
         - service: light.turn_on
-          entity_id: light.h_1
           data:
+            entity_id: light.h_1
             brightness: 200
         - service: input_boolean.turn_off
           data:
@@ -272,18 +288,19 @@
       to: 'on'
   action:
     - delay: 1
-    - wait_template: "{{ is_state('binary_sensor.motion_g1_occupancy', 'on') }}"
+    - wait_template: "{{ is_state('group.hallway_motion', 'on') }}"
       continue_on_timeout: false
-      timeout: 10
+      timeout: 20
     - service: script.speech_engine
       data: 
         who: ai_2
         message: !include ../tpl/speech/family_greetings.yaml
+        voice: "{{ states('input_select.jarvis_voice') }}"
 
     - condition: template 
       value_template: "{{ not is_state('switch.momentary_activate_guest', 'on') }}" 
     - condition: template 
-      value_template: "{{ states.sensor.rear_illuminance.state | float(0) > 0.22 }}" 
+      value_template: "{{ states.sensor.lr_radar_illuminance.state | float(0) > 0.39 }}" 
     - service: script.turn_on_lr_lights
 
 
@@ -309,7 +326,7 @@
       data: 
         who: ai_2
         message: !include ../tpl/speech/guest_greetings.yaml
-
+        voice: "{{ states('input_select.jarvis_voice') }}"
 
 
 #########################################################

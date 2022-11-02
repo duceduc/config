@@ -4,61 +4,63 @@
 #                                                                                                    
 ####################################################
 
-# Duc
-  - platform: mqtt
-    name: 'iD Genkan'
-    state_topic: 'monitor/genkan/id'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
+## Duc
+#  - platform: mqtt
+#    name: 'iD Genkan'
+#    state_topic: 'monitor/genkan/id'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Eri
+#  - platform: mqtt
+#    name: 'iE Genkan'
+#    state_topic: 'monitor/genkan/ie'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6
+#  - platform: mqtt
+#    name: 'iS Genkan'
+#    state_topic: 'monitor/genkan/is'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6+
+#  - platform: mqtt
+#    name: 'iSp Genkan'
+#    state_topic: 'monitor/genkan/isp'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Tile Mate
+#  - platform: mqtt
+#    name: 'tms Genkan'
+#    state_topic: 'monitor/genkan/tms'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Sachiko
+#  - platform: mqtt
+#    name: 'Sachiko Genkan'
+#    state_topic: 'monitor/genkan/sachiko'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Tomokun
+#  - platform: mqtt
+#    name: 'Tomokun Genkan'
+#    state_topic: 'monitor/genkan/tomokun'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
 
-# Eri
-  - platform: mqtt
-    name: 'iE Genkan'
-    state_topic: 'monitor/genkan/ie'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
 
-# Shion 6
-  - platform: mqtt
-    name: 'iS Genkan'
-    state_topic: 'monitor/genkan/is'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6+
-  - platform: mqtt
-    name: 'iSp Genkan'
-    state_topic: 'monitor/genkan/isp'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Tile Mate
-  - platform: mqtt
-    name: 'tms Genkan'
-    state_topic: 'monitor/genkan/tms'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Sachiko
-  - platform: mqtt
-    name: 'Sachiko Genkan'
-    state_topic: 'monitor/genkan/sachiko'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Tomokun
-  - platform: mqtt
-    name: 'Tomokun Genkan'
-    state_topic: 'monitor/genkan/tomokun'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
 
 ####################################################
 #                                                                                                    
@@ -66,61 +68,62 @@
 #                                                                                                    
 ####################################################
 
-# Duc
-  - platform: mqtt
-    name: 'iD Shionroom'
-    state_topic: 'monitor/shionroom/id'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
+## Duc
+#  - platform: mqtt
+#    name: 'iD Shionroom'
+#    state_topic: 'monitor/shionroom/id'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Eri
+#  - platform: mqtt
+#    name: 'iE Shionroom'
+#    state_topic: 'monitor/shionroom/ie'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6
+#  - platform: mqtt
+#    name: 'iS Shionroom'
+#    state_topic: 'monitor/shionroom/is'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6+
+#  - platform: mqtt
+#    name: 'iSp Shionroom'
+#    state_topic: 'monitor/shionroom/isp'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Tile Mate
+#  - platform: mqtt
+#    name: 'tms Shionroom'
+#    state_topic: 'monitor/shionroom/tms'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Sachiko
+#  - platform: mqtt
+#    name: 'Sachiko Shionroom'
+#    state_topic: 'monitor/shionroom/sachiko'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Tomokun
+#  - platform: mqtt
+#    name: 'Tomokun Shionroom'
+#    state_topic: 'monitor/shionroom/tomokun'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
 
-# Eri
-  - platform: mqtt
-    name: 'iE Shionroom'
-    state_topic: 'monitor/shionroom/ie'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6
-  - platform: mqtt
-    name: 'iS Shionroom'
-    state_topic: 'monitor/shionroom/is'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6+
-  - platform: mqtt
-    name: 'iSp Shionroom'
-    state_topic: 'monitor/shionroom/isp'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Tile Mate
-  - platform: mqtt
-    name: 'tms Shionroom'
-    state_topic: 'monitor/shionroom/tms'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Sachiko
-  - platform: mqtt
-    name: 'Sachiko Shionroom'
-    state_topic: 'monitor/shionroom/sachiko'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Tomokun
-  - platform: mqtt
-    name: 'Tomokun Shionroom'
-    state_topic: 'monitor/shionroom/tomokun'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
 
 
 ####################################################
@@ -129,61 +132,62 @@
 #                                                                                                    
 ####################################################
 
-# Duc
-  - platform: mqtt
-    name: 'iD Masterroom'
-    state_topic: 'monitor/masterroom/id'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Eri
-  - platform: mqtt
-    name: 'iE Masterroom'
-    state_topic: 'monitor/masterroom/ie'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6
-  - platform: mqtt
-    name: 'iS Masterroom'
-    state_topic: 'monitor/masterroom/is'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6+
-  - platform: mqtt
-    name: 'iSp Masterroom'
-    state_topic: 'monitor/masterroom/isp'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Tile Mate
-  - platform: mqtt
-    name: 'tms Masterroom'
-    state_topic: 'monitor/masterroom/tms'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Sachiko
-  - platform: mqtt
-    name: 'Sachiko Masterroom'
-    state_topic: 'monitor/masterroom/sachiko'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Tomokun
-  - platform: mqtt
-    name: 'Tomokun Masterroom'
-    state_topic: 'monitor/masterroom/tomokun'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
+## Duc
+#  - platform: mqtt
+#    name: 'iD Masterroom'
+#    state_topic: 'monitor/masterroom/id'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Eri
+#  - platform: mqtt
+#    name: 'iE Masterroom'
+#    state_topic: 'monitor/masterroom/ie'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6
+#  - platform: mqtt
+#    name: 'iS Masterroom'
+#    state_topic: 'monitor/masterroom/is'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6+
+#  - platform: mqtt
+#    name: 'iSp Masterroom'
+#    state_topic: 'monitor/masterroom/isp'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Tile Mate
+#  - platform: mqtt
+#    name: 'tms Masterroom'
+#    state_topic: 'monitor/masterroom/tms'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Sachiko
+#  - platform: mqtt
+#    name: 'Sachiko Masterroom'
+#    state_topic: 'monitor/masterroom/sachiko'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Tomokun
+#  - platform: mqtt
+#    name: 'Tomokun Masterroom'
+#    state_topic: 'monitor/masterroom/tomokun'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
 
 
 ####################################################
@@ -192,61 +196,61 @@
 #                                                                                                    
 ####################################################
 
-# Duc
-  - platform: mqtt
-    name: 'iD Livingroom'
-    state_topic: 'monitor/livingroom/id'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
- 
-# Eri
-  - platform: mqtt
-    name: 'iE Livingroom'
-    state_topic: 'monitor/livingroom/ie'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6
-  - platform: mqtt
-    name: 'iS Livingroom'
-    state_topic: 'monitor/livingroom/is'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Shion 6+
-  - platform: mqtt
-    name: 'iSp Livingroom'
-    state_topic: 'monitor/livingroom/isp'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Tile Mate
-  - platform: mqtt
-    name: 'tms Livingroom'
-    state_topic: 'monitor/livingroom/tms'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Sachiko
-  - platform: mqtt
-    name: 'Sachiko Livingroom'
-    state_topic: 'monitor/livingroom/sachiko'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
-
-# Guest Tomokun
-  - platform: mqtt
-    name: 'Tomokun Livingroom'
-    state_topic: 'monitor/livingroom/tomokun'
-    value_template: '{{ value_json.confidence }}'
-    unit_of_measurement: '%'
-    icon: mdi:account
+## Duc
+#  - platform: mqtt
+#    name: 'iD Livingroom'
+#    state_topic: 'monitor/livingroom/id'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+# 
+## Eri
+#  - platform: mqtt
+#    name: 'iE Livingroom'
+#    state_topic: 'monitor/livingroom/ie'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6
+#  - platform: mqtt
+#    name: 'iS Livingroom'
+#    state_topic: 'monitor/livingroom/is'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Shion 6+
+#  - platform: mqtt
+#    name: 'iSp Livingroom'
+#    state_topic: 'monitor/livingroom/isp'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Tile Mate
+#  - platform: mqtt
+#    name: 'tms Livingroom'
+#    state_topic: 'monitor/livingroom/tms'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Sachiko
+#  - platform: mqtt
+#    name: 'Sachiko Livingroom'
+#    state_topic: 'monitor/livingroom/sachiko'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
+#
+## Guest Tomokun
+#  - platform: mqtt
+#    name: 'Tomokun Livingroom'
+#    state_topic: 'monitor/livingroom/tomokun'
+#    value_template: '{{ value_json.confidence }}'
+#    unit_of_measurement: '%'
+#    icon: mdi:account
 
 
 ####################################################
@@ -435,53 +439,6 @@
               {{ states('person.shion') }}
             {%- endif %}
           {%- endif %}
-
-
-####################################################
-#                                                                                                    
-#            Audio Presence                                                            
-#                                                                                                    
-####################################################
-
-
-#  - platform: mqtt
-#    name: "Room Presence"
-#    state_topic: "house/presence/current_room"
-#    
-#  - platform: template
-#    sensors:
-#      room_audio:
-#        friendly_name: "Room Audio"
-#        value_template: >-
-#          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%}
-#          {%- if last_alexa_called_seconds <= 60 %}  
-#            {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
-#          {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
-#            {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
-#              {% if is_state('input_boolean.audible_notifications', 'off') %}
-#                {% if sensor.name == 'motion computerroom occupancy' %}
-#                  computer_room
-#                {% else %}
-#                  living_room      
-#                {%- endif %}
-#              {% else %} 
-#                {% if sensor.name == 'motion computerroom occupancy' %}
-#                  computer_room
-#                {% elif sensor.name in ('motion kitchen occupancy','motion lr occupancy') %}
-#                  living_room
-#                {% elif sensor.name in ('motion sr occupancy', 'motion mr occupancy', 'motion hallway occupancy') %}
-#                  hallway
-#                {% else %}
-#                  living_room
-#                {%- endif %}
-#            {%- endif %}
-#          {% elif is_state('media_player.theater_tv', 'on') %}
-#            theater
-#          {% else %}
-#            {{ states('sensor.room_presence') }}
-#          {% endif %}
-#
-
 
 
 ####################################################

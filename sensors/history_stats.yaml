@@ -50,7 +50,7 @@
     name: "Toilet Room Temp Sats"
     state_characteristic: mean
   - platform: statistics
-    entity_id: sensor.lr_temperature
+    entity_id: sensor.lr_radar_temperature
     name: "Living Room Temp Sats"
     state_characteristic: mean
   - platform: statistics
@@ -63,7 +63,7 @@
     - sensor.sr_temperature
     - sensor.mr_temperature
     - sensor.toilet_airfreshener_temperature
-    - sensor.lr_temperature
+    - sensor.lr_radar_temperature
     - sensor.meter_temperature
 
 ####################################################

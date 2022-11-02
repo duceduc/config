@@ -1,4 +1,4 @@
-# ESP8266 NodeMCU....
+# ESP8266 NodeMCU.... 50-02-91-FD-4B-26
 substitutions:
   name: mdf-sensor
   platform: ESP8266
@@ -16,7 +16,7 @@ wifi:
   power_save_mode: none
   reboot_timeout: 0s  
   manual_ip:
-    static_ip: 192.168.1.79
+    static_ip: 192.168.1.98
     subnet: 255.255.255.0
     gateway: 192.168.1.1
   

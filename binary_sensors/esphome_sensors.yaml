@@ -4,46 +4,29 @@
 #                                                                                                    
 ####################################################
 
-  - platform: mqtt
-    name: "motion kitchen occupancy"
-    state_topic: "switchbotmqtt/esp32/motion/motion_kitchen_occupancy"
-    value_template: '{{ value }}'
-    payload_on: "ON"
-    qos: 0
-    device_class: motion
-
-
-  - platform: mqtt
-    name: "motion g1 occupancy"
-    state_topic: "esphome/hallway-sensor/binary_sensor/motion_g1_occupancy/state"
-    value_template: '{{ value }}'
-    payload_on: "ON"
-    qos: 0
-    device_class: motion
-
-  - platform: mqtt
-    name: "motion hallway occupancy"
-    state_topic: "esphome/hallway-sensor/binary_sensor/motion_hallway_occupancy/state"
-    value_template: '{{ value }}'
-    payload_on: "ON"
-    qos: 0
-    device_class: motion
-
-  - platform: mqtt
-    name: "motion computerroom occupancy"
-    state_topic: "esphome/computerroom-sensor/binary_sensor/motion_computerroom_occupancy/state"
-    value_template: '{{ value }}'
-    payload_on: "ON"
-    qos: 0
-    device_class: motion
-
-  - platform: mqtt
-    name: "motion kitchen2 occupancy"
-    state_topic: "esphome/kitchen-sensor/binary_sensor/motion_kitchen2_occupancy/state"
-    value_template: '{{ value }}'
-    payload_on: "ON"
-    qos: 0
-    device_class: motion
+#  - platform: mqtt
+#    name: "motion kitchen occupancy"
+#    state_topic: "switchbotmqtt/esp32/motion/motion_kitchen_occupancy"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 0
+#    device_class: motion
+#
+#  - platform: mqtt
+#    name: "motion g1 occupancy"
+#    state_topic: "esphome/hallway-sensor/binary_sensor/motion_g1_occupancy/state"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 0
+#    device_class: motion
+#
+#  - platform: mqtt
+#    name: "motion hallway occupancy"
+#    state_topic: "esphome/hallway-sensor/binary_sensor/motion_hallway_occupancy/state"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 0
+#    device_class: motion
 
 
 ####################################################
@@ -53,28 +36,13 @@
 ####################################################
 
 
-  - platform: mqtt
-    name: "hallway sensor status"
-    state_topic: "esphome/hallway-sensor/status"
-    value_template: '{{ value }}'
-    payload_on: "online"
-    qos: 0
-    device_class: connectivity
-
-  - platform: mqtt
-    name: "computerroom sensor status"
-    state_topic: "esphome/computerroom-sensor/status"
-    value_template: '{{ value }}'
-    payload_on: "online"
-    qos: 0
-    device_class: connectivity
-
-
-
-
-
-
-
+#  - platform: mqtt
+#    name: "hallway sensor status"
+#    state_topic: "esphome/hallway-sensor/status"
+#    value_template: '{{ value }}'
+#    payload_on: "online"
+#    qos: 0
+#    device_class: connectivity
 
 
 #########################################################

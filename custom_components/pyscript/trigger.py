@@ -605,6 +605,11 @@ class TrigTime:
             dt_str = dt_str[len(match0.group(0)) :]
         elif dt_str.startswith("sunrise") or dt_str.startswith("sunset"):
             location = sun.get_astral_location(cls.hass)
+            if isinstance(location, tuple):
+                # HA core-2021.5.0 included this breaking change: https://github.com/home-assistant/core/pull/48573.
+                # As part of the upgrade to astral 2.2, sun.get_astral_location() now returns a tuple including the
+                # elevation.  We just want the astral.location.Location object.
+                location = location[0]
             try:
                 if dt_str.startswith("sunrise"):
                     time_sun = location.sunrise(dt.date(year, month, day))
@@ -712,11 +717,12 @@ class TrigTime:
 
             elif len(match1) == 3:
                 this_t = cls.parse_date_time(match1[1].strip(), 0, now, startup_time)
-                if this_t <= now and this_t != startup_time:
+                day_offset = (now - this_t).days + 1
+                if day_offset != 0 and this_t != startup_time:
                     #
-                    # Try tomorrow (won't make a difference if spec has full date)
+                    # Try a day offset (won't make a difference if spec has full date)
                     #
-                    this_t = cls.parse_date_time(match1[1].strip(), 1, now, startup_time)
+                    this_t = cls.parse_date_time(match1[1].strip(), day_offset, now, startup_time)
                 startup = now == this_t and now == startup_time
                 if (now < this_t or startup) and (next_time is None or this_t < next_time):
                     next_time = this_t

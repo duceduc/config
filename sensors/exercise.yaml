@@ -11,10 +11,10 @@
       exercise_map:
         value_template: >
           {% set mapper =
-            { 'Master Room':'light.master_room',
-              'Computer Room':'light.computer_room',
-              'Shion Room':'light.shion_room',
-              'Living Room':'light.living_room' } %}
+            { 'Master Room':'light.master',
+              'Computer Room':'light.computer',
+              'Shion Room':'light.shion',
+              'Living Room':'light.living' } %}
           {% set state = states('input_select.exercise_select') %}
           {% set id = mapper[state] if state in mapper %}
           {{ id }}

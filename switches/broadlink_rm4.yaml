@@ -10,12 +10,12 @@
     mac: !secret RM4_mac
     switches:
      # Ceiling Fan
-    - name: Ceiling Fan Light
-      command_on: JgAwABYcNBw1Nhs2HDUcNRscNRw0HDQcNQABohsbNRw0Nhs3HDUbNhscNBw0HDUcNAANBQAAAAAAAA==
-      command_off: JgAwABcbNRo3NRw1HBo2GzYbNRw0GzYaNgABoRwaNxo2NRw2HBo2GzUaNhs2GjYbNgANBQAAAAAAAA==
-    - name: Ceiling Fan Summer
-      command_on: JgAwABcbNhs1NR00HRk2HDUbNTYbGzY1HAABoR0ZNho3NR00HRo1GjcaNjUdGTc1HAANBQAAAAAAAA==
-      command_off: JgAwABkZNhs1NR40HRk2GzUbNho2GzUbNgABoR0aNRs2NR00HRk2GzYaNxo2GzUbNQANBQAAAAAAAA==
+#    - name: Ceiling Fan Light
+#      command_on: JgAwABYcNBw1Nhs2HDUcNRscNRw0HDQcNQABohsbNRw0Nhs3HDUbNhscNBw0HDUcNAANBQAAAAAAAA==
+#      command_off: JgAwABcbNRo3NRw1HBo2GzYbNRw0GzYaNgABoRwaNxo2NRw2HBo2GzUaNhs2GjYbNgANBQAAAAAAAA==
+#    - name: Ceiling Fan Summer
+#      command_on: JgAwABcbNhs1NR00HRk2HDUbNTYbGzY1HAABoR0ZNho3NR00HRo1GjcaNjUdGTc1HAANBQAAAAAAAA==
+#      command_off: JgAwABkZNhs1NR40HRk2GzUbNho2GzUbNgABoR0aNRs2NR00HRk2GzYaNxo2GzUbNQANBQAAAAAAAA==
     - name: Ceiling Fan Winter
       command_on: JgA0ABkZNxo3NB00HRo3GTcaNzQdNB0aNwABoB0aNxk3NB00Hhk3GTcaNjUcNRwbNAAJLAoADQUAAA==
       command_off: JgAwABkZNhs1NR40HRk2GzUbNho2GzUbNgABoR0aNRs2NR00HRk2GzYaNxo2GzUbNQANBQAAAAAAAA==
@@ -93,27 +93,40 @@
 
   - platform: template
     switches:
-     ceiling_fan_lights:
-       friendly_name: 'Ceiling Fan Lights'
+     ceiling_fan_light:
+       friendly_name: 'Ceiling Fan Light'
        value_template: "{{ states('input_boolean.ceiling_fan_lights') }}"
        turn_on:
-         - service: switch.turn_on
-           data: 
-             entity_id: switch.ceiling_fan_light
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.ceiling_fan_lights
+         - service: script.dining_lights_mode_on
+           data:
+             entity: remote.rm4_remote
+             device: Ceiling Fan           
        turn_off:
-         - service: switch.turn_off
-           data: 
-             entity_id: switch.ceiling_fan_light
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.ceiling_fan_lights
+         - service: script.dining_lights_mode_off
+           data:
+             entity: remote.rm4_remote
+             device: Ceiling Fan         
        icon_template: >-
          {% if is_state('input_boolean.ceiling_fan_lights', 'on') %}
             mdi:lightbulb-on
          {% else %}
             mdi:lightbulb
          {% endif %}
+
+  - platform: template
+    switches:
+     ceiling_fan_summer:
+       friendly_name: 'Ceiling Fan Summer'
+       turn_on:
+         - service: script.toggle_summer_fan
+       turn_off:
+         - service: script.turn_off_all_fans
+
+
+
+
+
+
 
 
 ####################################################

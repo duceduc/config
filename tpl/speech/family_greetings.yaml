@@ -91,7 +91,7 @@
        'The current livingroom temperature is TT degrees ',
        'The temperature in the livingroom is TT degrees ',
        'TT degrees is what my system is detecting in the livingroom currently'
-       ]| random | replace('TT', states('sensor.lr_temperature')) }}
+       ]| random | replace('TT', states('sensor.lr_radar_temperature')) }}
 
       {{ [
        '.The humidity is TT %.',
@@ -143,8 +143,10 @@
        </p>
 
     <p>
-    {%- if is_state('sensor.front_door_motion_away_count','0') %}
+    {% if is_state('sensor.front_door_motion_away_count','0') %}
       While you were gone there was no motion detected at the front door.
+    {% elif is_state('sensor.front_door_motion_away_count','1') %}
+      While you were out I detected motion at the front door {{ states.sensor.front_door_motion_away_count.state | int }} time.      
     {% else %}
       While you were out I detected motion at the front door {{ states.sensor.front_door_motion_away_count.state | int }} times.
     {% endif %}

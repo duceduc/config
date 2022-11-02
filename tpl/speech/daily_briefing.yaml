@@ -54,6 +54,8 @@
         {% else %}
           and {{ states.weather.weatherbit.state }}
         {% endif %}
+      </p>
+
 
       <p>
         {% if states.sensor.pollen_tree.state | int(0) > 1 %}
@@ -67,9 +69,8 @@
         {% endif %}
       </p>
 
-      {% if states.sensor.weatherbit_weather_alerts.state | int(0) > 0 %}
-        There are currently {{states.sensor.weatherbit_weather_alerts.state }} active weather alerts for our area.
-      {% endif %}
+      <p>
+
 
         {% if is_state('binary_sensor.evening','on') %}
           The overnight forecast says we can expect {{ states.weather.weatherbit.attributes.forecast[0].condition }}.    
@@ -202,7 +203,7 @@
           {% endif %}
         
           {% if states.sensor.christmas_countdown.state | int(0) == 1 %}
-            Tomorrow is Christmas. It is practically here! Santa is coming tonight! Do not forget the cookies!
+            Tomorrow is Christmas. <break time="1s"/> It is practically here! <break time="1s"/> Santa is coming tonight! Do not forget the cookies!
           {% elif states.sensor.christmas_countdown.state | int(0) < 31 %}
             There are only {{states.sensor.christmas_countdown.state}} days until christmas.
             {{ [ 'All I want for Christmas, is a hippopotamus.',

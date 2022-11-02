@@ -1,29 +1,24 @@
 ####################################################
-#                                                                                                    #
-#            Misc                                                                                  #
-#                                                                                                    #
+#                                                                                                    
+#            Amazon Polly Voice Speed                                                      
+#                                                                                                    
 ####################################################
 
-  - platform: imap_email_content
-    server: imap.mail.yahoo.com
-    name: is_payday
-    port: 993
-    username: !secret recipient_3
-    password: !secret recipient_3_password
-    folder: External
-    senders:
-     - cibadmin@shinseibank.com
-    value_template: >-
-      {% if 'Information from Transfer' in subject %}
-        on
-      {% else %}
-        off
-      {% endif %}
+  - platform: template
+    sensors:
+      jarvis_voice_speed:
+        value_template: >
+          {% if is_state('input_select.jarvis_voice', 'Brian') %}
+             fast
+          {% else %}    
+             medium
+          {% endif %}
+
 
 ####################################################
-#                                                                                                    #
-#            Last Alexa                                                                          #
-#                                                                                                    #
+#                                                                                                    
+#            Last Alexa                                                                          
+#                                                                                                    
 ####################################################
 
   - platform: template
@@ -33,9 +28,9 @@
           {{ expand('group.echos') | selectattr('attributes.last_called','eq',true) | map(attribute='entity_id') | first }}
 
 ####################################################
-#                                                                                                    #
-#            Icon Tpl                                                                             #
-#                                                                                                    #
+#                                                                                                    
+#            Icon Tpl                                                                             
+#                                                                                                    
 ####################################################
 # Hallway
   - platform: template
@@ -94,9 +89,9 @@
          {% if is_state("binary_sensor.motion_sr_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
       livingroom:
         value_template: >-
-         {% if is_state("binary_sensor.motion_lr_occupancy", "off") %}Off{% else %}On{% endif %}
+         {% if is_state("binary_sensor.lr_radar_movement", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.motion_lr_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+         {% if is_state("binary_sensor.lr_radar_movement", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
       computerroom:
         value_template: >-
          {% if is_state("binary_sensor.motion_computerroom_occupancy", "off") %}Off{% else %}On{% endif %}
@@ -121,9 +116,9 @@
 
 
 ####################################################
-#                                                                                                    #
-#            Day of Week                                                                       #
-#                                                                                                    #
+#                                                                                                    
+#            Day of Week                                                                       
+#                                                                                                    
 ####################################################
 
   - platform: template
@@ -149,20 +144,20 @@
 
 
 ####################################################
-#                                                                                                    #
-#            Custom Illuminance                                                              #
-#                                                                                                    #
+#                                                                                                    
+#            Custom Illuminance                                                              
+#                                                                                                    
 ####################################################
 
   - platform: template
     sensors:
-      k1_illuminance:
+      kt_illuminance:
         value_template: >
-          {% if states.sensor.rear_illuminance.state | float(0) == 0.10 %}
+          {% if states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
             on
-          {% elif states.sensor.rear_illuminance.state | float(0) == 0.13 %}
+          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
             on
-          {% elif states.sensor.rear_illuminance.state | float(0) == 0.18 %}
+          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
             on
           {% else %}
             off
@@ -170,9 +165,9 @@
 
 
 ####################################################
-#                                                                                                    #
-#            Earthquake Alert                                                                  #
-#                                                                                                    #
+#                                                                                                    
+#            Earthquake Alert                                                                  
+#                                                                                                    
 ####################################################
 
   - platform: rest
@@ -200,14 +195,8 @@
         value_template: "{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
 
-  - platform: mqtt
-    name: earthquake_one_day_count
-    state_topic: "house/earthquake/one_day_count"
-
-
-
 ####################################################
-#                                                                                                    #
-#            END OF CONFIGURATION FILE                                                 #
-#                                                                                                    #
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
 ####################################################

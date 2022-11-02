@@ -64,7 +64,10 @@
       - platform: homeassistant
         event: start
     action:
-      - delay: 25
+      - service: frontend.set_theme
+        data:
+          name: midnight    
+      - delay: 24
       - service: automation.trigger
         entity_id: automation.presence_restart_daily
 

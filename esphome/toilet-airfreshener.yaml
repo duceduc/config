@@ -1,4 +1,4 @@
-# ESP8266 NodeMCU....
+# ESP8266 NodeMCU.... BC-DD-C2-7A-CC-B4
 substitutions:
   name: toilet-airfreshener
   platform: ESP8266
@@ -20,7 +20,6 @@ wifi:
     gateway: 192.168.1.1
 
 captive_portal:
-
 logger:
 
 api:
@@ -42,6 +41,10 @@ switch:
              entity_id: counter.toilet_airfreshener
       - delay: 12s
       - switch.turn_off: relay
+
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart
 
 sensor:
   - platform: dht
@@ -65,3 +68,4 @@ binary_sensor:
     pin: D1 # was D5
     name: 'motion tr1 occupancy'
     device_class: motion
+

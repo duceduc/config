@@ -7,7 +7,10 @@
 ###############################################################################
 # cr window contact: battery replaced on 3/23/2022
 # lr window contact: battery replaced on 3/23/2022
-
+# hdmi selector battery replaced on 8/11/2022
+# 24h fan battery replaced on 8/15/2022
+# jcom tv battery replaced on 8/20/2022
+# meter battery repalced on 10/3/2022
 
 input_boolean:
   sb_humidifier:
@@ -17,6 +20,9 @@ input_boolean:
     name: Humidifier Automation
     icon: mdi:av-timer
     initial: off
+  tv_lock:
+    name: Tv Lock
+    icon: mdi:monitor-lock
 
 counter:
   humidifier_toggle:
@@ -63,31 +69,42 @@ binary_sensor:
         friendly_name: "Front Door Lock"
         device_class: lock
         value_template: >-
-          {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+          {% if states('sensor.genkan_doorlock_contact').lower() in ['open', 'timeout', 'unavailable'] %}off{% else %}on{% endif %}
+
       washer_door:
         friendly_name: "Washer Door"
         device_class: door
         value_template: >-
-          {% if states('sensor.washer_door_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+          {% if states('sensor.washer_door_contact').lower() in ['open', 'timeout', 'unavailable'] %}off{% else %}on{% endif %}
 
       computerroom_window:
         friendly_name: "Computer Room Window"
         device_class: window
         value_template: >-
-          {% if states('sensor.cr_window_contact').lower() in ['closed', 'timeout'] %}off{% else %}on{% endif %}
+          {% if states('sensor.cr_window_contact').lower() in ['closed', 'unavailable'] %}off{% else %}on{% endif %}
+
       livingroom_window:
         friendly_name: "Livingroom Window"
         device_class: window
         value_template: >-
-          {% if states('sensor.lr_window_contact').lower() in ['closed', 'timeout'] %}off{% else %}on{% endif %}
+          {% if states('sensor.lr_window_contact').lower() in ['closed', 'unavailable'] %}off{% else %}on{% endif %}
 
+      jcom_tv:
+        friendly_name: "Jcom Tv"
+        device_class: power
+        value_template: >-
+          {% if states('sensor.gosund_tv_power')| int(0) < 145 %}off{% else %}on{% endif %}
+#          {% if states('sensor.gosund_tv_amperage')| float(0) < 0.7 %}off{% else %}on{% endif %}
+# use < 140 for power for fulucation
 
-sensor:
-  - platform: mqtt
-    name: 'Switchbot Devices Offline'
-    state_topic: 'switchbotmqtt/esp32/lastwill'
-    value_template: '{{ value }}'
-    icon: mdi:server-network-off
+mqtt:
+  sensor:
+    - name: 'Switchbot Devices Offline'
+      state_topic: 'switchbotmqtt/esp32/lastwill'
+      value_template: '{{ value }}'
+      icon: mdi:server-network-off
+    
+sensor:    
   - platform: template
     sensors:
       cr_curtain_batteries:
@@ -117,7 +134,7 @@ sensor:
     sensors:
       genkan_doorlock:
         value_template: >-
-         {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}Locked{% else %}Unlocked{% endif %}
+         {% if states('sensor.genkan_doorlock_contact').lower() in ['open', 'timeout'] %}Locked{% else %}Unlocked{% endif %}
         icon_template: >-
          {% if is_state("sensor.genkan_doorlock_contact", "CLOSED") %}mdi:door-open{% else %}mdi:door-closed-lock{% endif %}
 
@@ -224,7 +241,7 @@ switch:
 
       jcom_tv:
         friendly_name: 'Jcom Tv'
-        value_template: "{{ states('input_boolean.jcom_tv') }}"
+        value_template: "{{ states('binary_sensor.jcom_tv') }}"
         turn_on:
           - service: switch.turn_on
             entity_id: switch.jcom_tv_box_switch
@@ -236,7 +253,7 @@ switch:
           - service: input_boolean.turn_off
             entity_id: input_boolean.jcom_tv
         icon_template: >-
-          {% if is_state('input_boolean.jcom_tv', 'on') %}
+          {% if is_state('binary_sensor.jcom_tv', 'on') %}
              mdi:monitor
           {% else %}
              mdi:monitor-off
@@ -337,15 +354,15 @@ script:
       - service: "cover.{{ modus }}_cover"
         target:
           entity_id:
-          - cover.cr_curtain_lt_curtain
           - cover.lr_curtain_lt_curtain
+          - cover.cr_curtain_lt_curtain          
   fr_curtains_position:
     sequence:
       - service: cover.set_cover_position
         target:
           entity_id:
-          - cover.cr_curtain_lt_curtain
           - cover.lr_curtain_lt_curtain
+          - cover.cr_curtain_lt_curtain
         data:
           position: "{{ position }}"
 

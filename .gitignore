@@ -34,6 +34,7 @@ id_ha
 gitupdate.sh
 ip_bans.yaml
 secrets.yaml
+purge_imap.py
 web_hooks.yaml
 known_devices.yaml
 shell_commands.yaml

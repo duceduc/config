@@ -1,0 +1,37 @@
+#########################################################
+#                                                                                                              
+#             Template Binary Sensors                                                 
+#                                                                                                              
+#########################################################
+
+  - binary_sensor:
+      - name: "Central Night Cooling"
+        delay_on: 00:30:00 # to avoid toggling
+        delay_off: 01:00:00 # to avoid toggling
+        state: >
+          {{ (states('sensor.average_house_temperature') | float(0) > 22) and (states('sensor.oa_temperature') | float(0) < (states('sensor.average_house_temperature') | float(0) - 1)) }}
+
+  - trigger:
+      - platform: event
+        event_type: cube_living_room_last_action
+    sensor:
+      - name: "Cube Living Room Last Action"
+        unique_id: d7169ac1-a255-45ee-b19b-ad0a8ef5f95f
+        icon: mdi:eye-refresh-outline
+        attributes:
+          friendly_name: "Cube Action"
+        state: >
+          {{ trigger.event.data.friendly_name }} - 
+          {{ trigger.event.data.action }} - 
+          {{ trigger.event.data.side }} frm 
+          {{ trigger.event.data.last_side }}
+
+
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

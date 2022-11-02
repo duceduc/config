@@ -1,4 +1,12 @@
 
+  jarvis_voice:
+    name: Jarvis voice
+    options:
+      - Brian
+      - Emma
+      - Raveena
+    initial: Brian
+
   exercise_select:
     name: Select a Room
     icon: mdi:bed-empty
@@ -23,7 +31,7 @@
   entity_list:
     name : Entity List
     options:
-      - switch.ac_lr_unit
+      - switch.ac_lr_unit # 0
       - switch.ac_mr_unit
       - switch.ac_sr_unit
       - sensor.oa_temperature
@@ -35,15 +43,16 @@
       - sensor.sr_humidity
       - sensor.mr_temperature #10
       - sensor.mr_humidity
-      - sensor.genkan_temperature
-      - sensor.genkan_humidity
+      - sensor.meter_temperature # need to remove and change order
+      - sensor.meter_humidity # need to remove and change order
       - sensor.mdf_temperature
       - sensor.mdf_humidity #15
-      - light.shion_room
-      - sensor.shion_birthday
+      - light.shion
+      - sensor.shion_birthday # need to remove and change order
       - sensor.ikea_pm25
       - sensor.carbon_dioxide
       - sensor.carbon_monoxide #20
+      - sensor.alexa_last_msg
       
   speak_list:
     icon: si:amazonalexa 
@@ -68,6 +77,7 @@
       - The (e18f) is (e18$) micrograms per cubic meter
       - The (e19f) is (e19$) parts per million
       - The (e20f) is (e20$) parts per million
+      - (e21$)
 
 #       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
 
@@ -178,7 +188,7 @@
       - costcokawa
       - costcokisa
       - others
-    initial: costcokawa  
+    initial: costcokisa  
 
   shion_destination_waze:
     name: Shion Destination Waze

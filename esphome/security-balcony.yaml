@@ -1,0 +1,90 @@
+# ESP32 CAM... C8-C9-A3-F9-24-4C (205)
+substitutions:
+  name: security-balcony
+  platform: ESP32
+  board: esp-wrover-kit 
+
+esphome:
+  name: $name
+  platform: $platform
+  board: $board
+
+wifi:
+  ssid: !secret ssid3
+  password: !secret ssid_pass
+  fast_connect : true
+  power_save_mode: none
+  reboot_timeout: 0s
+  manual_ip:
+    static_ip: 192.168.1.72
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
+
+captive_portal:
+logger:
+
+api:
+  password: !secret ota_pass
+ota:
+  password: !secret ota_pass
+
+i2c:
+  sda: GPIO1
+  scl: GPIO3
+  scan: true
+
+esp32_camera:
+  name: $name
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+
+# Image settings
+  vertical_flip: false
+  max_framerate: 1 fps
+  resolution: SXGA
+  jpeg_quality: 20
+  contrast: 2
+  saturation: 2
+
+output:
+  - platform: gpio
+    pin: GPIO3
+    id: gpio_3
+    
+light:
+  - platform: binary
+    name: $name light  
+    output: gpio_3
+
+sensor:
+  - platform: wifi_signal
+    name: '$name WiFi Signal'
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO14
+    name: motion balcony occupancy
+    device_class: motion    
+
+  - platform: status
+    name: "$name status"
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart    

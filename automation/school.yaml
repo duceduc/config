@@ -40,7 +40,67 @@
     - service: script.turn_on
       entity_id: script.school_in_session
     
-    
+
+
+#########################################################
+#                                                                                                              
+#             Shion Bedtime Announcement                                                                   
+#                                                                                                              
+#########################################################
+
+  - alias: Shion Night Briefing
+    trigger:
+      - platform: time
+        at: input_datetime.shion_school_bedtime
+        id: school_night
+      - platform: time
+        at: input_datetime.shion_bedtime_holiday
+        id: no_school
+    condition:
+      - condition: state
+        entity_id: input_boolean.shion_awake
+        state: 'on'
+    action:
+      - choose:
+          - conditions:
+            - condition: state
+              entity_id: sensor.school_tomorrow
+              state: 'on'
+            - condition: trigger
+              id: school_night
+            sequence:
+            - service: script.turn_on
+              target:
+                entity_id: script.shion_nightly_briefing
+          - conditions:
+            - condition: state
+              entity_id: sensor.school_tomorrow
+              state: 'off'
+            - condition: trigger
+              id: no_school
+            sequence:
+            - service: script.turn_on
+              target:
+                entity_id: script.shion_nightly_briefing
+        default: []
+      
+
+
+  - alias: set shion nightly bedtime time
+    trigger:
+      - platform: time
+        at: '18:30:00'
+    action:
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.shion_nightly_report
+        data_template:
+          time: > 
+            {% if is_state('sensor.school_tomorrow', 'on') %}
+              21:00
+            {% else %}
+              21:30
+            {% endif %}
+
 
 
 #########################################################

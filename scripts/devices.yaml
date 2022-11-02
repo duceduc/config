@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Ceiling Fan                                                                                   #
-#                                                                                                              #
+#                                                                                                              
+#             Ceiling Fan                                                                                   
+#                                                                                                              
 #########################################################
 
 # Broadlink Cmd -> Emulated Hue
@@ -44,6 +44,17 @@
           device: Ceiling Fan
           command:
           - toggle winter fan
+
+
+  toggle_summer_fan:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - toggle summer fan
+
 
   ceiling_fan_lights:
     sequence:
@@ -109,10 +120,10 @@
     sequence:
 #      - service: script.xmas_off
       - condition: template
-        value_template: '{{ states("sensor.rear_illuminance")| float(0) >= 0.20 }}'
+        value_template: '{{ states("sensor.lr_radar_illuminance")| float(0) >= 0.29 }}'
       - service: light.turn_off
         data:
-          entity_id: light.computer_room, light.living_room
+          entity_id: light.computer, light.living
       - service: script.turn_off
         data_template:
           entity_id:  script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
@@ -142,7 +153,7 @@
         value_template: "{{ is_state('switch.tv_lock', 'on') }}"
       - service: homeassistant.turn_off
         data:
-          entity_id: switch.tv_lock, input_boolean.child_mode
+          entity_id: switch.tv_lock, input_boolean.lock_tv
 
   enable_dev2:
     sequence:
@@ -225,17 +236,31 @@
 #########################################################
 
 
-  desktop_wol:
-    alias: "Desktop WOL"
+  desktop_wol_on:
+    alias: "Desktop WOL On"
     sequence:
       - service: wake_on_lan.send_magic_packet
         data:
           mac: "B4:4B:D6:27:22:55"
 
+  desktop_wol_off:
+    alias: "Desktop WOL Off"
+    sequence:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.desktop_fddl8i4_shutdown
+      - condition: template
+        value_template: "{{ states('light.computer') == 'on' }}"
+      - service: script.tradfri_transition_down
+        data:
+          entity_id: light.computer
+          transition: 120
+        entity_id: light.computer        
+        
 
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

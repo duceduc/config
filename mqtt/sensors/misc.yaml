@@ -1,0 +1,31 @@
+####################################################
+#                                                                                                    
+#            Misc                                                                                  
+#                                                                                                    
+####################################################
+
+
+  - name: earthquake_one_day_count
+    state_topic: "house/earthquake/one_day_count"
+
+
+
+####################################################
+#                                                                                                    
+#            Notifications                                                                                  
+#                                                                                                    
+####################################################
+
+  - name: "Alexa Last Msg"
+    state_topic: "house/alexa/lastmsg"
+  - name: "Alexa Last Location"
+    state_topic: "house/alexa/lastloc"
+  - name: "Alexa Last Msg Time"
+    state_topic: "house/alexa/msgtime"
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

@@ -13,7 +13,7 @@
       event_id:
         description: 'Correlation ID for event responses'
         example: 'ask_to_turn_on_ac_temp_above_25'
-      alexa_device: 
+      who: 
         description: 'Alexa device you want to trigger'
         example: 'media_player.ai_1'
     sequence:
@@ -23,7 +23,7 @@
           value: '{"text": "{{ text }}", "event": "{{ event_id }}"}'
       - service: media_player.play_media
         data:
-          entity_id: "{{ alexa_device }}"
+          entity_id: "{{ who }}"
           media_content_type: skill
           media_content_id: amzn1.ask.skill.2ccd013f-8afa-4939-ab9e-996e8466f88c # Enable AC Skill
 

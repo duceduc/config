@@ -12,7 +12,6 @@ input_boolean:
     icon: mdi:snowflake-alert
 
 sensor:
-
   - platform: template
     sensors:
       clothing_forecast:
@@ -22,7 +21,7 @@ sensor:
           {% if is_state('binary_sensor.overnight', 'off') %}
             {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
           {% else %}
-            {% set temp = states('sensor.oa_temperature')|round %}
+            {% set temp = states('sensor.oa_temperature')|round(0) %}
           {% endif %}
           {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
             {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
@@ -195,6 +194,35 @@ sensor:
           {% set humidity = states('sensor.oa_humidity')|float(0) %}
           {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
 
+
+  - platform: history_stats
+    name: Rainsensor flips 
+    entity_id: binary_sensor.rain_gauge_contact # The aqara sensor
+    state: 'off'
+    type: count
+    start: '{{ now().replace(hour=0, minute=0, second=0) }}'
+    end: '{{ now() }}'
+
+  - platform: min_max
+    name: "average_house_temperature"
+    round_digits: 1
+    type: mean
+    entity_ids:
+     - sensor.sr_temperature
+     - sensor.mr_temperature
+     - sensor.lr_radar_temperature
+     - sensor.meter_temperature
+     - sensor.espresense_computerroom_temperature
+     - sensor.espresense_kitchen_temperature
+
+binary_sensor:
+  - platform: trend
+    sensors:
+      rainfall_trend:
+        entity_id: sensor.rainfall_today
+        max_samples: 2
+
+
 # Tomorrowio Pollen Count Forecast
 template:
   - sensor:
@@ -230,6 +258,47 @@ template:
           Today + 4: "{{ state_attr('sensor.pollen_tree_index_day_4', 'weedIndex') }}"
 
 
+
+
+# Rain Guage
+  - sensor:
+      - name: Rainfall today
+        unit_of_measurement: mm
+        state_class: total_increasing
+        unique_id: rainfall_today
+        state: >-
+          {% set count = states('sensor.rainsensor_flips') | int(0) %}
+          {% set mm = count * 0.30303 %}
+          {% if count >= 0 %}
+            {{ mm|round(1, 'floor') }}
+          {% endif %}
+        # If you have issues with the history sensor doubling after restarting HA, add the line below (@BigG)
+        #availability: "{{ (states('sensor.rainsensor_flips') not in ('unknown', 'unavailable')) }}"
+
+  - sensor:
+      - name: "Rain intensity"
+        unit_of_measurement: 'mm/h'
+        state_class: measurement
+        unique_id: rainfall_per_hour
+        state: >-
+          {% set rain_hour = ((state_attr('binary_sensor.rainfall_trend', 'gradient') | float(0)) * 3600) | round(1, 'floor') %}
+          {% if rain_hour >= 0 %}
+            {{ rain_hour }}
+          {% else %}
+            {{ 0 }}
+          {% endif %}
+
+utility_meter:
+  rainfall_week:
+    source: sensor.rainfall_today 
+    cycle: weekly
+  rainfall_month:
+    source: sensor.rainfall_today 
+    cycle: monthly
+  rainfall_year:
+    source: sensor.rainfall_today 
+    cycle: yearly
+
 automation:
   - alias: Forecast Low Near Freezing
     trigger:
@@ -263,7 +332,20 @@ automation:
       - service: input_boolean.turn_off
         entity_id: input_boolean.freeze_warning
 
+  - alias: Rain Detected Home
+    trigger:
+      - platform: state
+        entity_id: sensor.rainfall_today
+        from: '0.0'
+    action:
+      - service: script.text_notify
+        data_template:
+          who: duc
+          message: "It's currently raining at home."    
+      - service: script.status_annc
+        data:
+          who: ai_4
+          voice: "{{ states('input_select.jarvis_voice') }}"        
+          call_interuption: 1
+          speech_message: "Rain has been detected at home."
 
-
-
-      

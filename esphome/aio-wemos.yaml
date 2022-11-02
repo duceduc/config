@@ -1,4 +1,4 @@
-# ESP8266 Uno 
+# ESP8266 Uno... 8C-AA-B5-79-83-92 
 substitutions:
   name: aio-wemos
   platform: ESP8266
@@ -12,7 +12,6 @@ esphome:
   board: $board
 
 wifi:
-#  use_address: aio_wemos.local
   ssid: !secret ssid1
   password: !secret ssid_pass
   fast_connect : true
@@ -39,7 +38,7 @@ sensor:
       name: '$mr temperature'
     humidity:
       name: '$mr humidity'
-    update_interval: 40s
+    update_interval: 20s
 
   - platform: dht
     model: AM2302
@@ -48,7 +47,7 @@ sensor:
       name: '$oa temperature'
     humidity:
       name: '$oa humidity'
-    update_interval: 40s
+    update_interval: 25s
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -63,7 +62,7 @@ sensor:
     pin: A0
     name: 'front illuminance'
     unit_of_measurement: lux
-    update_interval: 20s
+    update_interval: 5s
 
 binary_sensor:
   - platform: status

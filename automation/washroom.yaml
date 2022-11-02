@@ -4,37 +4,79 @@
 #                                                                                                              
 #########################################################
 
+
 - alias: 'motion washroom auto-on'
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_washroom_sensor_occupancy 
       to: 'on'
   action:
-    - service: light.turn_on
-      entity_id: light.w_1
+#    - service: light.turn_on
+#      entity_id: light.wash
+    - service: script.tradfri_transition
+      data:
+        entity_id: light.wash
+        color_temp: 400
+        transition: 2
+        brightness: 254
+      entity_id: light.wash
 
-- alias: 'motion washroom auto-off'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.motion_washroom_sensor_occupancy 
-      to: 'off'
-      for: 00:01:05
-  action:
-    - service_template: light.turn_{{ 'on' if is_state('light.shower_room', 'on') else 'off' }}
-      entity_id: light.w_1
+    - condition: template # Don't run if on
+      value_template: "{{ not is_state('light.sink_cool', 'on') }}"      
+    - service: script.tradfri_transition
+      data:
+        entity_id: light.sink_cool
+        color_temp: 153
+        transition: 2
+        brightness: 254
+      entity_id: light.sink_cool
+      
+    - service: script.tradfri_transition
+      data:
+        entity_id: light.w_4
+        color_temp: 370
+        transition: 2
+        brightness: 254
+      entity_id: light.w_4
 
+#    - service: light.turn_on
+#      entity_id: light.sink_all
 
-
-
-- alias: 'Washroom Manual Light on'
+- alias: 'Washroom Switch Light on'
   trigger:
     - entity_id: binary_sensor.washer_door_button 
       platform: state
       to: 'on' 
   action:
-    - service: light.turn_on
-      entity_id: light.w_1
+    - service: script.tradfri_transition
+      data:
+        entity_id: light.wash
+        color_temp: 400
+        transition: 2
+        brightness: 254
+      entity_id: light.wash
 
+- alias: 'motion washroom auto-off'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_washroom_sensor_occupancy
+      to: 'off'
+      for: '00:01:05'
+  action:
+    - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
+      entity_id: 
+       - light.wash
+
+
+- alias: 'motion sink auto-off'
+  trigger:
+    - platform: state
+      entity_id: light.wash
+      to: 'off'
+      for: '00:00:40'
+  action:
+    - service_template: light.turn_off
+      entity_id: light.sink_all
 
 
 #########################################################

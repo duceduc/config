@@ -1,6 +1,11 @@
     mode: yaml
     resources:
-      - url: /local/custom_ui/card-mod.js
+      - url: /local/lovelace/css/styles.css?v=1.0.0
+        type: css
+      - url: /local/lovelace/css/fontstyle.css
+        type: css
+
+      - url: /local/custom_ui/card-mod.js?v=1.0
         type: module
       - url: /local/custom_ui/fold-entity-row.js
         type: module
@@ -16,9 +21,27 @@
         type: module
       - url: /local/custom_ui/button-card.js
         type: module
-        
+      - url: /local/custom_ui/layout-card.js
+        type: module
+      - url: /local/custom_ui/weather-card.js
+        type: module        
+      - url: /local/custom_ui/honeycomb-menu.js?v=1.0.0
+        type: module
+
       - url: /local/custom_ui/vertical-stack-in-card.js
         type: js
-      - url: /local/custom_ui/card-tools.js
+      - url: /local/custom_ui/card-tools.js?v=2.1.2
+        type: js
+      - url: /local/custom_ui/floorplan.js?v=1.0.0
+        type: js
+      - url: /local/custom_ui/auto-entities.js?v=1.0.0
         type: js
 
+    dashboards:
+      lovelace-floorplan:
+        mode: yaml
+        filename: lovelace/dashboards/floorplan/ui-floorplan.yaml
+        title: Floorplan
+        icon: mdi:view-dashboard
+        show_in_sidebar: true
+        require_admin: false
