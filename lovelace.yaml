@@ -4,7 +4,6 @@
         type: css
       - url: /local/lovelace/css/fontstyle.css
         type: css
-
       - url: /local/custom_ui/card-mod.js?v=1.0
         type: module
       - url: /local/custom_ui/fold-entity-row.js
@@ -17,6 +16,7 @@
         type: module
       - url: /local/custom_ui/custom-ui.js?v=20200918
         type: module
+
       - url: /local/custom_ui/decluttering-card.js
         type: module
       - url: /local/custom_ui/button-card.js
@@ -24,10 +24,9 @@
       - url: /local/custom_ui/layout-card.js
         type: module
       - url: /local/custom_ui/weather-card.js
-        type: module        
+        type: module
       - url: /local/custom_ui/honeycomb-menu.js?v=1.0.0
         type: module
-
       - url: /local/custom_ui/vertical-stack-in-card.js
         type: js
       - url: /local/custom_ui/card-tools.js?v=2.1.2

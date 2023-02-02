@@ -29,10 +29,14 @@ external_components:
 logger:
   level: INFO  #You Can Use "INFO" Level
   baud_rate: 0
+  
 api:
-  password: !secret ota_pass
+  encryption:
+    key: !secret esphome_apikey
+
 ota:
   password: !secret ota_pass
+  
 wifi:
   ssid: !secret ssid3
   password: !secret ssid_pass

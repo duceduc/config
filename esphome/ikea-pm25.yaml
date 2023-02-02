@@ -24,7 +24,9 @@ captive_portal:
 logger:
 
 api:
-  password: !secret ota_pass
+  encryption:
+    key: !secret esphome_apikey
+
 ota:
   password: !secret ota_pass
 

@@ -11,8 +11,9 @@
     qos: 0
     device_class: motion
 
-#  - name: "motion g1 occupancy"
-#    state_topic: "esphome/hallway-sensor/binary_sensor/motion_g1_occupancy/state"
+# TESTING 
+#  - name: "motion k1 occupancy"
+#    state_topic: "esphome/kitchen-sensor/binary_sensor/motion_k1_occupancy/state"
 #    value_template: '{{ value }}'
 #    payload_on: "ON"
 #    qos: 0

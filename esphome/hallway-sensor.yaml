@@ -1,4 +1,4 @@
-# ESP8266 NodeMCU.... C4-5B-BE-70-C4-A1
+# ESP8266 192.168.1.74
 substitutions:
   name: hallway-sensor
   platform: ESP8266
@@ -10,21 +10,21 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid1
+  ssid: !secret ssid2
   password: !secret ssid_pass
-#  fast_connect : true
-#  power_save_mode: none
-#  reboot_timeout: 0s  
+  fast_connect : true
+  reboot_timeout: 0s
   manual_ip:
     static_ip: 192.168.1.74
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-
-captive_portal:
+  
 logger:
 
 api:
-  password: !secret ota_pass
+  encryption:
+    key: !secret esphome_apikey
+
 ota:
   password: !secret ota_pass
 

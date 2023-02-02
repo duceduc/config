@@ -34,11 +34,13 @@ sensor:
     name: Internet Test Down
     entity_id: sensor.speedtest_download
     state_characteristic: value_max
+    sampling_size: 20
     max_age:
       days: 7
   - platform: statistics
     name: Internet Test Up
     entity_id: sensor.speedtest_upload
     state_characteristic: value_max
+    sampling_size: 20
     max_age:
-      days: 7            
+      days: 7

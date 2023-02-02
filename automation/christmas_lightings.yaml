@@ -4,39 +4,32 @@
 #                                                                                                              
 #########################################################
 
-- alias: Enable Christmas Lights
+- alias: Automate Christmas Lights
   trigger:
   - platform: numeric_state
     entity_id: sensor.lr_radar_illuminance
-    above: 0.35
-    below: 0.37
+    above: 0.38
+    below: 0.51
   - platform: time
-    at: '22:00:00'
+    at: '23:00:00'
   - platform: numeric_state
     entity_id: sensor.lr_radar_illuminance
-    below: 0.16    
+    below: 0.29    
   condition:
-  - condition: template # Vacation mode is off
+  - condition: template 
     value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
-  - condition: template # Someone is home
+  - condition: template 
     value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
 
   action:
     choose:
-      - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) <= 0.16 or now().hour == 22 and now().minute == 00 }}"
+      - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) < 0.29 or now().hour == 23 and now().minute == 00 }}"
         sequence:
           - service: script.christmas_lights_off
     
-      - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) >= 0.35 }}"
+      - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) > 0.38 }}"
         sequence:
           - service: script.christmas_lights_on
-
-#      - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) >= 0.70 and is_state('sensor.date_weekday', 'on') }}"
-#        sequence:
-#          - service: switch.turn_on
-#            data:
-#              entity_id: switch.christmas_lights
-
 
 
 #########################################################

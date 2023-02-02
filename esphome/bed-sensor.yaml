@@ -20,10 +20,6 @@ wifi:
 
 captive_portal:
 logger:
-#  level: VERBOSE
-
-#status_led:
-#  pin: GPIO2
 
 mqtt:
 #  topic_prefix: esphome/$name

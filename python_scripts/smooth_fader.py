@@ -1,7 +1,7 @@
 #   smooth_fader.py
 #   Version 2.0.1
 #   By Ingrid Bakker studioilb.nl
-#
+#   https://community.home-assistant.io/t/light-fader-with-curves-linear-exponential-and-smooth/366157/
 #--------------------------------------
 #
 #  HOW TO CALL
@@ -38,8 +38,8 @@
 #   50% effect at 88% time
 
 # FOR debugging
-debug_report = 2 # 0 = errors only; 1 = change events only; 2 = full
-system_lag_time = 2 # Estimation how quick the a new state readout will be available.
+debug_report = 0 # 0 = errors only; 1 = change events only; 2 = full
+system_lag_time = 12 # Estimation how quick a new state readout will be available.
 
 # INPUT
 entity_id = data.get ('entity_id')
@@ -126,7 +126,7 @@ else :
     if (debug_report > 1) : logger.info("x: %s, b_cur: %s, b_last: %s, b_lag: %s, b_new: %s, t_cur: %s, t_last: %s, t_lag: %s, t_new: %s", x, b_cur, b_last, lag[xlag]["b"], b_new, t_cur, t_last, lag[xlag]["t"], t_new)
     if (x > 0 and b_cur > 24 and ((b_cur - lag[xlag]["b"]) * b_dir < 0 or (b_cur - b_last) * b_dir * -1 < 0 or (t_cur - lag[xlag]["t"]) * t_dir < 0 or (t_cur - t_last) * t_dir * -1 < 0) and b_cur != b_initial and t_cur != t_initial) :
       if ((b_cur - lag[xlag]["b"]) * b_dir < 0 or (t_cur - lag[xlag]["t"]) * t_dir < 0) :          
-        logger.error ("Curved fader: Break because system_lag_time is set to low, please increase value. The lagere the difference between cur and lag, the larger the increment.")
+        logger.error ("Curved fader: Break because system_lag_time is set to low, please increase value. The larger the difference between cur and lag, the larger the increment will be.")
         logger.error ("Lag_steps_allowed: %s, x: %s, b_cur: %s, b_lag: %s, t_cur: %s, t_lag: %s", lag_steps_allowed, x, b_cur, lag[xlag]["b"], t_cur, lag[xlag]["t"])
       else :
         logger.info ("Curved fader: Break by external change.")

@@ -13,7 +13,9 @@ lovelace_gen:
 tts:
   - platform: google_translate
     service_name: google_say
+    cache_dir: /config/www/tts
     time_memory: 300
+    cache: true
 
 notify_events:
   token: !secret notify_token
@@ -48,6 +50,7 @@ script: !include_dir_merge_named scripts/
 mqtt:
  sensor: !include_dir_merge_list mqtt/sensors/
  binary_sensor: !include_dir_merge_list mqtt/binary_sensors/
+ button: !include_dir_merge_list mqtt/buttons/ 
 # cover: !include_dir_merge_list mqtt/cover/
 # certificate: auto
 
@@ -58,18 +61,22 @@ homeassistant:
   elevation: 20
   unit_system: metric
   time_zone: Asia/Tokyo
+  country: JP
+  currency: USD
   internal_url: !secret internal_url
+  external_url: !secret external_url
   customize: !include customize.yaml
   packages: !include_dir_named packages
   allowlist_external_dirs:
     - '/config'
+    - '/media/music'
 
 # https://community.home-assistant.io/t/reverse-proxy-error/312936
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - 192.168.1.15  #Ngnix
-
+    - 192.168.1.15 #ws1
+    - 172.30.33.0/24 # Docker network
 
 #########################################################
 #                                                                                           

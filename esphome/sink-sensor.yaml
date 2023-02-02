@@ -1,6 +1,6 @@
-# ESP8266 NodeMCU.... 50-02-91-FD-4B-26
+# ESP8266 NodeMCU.... 4C:75:25:35:08:7C
 substitutions:
-  name: mdf-sensor
+  name: sink-sensor
   platform: ESP8266
   board: nodemcuv2
 
@@ -10,26 +10,22 @@ esphome:
   board: $board
 
 wifi:
-  ssid: !secret ssid1
+  ssid: !secret ssid3
   password: !secret ssid_pass
   fast_connect : true
-  power_save_mode: none
-  reboot_timeout: 0s  
+  power_save_mode: Light
+  reboot_timeout: 0s
   manual_ip:
-    static_ip: 192.168.1.98
+    static_ip: 192.168.1.75
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-  
-captive_portal:
+
 logger:
 
-mqtt:
-  topic_prefix: esphome/$name
-  discovery: false
-  broker: 192.168.1.20
-  username: !secret mqtt_user
-  password: !secret mqtt_pass
-
+api:
+  encryption:
+    key: !secret esphome_apikey  
+  
 ota:
   password: !secret ota_pass
 
@@ -43,18 +39,16 @@ sensor:
           send_every: 15
           send_first_at: 1
 
-  - platform: adc
-    pin: A0
-    name: '$name illuminance'
-    unit_of_measurement: lux
-    update_interval: 8s
-
 binary_sensor:
+  - platform: gpio
+    pin: D2
+    name: 'motion sink occupancy'
+    device_class: motion
+
   - platform: status
     name: "$name status"
-
+    
 switch:
   - platform: restart
     name: "$name Restart"
-    icon: mdi:restart
-
+    icon: mdi:restart    

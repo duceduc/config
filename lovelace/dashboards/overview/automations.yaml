@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                                             #
-#                    AUTOMATIONS VIEW                                                                         #
-#                                                                                                                             #
+#                                                                                                                             
+#                    AUTOMATIONS VIEW
+#                                                                                                                             
 ####################################################
 
 title: Automations
@@ -327,8 +327,8 @@ cards:
             name: Enable Tv Lock
             icon: mdi:monitor-lock
             secondary_info: last-triggered
-          - entity: automation.disable_iphone_internet
-            name: Disable iPhone Internet
+          - entity: automation.disable_device_internet
+            name: Disable Internet Devices
             icon: mdi:wifi
             secondary_info: last-triggered
 

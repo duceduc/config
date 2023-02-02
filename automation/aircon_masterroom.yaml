@@ -20,17 +20,17 @@
     - condition: time
       after: '06:00:00'
       before: '22:01:00'
-    - condition: template # mcl is off
-      value_template: "{{ is_state('input_boolean.masterroom_mcl', 'off') }}"
+#    - condition: template # mcl is off
+#      value_template: "{{ is_state('input_boolean.masterroom_mcl', 'off') }}"
       
   action:
   - service: python_script.room_occupancy
     data:
       roomname: masterroom 
       entities_toggle: # entities that can mark a room as occupied
-      - binary_sensor.motion_mr_occupancy
-#      entities_keep: 
-#      - sensor.eri_espresense
+       - binary_sensor.motion_mr_occupancy
+      entities_keep:
+       - input_boolean.masterroom_mcl
       timeout: 2 # timeout of the room, timer gets set to this
 
 - alias: Masterroom Light

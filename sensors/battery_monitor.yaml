@@ -17,7 +17,7 @@
             | rejectattr('entity_id', 'in', ignore_entities)
             | map(attribute='state')
             | reject('in', ['unknown', 'unavailable'])
-            | map('int', -1) | select('le', 5)
+            | map('int', -1) | select('le', 6)
             |select('ge', 0)
             | list | count
           }}
@@ -27,6 +27,8 @@
           {% else %}
             mdi:battery-alert
           {% endif %}
+
+
 
 ####################################################
 #                                                                                                    #

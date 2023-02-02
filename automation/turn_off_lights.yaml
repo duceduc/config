@@ -52,6 +52,8 @@
   action:
     - service: script.lights_out
 
+
+
 #########################################################
 #                                                                                                              
 #          END OF CONFIGURATION FILE                                                             

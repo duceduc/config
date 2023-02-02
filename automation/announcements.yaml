@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Announcements                                
-#                                                                                                              
+#
+#             Announcements
+#
 #########################################################
 
 # Alexa Remind Shion to Go to Bed Starting at 9pm
@@ -70,9 +70,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Audio on Notification                                                
-#                                                                                                              
+#
+#             Audio on Notification
+#
 #########################################################
 
 
@@ -85,7 +85,7 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.audible_notifications
 
-# Turn off audible notifications if they have't been turned off yet. 
+# Turn off audible notifications if they have't been turned off yet.
 - alias: Turn Off Audible Notifications
   initial_state: true
   trigger:
@@ -103,9 +103,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Shion Calendar Events                                                
-#                                                                                                              
+#
+#             Shion Calendar Events
+#
 #########################################################
 
 - alias: Shion Event Starting Soon
@@ -121,7 +121,7 @@
         call_interuption: 1
         call_shion_events: 1
 
-- alias: School Pickup Reminder  
+- alias: School Pickup Reminder
   trigger:
 #    - platform: time
 #      at: input_datetime.school_day_start_reminder
@@ -145,9 +145,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Calendar Appointments                                                
-#                                                                                                              
+#
+#             Calendar Appointments
+#
 #########################################################
 
 - alias: Appointments Reminder
@@ -164,9 +164,9 @@
         call_appointments: 1
 
 #########################################################
-#                                                                                                              
-#             Calendar Reminders                                                
-#                                                                                                              
+#
+#             Calendar Reminders
+#
 #########################################################
 
 - alias: Calendar Reminder
@@ -183,18 +183,19 @@
         call_reminders: 1
 
 #########################################################
-#                                                                                                              
-#             Alexa Announce Who is Coming Home                                                 
-#                                                                                                              
+#
+#             Alexa Announce Who is Coming Home
+#
 #########################################################
 
 #Make sure to enable this automation when done testing.
 - alias: announce who is arriving
   trigger:
     - platform: state
-      entity_id: 
-        - device_tracker.duc
-        - device_tracker.eri
+      entity_id:
+       - device_tracker.id #duc
+       - device_tracker.ie #eri
+#       - device_tracker.shion
       to: 'home'
   action:
     - choose:
@@ -206,27 +207,26 @@
               entity_id: input_select.home_mode
               data:
                 option: 'Returning'
-            - service: script.standby
+            - service: script.standby # turn off alarm
             - service: input_boolean.turn_off
               data:
                 entity_id: >
-                 {% if trigger.to_state.attributes.friendly_name == 'Eri' %}
+                 {% if trigger.to_state.attributes.friendly_name == 'iE' %}
                     input_boolean.eri_travel_monitor
-                 {% elif trigger.to_state.attributes.friendly_name == 'Duc' %}
+                 {% elif trigger.to_state.attributes.friendly_name == 'id' %}
                     input_boolean.duc_travel_monitor
                  {% else %}
                  {% endif %}
-                 
-      default:  
+      default:
         - service: script.speech_engine
-          data: 
+          data:
             who: "{{ states('sensor.room_audio') }}"
             voice: "{{ states('input_select.jarvis_voice') }}"
             message: >
-              {% set alias = {"Eri":"mommy", "Duc":"daddy", "Shion":"she-on"} %}
+              {% set alias = {"iE":"mommy", "id":"daddy", "Shion":"she-on"} %}
               {% set p = trigger.to_state.attributes.friendly_name %}
               {% set person = alias.get(p) %}
-                {{ person }}, will be home in about 10 minutes.
+                {{ person }}, will be home in about 5 minutes.
         - service: light.turn_on
           data:
             entity_id: light.h_1
@@ -234,17 +234,17 @@
         - service: input_boolean.turn_off
           data:
             entity_id: >
-             {% if trigger.to_state.attributes.friendly_name == 'Eri' %}
+             {% if trigger.to_state.attributes.friendly_name == 'iE' %}
                 input_boolean.eri_travel_monitor
-             {% elif trigger.to_state.attributes.friendly_name == 'Duc' %}
+             {% elif trigger.to_state.attributes.friendly_name == 'id' %}
                 input_boolean.duc_travel_monitor
              {% else %}
              {% endif %}
 
 #########################################################
-#                                                                                                              
-#             Momentary Switch Trigger                                                               
-#                                                                                                              
+#
+#             Momentary Switch Trigger
+#
 #########################################################
 
 
@@ -252,7 +252,7 @@
   trigger:
      - platform: state
        entity_id:
-        - input_boolean.toggle_guest_presence   
+        - input_boolean.toggle_guest_presence
         - binary_sensor.duc_presence
        to: 'on'
   action:
@@ -265,17 +265,17 @@
              switch.momentary_activate_tv
           {% endif %}
     - delay: 2
-    - condition: template 
-      value_template: "{{ is_state('input_boolean.toggle_guest_presence', 'off') }}" 
+    - condition: template
+      value_template: "{{ is_state('input_boolean.toggle_guest_presence', 'off') }}"
     - service: homeassistant.turn_off
       data:
-        entity_id: input_boolean.toggle_guest_presence 
-    
+        entity_id: input_boolean.toggle_guest_presence
+
 
 #########################################################
-#                                                                                                              
-#             Alexa Greets Faimly at Genkan                                                                  
-#                                                                                                              
+#
+#             Alexa Greets Faimly at Genkan
+#
 #########################################################
 
 - alias: welcome family announcement
@@ -287,27 +287,26 @@
        - binary_sensor.shion_presence
       to: 'on'
   action:
-    - delay: 1
     - wait_template: "{{ is_state('group.hallway_motion', 'on') }}"
       continue_on_timeout: false
       timeout: 20
     - service: script.speech_engine
-      data: 
+      data:
         who: ai_2
         message: !include ../tpl/speech/family_greetings.yaml
         voice: "{{ states('input_select.jarvis_voice') }}"
 
-    - condition: template 
-      value_template: "{{ not is_state('switch.momentary_activate_guest', 'on') }}" 
-    - condition: template 
-      value_template: "{{ states.sensor.lr_radar_illuminance.state | float(0) > 0.39 }}" 
+    - condition: template
+      value_template: "{{ not is_state('switch.momentary_activate_guest', 'on') }}"
+    - condition: template
+      value_template: "{{ states.sensor.lr_radar_illuminance.state | float(0) > 0.39 }}"
     - service: script.turn_on_lr_lights
 
 
 #########################################################
-#                                                                                                              
-#             Alexa Greets Guest at Genkan                                                                  
-#                                                                                                              
+#
+#             Alexa Greets Guest at Genkan
+#
 #########################################################
 
 - alias: welcome guest announcement
@@ -315,7 +314,7 @@
     - platform: state
       entity_id:
        - binary_sensor.sachiko_presence
-       - binary_sensor.tomokun_presence       
+       - binary_sensor.tomokun_presence
       to: 'on'
   action:
     - delay: 1
@@ -323,14 +322,14 @@
       continue_on_timeout: false
       timeout: 10
     - service: script.speech_engine
-      data: 
+      data:
         who: ai_2
         message: !include ../tpl/speech/guest_greetings.yaml
         voice: "{{ states('input_select.jarvis_voice') }}"
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

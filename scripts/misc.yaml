@@ -43,26 +43,41 @@
 
 #########################################################
 #                                                                                                              
-#            Earthquake One Day Count                                                  
+#            Earthquake Daily Count                                                  
 #                                                                                                              
 #########################################################
 
-  update_earthquake_one_day_count:
+  update_earthquake_daily_count:
     sequence:
       - service: mqtt.publish
         data:
-          topic: house/earthquake/one_day_count
-          payload_template: "{{ states.sensor.earthquake_one_day_count.state | int + 1 }}"
+          topic: house/earthquake/daily_count
+          payload_template: "{{ states.sensor.earthquake_daily_count.state | int + 1 }}"
           retain: true
-          
-          
-  reset_earthquake_one_day_count:
+
+  reset_earthquake_daily_count:
     sequence:
       - service: mqtt.publish
         data:
-          topic: house/earthquake/one_day_count
+          topic: house/earthquake/daily_count
           payload_template: 0
           retain: true
+
+  seismom5p_reset:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/seismom5P/command
+          payload: '{"reset": true}'
+
+  seismom5_reset:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/seismom5/command
+          payload: '{"reset": true}'
+
+
 
 #########################################################
 #                                                                                                              

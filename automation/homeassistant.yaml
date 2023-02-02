@@ -105,6 +105,7 @@
           name: Golden Week
           type: holiday
           date: '29/04/2022'
+#      - service: script.seismom5p_reset #remove if not needed. prevent from going unavailable
 
           
 #########################################################

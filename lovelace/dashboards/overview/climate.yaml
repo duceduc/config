@@ -136,41 +136,6 @@ cards:
       - entity_3: sensor.toilet_airfreshener_temperature
       - name_3: Room Temperature
 
-  # Hide when turned off
-  - type: entities
-    title: Humidifier
-    show_header_toggle: false
-    footer:
-      type: graph
-      entity: sensor.sb_humidifier_temperature
-      detail: 2
-    entities:
-      - entity: sensor.sb_humidifier_nebulization_efficiency
-        name: Humidifier Efficiency
-        icon: mdi:molecule
-      - entity: sensor.sb_humidifier_humidity
-        name: Humidifier Humidity
-        icon: mdi:water-percent
-      - type: divider
-      - entity: sensor.sb_humidifier_temperature
-        name: Humidifier Temperature
-        icon: mdi:thermometer-lines
-    style: |
-      ha-card {
-        {% if is_state('switch.sb_humidifier','off') %}
-           display:none !important;
-        {% endif %}
-      }
-
-
-
-
-
-
-
-
-
-
 
 
 ####################################################

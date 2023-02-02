@@ -3,67 +3,82 @@
 #                     ESPresense                                                
 #                                                                                                    
 ####################################################
-# apple tv shares same id as iphone8, iphone 6+, iphone 6
+#apple:1007:11-12 apple:iphone10-1 apple:1005:9 apple:1005:9-24 apple:1006:10-12 apple:1005:9-26 apple:iphone7-1 apple:iphone7-2 tile:ed5cc31a97c6 exp:20
+
+# id iphone - irk:b3cbe1bc5e6db13e19bd326d60072d77
+# ie iphone - irk:fde3aef775146c642f726e1494431aa8
 
 # Duc
   - platform: mqtt_room
     name: 'Duc ESPresense'
-    device_id: 'apple:1007:11-12' # ID e929fe00d0bf
-    state_topic: 'espresense/devices/apple:1007:11-12'
-#    device_id: 'apple:iphone10-3'
-#    state_topic: 'espresense/devices/apple:iphone10-3'
-    timeout: 60 #30
-    away_timeout: 120 #120
+    device_id: 'irk:b3cbe1bc5e6db13e19bd326d60072d77'
+    state_topic: 'espresense/devices/irk:b3cbe1bc5e6db13e19bd326d60072d77'
+    timeout: 5
+    away_timeout: 45
 
   - platform: mqtt_room
     name: 'Duc iWatch ESPresense'
     device_id: 'apple:1005:9-24'
     state_topic: 'espresense/devices/apple:1005:9-24'
-#    device_id: 'apple:watch3-3'
-#    state_topic: 'espresense/devices/apple:watch3-3'    
-    timeout: 60
-    away_timeout: 120
+    timeout: 5
+    away_timeout: 60
 
 # Eri
   - platform: mqtt_room
-    name: 'Eri ESPresense 101'
-    device_id: 'apple:iphone10-1' # exp:20
-    state_topic: 'espresense/devices/apple:iphone10-1'
-    timeout: 60
-    away_timeout: 120
-# Eri Not Reliable node
+    name: 'Eri ESPresense'
+    device_id: 'irk:fde3aef775146c642f726e1494431aa8'
+    state_topic: 'espresense/devices/irk:fde3aef775146c642f726e1494431aa8'
+    timeout: 5
+    away_timeout: 60
+
   - platform: mqtt_room
-    name: 'Eri ESPresense 1006'
-    device_id: 'apple:1006:10-12' 
-    state_topic: 'espresense/devices/apple:1006:10-12'
-    timeout: 60
-    away_timeout: 120
+    name: 'Eri iWatch ESPresense'
+    device_id: 'apple:1005:9-26'
+    state_topic: 'espresense/devices/apple:1005:9-26'
+    timeout: 5
+    away_timeout: 60
+
+#  DELETE 3 BELOW
+#  - platform: mqtt_room
+#    name: 'Eri ESPresense 101'
+#    device_id: 'apple:iphone10-1'
+#    state_topic: 'espresense/devices/apple:iphone10-1'
+#    timeout: 5
+#    away_timeout: 60
 # Eri Not Reliable node
-  - platform: mqtt_room
-    name: 'Eri ESPresense Exp20'
-    device_id: 'exp:20' 
-    state_topic: 'espresense/devices/exp:20'
-    timeout: 60
-    away_timeout: 120
+#  - platform: mqtt_room
+#    name: 'Eri ESPresense 1006'
+#    device_id: 'apple:1006:10-12' 
+#    state_topic: 'espresense/devices/apple:1006:10-12'
+#    timeout: 5
+#    away_timeout: 60
+# Eri Not Reliable node
+#  - platform: mqtt_room
+#    name: 'Eri ESPresense Exp20'
+#    device_id: 'exp:20' 
+#    state_topic: 'espresense/devices/exp:20'
+#    timeout: 5
+#    away_timeout: 60
 
 #          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
 #            {{ states("sensor.eri_espresense_101") }}
-  - platform: template
-    sensors:
-      eri_espresense:
-        friendly_name: Eri ESPresense
-        value_template: >-      
-          {% if states("sensor.eri_espresense_1006") != "not_home" and states("sensor.eri_espresense_101") == "not_home" %}
-            {{ states("sensor.eri_espresense_1006") }}
-          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
-            {{ states("sensor.eri_espresense_101") }}            
-          {% elif states("sensor.eri_espresense_exp20") != "not_home" %}
-            {{ states("sensor.eri_espresense_exp20") }}                
-          {% elif states("sensor.eri_espresense_1006") == "not_home"  and states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_exp20") == "not_home" %} 
-            not_home
-          {% else %}
-            unknown          
-          {% endif %}
+#  - platform: template
+#    sensors:
+#      eri_espresense:
+#        friendly_name: Eri ESPresense
+#        value_template: >-      
+#          {% if states("sensor.eri_espresense_1006") != "not_home" and states("sensor.eri_espresense_101") == "not_home" %}
+#            {{ states("sensor.eri_espresense_1006") }}
+#          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+#            {{ states("sensor.eri_espresense_101") }}            
+#          {% elif states("sensor.eri_espresense_exp20") != "not_home" %}
+#            {{ states("sensor.eri_espresense_exp20") }}                
+#          {% elif states("sensor.eri_espresense_1006") == "not_home"  and states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_exp20") == "not_home" %} 
+#            not_home
+#          {% else %}
+#            unknown          
+#          {% endif %}
+
 
 
 #          {% if states("sensor.eri_espresense_101") != "not_home" %}
@@ -77,25 +92,13 @@
 #          {% endif %}
 
 
-
-
-
-  - platform: mqtt_room
-    name: 'Eri iWatch ESPresense'
-    device_id: 'apple:1005:9-26'
-    state_topic: 'espresense/devices/apple:1005:9-26'    
-#    device_id: 'apple:watch5-9'
-#    state_topic: 'espresense/devices/apple:watch5-9'
-    timeout: 60
-    away_timeout: 120
-
 # Shion Tile
   - platform: mqtt_room
     name: 'Shion tms ESPresense'
     device_id: 'tile:ed5cc31a97c6'
     state_topic: 'espresense/devices/tile:ed5cc31a97c6'
-    timeout: 60
-    away_timeout: 120
+    timeout: 5
+    away_timeout: 60
 
 # Shion ISP
   - platform: mqtt_room
@@ -104,17 +107,15 @@
 #    state_topic: 'espresense/devices/apple:1005:9'
     device_id: 'apple:iphone7-1'
     state_topic: 'espresense/devices/apple:iphone7-1'
-    timeout: 60
-    away_timeout: 120
+    timeout: 5
+    away_timeout: 60
 
   - platform: mqtt_room
     name: 'Shion is ESPresense'
     device_id: 'apple:iphone7-2' # apple:1005:9-12
     state_topic: 'espresense/devices/apple:iphone7-2'
-    timeout: 60
-    away_timeout: 120
-
-
+    timeout: 5
+    away_timeout: 60
 
 
 ####################################################

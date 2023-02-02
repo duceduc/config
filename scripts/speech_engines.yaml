@@ -150,6 +150,13 @@
 #                                                                                                              
 #########################################################
 
+  morning_wakeup_report:
+    sequence:
+      - service: script.alexa_alert
+        data: 
+          who: ai_4
+          message: !include ../tpl/speech/morning_wakeup_report.yaml
+          voice: "{{ states('input_select.jarvis_voice') }}"
 
   morning_briefing:
     sequence:
@@ -157,14 +164,6 @@
         data: 
           who: ai_4
           message: !include ../tpl/speech/morning_briefing.yaml
-          voice: "{{ states('input_select.jarvis_voice') }}"
-
-  morning_wakeup_report:
-    sequence:
-      - service: script.alexa_alert
-        data: 
-          who: ai_4
-          message: !include ../tpl/speech/morning_wakeup_report.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
 
   daily_briefing:
@@ -186,7 +185,6 @@
         data_template:
           who: duc
           message: "Sun is almost down. Time to call it a day."
-
 
   nightly_briefing:
     sequence:

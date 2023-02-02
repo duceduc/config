@@ -63,7 +63,7 @@ cards:
           - entity: sensor.rainfall_today
             icon: mdi:weather-pouring
             name: Rain today        
-          - entity: sensor.earthquake_one_day_count
+          - entity: sensor.earthquake_daily_count
             icon: mdi:home-flood
             name: Daily Earthquakes
 

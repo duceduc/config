@@ -74,6 +74,8 @@ cards:
                   - input_number.wakeup_hour
                   - input_number.wakeup_minutes
                   - input_number.wakeup_duration
+                  - input_number.brightness_start
+                  - input_number.brightness_end
                   - input_boolean.wakeup
                   - input_boolean.wakeup_weekends
                   - input_select.wakeup_select
@@ -91,39 +93,11 @@ cards:
           - entity: input_select.exercise_select
             icon: mdi:bed-empty
 
-
-
-      - type: entities
-        title: TV and Stereo Controls
-        show_header_toggle: false
-        footer:
-          type: buttons
-          entities:
-            - entity: script.tv_volume_down
-              icon: mdi:volume-minus
-            - entity: script.appletv_netflix
-              icon: si:netflix
-            - entity: switch.tv_mute
-              icon: mdi:volume-mute
-            - entity: script.tv_volume_up
-              icon: mdi:volume-plus
-        entities:
-          - type: section
-            label: Living Room
-          - entity: media_player.living_room
-            icon: mdi:cast-variant
-            name: Apple Tv
-          - type: section
-            label: Basement
-          - entity: switch.tv_power
-            name: TV
-            icon: mdi:television-shimmer
-          - type: section
-            label: Jarvis Voice        
-          - entity: input_select.jarvis_voice
-            name: Select a Voice
-            icon: si:amazonalexa
-
+# Media Player
+      - type: vertical-stack
+        cards:
+        - !include /config/lovelace/tpl/media_interface.yaml
+      
       - type: vertical-stack
         cards:
           - type: custom:stack-in-card
@@ -210,6 +184,43 @@ cards:
                 entity: light.cabinet
                 name: Cabinent 
                 icon: mdi:lightbulb-outline
+
+
+# TV and Stereo
+      - type: entities
+        title: TV and Stereo Controls
+        show_header_toggle: false
+        footer:
+          type: buttons
+          entities:
+            - entity: script.tv_volume_down
+              icon: mdi:volume-minus
+            - entity: script.appletv_netflix
+              icon: si:netflix
+            - entity: switch.tv_mute
+              icon: mdi:volume-mute
+            - entity: script.tv_volume_up
+              icon: mdi:volume-plus
+        entities:
+          - type: section
+            label: Living Room
+          - entity: media_player.living_room
+            icon: mdi:cast-variant
+            name: Apple Tv
+          - type: section
+            label: Basement
+          - entity: switch.tv_power
+            name: TV
+            icon: mdi:television-shimmer
+          - type: section
+            label: Jarvis Voice        
+          - entity: input_select.jarvis_voice
+            name: Select a Voice
+            icon: si:amazonalexa
+
+
+
+
 
 ####################################################
 #                                                                                                    

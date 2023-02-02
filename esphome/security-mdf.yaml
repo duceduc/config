@@ -12,26 +12,24 @@ esphome:
 wifi:
   ssid: !secret ssid1
   password: !secret ssid_pass
-#  fast_connect : true
-#  power_save_mode: none
-#  reboot_timeout: 0s
-#  manual_ip:
-#    static_ip: 192.168.1.94
-#    subnet: 255.255.255.0
-#    gateway: 192.168.1.1
+  fast_connect : true
+  power_save_mode: none
+  reboot_timeout: 0s
+  manual_ip:
+    static_ip: 192.168.1.94
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
 
 captive_portal:
 logger:
 
 api:
-  password: !secret ota_pass
+  encryption:
+    key: !secret esphome_apikey
+
 ota:
   password: !secret ota_pass
 
-i2c:
-  sda: GPIO1
-  scl: GPIO3
-  scan: true
 
 esp32_camera:
   name: $name
@@ -54,16 +52,6 @@ esp32_camera:
   contrast: 2
   saturation: 2
 
-output:
-  - platform: gpio
-    pin: GPIO3
-    id: gpio_3
-    
-light:
-  - platform: binary
-    name: $name light  
-    output: gpio_3
-
 sensor:
   - platform: wifi_signal
     name: '$name WiFi Signal'
@@ -74,16 +62,14 @@ sensor:
           send_every: 15
           send_first_at: 1
 
-  - platform: bme280
+  - platform: dht
+    model: AM2302
+    update_interval: 15s    
+    pin: GPIO3
     temperature:
       name: "mdf Temperature"
-      oversampling: 16x
-    pressure:
-      name: "mdf Pressure"
     humidity:
       name: "mdf Humidity"
-    address: 0x76
-    update_interval: 20s
 
 binary_sensor:
   - platform: status

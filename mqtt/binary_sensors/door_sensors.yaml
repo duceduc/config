@@ -7,10 +7,10 @@
 ## http://archive.shelly-tools.de/ ##
 
 # Battery seems to last for 1 year. status of battery inaccurate
-# genkan door sensor [D8BFC01A8C6A] - 192.168.1.82 [batt installed on 6/29/2022]
+# genkan door sensor [D8BFC01A8C6A] - 192.168.1.82 [batt installed on 1/10/2023]
 # hallway door sensor [D8BFC01A8C33] - 192.168.1.83 [batt installed on 3/3/2022. died 6 months first doc]
-# shion door sensor [483FDA81F69D] - 192.168.1.92  [batt installed on 3/3/2022]
-# master door sensor [483FDA81F97F] - 192.168.1.93
+# shion door sensor [483FDA81F69D] - 192.168.1.92  [batt installed on 11/8/2022]
+# master door sensor [483FDA81F97F] - 192.168.1.93 
 # shellyem sensor [8CAAB506209A] - 192.168.1.87
 # smart plug sensor [FCF5C4AAF6E1] - 192.168.1.91
 

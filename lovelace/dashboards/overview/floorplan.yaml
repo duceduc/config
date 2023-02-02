@@ -81,6 +81,47 @@ cards:
               color: transparent
               opacity: var(--shion-state-opacity)
 
+      # Presence GK
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'genkan'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 45%
+              left: 24%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'genkan'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 45%
+              left: 21%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'genkan'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 45%
+              left: 18%
+              width: 2.5%
+
       # Presence MR
       - type: conditional
         conditions:

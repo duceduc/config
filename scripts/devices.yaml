@@ -158,10 +158,10 @@
   enable_dev2:
     sequence:
       - condition: template
-        value_template: "{{ is_state('switch.is_internet', 'on') or is_state('switch.isp_internet', 'on') }}"
+        value_template: "{{ is_state('switch.is_internet', 'on') or is_state('switch.laptop_internet', 'on') }}"
       - service: switch.turn_off
         data:
-          entity_id: switch.is_internet, switch.isp_internet, switch.switch_internet
+          entity_id: switch.is_internet, switch.laptop_internet, switch.switch_internet
 
 
 

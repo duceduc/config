@@ -1,4 +1,6 @@
-# ESP8266 Uno... 8C-AA-B5-79-83-92 
+# ESP8266 Uno... 8C-AA-B5-79-83-92
+# Change ip via ota
+# https://community.home-assistant.io/t/can-i-change-ip-address-over-the-air/168870/6
 substitutions:
   name: aio-wemos
   platform: ESP8266
@@ -10,22 +12,33 @@ esphome:
   name: $name
   platform: $platform
   board: $board
+  libraries:
+   - ESP8266WiFi
+   - https://github.com/akaJes/AsyncPing#95ac7e4
+
+external_components:
+  - source:
+      type: local
+      path: components/esphome-component-ping/components
 
 wifi:
-  ssid: !secret ssid1
+  ssid: !secret ssid2
   password: !secret ssid_pass
-  fast_connect : true
   power_save_mode: none
+  reboot_timeout: 0s
+  fast_connect : true
   manual_ip:
-    static_ip: 192.168.1.95
+    static_ip: 192.168.1.96
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-  
+
 captive_portal:
 logger:
 
 api:
-  password: !secret ota_pass
+  encryption:
+    key: !secret esphome_apikey
+
 ota:
   password: !secret ota_pass
 
@@ -38,7 +51,7 @@ sensor:
       name: '$mr temperature'
     humidity:
       name: '$mr humidity'
-    update_interval: 20s
+    update_interval: 15s
 
   - platform: dht
     model: AM2302
@@ -47,7 +60,7 @@ sensor:
       name: '$oa temperature'
     humidity:
       name: '$oa humidity'
-    update_interval: 25s
+    update_interval: 15s
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -63,6 +76,18 @@ sensor:
     name: 'front illuminance'
     unit_of_measurement: lux
     update_interval: 5s
+
+  - platform: ping
+    ip_address: 8.8.8.8
+    num_attempts: 17
+    timeout: 1sec
+    loss:
+      name: $name Packet loss
+    latency:
+      name: $name Latency
+      accuracy_decimals: 3 # this should be 3 as the value is float, unit is sec, and the raw
+    update_interval: 30s
+
 
 binary_sensor:
   - platform: status
@@ -85,4 +110,3 @@ switch:
     name: "$name Restart"
     icon: mdi:restart
 
-    

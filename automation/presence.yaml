@@ -11,11 +11,11 @@
       entity_id: sensor.id_presence
       above: 10
     - platform: template
-      value_template: "{{ states('sensor.duc_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom'] }}"
+      value_template: "{{ states('sensor.duc_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
       
-  condition:
-    - condition: template
-      value_template: "{{ states('sensor.duc_espresense') != 'not_home' }}"
+#  condition:
+#    - condition: template
+#      value_template: "{{ states('sensor.duc_espresense') != 'not_home' }}"
       
   action:
     - service: input_boolean.turn_on
@@ -50,11 +50,11 @@
       entity_id: sensor.ie_presence
       above: 10
     - platform: template
-      value_template: "{{ states('sensor.eri_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom'] }}"
+      value_template: "{{ states('sensor.eri_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
       
-  condition:
-    - condition: template
-      value_template: "{{ states('sensor.eri_espresense') != 'not_home' }}"
+#  condition:
+#    - condition: template
+#      value_template: "{{ states('sensor.eri_espresense') != 'not_home' }}"
 
   action:
     - service: input_boolean.turn_on
@@ -88,7 +88,7 @@
       entity_id: sensor.tms_presence
       above: 10
     - platform: template
-      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom'] }}"
+      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
   condition:
     - condition: template
       value_template: "{{ states('sensor.shion_tms_espresense') != 'not_home' }}"            
@@ -219,7 +219,6 @@
       data_template:
         topic: monitor/scan/arrive
 
-
 - alias: Presence Scan Departure
   trigger:
     - platform: state
@@ -227,7 +226,7 @@
       to: 'on'
   condition:
     - condition: template
-      value_template: "{{ is_state('switch.momentary_presence_monitor', 'on') }}"
+      value_template: "{{ is_state('switch.momentary_presence_monitor', 'on') }}" # on for 30sec
   action:  
     - delay: '00:01:25'
     - service: script.monitor_depart
@@ -292,7 +291,7 @@
     - platform: numeric_state
       entity_id: sensor.n_people_home
       below: 1
-      for: 60
+      for: 5
   condition:
     - condition: template
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
@@ -366,7 +365,6 @@
       entity_id: input_boolean.shion_presence
   action:
     - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
-
 
 - alias: Set Location Waze
   trigger:

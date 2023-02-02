@@ -218,6 +218,10 @@ cards:
           - entity_3: sensor.ds1_cpu_usage
           - entity_4: sensor.ds1_temperature
 
+
+
+
+
       # Hide if PC is off
       - type: entities
         title: desktop
@@ -240,12 +244,6 @@ cards:
           - entity: sensor.desktop_fddl8i4_cpu_temperature
             name: CPU Temperature
             icon: mdi:thermometer
-        style: |
-          ha-card {
-            {% if is_state('binary_sensor.desktop_status','off') %}
-               display:none !important;
-            {% endif %}
-          }
 
 
     ###################
@@ -267,8 +265,8 @@ cards:
           - entity: sensor.processor_use
             name: Processor Use
             icon: mdi:memory
-          - entity: sensor.recorder_db
-            name: MariaDB Use
+          - entity: sensor.home_assistant_v2_db_size_gb
+            name: SQLite Use
             icon: mdi:database
     #      - entity: sensor.network_throughput_in_eth0
     #        name: Network Throughput IN

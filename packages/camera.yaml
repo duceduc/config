@@ -39,9 +39,10 @@ automation:
     mode: queued
     max_exceeded: silent
     trigger:
-      - platform: numeric_state
-        entity_id: sensor.mdf_illuminance
-        below: 0.55
+      - platform: state
+        entity_id: binary_sensor.espresense_genkan_motion
+        from: 'off'
+        to: 'on'
     condition:
       - condition: state
         entity_id: input_boolean.security_cameras
@@ -71,7 +72,18 @@ automation:
       - service: camera.snapshot
         data:
           entity_id: camera.security_balcony
+          filename: '/config/www/img/security/balcony/security_balcony_camera_last.jpg'
+      - delay: 1         
+      - service: camera.snapshot
+        data:
+          entity_id: camera.security_balcony
           filename: '/config/www/img/security/balcony/{{ now().strftime("%Y%m%d_%H%M%S") }}security_balcony_camera.jpg'
+
+#      - service: telegram_bot.send_photo
+#        data:
+#          file: '/config/www/img/security/balcony/security_balcony_camera_last.jpg'
+#          caption: Balcony motion detected
+
       - service: shell_command.clean_balcony_images
 
 

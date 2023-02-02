@@ -125,12 +125,12 @@
 
       <p>
         As of {{ states('sensor.time') }},
-          {%- if is_state('sensor.earthquake_one_day_count', '0') %}
+          {%- if is_state('sensor.earthquake_daily_count', '0') %}
             There was no earthquakes reported in Japan.
-          {%- elif is_state('sensor.earthquake_one_day_count', '1') %}
-            There was {{ states('sensor.earthquake_one_day_count') | int(0) }} earthquake reported in Japan.
-          {% else %}          
-            There were {{ states('sensor.earthquake_one_day_count') | int(0) }} earthquakes reported in Japan.
+          {%- elif is_state('sensor.earthquake_daily_count', '1') %}
+            There was {{ states('sensor.earthquake_daily_count') | int(0) }} earthquake reported in Japan.
+          {% else %}
+            There were {{ states('sensor.earthquake_daily_count') | int(0) }} earthquakes reported in Japan.
           {% endif %}
       </p>
 

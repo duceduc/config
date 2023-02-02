@@ -36,7 +36,9 @@ captive_portal:
 logger:
 
 api:
-  password: !secret ota_pass
+  encryption:
+    key: !secret esphome_apikey
+
 ota:
   password: !secret ota_pass
 
@@ -51,9 +53,7 @@ sensor:
           send_first_at: 1
 
   - platform: ping
-    # IP address of the target
     ip_address: 8.8.8.8
-    # number of packets to send
     num_attempts: 17
     # the timeout. however, this is not what you usually expect from `ping`
     # implementation: the timeout is also the interval to send packets. if you
@@ -61,17 +61,11 @@ sensor:
     # the component sends a packet at 10 sec interval, and the total time to
     # finish would be 10 sec * num_attempts = 10 * 17 = 170 sec.
     timeout: 1sec
-
     loss:
       name: $name Packet loss
-
     latency:
       name: $name Latency
-      # this should be 3 as the value is float, unit is sec, and the raw
-      # values are in ms.
-      accuracy_decimals: 3
-
-    # the interval for checking the sensors. defaults to 60s.
+      accuracy_decimals: 3 # this should be 3 as the value is float, unit is sec, and the raw
     update_interval: 30s
 
 binary_sensor:

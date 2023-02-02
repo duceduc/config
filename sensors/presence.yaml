@@ -265,9 +265,9 @@
     round_digits: 0
     entity_ids:
       - sensor.id_genkan
-#      - sensor.id_livingroom
       - sensor.id_shionroom
       - sensor.id_masterroom
+      - sensor.id_livingroom
 
   - platform: min_max
     name: 'iE Presence'
@@ -275,9 +275,9 @@
     round_digits: 0
     entity_ids:
       - sensor.ie_genkan
-#      - sensor.ie_livingroom
       - sensor.ie_shionroom
       - sensor.ie_masterroom
+      - sensor.ie_livingroom
 
   - platform: min_max
     name: 'iS Presence'

@@ -31,7 +31,7 @@ sensor:
             {% else %}
               Toasty
             {%- endif %}
-          {% elif states('sensor.wbio_daytime_temperature')|int(0) < 17 %}
+          {% elif states('sensor.wbio_daytime_temperature')|int(0) <= 17 %}
             {%- if states('sensor.wbio_daytime_temperature')|int(0) < 0 %}
               Freezing
             {% elif states('sensor.wbio_daytime_temperature')|int(0) > 10 %}
@@ -256,8 +256,6 @@ template:
           Today + 2: "{{ state_attr('sensor.pollen_tree_index_day_2', 'weedIndex') }}"
           Today + 3: "{{ state_attr('sensor.pollen_tree_index_day_3', 'weedIndex') }}"
           Today + 4: "{{ state_attr('sensor.pollen_tree_index_day_4', 'weedIndex') }}"
-
-
 
 
 # Rain Guage

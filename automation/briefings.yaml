@@ -72,7 +72,7 @@
 - alias: 'Morning Wakeup Report'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_computerroom_occupancy
+      entity_id: binary_sensor.cr_has_moving_target
       to: 'on'
   condition:
     - condition: time
@@ -80,6 +80,8 @@
       before: '06:00:00'
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Don't play if eri present
+      value_template: "{{ not is_state('sensor.eri_espresense', 'livingroom') }}"      
     - condition: state
       entity_id: input_boolean.morning_wakeup_report
       state: 'off'
@@ -98,7 +100,7 @@
 - alias: 'Morning Report'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_computerroom_occupancy
+      entity_id: binary_sensor.cr_has_moving_target
       to: 'on'
   condition:
     - condition: time
@@ -124,7 +126,7 @@
 - alias: 'Daily Report'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_computerroom_occupancy
+      entity_id: binary_sensor.cr_has_moving_target
       to: 'on'
   condition:
     - condition: time
@@ -192,7 +194,6 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
     - service: script.event_briefing
-
 
 
 #########################################################

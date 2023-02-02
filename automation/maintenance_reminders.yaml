@@ -26,7 +26,7 @@
 #                                                                                                              #
 #########################################################
 
-
+# sensors located at sensors/wakeup.yaml
 - alias: 'wakeup light bedroom'
   trigger:
     platform: template
@@ -45,7 +45,14 @@
         - condition: template # Is weekday
           value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
   action:
-    service: script.wakeup_bedroom
+    - service: python_script.smooth_fader
+      data:
+        entity_id: "{{ states('sensor.wakeup_map') }}" 
+        duration: "00:{{ states('input_number.wakeup_duration')|int }}:00"
+        brightness_start: "{{ states('input_number.brightness_start')|int }}"
+        brightness_end: "{{ states('input_number.brightness_end')|int }}"
+        brightness_curve: exp5
+        temperature_curve: exp5
 
 
 #########################################################
@@ -80,7 +87,7 @@
       entity_id: input_boolean.morning_wakeup_report
     - service: input_boolean.turn_off
       entity_id: input_boolean.daily_report
-    - service: script.reset_earthquake_one_day_count
+    - service: script.reset_earthquake_daily_count
     - service: script.enable_devices
     - service: input_boolean.turn_off
       entity_id: input_boolean.jcom_tv

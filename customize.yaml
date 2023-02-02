@@ -4,7 +4,9 @@ sensor.hacs:
 
 sensor.last_alexa:
   icon: si:amazonalexa
-  
+sensor.home_assistant_v2_db_size_gb:
+  icon: mdi:database  
+
 sensor.lr_condensation_chance:
   friendly_name: Living Room Condensation
   icon: mdi:weather-rainy

@@ -19,9 +19,9 @@
   condition:
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
-    - condition: template # mcl is off
-      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"      
-      
+#    - condition: template # mcl is off
+#      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"      
+
   action:
   - service: python_script.room_occupancy
     data:
@@ -29,8 +29,9 @@
       entities_toggle: # entities that can mark a room as occupied
       - binary_sensor.motion_sr_occupancy
       entities_keep: # entities that can keep a room occupied
-      - binary_sensor.middle
-#      - sensor.eri_espresense
+       - input_boolean.shionroom_mcl
+       - binary_sensor.middle
+#       - sensor.eri_espresense
       timeout: 2 # timeout of the room, timer gets set to this
 
 - alias: Shionroom Light
@@ -71,7 +72,7 @@
         target:
           entity_id: light.shion
         data:
-          brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.50 %} 250 {% else %} 160 {% endif %}'          
+          brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.78 %} 255 {% else %} 160 {% endif %}'          
     - conditions:
       - condition: trigger
         id: 'off'
@@ -83,9 +84,6 @@
         target:
           entity_id: timer.shionroom_timer
     default: []
-
-
-
 
 ##############################
 - alias: 'motion shion room auto-on'

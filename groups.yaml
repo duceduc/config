@@ -105,12 +105,25 @@
   motion_kitchen_occupancy:
     name: Motion Kitchen Occupancy
     entities:
-      - binary_sensor.motion_kitchen_occupancy
-      - binary_sensor.motion_cabinet_occupancy
+     - binary_sensor.motion_kitchen_occupancy
+     - binary_sensor.cabinet_has_moving_target
+
+
+  motion_showerroom_occupancy:
+    name: Motion Shower Room Occupancy
+    entities:
+     - binary_sensor.motion_washroom_sensor_occupancy
+     - binary_sensor.motion_sink_occupancy
+
 
   hallway_motion:
     - binary_sensor.motion_hallway_occupancy
     - binary_sensor.motion_g1_occupancy   
+
+  motion_genkan_occupancy:
+    - binary_sensor.espresense_genkan_motion
+    - binary_sensor.motion_g1_occupancy
+
 
   occupancy:
     - binary_sensor.motion_kitchen_occupancy
@@ -118,7 +131,7 @@
     - binary_sensor.motion_mr_occupancy
     - binary_sensor.motion_sr_occupancy
     - binary_sensor.motion_hallway_occupancy
-    - binary_sensor.motion_computerroom_occupancy
+    - binary_sensor.cr_has_moving_target
 
   home_alarm_motion_sensors:
     name: Home Alarm Motion Sensors

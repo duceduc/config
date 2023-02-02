@@ -35,7 +35,7 @@
       - switch.ac_mr_unit
       - switch.ac_sr_unit
       - sensor.oa_temperature
-      - sensor.lr_temperature
+      - sensor.livingroom_temperature
       - group.bed_sensors #5
       - sensor.oa_humidity
       - sensor.livingroom_humidity
@@ -66,8 +66,8 @@
       - The (e02f) is turned (e02s)
       - The current outside temperature is (e03$) degrees and the humidity is (e06$) percent # Outside Temp
       - The current livingroom temperature is (e04S) and the humidity is (e07S) # Livingroom Temp
-      - The current (e10f) is (e10$) degrees and the humidity is (e11$) # Master Room Temp
-      - The current (e12f) is (e12$) degrees the humidity is (e13$) percent # Hallway Temp
+      - The current master room temperature is (e10$) degrees and the humidity is (e11$) # Master Room Temp
+      - The current hallway temperature is (e12$) degrees the humidity is (e13$) percent # Hallway Temp
       - The current she on room temperature is (e08$) degrees and the humidity is (e09$) percent # Shion Room Temp
       - The current (e14f) is (e14$) degrees and the humidity is (e15$) percent # MDF Temp
       - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です

@@ -11,6 +11,7 @@
 # 24h fan battery replaced on 8/15/2022
 # jcom tv battery replaced on 8/20/2022
 # meter battery repalced on 10/3/2022
+# floor heater battery repalced on 11/23/2022
 
 input_boolean:
   sb_humidifier:
@@ -93,9 +94,7 @@ binary_sensor:
         friendly_name: "Jcom Tv"
         device_class: power
         value_template: >-
-          {% if states('sensor.gosund_tv_power')| int(0) < 145 %}off{% else %}on{% endif %}
-#          {% if states('sensor.gosund_tv_amperage')| float(0) < 0.7 %}off{% else %}on{% endif %}
-# use < 140 for power for fulucation
+          {% if states('sensor.gosund_tv_power')| int(0) < 99 %}off{% else %}on{% endif %}
 
 mqtt:
   sensor:
@@ -577,6 +576,8 @@ automation:
         value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
       - condition: template # Not in Vacation
         value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+      - condition: template # don't run if eri is front area
+        value_template: "{{ not states('sensor.eri_espresense').lower() in ['kitchen', 'livingroom'] }}"        
     action:
       - service: cover.set_cover_position
         data:

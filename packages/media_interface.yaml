@@ -11,24 +11,25 @@
 # https://community.home-assistant.io/t/a-flexible-multi-player-multi-device-music-interface/379769
 # https://fluxradios.blogspot.com/
 
-input_select:
 
+
+input_select:
   audio_media_player_select:
     name: Choice of audio media
     options:
       - Plex
       - Spotify
       - Webradio
-    initial: Plex
+    initial: Spotify
     icon: mdi:music-box-multiple
 
   audio_media_device_select:
     name: Choice of speakers
     options:
-      - Cuisine
-      - Rez-de-chaussée
-      - Maison entière
-    initial: Cuisine
+      - Kitchen
+      - Computer
+      - Hallway
+    initial: Computer
     icon: mdi:cast-audio
     
   plex_playlist_select:
@@ -72,18 +73,79 @@ input_select:
     initial: London Radio
     icon: mdi:radio
 
+
+###################################################################################################
+# Spotify Statistic Usage
+###################################################################################################
+
+switch:
+  - platform: template
+    switches:
+      spotify_usage:
+        value_template: "{{ is_state('media_player.spotify_duc', 'playing')  }}"
+        turn_on:
+          service: switch.turn_on
+          target:
+            entity_id: switch.target
+        turn_off:
+          service: switch.turn_off
+          target:
+            entity_id: switch.target   
+
+sensor:
+  #Spotify Daily
+  - platform: history_stats
+    name: spotify_usage_daily
+    entity_id: switch.spotify_usage
+    state: "on"
+    type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+  - platform: template
+    sensors:
+      spotify_usage_daily_convert:
+        value_template: "{{ (states('sensor.spotify_usage_daily') | float * 3600)| timestamp_custom('%-H.%-M', false) }}"     
+  #Spotify Weekly
+  - platform: history_stats
+    name: spotify_usage_weekly
+    entity_id: switch.spotify_usage
+    state: "on"
+    type: time
+    start: "{{ as_timestamp( now().replace(hour=0, minute=0, second=0) ) - now().weekday() * 86400 }}"
+    end: "{{ now() }}"
+  - platform: template
+    sensors:
+      spotify_usage_weekly_convert:
+        value_template: "{{ (states('sensor.spotify_usage_weekly') | float * 3600)| timestamp_custom('%-H.%-M', false) }}"       
+  #Spotify Monthly
+  - platform: history_stats
+    name: spotify_usage_monthly
+    entity_id: switch.spotify_usage
+    state: "on"
+    type: time
+    start: "{{ now().replace(day=1).replace(hour=0).replace(minute=0).replace(second=0) }}"
+    end: "{{ now() }}"
+  - platform: template
+    sensors:
+      spotify_usage_monthy_convert:
+        value_template: "{{ (states('sensor.spotify_usage_monthly') | float * 3600)| timestamp_custom('%-H.%-M', false) }}"
+  - platform: template
+    sensors:
+      spotify_usage_monthy_convert_full:
+        value_template: "{{ (states('sensor.spotify_usage_monthly') | float * 3600)| timestamp_custom('%-H hours %-M minutes', false) }}"
+
+
+
 ###################################################################################################
 # Music Player - Selected Audio Transformation
 ###################################################################################################
 
 template:
-
   - sensor:
-
       - unique_id: "selected_plex_playlist_url" 
         icon: "mdi:music"
         state: >-
-          {% if is_state("input_select.plex_playlist_select", "All Music") %} plex://{ "library_name": "Musique", "playlist_name": "All Music", "shuffle":"1" }
+          {% if is_state("input_select.plex_playlist_select", "All Music") %} plex://{ "library_name": "MUSIC", "playlist_name": "All Music", "shuffle":"1" }
           {% elif is_state("input_select.plex_playlist_select", "Cinéma & Télévision") %} plex://{ "library_name": "Musique", "playlist_name": "Cinéma & Télévision", "shuffle":"1" }
           {% elif is_state("input_select.plex_playlist_select", "Dinner Classics") %} plex://{ "library_name": "Musique", "playlist_name": "Dinner Classics", "shuffle":"1" }
           {% elif is_state("input_select.plex_playlist_select", "Français") %} plex://{ "library_name": "Musique", "playlist_name": "Français", "shuffle":"1" }
@@ -168,18 +230,23 @@ template:
       - unique_id: "selected_audio_media_device" 
         icon: "mdi:cast-audio"
         state: >-
-          {% if is_state("input_select.audio_media_device_select", "Cuisine") %} media_player.ai_4
-          {% elif is_state("input_select.audio_media_device_select", "Rez-de-chaussée") %} media_player.ai_1
-          {% elif is_state("input_select.audio_media_device_select", "Maison entière") %} media_player.plex_plex_web_chrome_windows
+          {% if is_state("input_select.audio_media_device_select", "Kitchen") %} media_player.razer_leviathan_player
+          {% elif is_state("input_select.audio_media_device_select", "Computer") %} media_player.ai_4
+          {% elif is_state("input_select.audio_media_device_select", "Hallway") %} media_player.ai_2
           {% endif %}
         attributes:
           friendly_name: "Selected Speaker Group"
           filter_key: "Music_Player"
+          nameid: >-
+            {% if is_state("input_select.audio_media_device_select", "Kitchen") %} Ai.1
+            {% elif is_state("input_select.audio_media_device_select", "Computer") %} Ai.4
+            {% elif is_state("input_select.audio_media_device_select", "Hallway") %} Ai.2
+            {% endif %}  
           plexid: >-
-            {% if is_state("input_select.audio_media_device_select", "Cuisine") %} media_player.plex_chromecast_ai_4
-            {% elif is_state("input_select.audio_media_device_select", "Rez-de-chaussée") %} media_player.plex_chromecast_ai_1
-            {% elif is_state("input_select.audio_media_device_select", "Maison entière") %} media_player.plex_chromecast_plex_plex_web_chrome_windows
-            {% endif %}          
+            {% if is_state("input_select.audio_media_device_select", "Kitchen") %} media_player.plex_razer_leviathan_player
+            {% elif is_state("input_select.audio_media_device_select", "Computer") %} media_player.plex_ai_4
+            {% elif is_state("input_select.audio_media_device_select", "Hallway") %} media_player.plex_ai_2
+            {% endif %}
 
       - unique_id: "selected_audio_media_device_state" 
         icon: "mdi:cast-audio-variant"
@@ -217,12 +284,12 @@ template:
 
       - unique_id: "sound_volume_selected_audio_device"
         state: >-
-          {% if is_state("input_select.audio_media_device_select", "Cuisine") %}
+          {% if is_state("input_select.audio_media_device_select", "Kitchen") %}
+          {{ (state_attr('media_player.razer_leviathan_player', 'volume_level') | float *100) |int }}
+          {% elif is_state("input_select.audio_media_device_select", "Computer") %}
           {{ (state_attr('media_player.ai_4', 'volume_level') | float *100) |int }}
-          {% elif is_state("input_select.audio_media_device_select", "Rez-de-chaussée") %}
-          {{ (state_attr('media_player.ai_1', 'volume_level') | float *100) |int }}
-          {% elif is_state("input_select.audio_media_device_select", "Maison entière") %}
-          {{ (state_attr('media_player.plex_plex_web_chrome_windows', 'volume_level') | float *100) |int }}
+          {% elif is_state("input_select.audio_media_device_select", "Hallway") %}
+          {{ (state_attr('media_player.ai_2', 'volume_level') | float *100) |int }}
           {% endif %}
         icon: >-
           {% if states("sensor.template_sound_volume_selected_audio_device")|float(0) >37 %} mdi:volume-high
@@ -266,9 +333,7 @@ template:
 # Music Player - Scripts
 ###################################################################################################    
 script:
-
 # Music Player - Scripts dynamiques
-
     music_control_play_music:
       alias: Dynamic Music - Play Music
       sequence:
@@ -278,14 +343,19 @@ script:
             entity_id: input_select.audio_media_player_select
             state: Spotify
           sequence:
-          - service: spotcast.start
-            data:
-              random_song: true
-              shuffle: true
-              entity_id: >-
-                {{ states("sensor.template_selected_audio_media_device")}}
-              uri: '{{ (states(''sensor.template_selected_spotify_playlist_uri'')) }}'
-#              account: quizmaster # uncomment for multiple accounts
+            - service: media_player.select_source
+              data:
+                entity_id: media_player.spotify_duc
+                source: '{{ state_attr("sensor.template_selected_audio_media_device", "nameid") }}'
+            - service: media_player.shuffle_set
+              data:
+                shuffle: true
+                entity_id: media_player.spotify_duc
+            - service: media_player.play_media
+              data:
+                entity_id: media_player.spotify_duc
+                media_content_type: '{{ states("sensor.template_selected_audio_media_type")}}'
+                media_content_id: '{{ (states(''sensor.template_selected_spotify_playlist_uri'')) }}'
         default:
         - service: media_player.play_media
           data:
@@ -361,3 +431,41 @@ script:
       mode: single
       icon: mdi:skip-next
       
+
+###################################################################################################
+# Razer Player
+###################################################################################################    
+
+    play_random_track:
+      alias: Play Random Music Track
+      sequence:
+        - service: media_player.play_media
+          data:
+            media_content_id: "{{ state_attr('sensor.music', 'file_list') | random | replace('media/','media/local/') }}"
+            media_content_type: audio/mp4        
+          target:
+            entity_id: media_player.razer_leviathan_player
+
+input_boolean:
+  continuous_play:
+    name: Continous Play
+    initial: off
+
+automation:
+  trigger:
+    - platform: state
+      entity_id: media_player.razer_leviathan_player
+      to: idle
+    - platform: state
+      entity_id: input_boolean.continuous_play
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.continuous_play
+              state: 'on'
+          sequence:
+            - service: script.play_random_track
+      default:
+        - service: media_player.media_stop
+          entity_id: media_player.razer_leviathan_player

@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#                      Devices                                                                 
-#                                                                                                    
+#
+#                      Devices
+#
 ####################################################
 
   - platform: history_stats
@@ -22,12 +22,10 @@
     duration:
       hours: 5
 
-
-
 ####################################################
-#                                                                                                    
-#                      Temperature                                                                 
-#                                                                                                    
+#
+#                      Temperature
+#
 ####################################################
 
 
@@ -38,25 +36,35 @@
     sampling_size: 500
 
   - platform: statistics
-    entity_id: sensor.sr_temperature
     name: "Shion Room Temp Sats"
+    entity_id: sensor.sr_temperature
     state_characteristic: mean
+    sampling_size: 20
+
   - platform: statistics
-    entity_id: sensor.mr_temperature
     name: "Master Room Temp Sats"
-    state_characteristic: mean  
+    entity_id: sensor.mr_temperature
+    state_characteristic: mean
+    sampling_size: 20
+
   - platform: statistics
-    entity_id: sensor.toilet_airfreshener_temperature
     name: "Toilet Room Temp Sats"
+    entity_id: sensor.toilet_airfreshener_temperature
     state_characteristic: mean
+    sampling_size: 20
+
   - platform: statistics
-    entity_id: sensor.lr_radar_temperature
     name: "Living Room Temp Sats"
+    entity_id: sensor.lr_radar_temperature
     state_characteristic: mean
+    sampling_size: 20
+
   - platform: statistics
-    entity_id: sensor.meter_temperature
     name: "Hallway Temp Sats"
+    entity_id: sensor.meter_temperature
     state_characteristic: mean
+    sampling_size: 20
+
   - platform: min_max
     name: Inside Temp Stats
     entity_ids:
@@ -67,7 +75,7 @@
     - sensor.meter_temperature
 
 ####################################################
-#                                                                                                    
-#            END OF CONFIGURATION FILE                                                 
-#                                                                                                    
+#
+#            END OF CONFIGURATION FILE
+#
 ####################################################

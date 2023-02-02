@@ -55,7 +55,6 @@
       - dns_names
       - issuer
 
-
 # long ver: {{ 90 - ((now() - states("sensor.vj_ssl_cert_issued")|as_datetime|as_local) / timedelta(days=1)) | round(0) }}
 # shorter ver old ways: {{ 90 - (now() - states("sensor.vj_ssl_cert_issued")|as_datetime|as_local).days }}
   - platform: template

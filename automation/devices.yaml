@@ -77,7 +77,7 @@
 - alias: 'Turn on desktop in morning'
   trigger:
     - platform: time
-      at: '04:55:00'
+      at: '04:25:00'
   condition:
     - condition: template # Vacation mode is not On
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"

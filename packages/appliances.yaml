@@ -31,9 +31,9 @@ input_select:
 timer:
   dish_cabinet:
     duration: '00:02:00'
-# washer load error
+# washer load filter checks
   washer_monitor:
-    duration: '00:38:00'
+    duration: '00:26:00'
 
 mqtt:
   sensor:
@@ -221,12 +221,12 @@ automation:
       - platform: numeric_state
         entity_id: sensor.gosund_washer_power
         below: 3
-        for: '00:00:33'
+        for: '00:00:35'
         id: 'done'
 
       - platform: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"
-        for: '00:00:20'         
+        for: '00:00:19'         
         id: 'filter'
         
     condition: []

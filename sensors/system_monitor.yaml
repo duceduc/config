@@ -6,10 +6,9 @@
 
   - platform: command_line
     name: HA CPU Temperature
-    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    command: "cat /sys/class/thermal/thermal_zone2/temp"
     unit_of_measurement: "°C"
     value_template: '{{ value | multiply(0.001) | round(1) }}'
-
 
 # HA Servers
   - platform: systemmonitor

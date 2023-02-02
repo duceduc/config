@@ -8,17 +8,24 @@
 - alias: 'motion washroom auto-on'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_washroom_sensor_occupancy 
+      entity_id: group.motion_showerroom_occupancy ##
       to: 'on'
+#  condition:
+#    - condition: template # Prevent sink false triggers. remove if not needed
+#      value_template: >-
+#        {%- set seconds = (now() - states.binary_sensor.motion_washroom_sensor_occupancy.last_changed).seconds -%}
+#        {{ seconds <= 180 }}
+
   action:
-#    - service: light.turn_on
-#      entity_id: light.wash
-    - service: script.tradfri_transition
-      data:
-        entity_id: light.wash
-        color_temp: 400
-        transition: 2
-        brightness: 254
+#    - service: script.tradfri_transition
+#      data:
+#        entity_id: light.wash
+#        color_temp: 400
+#        transition: 2
+#        brightness: 255
+#      entity_id: light.wash  
+  
+    - service: light.turn_on
       entity_id: light.wash
 
     - condition: template # Don't run if on
@@ -28,15 +35,14 @@
         entity_id: light.sink_cool
         color_temp: 153
         transition: 2
-        brightness: 254
+        brightness: 255
       entity_id: light.sink_cool
-      
     - service: script.tradfri_transition
       data:
         entity_id: light.w_4
         color_temp: 370
         transition: 2
-        brightness: 254
+        brightness: 255
       entity_id: light.w_4
 
 #    - service: light.turn_on
@@ -59,21 +65,20 @@
 - alias: 'motion washroom auto-off'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_washroom_sensor_occupancy
+      entity_id: group.motion_showerroom_occupancy ##
       to: 'off'
-      for: '00:01:05'
+      for: '00:00:40'
   action:
     - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
       entity_id: 
        - light.wash
-
 
 - alias: 'motion sink auto-off'
   trigger:
     - platform: state
       entity_id: light.wash
       to: 'off'
-      for: '00:00:40'
+      for: '00:00:30'
   action:
     - service_template: light.turn_off
       entity_id: light.sink_all

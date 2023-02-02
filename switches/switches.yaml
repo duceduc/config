@@ -30,47 +30,27 @@
 ####################################################
 
 
-  - platform: command_line
-    switches:
+#  - platform: command_line
+#    switches:
 
-      is_internet:
-        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
-        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
-        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
-        value_template: '{{ value == "1" }}'
+#      is_internet:
+#        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
+#        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
+#        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
+#        value_template: '{{ value == "1" }}'
 
-      isp_internet:
-        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.104"
-        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.104"
-        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.104"
-        value_template: '{{ value == "1" }}'
+## old ip for iphone 6+ 192.168.1.104 .Now is shion school laptop
+#      laptop_internet:
+#        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.251"
+#        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.251"
+#        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.251"
+#        value_template: '{{ value == "1" }}'
 
-      switch_internet:
-        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.102"
-        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.102"
-        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.102"
-        value_template: '{{ value == "1" }}'
-
-
-####################################################
-#                                                                                                    
-#                    Tasmota
-#                                                                                                    
-####################################################
-
-
-#  - platform: mqtt
-#    name: "Washer"
-#    state_topic: "tasmota/washer_plug/RESULT"  
-#    value_template: "{{ value_json.POWER }}"
-#    command_topic: "tasmota/washer_plug/POWER"
-#    payload_on: "ON"
-#    payload_off: "OFF"
-#    availability_topic: "tasmota/washer_plug/LWT"
-#    payload_available: "Online"
-#    payload_not_available: "Offline"
-#    qos: 1
-#    retain: false
+#      switch_internet:
+#        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.102"
+#        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.102"
+#        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.102"
+#        value_template: '{{ value == "1" }}'
 
 
 ####################################################
