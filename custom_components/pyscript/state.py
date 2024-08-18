@@ -4,7 +4,7 @@ import asyncio
 import logging
 
 from homeassistant.core import Context
-from homeassistant.helpers.restore_state import RestoreStateData
+from homeassistant.helpers.restore_state import DATA_RESTORE_STATE
 from homeassistant.helpers.service import async_get_all_descriptions
 
 from .const import LOGGER_PATH
@@ -13,7 +13,7 @@ from .function import Function
 
 _LOGGER = logging.getLogger(LOGGER_PATH + ".state")
 
-STATE_VIRTUAL_ATTRS = {"last_changed", "last_updated"}
+STATE_VIRTUAL_ATTRS = {"entity_id", "last_changed", "last_updated"}
 
 
 class StateVal(str):
@@ -23,6 +23,7 @@ class StateVal(str):
         """Create a new instance given a state variable."""
         new_var = super().__new__(cls, state.state)
         new_var.__dict__ = state.attributes.copy()
+        new_var.entity_id = state.entity_id
         new_var.last_updated = state.last_updated
         new_var.last_changed = state.last_changed
         return new_var
@@ -128,7 +129,7 @@ class State:
         if notify:
             _LOGGER.debug("state.update(%s, %s)", new_vars, func_args)
             for queue, var_names in notify.items():
-                await queue.put(["state", [cls.notify_var_get(var_names, new_vars), func_args]])
+                await queue.put(["state", [cls.notify_var_get(var_names, new_vars), func_args.copy()]])
 
     @classmethod
     def notify_var_get(cls, var_names, new_vars):
@@ -217,7 +218,8 @@ class State:
     async def register_persist(cls, var_name):
         """Register pyscript state variable to be persisted with RestoreState."""
         if var_name.startswith("pyscript.") and var_name not in cls.persisted_vars:
-            restore_data = await RestoreStateData.async_get_instance(cls.hass)
+            # this is a hack accessing hass internals; should re-implement using RestoreEntity
+            restore_data = cls.hass.data[DATA_RESTORE_STATE]
             this_entity = PyscriptEntity()
             this_entity.entity_id = var_name
             cls.persisted_vars[var_name] = this_entity
@@ -289,6 +291,7 @@ class State:
                     for keyword, typ, default in [
                         ("context", [Context], Function.task2context.get(curr_task, None)),
                         ("blocking", [bool], None),
+                        ("return_response", [bool], None),
                         ("limit", [float, int], None),
                     ]:
                         if keyword in kwargs and type(kwargs[keyword]) in typ:
@@ -305,7 +308,9 @@ class State:
                         kwargs[param_name] = args[0]
                     elif len(args) != 0:
                         raise TypeError(f"service {domain}.{service} takes no positional arguments")
-                    await cls.hass.services.async_call(domain, service, kwargs, **hass_args)
+
+                    # return await Function.hass_services_async_call(domain, service, kwargs, **hass_args)
+                    return await cls.hass.services.async_call(domain, service, kwargs, **hass_args)
 
                 return service_call
 

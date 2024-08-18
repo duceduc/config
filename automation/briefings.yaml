@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Morning Email Briefings                                                                   
-#                                                                                                              
+#
+#             Morning Email Briefings
+#
 #########################################################
 
 
@@ -9,18 +9,22 @@
   initial_state: true
   variables:
     msg: >-
-      <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-      <br>
-      <b> Today's Weather </b> <br>
-      The current temperature is {{ states('sensor.wbio_current_temperature') }}° ( {{states('sensor.oa_feels_like')}}° feel like) with a forecast of {{ states('sensor.nws_overnight_forecast') }}. Today's low is {{ states('sensor.wbio_overnight_low') }}° with a high of {{ states('sensor.wbio_daytime_temperature') }}°. <br>
-      The predicted precipitation today is{% if states.weather.weatherbit.attributes.forecast[0].precipitation == 0 %} 0mm. {% else %} {{ states.weather.weatherbit.attributes.forecast[0].precipitation }}mm at a chance of {{ states('sensor.wbio_current_rain_forecast') }}%. {% endif %} <br>
-      <br>
-      <b> Holidays & Birthdays </b> <br>
-      {% if is_state('sensor.holiday', '') %} No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %} <br>
-      {% if is_state('sensor.holidaytomorrow', '') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %} <br>
-      {% if is_state('sensor.holidayinaweek', '') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}
+      Today is {{ now().strftime( '%B %d, %Y') }}
+       
+      Today's Weather
       
-      <b> A Picture of Us! </b>   
+      The current temperature is {{ states('sensor.wbio_current_temperature') }}° ( {{states('sensor.oa_feels_like')}}° feel like) with a forecast of {{ states('sensor.nws_overnight_forecast') }}. Today's low is {{ states('sensor.wbio_overnight_low') }}° with a high of {{ states('sensor.wbio_daytime_temperature') }}°. The predicted precipitation today is{% if state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation == 0 %} 0mm. {% else %} {{ states.sensor.my_weather_forecast_daily.attributes.forecast[0].precipitation }}mm at a chance of {{ states('sensor.wbio_current_rain_forecast') }}%. {% endif %}
+       
+      Holidays & Birthdays
+      
+      {% if is_state('sensor.holiday', 'none') %}No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %}
+      {% if is_state('sensor.holidaytomorrow', 'none') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %}
+      
+      {% if is_state('sensor.holidayinaweek', 'none') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}
+      
+      
+      A Picture of Us!
+
   trigger:
     - platform: time
       at: input_datetime.morning_report
@@ -31,48 +35,48 @@
         title: 'Morning Briefing'
         message: '{{ msg }}'
         path:
-          - '/config/www/img/private/{{ range(1, 25) | random }}.jpg'
+        - '/config/www/img/private/{{ range(1, 25) | random }}.jpg'
     - service: script.text_notify
       data:
         who: duc
         title: 'Weather'
         message: >-
-          Currently {{state_attr('weather.weatherbit','temperature')}}°, 
-          feels like {{states('sensor.oa_feels_like')}}°. 
-          Today 
-          {{ (state_attr('weather.weatherbit', 'forecast')
+          Currently {{state_attr('weather.my_weather','temperature')}}°,
+          feels like {{states('sensor.oa_feels_like')}}°.
+          Today
+          {{ (state_attr('sensor.my_weather_forecast_daily', 'forecast')
               | map(attribute="temperature")
               | list)[0:1]
               | max }}°
-          /{{ state_attr('weather.weatherbit', 'forecast')[0].templow }}° 
-          {{ states('weather.weatherbit') }} 
-          humidity {{ state_attr('weather.weatherbit', 'humidity') }}% 
-          with 
-          {% if state_attr('weather.weatherbit', 'forecast')[0].precipitation_probability != 0 %}
-             preciptation of {{ state_attr('weather.weatherbit', 'forecast')[0].precipitation }}
+          /{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].templow }}°
+          {{ states('weather.my_weather') }}
+          humidity {{ state_attr('weather.my_weather', 'humidity') }}%
+          with
+          {% if state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation_probability != 0 %}
+             preciptation of {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation }}
           {%else%}
              no precipitation
           {%endif%}.
-   
+
     - service: script.email_notify_image
       data:
         who: eri
         title: 'Morning Briefing'
         message: '{{ msg }}'
         path:
-          - '/config/www/img/private/{{ range(1, 25) | random }}.jpg'
+        - '/config/www/img/private/{{ range(1, 25) | random }}.jpg'
 
 
 #########################################################
-#                                                                                                              
-#             Morning Wakeup Report                                                                   
-#                                                                                                              
+#
+#             Morning Wakeup Report
+#
 #########################################################
 
 - alias: 'Morning Wakeup Report'
   trigger:
     - platform: state
-      entity_id: binary_sensor.cr_has_moving_target
+      entity_id: binary_sensor.motion_cr_sensor_occupancy # binary_sensor.cr_has_moving_target
       to: 'on'
   condition:
     - condition: time
@@ -81,7 +85,7 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # Don't play if eri present
-      value_template: "{{ not is_state('sensor.eri_espresense', 'livingroom') }}"      
+      value_template: "{{ not is_state('sensor.eri_espresense', 'livingroom') }}"
     - condition: state
       entity_id: input_boolean.morning_wakeup_report
       state: 'off'
@@ -92,15 +96,15 @@
 
 
 #########################################################
-#                                                                                                              
-#             Morning Briefing                                                                   
-#                                                                                                              
+#
+#             Morning Briefing
+#
 #########################################################
 
 - alias: 'Morning Report'
   trigger:
     - platform: state
-      entity_id: binary_sensor.cr_has_moving_target
+      entity_id: binary_sensor.motion_cr_sensor_occupancy #binary_sensor.cr_has_moving_target
       to: 'on'
   condition:
     - condition: time
@@ -108,6 +112,8 @@
       before: '08:30:00'
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Don't play if eri present
+      value_template: "{{ not is_state('sensor.eri_espresense', 'livingroom') }}"
     - condition: state
       entity_id: input_boolean.good_morning_report
       state: 'off'
@@ -118,15 +124,15 @@
 
 
 #########################################################
-#                                                                                                              
-#             Daily Briefing                                                                   
-#                                                                                                              
+#
+#             Daily Briefing
+#
 #########################################################
 
 - alias: 'Daily Report'
   trigger:
     - platform: state
-      entity_id: binary_sensor.cr_has_moving_target
+      entity_id: binary_sensor.motion_cr_sensor_occupancy #binary_sensor.cr_has_moving_target
       to: 'on'
   condition:
     - condition: time
@@ -144,9 +150,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Sunset Briefing                                                                   
-#                                                                                                              
+#
+#             Sunset Briefing
+#
 #########################################################
 
 - alias: Enable Cameras at Sunset
@@ -157,15 +163,15 @@
       offset: "-00:03:00"
   condition:
     - condition: template # Someone is home
-      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"      
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
     - service: script.sundown_briefing
 
 
 #########################################################
-#                                                                                                              
-#             Nightly Briefing                                                                   
-#                                                                                                              
+#
+#             Nightly Briefing
+#
 #########################################################
 
 - alias: 'Nightly Briefing'
@@ -180,9 +186,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Event Briefing                                                                   
-#                                                                                                              
+#
+#             Event Briefing
+#
 #########################################################
 
 - alias: 'Event Briefing'
@@ -197,7 +203,7 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

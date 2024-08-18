@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#                    Chores                                                                 
-#                                                                                                    
+#
+#                    Chores
+#
 ####################################################
 
 title: Chores
@@ -30,18 +30,18 @@ cards:
 
       - type: vertical-stack
         title: Appliances
-        cards:         
+        cards:
          - !include
            - /config/lovelace/tpl/chores_tpl.yaml
            - name: Clean Air Filters
-             sensor_name: clean_air_filters       
+             sensor_name: clean_air_filters
              icon: mdi:air-filter
              warning_before: 2
              cycle_days: 60
 
       - type: vertical-stack
         title: Bathroom
-        cards:         
+        cards:
          - !include
            - /config/lovelace/tpl/chores_tpl.yaml
            - name: Clean Toilet
@@ -52,7 +52,7 @@ cards:
 
       - type: vertical-stack
         title: Outdoor
-        cards:         
+        cards:
          - !include
            - /config/lovelace/tpl/chores_tpl.yaml
            - name: Clean Balcony
@@ -83,7 +83,7 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

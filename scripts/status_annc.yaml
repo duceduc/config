@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Status Announcements                                                                    
-#                                                                                                              
+#
+#             Status Announcements
+#
 #########################################################
 
   status_annc:
@@ -25,7 +25,7 @@
             {% macro confirmation() %}
               <p>
               {{ [
-              'Okay.', 
+              'Okay.',
               'If you insist.',
               'I am afraid I can not do that.  I am kidding,',
               'Leave it to me.',
@@ -78,13 +78,7 @@
                   'Did you see that flash? I did. Lightning is near.',
                   'If you didnt hear the thunder you will soon. '
                 ]|random }}
-                  If anyone is outside they shoudld seek shelter inside. 
-              {% if is_state('binary_sensor.garage_door', 'on') %} 
-                {{ [ 'The garage door needs to be closed. ',
-                  'Can someone close the garage?. ',
-                  'If you do not want the contents of the garage to get wet, you might want to close it.'
-                ] | random }}
-              {% endif %}
+                  If anyone is outside they should seek shelter inside.
             {% endmacro %}
             {% macro lightning_clear() %}
                 {{ [
@@ -92,7 +86,7 @@
                   'No more lightning appears to be occuring.',
                   'Lightning is gone.'
               ]|random }}
-                It is safe to resume normal activities. 
+                It is safe to resume normal activities.
             {% endmacro %}
             {% macro freeze_warning() %}
               {% if is_state('input_boolean.freeze_warning','on') %}
@@ -105,10 +99,9 @@
               {% endif %}
             {% endmacro %}
 
-
             {% macro secure_dish() %}
             {{ [
-              'Do not forget to close the dish cabinent.', 
+              'Do not forget to close the dish cabinent.',
               'Someone forgot to close the dish cabinent. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
               'Even though there is no earthquake <break time="1s"/> yet, you should secure the kitchen cabinent doors.',
               'You might want to close the kitchen cabinet.'
@@ -116,7 +109,7 @@
             {% endmacro %}
 
             {% macro shion_events() %}
-              She on has {{ states.calendar.shion_events.attributes.message }} starting in forty five minutes.              
+              She on has {{ states.calendar.shion_events.attributes.message }} starting in forty five minutes.
               {{ [ 'It is time to get ready to leave. ',
                   'You should prepare to leave. ',
                   'If you are not ready, you start getting ready.',
@@ -132,7 +125,7 @@
                   'Gather your things and prepare in a timely manner.'
                 ] | random }}
             {% endmacro %}
-            
+
             {% macro appointments() %}
               There is {{ states.calendar.appointments.attributes.message }} appoinment in forty five minutes.
               {{ [ 'It is time to get ready to leave. ',
@@ -141,7 +134,7 @@
                   'Gather your things and prepare to leave.'
                 ] | random }}
             {% endmacro %}
-            
+
             {% macro duc_location() %}
             {% if is_state('input_boolean.duc_travel_monitor', 'on') %}
               Duck appears to be headed home. Based on current traffic conditions, he should be here in {{states.sensor.duc_ett_home.attributes.duration | round}} minutes.
@@ -150,7 +143,7 @@
                 Duck is currenly moving, and at last check was {{states.sensor.duc_ett_home.attributes.duration | round}} minutes from home.
               {% else %}
                 {% if is_state('sensor.duc_location', 'home') %}
-                  
+
                 {% elif is_state('sensor.duc_location', 'away') %}
                   Duck is lost, and at last check was {{states.sensor.duc_ett_home.attributes.duration | round}} minutes from home.
                 {% else %}
@@ -159,7 +152,7 @@
               {% endif %}
             {% endif %}
             {% endmacro %}
-                
+
             {% macro eri_location() %}
             {% if is_state('input_boolean.eri_travel_monitor', 'on') %}
               Eddie appears to be headed home. Based on current traffic conditions, she should be here in {{states.sensor.eri_ett_home.attributes.duration | round}} minutes.
@@ -168,7 +161,7 @@
                 Eddie is currenly moving, and at last check was {{states.sensor.eri_ett_home.attributes.duration | round}} minutes from home.
               {% else %}
                 {% if is_state('sensor.eri_location', 'home') %}
-                  
+
                 {% elif is_state('sensor.eri_location', 'away') %}
                   Eddie is lost, and at last check was {{states.sensor.eri_ett_home.attributes.duration | round}} minutes from home.
                 {% else %}
@@ -178,7 +171,7 @@
             {% endif %}
             {% endmacro %}
 
-            
+
             {% macro duc_headed_home() %}
               Duc appears to be headed home. Based on current traffic conditions, he should be here in {{states.sensor.duc_ett_home.attributes.duration | round}} minutes.
             {% endmacro %}
@@ -187,7 +180,7 @@
             {% endmacro %}
 
 
-            
+
             {% macro traffic_conditions() %}
                 {%- if states.sensor.home_to_zoo.state|round > 50 %}
                   Traffic to the Zoo appears heavy than normal.
@@ -201,31 +194,31 @@
                   Traffic to Summit is normal.
                 {% endif %}
                 Currently it will take {{states.sensor.home_to_summit.state|round}} minutes to get to Summit taking {{ states.sensor.home_to_summit.attributes.route }}.
-              
+
             {% endmacro %}
-            {% macro iss() %} 
+            {% macro iss() %}
               {{ [
                   'But the International Space Station is passing over. Wave.',
                   'But The International Space Station just flew by.',
                   'But if you were to look up right now, and it was dark outside, and you happened to be looking in the right place you would see the International Space Station go by. But, it has already passed.'
-                  ] | random}} 
+                  ] | random}}
             {% endmacro %}
             {%- macro washer_needs_emptying() -%}
               <p>
-                The washing machine completed its cycle 
+                The washing machine completed its cycle
                 {% set seconds = now().timestamp() - as_timestamp(states.sensor.washer_status_m.last_changed) %}
                 {% set hours = seconds / 60 %}
                 {% if (seconds / ( 60 * 60 )) | int == 1 %}
                   over an hour ago.
                   {{ [
-                  'Do not forget to rotate the clothes.', 
+                  'Do not forget to rotate the clothes.',
                   'Was someone going to rotate the laundry?',
                   'Once you rotate the laundry I will stop reminding you to do it. So if you want me to stop. Its up to you.'
                   ] | random }}
                 {% elif (seconds / ( 60 * 60 )) | int > 1 and (seconds / ( 60 * 60 )) | int < 6 %}
                   over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
                   {{ [
-                  'Much longer and you are going to need to wash them again.', 
+                  'Much longer and you are going to need to wash them again.',
                   'Someone needs to rotate the laundry.',
                   'Do not forget about the clothes in the washing machine.',
                   'Surely you did not mean to forget about the clothes. Mistakes happen. But you can still fix it.',
@@ -234,7 +227,7 @@
                 {% elif (seconds / ( 60 * 60 )) | int > 6 %}
                   over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
                   {{ [
-                  'That is a crazy amount of time.', 
+                  'That is a crazy amount of time.',
                   'Did you decide you want those clothes to suffer?',
                   'You might as well just rewash those clothes.',
                   'I can smell the mildew. Virtually that is.',
@@ -243,7 +236,7 @@
                 {% else %}
                   {{ (seconds // 60) | int }} minutes ago.
                   {{ [
-                  'Do not forget to rotate the clothes.', 
+                  'Do not forget to rotate the clothes.',
                   'Someone forgot to move the clothes to the dryer. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
                   'You might want to move them to the dryer.'
                   ] | random }}
@@ -292,22 +285,22 @@
                 {% if is_state('binary_sensor.morning','on') %}
                   for dropoff.
                 {% else %}
-                  for pickup. 
+                  for pickup.
                 {% endif %}
             {%- endmacro -%}
             {% macro skylar_dressed_reminder() %}
               <p>
-              Duc, If you are already dressed, 
+              Duc, If you are already dressed,
               {{ [
                   'high five.',
                   'good job.'
               ]|random }}
-              But if you have not gotten dressed,  
+              But if you have not gotten dressed,
               {{ [
                   'stop what you are doing and go get dressed.',
                   'You should get dressed before you watch TV.'
               ]|random }}
-              
+
               </p>
             {% endmacro %}
             {# a macro that removes all newline characters, empty spaces, and returns formatted text. Also replaces all Underscores with Spaces  #}
@@ -344,16 +337,16 @@
               {% if call_freeze_warning == 1 %}
                 {{ freeze_warning() }}
               {% endif %}
-              
+
               {% if call_shion_events == 1 %}
                 {{ shion_events() }}
-              {% endif %}                
+              {% endif %}
               {% if call_appointments == 1 %}
-                {{ appointments() }}                
+                {{ appointments() }}
               {% endif %}
               {% if call_reminders == 1 %}
-                {{ reminders() }}                
-              {% endif %}              
+                {{ reminders() }}
+              {% endif %}
               {% if call_duc_location == 1 %}
                 {{ duc_location() }}
               {% endif %}
@@ -385,104 +378,33 @@
               {% if call_secure_dish == 1 %}
                 {{ secure_dish() }}
               {% endif %}
-              
+
               {{ welcome_home }}
 
               {{ speech_message }}
-              
+
               {% if call_snark_door_motion == 1 %}
                 {{ snark_door_motion() }}
               {% endif %}
-              
+
               {% if call_snark_door_open == 1 %}
                 {{ snark_door_open() }}
               {% endif %}
-              
+
               {% if call_school_pickup_reminder == 1 %}
                 {{ school_pickup_reminder() }}
               {% endif %}
-              
+
               {% if call_skylar_dressed_reminder == 1 %}
                 {{ skylar_dressed_reminder() }}
               {% endif %}
-              
+
             {%- endmacro -%}
             {{- cleanup(mother_of_all_macros()) -}}
 
 
 #########################################################
-#                                                                                                              
-#             Washer Announcements                                                                    
-#                                                                                                              
-#########################################################
-
-
-#  simplified_washer_audible:
-#    sequence:
-#    - condition: template
-#      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-#    - condition: state
-#      entity_id: sensor.washer_status_m
-#      state: complete
-#    - service: script.speech_engine
-#      data: 
-#        who: "{{ states('sensor.room_presence') }}"
-#        voice: "{{ states('input_select.jarvis_voice') }}"
-#        message: >
-#          {{ [
-#            'Pardon me, ',
-#            'Excuse me, ',
-#            'I do not mean to interrupt, but,',
-#            'I hate to interrupt, but,',
-#            'I beg your pardon, ',
-#            'I do not mean to intrude, but, ',
-#            'I am sorry to interrupt, but. ',
-#            'Just a quick heads up, '
-#            ] | random }}
-#          <p>
-#            The washing machine completed its cycle 
-#            {% set seconds = now().timestamp() - as_timestamp(states.sensor.washer_status_m.last_changed) %}
-#            {% if (seconds / ( 60 * 60 )) | int == 1 %}
-#              over an hour ago.
-#              {{ [
-#              'Do not forget to rotate the clothes.', 
-#              'Was someone going to rotate the laundry?',
-#              'Once you rotate the laundry I will stop reminding you to do it. So if you want me to stop. Its up to you.'
-#              ] | random }}
-#            {% elif (seconds / ( 60 * 60 )) | int > 1 and (seconds / ( 60 * 60 )) | int < 6 %}
-#              over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
-#              {{ [
-#              'Much longer and you are going to need to wash them again.', 
-#              'Someone needs to rotate the laundry.',
-#              'Do not forget about the clothes in the washing machine.',
-#              'Surely you did not mean to forget about the clothes. Mistakes happen. But you can still fix it.',
-#              'Do you like your clothes smelling like mildew? Becasue that is what is happening right now.'
-#              ] | random }}
-#            {% elif (seconds / ( 60 * 60 )) | int > 6 %}
-#              over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
-#              {{ [
-#              'That is a crazy amount of time.', 
-#              'Did you decide you want those clothes to suffer?',
-#              'You might as well just rewash those clothes.',
-#              'I can smell the mildew. Virtually that is.',
-#              'Surely you did not mean to forget about the clothes.'
-#              ] | random }}
-#            {% else %}
-#              {{ (seconds // 60) | int }} minutes ago.
-#              {{ [
-#              'Do not forget to rotate the clothes.', 
-#              'Someone forgot to move the clothes to the dryer. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
-#              'You might want to move them to the dryer.'
-#              ] | random }}
-#            {% endif %}
-#          </p>
-#    
 #
-
-
-
+#          END OF CONFIGURATION FILE
+#
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
-#########################################################            

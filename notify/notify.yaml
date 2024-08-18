@@ -43,10 +43,6 @@
     recipient:
       - !secret recipient_3
 
-  - name: "Agent Desktop"
-    platform: hass_agent_notifier
-    resource: http://192.168.1.111:5115/notify
-
 
 #########################################################
 #                                                                                                              
@@ -78,15 +74,21 @@
 #                                                                                                              
 #########################################################
 
-  - name: energy_log
-    platform: file
-    filename: /config/www/data/csv_logs/energy_log.csv
-    timestamp: false
-
-  - name: earthquake_log
-    platform: file
-    filename: /config/www/data/csv_logs/earthquake_log.csv
-    timestamp: false
+## Removed. File has it's own integration.
+#  - name: energy_log
+#    platform: file
+#    filename: /config/www/data/csv_logs/energy_log.csv
+#    timestamp: false
+#
+#  - name: fridge_log
+#    platform: file
+#    filename: /config/www/data/csv_logs/fridge_log.csv
+#    timestamp: false
+#
+#  - name: earthquake_log
+#    platform: file
+#    filename: /config/www/data/csv_logs/earthquake_log.csv
+#    timestamp: false
 
 
 #########################################################

@@ -12,11 +12,6 @@
       above: 10
     - platform: template
       value_template: "{{ states('sensor.duc_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
-      
-#  condition:
-#    - condition: template
-#      value_template: "{{ states('sensor.duc_espresense') != 'not_home' }}"
-      
   action:
     - service: input_boolean.turn_on
       data:
@@ -51,11 +46,6 @@
       above: 10
     - platform: template
       value_template: "{{ states('sensor.eri_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
-      
-#  condition:
-#    - condition: template
-#      value_template: "{{ states('sensor.eri_espresense') != 'not_home' }}"
-
   action:
     - service: input_boolean.turn_on
       data:
@@ -88,14 +78,12 @@
       entity_id: sensor.tms_presence
       above: 10
     - platform: template
-      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
-  condition:
-    - condition: template
-      value_template: "{{ states('sensor.shion_tms_espresense') != 'not_home' }}"            
+      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"    
   action:
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.shion_presence
+
 - alias: Presence Shion Off
   trigger:
     - platform: numeric_state
@@ -222,7 +210,7 @@
 - alias: Presence Scan Departure
   trigger:
     - platform: state
-      entity_id: binary_sensor.genkan_door
+      entity_id: binary_sensor.genkan_door_contact
       to: 'on'
   condition:
     - condition: template
@@ -230,17 +218,6 @@
   action:  
     - delay: '00:01:25'
     - service: script.monitor_depart
-
-    
-#    - service: mqtt.publish
-#      data_template:
-#        topic: monitor/scan/depart
-#    - delay: '00:01:00'
-#    - service: mqtt.publish
-#      data_template:
-#        topic: monitor/scan/depart
-
-
 
 
 #########################################################
@@ -291,7 +268,7 @@
     - platform: numeric_state
       entity_id: sensor.n_people_home
       below: 1
-      for: 5
+      for: 10
   condition:
     - condition: template
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
@@ -309,7 +286,7 @@
         who: duc
         message: "There are {{ states('sensor.n_people_home') }} people at home now."
         title: '*Home Status*'
-    - service: input_boolean.turn_on
+    - service: input_boolean.turn_on #### RE ENABLE THIS WHEN RETURN FROM USA
       entity_id: input_boolean.sentry_mode
 
         
@@ -364,12 +341,13 @@
     - platform: state
       entity_id: input_boolean.shion_presence
   action:
-    - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
+#    - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
+    - service_template: script.set_device_tracker_shion
 
 - alias: Set Location Waze
   trigger:
     - platform: numeric_state
-      entity_id: sensor.shion_to_school_waze, sensor.duc_to_work_waze, sensor.eri_to_work_waze
+      entity_id: sensor.duc_to_work_waze, sensor.eri_to_work_waze # sensor.shion_to_school_waze
       below: 3
   action:
     choose:
@@ -387,12 +365,12 @@
               dev_id: eri
               location_name: 'Eri Work'
 
-      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'shion to school waze' }}"
-        sequence:
-          - service: device_tracker.see
-            data:
-              dev_id: shion
-              location_name: "school"
+#      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'shion to school waze' }}"
+#        sequence:
+#          - service: device_tracker.see
+#            data:
+#              dev_id: shion
+#              location_name: "school"
 
 
 
@@ -418,22 +396,32 @@
     id: eri
   condition: []
   action:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: duc
-      sequence:
-      - service: input_boolean.turn_off
-        data: {}
-        entity_id: input_boolean.duc_travel_monitor
-    - conditions:
-      - condition: trigger
-        id: eri
-      sequence:
-      - service: input_boolean.turn_off
-        data: {}
-        entity_id: input_boolean.eri_travel_monitor
-    default: []
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: duc
+          sequence:
+            - service: input_boolean.turn_off
+              data: {}
+              entity_id: input_boolean.duc_travel_monitor
+        - conditions:
+            - condition: trigger
+              id: eri
+          sequence:
+            - service: input_boolean.turn_off
+              data: {}
+              entity_id: input_boolean.eri_travel_monitor
+      default: []
+
+
+####################################################
+#                                                                                                    
+#            Monitor RPIw Devices                                         
+#                                                                                                    
+####################################################
+
+
+
 
 
 #########################################################

@@ -3,27 +3,32 @@
 # https://community.home-assistant.io/t/can-i-change-ip-address-over-the-air/168870/6
 substitutions:
   name: aio-wemos
-  platform: ESP8266
-  board: d1_mini
+  upper: Mr
+  lower: mr  
   oa: oa
-  mr: mr
 
+packages:
+  ld2410: !include components/ld2410.yaml
+
+########
 esphome:
   name: $name
-  platform: $platform
-  board: $board
-  libraries:
-   - ESP8266WiFi
-   - https://github.com/akaJes/AsyncPing#95ac7e4
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - /config/esphome/components/ld2410_uart.h
+  on_boot:
+    priority: 600
+    # ...
+    then:
+      - lambda: |-
+          auto uart_component = static_cast<LD2410 *>(ld2410);
+          uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);  
 
-external_components:
-  - source:
-      type: local
-      path: components/esphome-component-ping/components
-
+########
 wifi:
-  ssid: !secret ssid2
-  password: !secret ssid_pass
+  ssid: !secret ssid
+  password: !secret ssid_pwd
   power_save_mode: none
   reboot_timeout: 0s
   fast_connect : true
@@ -32,35 +37,57 @@ wifi:
     subnet: 255.255.255.0
     gateway: 192.168.1.1
 
-captive_portal:
 logger:
+  baud_rate: 0
 
 api:
   encryption:
     key: !secret esphome_apikey
 
 ota:
-  password: !secret ota_pass
+  - platform: esphome
+    password: !secret ota_pass
+########
 
 # Sensors
 sensor:
   - platform: dht
     model: AM2302
     pin: D6
-    temperature:
-      name: '$mr temperature'
-    humidity:
-      name: '$mr humidity'
     update_interval: 15s
+    temperature:
+      name: '$lower temperature'
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+           send_first_at: 1           
+    humidity:
+      name: '$lower humidity'
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+           send_first_at: 1           
 
-  - platform: dht
-    model: AM2302
-    pin: D7
-    temperature:
-      name: '$oa temperature'
-    humidity:
-      name: '$oa humidity'
-    update_interval: 15s
+#  - platform: dht
+#    model: AM2302
+#    pin: D7
+#    update_interval: 60s
+#    temperature:
+#      name: '$oa temperature'
+#      filters:
+#        - sliding_window_moving_average:
+#           window_size: 15
+#           send_every: 15
+#           send_first_at: 1           
+#    humidity:
+#      name: '$oa humidity'
+#      filters:
+#        - sliding_window_moving_average:
+#           window_size: 15
+#           send_every: 15
+#           send_first_at: 1
 
   - platform: wifi_signal
     name: $name wifi signal
@@ -75,38 +102,14 @@ sensor:
     pin: A0
     name: 'front illuminance'
     unit_of_measurement: lux
-    update_interval: 5s
-
-  - platform: ping
-    ip_address: 8.8.8.8
-    num_attempts: 17
-    timeout: 1sec
-    loss:
-      name: $name Packet loss
-    latency:
-      name: $name Latency
-      accuracy_decimals: 3 # this should be 3 as the value is float, unit is sec, and the raw
-    update_interval: 30s
-
+    update_interval: 10s
 
 binary_sensor:
   - platform: status
-    name: $mr dht sensor status
-  - platform: status
-    name: $oa dht sensor status
-
-  - platform: gpio
-    pin: D5
-    name: 'motion $mr occupancy'
-    device_class: motion
+    name: $name status
 
   - platform: gpio
     pin: GPIO4
     name: 'motion g2 occupancy'
     device_class: motion
-
-switch:
-  - platform: restart
-    name: "$name Restart"
-    icon: mdi:restart
 

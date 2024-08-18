@@ -1,988 +1,214 @@
-2023-01-30 20:14:46.737 WARNING (SyncWorker_0) [homeassistant.util.yaml.loader] YAML file /config/themes/midnight/midnight.yaml contains duplicate key "input-hover-line-color". Check lines 32 and 34
-2023-01-30 20:14:46.928 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hass_agent_notifier which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.928 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration momentary which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.929 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration lovelace_gen which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.929 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration weatherbit which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.929 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration garbage_collection which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.930 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration spotcast which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.930 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration simpleicons which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.931 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.931 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration pyscript which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:46.931 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration alexa_media which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-30 20:14:50.699 ERROR (MainThread) [homeassistant.components.websocket_api.http.connection] [140369658391008] Error handling message: Unknown error (unknown_error) from 192.168.1.111 (Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36)
+2024-08-18 09:30:37.495 WARNING (SyncWorker_0) [homeassistant.util.yaml.loader] YAML file /config/includes/input_number.yaml contains duplicate key "sr_ac_temp_set_cool". Check lines 131 and 146
+2024-08-18 09:30:37.495 WARNING (SyncWorker_0) [homeassistant.util.yaml.loader] YAML file /config/includes/input_number.yaml contains duplicate key "sr_ac_temp_set_heat". Check lines 138 and 153
+2024-08-18 09:30:37.710 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration climate_template which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.711 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration momentary which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.711 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration lovelace_gen which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.712 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration mass which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.712 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hass_agent which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.713 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration watchman which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.713 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration spotcast which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.713 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration weatherdotcom which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.714 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration extended_openai_conversation which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.714 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration simpleicons which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.715 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration meross_lan which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.715 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.715 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration pyscript which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.716 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration lunar_phase which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.716 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration alexa_media which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:37.716 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration average which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-08-18 09:30:41.968 ERROR (MainThread) [custom_components.pyscript.file.meross] Exception in </config/pyscript/meross.py> line 16:
+        for device in pyscript.config['meross']:
+                                      ^
+KeyError: 'meross'
+
+During handling of the above exception, another exception occurred:
+
+Exception in </config/pyscript/meross.py> line 30:
+        raise Exception(f"missing parameters in configuration.yaml: {e}")
+                                                                     ^
+Exception: missing parameters in configuration.yaml: 'meross'
+2024-08-18 09:30:53.771 ERROR (MainThread) [homeassistant.components.mqtt.models] Exception raised while updating state of sensor.esp32_linkquality, topic: 'switchbotmqtt/esp32/esp32/rssi' with payload: b'-58e'
 Traceback (most recent call last):
-  File "/usr/src/homeassistant/homeassistant/components/websocket_api/decorators.py", line 27, in _handle_async_response
-    await func(hass, connection, msg)
-  File "/usr/src/homeassistant/homeassistant/components/lovelace/websocket.py", line 38, in send_with_error_handling
-    result = await func(hass, connection, msg, config)
-  File "/usr/src/homeassistant/homeassistant/components/lovelace/websocket.py", line 86, in websocket_lovelace_config
-    return await config.async_load(msg["force"])
-  File "/usr/src/homeassistant/homeassistant/components/lovelace/dashboard.py", line 186, in async_load
-    is_updated, config = await self.hass.async_add_executor_job(
-  File "/usr/local/lib/python3.10/concurrent/futures/thread.py", line 58, in run
-    result = self.fn(*self.args, **self.kwargs)
-  File "/usr/src/homeassistant/homeassistant/components/lovelace/dashboard.py", line 205, in _load_config
-    config = load_yaml(self.path, Secrets(Path(self.hass.config.config_dir)))
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 158, in load_yaml
-    return parse_yaml(conf_file, secrets)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 171, in parse_yaml
-    return _parse_yaml(SafeLoader, content, secrets)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 201, in _parse_yaml
-    yaml.load(content, Loader=lambda stream: loader(stream, secrets))
-  File "/usr/local/lib/python3.10/site-packages/yaml/__init__.py", line 81, in load
-    return loader.get_single_data()
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 51, in get_single_data
-    return self.construct_document(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 55, in construct_document
-    data = self.construct_object(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 328, in _ordered_dict
-    nodes = loader.construct_pairs(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 155, in construct_pairs
-    value = self.construct_object(value_node, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 359, in _construct_seq
-    (obj,) = loader.construct_yaml_seq(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 408, in construct_yaml_seq
-    data.extend(self.construct_sequence(node))
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in construct_sequence
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in <listcomp>
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 249, in _include_yaml
-    return _add_reference(load_yaml(fname, loader.secrets), loader, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 158, in load_yaml
-    return parse_yaml(conf_file, secrets)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 171, in parse_yaml
-    return _parse_yaml(SafeLoader, content, secrets)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 201, in _parse_yaml
-    yaml.load(content, Loader=lambda stream: loader(stream, secrets))
-  File "/usr/local/lib/python3.10/site-packages/yaml/__init__.py", line 81, in load
-    return loader.get_single_data()
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 51, in get_single_data
-    return self.construct_document(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 55, in construct_document
-    data = self.construct_object(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 328, in _ordered_dict
-    nodes = loader.construct_pairs(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 155, in construct_pairs
-    value = self.construct_object(value_node, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 359, in _construct_seq
-    (obj,) = loader.construct_yaml_seq(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 408, in construct_yaml_seq
-    data.extend(self.construct_sequence(node))
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in construct_sequence
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in <listcomp>
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 328, in _ordered_dict
-    nodes = loader.construct_pairs(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 155, in construct_pairs
-    value = self.construct_object(value_node, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 359, in _construct_seq
-    (obj,) = loader.construct_yaml_seq(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 408, in construct_yaml_seq
-    data.extend(self.construct_sequence(node))
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in construct_sequence
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in <listcomp>
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 328, in _ordered_dict
-    nodes = loader.construct_pairs(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 155, in construct_pairs
-    value = self.construct_object(value_node, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 359, in _construct_seq
-    (obj,) = loader.construct_yaml_seq(node)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 408, in construct_yaml_seq
-    data.extend(self.construct_sequence(node))
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in construct_sequence
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 129, in <listcomp>
-    return [self.construct_object(child, deep=deep)
-  File "/usr/local/lib/python3.10/site-packages/yaml/constructor.py", line 100, in construct_object
-    data = constructor(self, node)
-  File "/usr/src/homeassistant/homeassistant/util/yaml/loader.py", line 247, in _include_yaml
-    fname = os.path.join(os.path.dirname(loader.get_name()), node.value)
-  File "/usr/local/lib/python3.10/posixpath.py", line 90, in join
-    genericpath._check_arg_types('join', a, *p)
-  File "/usr/local/lib/python3.10/genericpath.py", line 152, in _check_arg_types
-    raise TypeError(f'{funcname}() argument must be str, bytes, or '
-TypeError: join() argument must be str, bytes, or os.PathLike object, not 'list'
-2023-01-30 20:15:08.148 ERROR (MainThread) [homeassistant.components.websocket_api.http.connection] [140369662708992] Client unable to keep up with pending messages. Stayed over 512 for 5 seconds. The system's load is too high or an integration is misbehaving
-2023-01-30 20:15:16.612 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.espresense_computerroom_temperature with state: unavailable
-2023-01-30 20:15:16.613 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.espresense_computerroom_humidity, state: unavailable
-2023-01-30 20:15:16.705 ERROR (MainThread) [homeassistant.helpers.template_entity] TemplateError('TypeError: unsupported operand type(s) for -: 'str' and 'float'') while processing template 'Template("{{ ((as_timestamp(state_attr('calendar.vacation', 'start_time'), '%Y-%m-%d')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}")' for attribute '_attr_native_value' in entity 'sensor.vacation_days2go'
-2023-01-30 20:15:16.714 ERROR (MainThread) [homeassistant.helpers.template] Template variable error: No first item, sequence was empty. when rendering '{%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
-  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
-{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
-  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
-    {% if is_state('input_boolean.audible_notifications', 'off') %}
-      {% if sensor.name == 'Cr Has Moving Target' %}
-        computer_room
-      {% else %}
-        living_room
-      {%- endif %}
-    {% else %}
-      {% if sensor.name == 'Cr Has Moving Target' %}
-        computer_room
-      {% elif sensor.name in ('motion kitchen occupancy','LR Radar Movement') %}
-        living_room
-      {% elif sensor.name in ('motion sr occupancy', 'motion mr occupancy', 'motion hallway occupancy') %}
-        hallway
-      {% else %}
-        living_room
-      {%- endif %}
-  {%- endif %}
-{% elif is_state('media_player.theater_tv', 'on') %}
-  theater
-{% else %}
-  {{ states('sensor.room_presence') }}
-{% endif %}'
-2023-01-30 20:15:16.718 ERROR (MainThread) [homeassistant.helpers.template] Template variable error: No first item, sequence was empty. when rendering '{%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
-  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
-{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
-  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
-    {% if is_state('input_boolean.audible_notifications', 'off') %}
-      {% if sensor.name == 'Cr Has Moving Target' %}
-        computer_room
-      {% else %}
-        living_room
-      {%- endif %}
-    {% else %}
-      {% if sensor.name == 'Cr Has Moving Target' %}
-        computer_room
-      {% elif sensor.name in ('motion kitchen occupancy','LR Radar Movement') %}
-        living_room
-      {% elif sensor.name in ('motion sr occupancy', 'motion mr occupancy', 'motion hallway occupancy') %}
-        hallway
-      {% else %}
-        living_room
-      {%- endif %}
-  {%- endif %}
-{% elif is_state('media_player.theater_tv', 'on') %}
-  theater
-{% else %}
-  {{ states('sensor.room_presence') }}
-{% endif %}'
-2023-01-30 20:15:16.719 ERROR (MainThread) [homeassistant.helpers.template_entity] TemplateError('UndefinedError: No first item, sequence was empty.') while processing template 'Template("{%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
-  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
-{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
-  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
-    {% if is_state('input_boolean.audible_notifications', 'off') %}
-      {% if sensor.name == 'Cr Has Moving Target' %}
-        computer_room
-      {% else %}
-        living_room
-      {%- endif %}
-    {% else %}
-      {% if sensor.name == 'Cr Has Moving Target' %}
-        computer_room
-      {% elif sensor.name in ('motion kitchen occupancy','LR Radar Movement') %}
-        living_room
-      {% elif sensor.name in ('motion sr occupancy', 'motion mr occupancy', 'motion hallway occupancy') %}
-        hallway
-      {% else %}
-        living_room
-      {%- endif %}
-  {%- endif %}
-{% elif is_state('media_player.theater_tv', 'on') %}
-  theater
-{% else %}
-  {{ states('sensor.room_presence') }}
-{% endif %}")' for attribute '_attr_native_value' in entity 'sensor.room_audio'
-2023-01-30 20:15:16.735 ERROR (MainThread) [homeassistant.helpers.template_entity] TemplateError('ValueError: Template error: float got invalid input 'None' when rendering template '{% if is_state("input_select.audio_media_device_select", "Kitchen") %} {{ (state_attr('media_player.razer_leviathan_player', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Computer") %} {{ (state_attr('media_player.ai_4', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Hallway") %} {{ (state_attr('media_player.ai_2', 'volume_level') | float *100) |int }} {% endif %}' but no default was specified') while processing template 'Template("{% if is_state("input_select.audio_media_device_select", "Kitchen") %} {{ (state_attr('media_player.razer_leviathan_player', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Computer") %} {{ (state_attr('media_player.ai_4', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Hallway") %} {{ (state_attr('media_player.ai_2', 'volume_level') | float *100) |int }} {% endif %}")' for attribute '_attr_native_value' in entity 'sensor.template_sound_volume_selected_audio_device'
-2023-01-30 20:15:59.028 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 20:15:59.029 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 20:16:05.056 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 20:16:43.806 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:17:06.298 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 20:17:08.344 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 20:17:08.346 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 20:17:32.244 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 20:17:32.245 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 20:18:12.059 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 20:18:13.912 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 20:18:13.914 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 20:18:33.413 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 20:18:33.414 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 20:18:39.768 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:23:00.909 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:23:06.185 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:25:43.845 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:28:16.808 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:29:22.610 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 20:32:10.209 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:32:30.927 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:35:31.864 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:37:17.824 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:41:39.224 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:41:44.951 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:45:25.884 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:46:33.857 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:50:50.969 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:51:04.254 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:54:41.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 20:55:17.903 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 20:56:23.887 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:00:09.992 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:00:11.282 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:04:56.266 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:05:36.917 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:08:15.157 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 21:08:15.158 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 21:08:31.103 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 21:08:31.105 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 21:09:50.010 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:10:02.315 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:14:20.322 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:15:08.018 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:19:12.028 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:19:19.352 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:24:19.359 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:24:38.098 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:28:16.047 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:29:01.380 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:33:45.132 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:33:54.382 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:38:10.063 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:38:22.401 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:42:50.181 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:43:18.417 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:44:59.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 21:45:11.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 21:47:59.414 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:48:03.084 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:49:14.399 ERROR (SyncWorker_9) [spotipy.client] Max Retries reached
-2023-01-30 21:49:44.385 ERROR (SyncWorker_7) [spotipy.client] Max Retries reached
-2023-01-30 21:50:14.388 ERROR (SyncWorker_8) [spotipy.client] Max Retries reached
-2023-01-30 21:50:44.453 ERROR (SyncWorker_2) [spotipy.client] Max Retries reached
-2023-01-30 21:51:14.406 ERROR (SyncWorker_4) [spotipy.client] Max Retries reached
-2023-01-30 21:51:44.436 ERROR (SyncWorker_3) [spotipy.client] Max Retries reached
-2023-01-30 21:52:14.414 ERROR (SyncWorker_12) [spotipy.client] Max Retries reached
-2023-01-30 21:52:44.396 ERROR (SyncWorker_10) [spotipy.client] Max Retries reached
-2023-01-30 21:52:45.212 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:53:07.454 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:57:07.435 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 21:58:00.097 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:02:33.252 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:02:56.536 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:07:07.518 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:07:17.114 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:09:03.515 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 22:09:03.517 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 22:11:22.282 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 22:11:22.283 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 22:11:45.279 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:11:56.554 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:16:17.533 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:16:20.132 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:21:16.297 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:21:51.632 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:22:37.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 22:22:42.163 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 22:22:42.165 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 22:25:21.548 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:25:27.239 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:30:40.330 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:30:53.652 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:32:04.052 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 22:32:04.053 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 22:34:38.263 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:34:53.633 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:39:42.764 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:40:06.667 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:43:45.288 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:44:31.648 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:45:04.054 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 22:47:54.533 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 22:47:54.534 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 22:48:53.998 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:49:53.701 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:52:47.312 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:53:02.736 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 22:53:02.739 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 22:53:41.672 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:58:16.039 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 22:59:04.717 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:02:45.763 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:02:46.327 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:08:06.067 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:09:00.742 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:12:14.346 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:12:24.847 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:17:16.106 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:18:27.054 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-30 23:18:48.826 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:21:44.632 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 23:21:44.633 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 23:22:07.366 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:22:13.942 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:25:27.700 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-30 23:25:27.704 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-30 23:25:29.952 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.meter_humidity, state: unavailable
-2023-01-30 23:25:29.956 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.meter_temperature with state: unavailable
-2023-01-30 23:27:03.127 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:28:20.900 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:31:44.383 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:32:03.971 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:36:59.148 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:38:09.913 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:41:15.404 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:42:02.989 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:46:54.168 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:47:50.985 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:50:18.419 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:51:34.004 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:56:19.184 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:57:13.015 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-30 23:59:18.440 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:01:11.031 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:05:53.207 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:06:43.044 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:08:42.457 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:10:51.063 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:15:23.233 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:15:49.061 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:18:02.476 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:19:38.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 00:19:45.922 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 00:19:45.925 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 00:20:03.054 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 00:20:12.102 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.87/status
-2023-01-31 00:20:15.738 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.87/status
-2023-01-31 00:20:32.080 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:25:00.247 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:25:17.075 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:28:01.493 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:29:45.176 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:34:06.272 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:34:47.109 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:37:11.522 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:39:42.273 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:43:10.309 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:44:10.125 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:47:06.620 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:49:34.288 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:53:08.335 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:53:58.144 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:56:32.657 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 00:58:51.303 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:02:40.353 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:03:17.196 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:05:44.682 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:08:40.329 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:11:54.386 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:12:34.261 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:14:51.700 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:17:54.417 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:21:01.424 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:21:51.275 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:24:08.718 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:26:57.436 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:30:34.438 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:31:12.304 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:33:46.741 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:36:10.521 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:39:38.464 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:41:10.381 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:43:26.767 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:45:40.536 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:48:40.476 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:50:24.428 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:53:14.786 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:55:30.623 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:58:06.492 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 01:59:48.449 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:02:21.809 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:05:25.637 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:07:18.527 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:09:14.540 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:11:27.827 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:14:59.651 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:16:45.545 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:18:32.627 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:21:23.921 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:24:08.672 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:26:31.569 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:27:57.650 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:30:40.936 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:34:00.689 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:35:38.585 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:37:33.676 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:39:45.955 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:43:57.703 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:45:10.613 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:46:50.777 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:47:01.704 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request for 'https://api.uptimerobot.com/v2/getMonitors' failed with status code '520'
-2023-01-31 02:49:42.043 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:53:04.717 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:54:22.635 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:56:12.860 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 02:59:33.058 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:02:58.736 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:03:57.667 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:05:38.883 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:08:58.083 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:12:10.831 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:13:16.687 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:15:16.917 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:18:49.097 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:21:12.851 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:22:56.715 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:25:03.945 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:28:26.118 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:31:07.955 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:32:09.731 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:34:32.966 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:37:34.135 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:40:28.042 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:41:46.752 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:44:30.071 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:47:25.163 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:50:09.058 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:50:50.768 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:54:14.099 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 03:56:26.248 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:00:05.082 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:00:11.810 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:02:15.771 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 04:02:15.772 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 04:02:31.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 04:03:09.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 04:04:12.112 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:05:34.265 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:05:36.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 04:06:02.909 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 04:09:10.166 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:09:15.853 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:13:46.151 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:14:37.278 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:18:35.179 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:18:40.882 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:20:50.445 ERROR (MainThread) [frontend.js.latest.202301100] :0:0 Script error.
-2023-01-31 04:22:31.062 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 04:23:10.169 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:24:03.311 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:27:46.198 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:28:05.914 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:32:40.182 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:33:40.335 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:35:01.432 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request exception for 'https://api.uptimerobot.com/v2/getMonitors' with - [Errno 104] Connection reset by peer
-2023-01-31 04:37:30.929 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:37:43.230 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:42:18.202 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:42:58.354 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:46:57.959 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:47:14.243 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:52:05.223 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:52:36.371 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:56:46.977 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 04:57:07.338 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:01:02.787 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 05:01:58.239 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:02:16.388 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:03:32.936 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 05:05:59.994 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:07:07.368 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:11:02.263 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:11:47.413 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:15:58.009 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:16:31.451 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:20:47.430 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:20:56.357 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:25:22.432 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request exception for 'https://api.uptimerobot.com/v2/getMonitors' with - [Errno 104] Connection reset by peer
-2023-01-31 05:25:35.477 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:25:58.030 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:30:09.451 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:30:27.399 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:35:06.509 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:35:43.064 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:39:31.479 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:39:33.417 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:44:41.533 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:44:49.084 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:48:36.431 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:48:46.497 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:54:12.619 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:54:17.102 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:57:36.446 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 05:58:02.521 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:03:30.640 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:03:42.141 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:07:02.534 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:07:31.463 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:12:46.655 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:13:36.181 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:16:48.551 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:17:31.481 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:22:45.680 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:23:18.219 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:26:43.571 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:27:29.548 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:32:34.283 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:32:37.772 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:35:58.587 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:36:44.644 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:41:37.307 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:42:09.787 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:45:53.603 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:46:10.662 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:51:16.870 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:51:31.321 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:55:38.811 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 06:55:40.617 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:00:31.890 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:00:41.339 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:05:16.637 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:05:37.897 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:09:47.978 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:10:19.398 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:14:21.675 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:15:17.960 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:19:21.417 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:19:37.991 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:23:34.712 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:24:30.979 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:28:38.454 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:28:55.016 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:32:38.749 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:34:22.002 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:38:31.033 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:38:32.469 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:42:11.765 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:43:36.045 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:47:31.052 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:47:44.486 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:51:39.784 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:52:56.061 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:56:52.507 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 07:57:10.067 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:00:54.808 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:02:48.075 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:05:22.952 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.espresense_computerroom_humidity, state: unavailable
-2023-01-31 08:05:22.953 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.espresense_computerroom_temperature with state: unavailable
-2023-01-31 08:06:10.535 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:06:58.154 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:10:50.834 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:12:03.091 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:15:40.563 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:16:39.177 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:20:41.849 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:21:37.114 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:25:08.583 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:26:18.196 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:30:32.871 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:31:13.141 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:34:48.602 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:35:21.226 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:40:19.906 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:41:03.161 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:44:09.641 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:44:51.242 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:50:15.923 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:50:32.220 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:53:13.771 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:53:51.262 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:59:19.945 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 08:59:32.239 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:02:57.279 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:02:57.817 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:08:22.975 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:08:58.254 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:12:20.836 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:12:32.297 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:14:20.419 ERROR (SyncWorker_10) [homeassistant.components.imap_email_content.sensor] Failed to login to imap.mail.yahoo.com
-2023-01-31 09:18:11.989 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:18:13.272 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:21:26.849 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:22:21.315 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:27:17.008 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:27:20.350 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:30:40.874 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:32:17.337 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:36:41.373 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:36:53.026 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:40:03.891 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:42:09.425 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:46:11.040 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:46:17.393 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:49:39.923 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:51:20.448 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:55:24.054 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:55:49.482 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:58:44.970 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 09:59:37.294 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 09:59:39.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 09:59:42.126 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 09:59:42.127 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 10:01:19.465 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:04:32.073 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:05:09.577 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:08:34.012 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:10:28.555 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:14:19.096 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:14:43.600 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:17:43.030 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:19:33.569 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:23:49.112 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:24:11.652 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:26:44.057 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:28:37.586 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:33:05.137 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:33:50.737 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:36:22.086 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:37:50.603 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:42:48.154 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:42:55.751 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:46:18.124 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:47:42.684 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:51:29.751 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 10:51:29.754 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 10:52:47.183 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:52:48.779 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:54:19.039 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 10:54:19.041 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 10:55:26.139 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 10:57:21.711 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:01:10.361 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 11:01:10.362 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 11:02:01.201 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:02:37.802 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:04:27.187 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:06:34.731 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:08:29.251 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 11:08:29.252 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 11:09:18.896 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 11:09:18.898 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 11:11:49.225 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:11:56.817 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:14:25.202 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:16:11.765 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:20:56.254 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:21:33.843 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:24:06.218 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:26:04.795 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:30:22.283 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:30:59.859 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:33:23.250 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:35:07.809 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:39:37.301 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:40:57.893 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:42:44.293 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:43:06.295 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 11:43:08.054 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 11:43:08.193 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 11:44:24.834 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:45:18.084 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.livingroom_humidity, state: unavailable
-2023-01-31 11:46:28.187 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 11:49:32.315 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:50:33.910 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:52:11.311 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:53:28.849 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 11:59:26.341 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:00:04.933 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:02:05.356 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:02:41.873 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:06:28.196 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 12:08:39.354 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:09:33.952 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:10:30.848 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 12:10:30.849 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 12:11:25.379 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:12:20.969 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:12:50.879 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 12:12:50.882 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 12:17:41.371 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:18:43.059 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 12:18:50.060 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:21:24.394 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:21:39.991 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:26:52.386 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:28:48.181 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:30:43.007 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:30:58.418 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:34:40.292 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 12:36:50.401 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:38:10.215 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:40:35.463 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:40:42.023 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:40:50.295 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 12:44:34.821 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 12:44:34.824 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 12:46:20.418 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:47:24.233 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:49:48.561 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:50:37.075 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:52:06.054 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 12:53:03.296 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 12:56:07.434 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:57:15.320 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:59:36.577 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 12:59:38.094 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:05:49.454 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:06:49.355 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:08:38.118 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:09:02.608 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:14:57.476 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:15:53.463 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:17:58.138 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:18:52.653 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:19:28.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 13:24:03.493 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:25:49.480 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:27:53.215 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:28:32.885 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:34:01.508 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:35:45.575 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:37:27.230 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:38:22.721 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:43:16.523 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:45:30.592 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:46:51.257 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:47:37.736 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:52:26.556 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:54:48.639 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:56:39.284 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 13:56:58.753 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:01:50.582 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:03:55.675 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:06:02.769 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:06:14.297 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:11:12.595 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:13:39.699 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:14:01.054 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 14:15:33.803 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:15:47.316 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:20:14.611 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:23:27.802 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:24:54.401 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:25:15.816 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:29:20.633 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:33:10.883 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:34:29.425 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:34:50.835 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:39:18.658 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 14:41:31.008 ERROR (MainThread) [homeassistant.components.broadlink.config_flow] Failed to connect to the device at 192.168.1.85: Device not found
-2023-01-31 14:42:37.905 ERROR (MainThread) [homeassistant.components.emulated_hue.hue_api] Entity not found: switch.humidifier_mr_unit
-2023-01-31 15:05:27.857 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request timeout for 'https://api.uptimerobot.com/v2/getMonitors'
-2023-01-31 15:55:10.295 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 15:55:12.461 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.87/status
-2023-01-31 15:55:12.468 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.87/status
-2023-01-31 15:55:29.551 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 15:55:29.553 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 16:11:48.503 ERROR (MainThread) [homeassistant.components.hassio.handler] /addons/a0d7b954_appdaemon/changelog return code 500
-2023-01-31 16:11:48.524 ERROR (MainThread) [homeassistant.components.hassio.handler] /addons/a0d7b954_ssh/changelog return code 500
-2023-01-31 16:11:48.547 ERROR (MainThread) [homeassistant.components.hassio.handler] /addons/45df7312_zigbee2mqtt/changelog return code 500
-2023-01-31 16:11:48.630 ERROR (MainThread) [homeassistant.components.hassio.handler] /addons/9074a9fa_cloudflared/changelog return code 500
-2023-01-31 17:14:23.056 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 17:14:48.088 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 17:14:48.090 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 17:15:12.476 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.87/status
-2023-01-31 17:15:12.478 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.87/status
-2023-01-31 17:16:12.892 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 17:16:12.894 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 17:16:32.901 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 17:16:32.903 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 17:35:37.057 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 18:32:18.406 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 18:32:18.407 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 20:08:12.294 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 20:08:14.917 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-01-31 20:08:14.919 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-01-31 20:09:04.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-01-31 21:47:06.857 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request timeout for 'https://api.uptimerobot.com/v2/getMonitors'
-2023-02-01 01:02:04.857 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request timeout for 'https://api.uptimerobot.com/v2/getMonitors'
-2023-02-01 04:19:00.654 ERROR (MainThread) [frontend.js.latest.202301100] :0:0 Script error.
-2023-02-01 04:20:11.995 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.espresense_computerroom_humidity, state: unavailable
-2023-02-01 04:20:11.997 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.espresense_computerroom_temperature with state: unavailable
-2023-02-01 04:58:58.436 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 04:58:58.440 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 05:00:04.342 ERROR (MainThread) [homeassistant.components.rest.data] Error fetching data: http://192.168.1.87/status failed with All connection attempts failed
-2023-02-01 05:00:04.343 ERROR (MainThread) [homeassistant.components.rest.data] Error fetching data: http://192.168.1.87/status failed with All connection attempts failed
-2023-02-01 05:00:13.870 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 07:31:42.940 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 07:31:42.943 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 07:32:37.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 07:32:45.479 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 07:32:45.479 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 07:33:36.109 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 07:33:36.110 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 07:33:39.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 07:48:47.634 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 07:48:47.635 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 07:48:51.294 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 07:49:25.429 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 07:49:25.430 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 08:15:13.630 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: https://api.certspotter.com/v1/issuances?domain=vj.ducsu.com&expand=dns_names&expand=issuer&expand=cert
-2023-02-01 08:15:13.636 ERROR (MainThread) [homeassistant.helpers.template_entity] TemplateError('AttributeError: 'NoneType' object has no attribute 'tzinfo'') while processing template 'Template("{{ (states("sensor.vj_cert_sslmate")|as_datetime|as_local - now()).days }}")' for attribute '_attr_native_value' in entity 'sensor.vj_ssl_cert_expiry'
-2023-02-01 10:37:24.857 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request timeout for 'https://api.uptimerobot.com/v2/getMonitors'
-2023-02-01 10:38:01.857 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request timeout for 'https://api.uptimerobot.com/v2/getMonitors'
-2023-02-01 11:20:46.321 ERROR (Bot:1730593885:updater) [telegram.ext.updater] Error while getting Updates: urllib3 HTTPError ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
-2023-02-01 12:15:14.436 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: https://api.certspotter.com/v1/issuances?domain=vj.ducsu.com&expand=dns_names&expand=issuer&expand=cert
-2023-02-01 16:19:26.053 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 16:20:20.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 16:51:55.963 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.espresense_computerroom_humidity, state: unavailable
-2023-02-01 16:51:55.966 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.espresense_computerroom_temperature with state: unavailable
-2023-02-01 17:03:42.629 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-01 17:03:42.632 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-01 17:07:55.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 17:08:09.302 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 17:09:07.055 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-01 17:58:57.923 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mr_temperature with state: unavailable
-2023-02-01 17:58:57.927 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mr_humidity, state: unavailable
-2023-02-01 17:58:57.928 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.929 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.930 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.930 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.931 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.931 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.932 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:58:57.932 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:22.994 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mr_temperature with state: unavailable
-2023-02-01 17:59:22.996 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mr_humidity, state: unavailable
-2023-02-01 17:59:22.997 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:22.998 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:22.999 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:22.999 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:23.000 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:23.000 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:23.001 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:23.001 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-01 17:59:32.362 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.toilet_airfreshener_temperature with state: unavailable
-2023-02-01 17:59:32.366 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.toilet_airfreshener_humidity, state: unavailable
-2023-02-01 20:06:07.857 ERROR (MainThread) [homeassistant.components.uptimerobot] Error fetching uptimerobot data: Request timeout for 'https://api.uptimerobot.com/v2/getMonitors'
-2023-02-02 02:11:41.484 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 02:11:41.486 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 02:12:00.295 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 02:14:12.620 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 02:14:12.622 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 04:01:52.294 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 04:01:55.056 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 04:02:19.703 ERROR (MainThread) [homeassistant.components.broadlink.remote] Error during remote.send_command: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 04:02:49.235 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm31 (RM mini 3 at 192.168.1.85) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 04:03:51.160 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 04:03:51.161 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 04:04:01.057 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm4 (RM4 pro at 192.168.1.86) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 04:04:15.430 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 04:04:15.430 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 04:37:17.097 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 04:37:17.098 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 04:37:17.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 04:59:36.292 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 05:09:44.294 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 05:18:53.293 ERROR (MainThread) [homeassistant.components.broadlink.updater] Error fetching rm32 (RM mini 3 at 192.168.1.84) data: [Errno -4000] Network timeout: No response received within 5s
-2023-02-02 05:23:49.428 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 05:23:49.429 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 05:28:34.123 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.lr_radar_temperature with state: unavailable
-2023-02-02 05:28:34.137 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mr_temperature with state: unavailable
-2023-02-02 05:28:34.139 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mr_humidity, state: unavailable
-2023-02-02 05:28:34.139 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.140 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.140 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.140 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.141 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.141 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.142 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.142 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.oa_temperature with state: unavailable
-2023-02-02 05:28:34.143 ERROR (MainThread) [homeassistant.helpers.template_entity] TemplateError('ValueError: Template error: round got invalid input 'unavailable' when rendering template '{% if is_state('binary_sensor.overnight', 'off') %}
-  {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
-{% else %}
-  {% set temp = states('sensor.oa_temperature')|round(0) %}
-{% endif %} {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
-  {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
-    Nice
-  {% elif states('sensor.wbio_daytime_temperature')|int(0) > 33 %}
-    Hot
-  {% else %}
-    Toasty
-  {%- endif %}
-{% elif states('sensor.wbio_daytime_temperature')|int(0) <= 17 %}
-  {%- if states('sensor.wbio_daytime_temperature')|int(0) < 0 %}
-    Freezing
-  {% elif states('sensor.wbio_daytime_temperature')|int(0) > 10 %}
-    Chilly
-  {% else %}
-    Cold
-  {%- endif %}
-{% else %}
-  Unknown
-{%- endif %}' but no default was specified') while processing template 'Template("{% if is_state('binary_sensor.overnight', 'off') %}
-  {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
-{% else %}
-  {% set temp = states('sensor.oa_temperature')|round(0) %}
-{% endif %} {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
-  {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
-    Nice
-  {% elif states('sensor.wbio_daytime_temperature')|int(0) > 33 %}
-    Hot
-  {% else %}
-    Toasty
-  {%- endif %}
-{% elif states('sensor.wbio_daytime_temperature')|int(0) <= 17 %}
-  {%- if states('sensor.wbio_daytime_temperature')|int(0) < 0 %}
-    Freezing
-  {% elif states('sensor.wbio_daytime_temperature')|int(0) > 10 %}
-    Chilly
-  {% else %}
-    Cold
-  {%- endif %}
-{% else %}
-  Unknown
-{%- endif %}")' for attribute '_attr_native_value' in entity 'sensor.clothing_forecast'
-2023-02-02 05:28:34.146 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.sr_temperature with state: unavailable
-2023-02-02 05:28:34.147 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.sr_humidity, state: unavailable
-2023-02-02 05:28:34.152 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.toilet_airfreshener_temperature with state: unavailable
-2023-02-02 05:28:34.153 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.toilet_airfreshener_humidity, state: unavailable
-2023-02-02 05:28:34.427 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
-2023-02-02 05:28:34.430 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
-2023-02-02 05:28:44.409 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /core/update request Server disconnected
-2023-02-02 05:28:44.411 ERROR (MainThread) [homeassistant.core] Error executing service: <ServiceCall update.install (c:01GR7AM7XCXPGVZJEZQZXFJVG3): entity_id=['update.home_assistant_core_update'], version=2023.2.0, backup=False>
-Traceback (most recent call last):
-  File "/usr/src/homeassistant/homeassistant/components/hassio/update.py", line 303, in async_install
-    await async_update_core(self.hass, version=version, backup=backup)
-  File "/usr/src/homeassistant/homeassistant/components/hassio/handler.py", line 48, in _wrapper
-    data = await funct(*argv, **kwargs)
-  File "/usr/src/homeassistant/homeassistant/components/hassio/handler.py", line 245, in async_update_core
-    return await hassio.send_command(
-  File "/usr/src/homeassistant/homeassistant/components/hassio/handler.py", line 481, in send_command
-    raise HassioAPIError()
-homeassistant.components.hassio.handler.HassioAPIError
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 662, in state
+    numerical_value = float(value)  # type:ignore[arg-type]
+                      ^^^^^^^^^^^^
+ValueError: could not convert string to float: '-58e'
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/usr/src/homeassistant/homeassistant/core.py", line 1773, in catch_exceptions
-    await coro_or_task
-  File "/usr/src/homeassistant/homeassistant/core.py", line 1792, in _execute_service
-    await cast(Callable[[ServiceCall], Awaitable[None]], handler.job.target)(
-  File "/usr/src/homeassistant/homeassistant/helpers/entity_component.py", line 213, in handle_service
-    await service.entity_service_call(
-  File "/usr/src/homeassistant/homeassistant/helpers/service.py", line 678, in entity_service_call
-    future.result()  # pop exception if have
-  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 958, in async_request_call
-    await coro
-  File "/usr/src/homeassistant/homeassistant/helpers/service.py", line 715, in _handle_entity_call
-    await result
-  File "/usr/src/homeassistant/homeassistant/components/update/__init__.py", line 154, in async_install
-    await entity.async_install_with_progress(version, backup)
-  File "/usr/src/homeassistant/homeassistant/components/update/__init__.py", line 413, in async_install_with_progress
-    await self.async_install(version, backup)
-  File "/usr/src/homeassistant/homeassistant/components/hassio/update.py", line 305, in async_install
-    raise HomeAssistantError(
-homeassistant.exceptions.HomeAssistantError: Error updating Home Assistant Core 
+  File "/usr/src/homeassistant/homeassistant/components/mqtt/models.py", line 383, in process_write_state_requests
+    entity.async_write_ha_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1005, in async_write_ha_state
+    self._async_write_ha_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1130, in _async_write_ha_state
+    self.__async_calculate_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1067, in __async_calculate_state
+    state = self._stringify_state(available)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1011, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 664, in state
+    raise ValueError(
+ValueError: Sensor sensor.esp32_linkquality has device class 'None', state class 'None' unit 'rssi' and suggested precision 'None' thus indicating it has a numeric value; however, it has the non-numeric value: '-58e' (<class 'str'>)
+2024-08-18 09:30:53.812 ERROR (MainThread) [homeassistant.components.mqtt.models] Exception raised while updating state of sensor.espresense_computerroom_temperature, topic: 'espresense/rooms/computerroom/temperature' with payload: b'nan'
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/components/mqtt/models.py", line 383, in process_write_state_requests
+    entity.async_write_ha_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1005, in async_write_ha_state
+    self._async_write_ha_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1130, in _async_write_ha_state
+    self.__async_calculate_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1067, in __async_calculate_state
+    state = self._stringify_state(available)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1011, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 675, in state
+    raise ValueError(
+ValueError: Sensor sensor.espresense_computerroom_temperature has device class 'temperature', state class 'None' unit '°C' and suggested precision 'None' thus indicating it has a numeric value; however, it has the non-finite value: 'nan'
+2024-08-18 09:30:53.816 ERROR (MainThread) [homeassistant.components.mqtt.models] Exception raised while updating state of sensor.espresense_computerroom_humidity, topic: 'espresense/rooms/computerroom/humidity' with payload: b'nan'
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/components/mqtt/models.py", line 383, in process_write_state_requests
+    entity.async_write_ha_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1005, in async_write_ha_state
+    self._async_write_ha_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1130, in _async_write_ha_state
+    self.__async_calculate_state()
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1067, in __async_calculate_state
+    state = self._stringify_state(available)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1011, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 675, in state
+    raise ValueError(
+ValueError: Sensor sensor.espresense_computerroom_humidity has device class 'humidity', state class 'None' unit '%' and suggested precision 'None' thus indicating it has a numeric value; however, it has the non-finite value: 'nan'
+2024-08-18 09:30:58.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mr_temperature with state: unavailable
+2024-08-18 09:30:58.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mr_humidity, state: unavailable
+2024-08-18 09:30:58.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.sr_radar_temperature with state: unavailable
+2024-08-18 09:30:58.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.sr_radar_humidity, state: unavailable
+2024-08-18 09:30:58.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.toilet_airfreshener_temperature with state: unavailable
+2024-08-18 09:30:58.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.toilet_airfreshener_humidity, state: unavailable
+2024-08-18 09:30:58.356 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('TypeError: unsupported operand type(s) for -: 'str' and 'float'') while processing template 'Template<template=({{ ((as_timestamp(state_attr('calendar.vacation', 'start_time'), '%Y-%m-%d')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.vacation_days2go'
+2024-08-18 09:30:58.378 ERROR (MainThread) [homeassistant.helpers.template] Template variable error: No first item, sequence was empty. when rendering '{%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
+  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
+  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
+    {% if is_state('input_boolean.audible_notifications', 'off') %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% else %}
+        living_room
+      {%- endif %}
+    {% else %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% elif sensor.name in ('motion kitchen occupancy','Lr Has Moving Target') %}
+        living_room
+      {% elif sensor.name in ('motion sr occupancy', 'Mr Has Moving Target', 'motion hallway occupancy') %}
+        hallway
+      {% else %}
+        living_room
+      {%- endif %}
+  {%- endif %}
+{% elif is_state('media_player.theater_tv', 'on') %}
+  theater
+{% else %}
+  {{ states('sensor.room_presence') }}
+{% endif %}'
+2024-08-18 09:30:58.380 ERROR (MainThread) [homeassistant.helpers.template] Template variable error: No first item, sequence was empty. when rendering '{%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
+  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
+  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
+    {% if is_state('input_boolean.audible_notifications', 'off') %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% else %}
+        living_room
+      {%- endif %}
+    {% else %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% elif sensor.name in ('motion kitchen occupancy','Lr Has Moving Target') %}
+        living_room
+      {% elif sensor.name in ('motion sr occupancy', 'Mr Has Moving Target', 'motion hallway occupancy') %}
+        hallway
+      {% else %}
+        living_room
+      {%- endif %}
+  {%- endif %}
+{% elif is_state('media_player.theater_tv', 'on') %}
+  theater
+{% else %}
+  {{ states('sensor.room_presence') }}
+{% endif %}'
+2024-08-18 09:30:58.381 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('UndefinedError: No first item, sequence was empty.') while processing template 'Template<template=({%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
+  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
+  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
+    {% if is_state('input_boolean.audible_notifications', 'off') %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% else %}
+        living_room
+      {%- endif %}
+    {% else %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% elif sensor.name in ('motion kitchen occupancy','Lr Has Moving Target') %}
+        living_room
+      {% elif sensor.name in ('motion sr occupancy', 'Mr Has Moving Target', 'motion hallway occupancy') %}
+        hallway
+      {% else %}
+        living_room
+      {%- endif %}
+  {%- endif %}
+{% elif is_state('media_player.theater_tv', 'on') %}
+  theater
+{% else %}
+  {{ states('sensor.room_presence') }}
+{% endif %}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.room_audio'
+2024-08-18 09:30:58.566 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('ValueError: Template error: float got invalid input 'None' when rendering template '{% if is_state("input_select.audio_media_device_select", "Kitchen") %} {{ (state_attr('media_player.razer_leviathan_player', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Computer") %} {{ (state_attr('media_player.ai_4', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Hallway") %} {{ (state_attr('media_player.ai_2', 'volume_level') | float *100) |int }} {% endif %}' but no default was specified') while processing template 'Template<template=({% if is_state("input_select.audio_media_device_select", "Kitchen") %} {{ (state_attr('media_player.razer_leviathan_player', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Computer") %} {{ (state_attr('media_player.ai_4', 'volume_level') | float *100) |int }} {% elif is_state("input_select.audio_media_device_select", "Hallway") %} {{ (state_attr('media_player.ai_2', 'volume_level') | float *100) |int }} {% endif %}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.template_sound_volume_selected_audio_device'
+2024-08-18 09:31:00.461 ERROR (MainThread) [homeassistant.helpers.template] Template variable error: No first item, sequence was empty. when rendering '{%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%} {%- if last_alexa_called_seconds <= 60 %}  
+  {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+{% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
+  {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
+    {% if is_state('input_boolean.audible_notifications', 'off') %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% else %}
+        living_room
+      {%- endif %}
+    {% else %}
+      {% if sensor.name == 'motion cr-sensor occupancy' %}
+        computer_room
+      {% elif sensor.name in ('motion kitchen occupancy','Lr Has Moving Target') %}
+        living_room
+      {% elif sensor.name in ('motion sr occupancy', 'Mr Has Moving Target', 'motion hallway occupancy') %}
+        hallway
+      {% else %}
+        living_room
+      {%- endif %}
+  {%- endif %}
+{% elif is_state('media_player.theater_tv', 'on') %}
+  theater
+{% else %}
+  {{ states('sensor.room_presence') }}
+{% endif %}'
+2024-08-18 09:31:35.346 ERROR (MainThread) [homeassistant.components.automation.lr_aircon] LR Aircon: Choose at step 1: choice 1: Error executing script. Error for call_service at pos 1: Template rendered invalid service: 
+2024-08-18 09:31:35.347 ERROR (MainThread) [homeassistant.components.automation.lr_aircon] LR Aircon: Error executing script. Error for choose at pos 1: Template rendered invalid service: 
+2024-08-18 09:31:35.347 ERROR (MainThread) [homeassistant.components.automation.lr_aircon] Error while executing automation automation.lr_aircon: Template rendered invalid service: 
+2024-08-18 09:50:34.985 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.lr_radar_temperature with state: unavailable
+2024-08-18 09:50:35.226 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.cr_humidity, state: unavailable
+2024-08-18 09:50:35.231 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.cr_temperature with state: unavailable
+2024-08-18 09:50:35.232 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mr_humidity, state: unavailable
+2024-08-18 09:50:35.239 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mr_temperature with state: unavailable
+2024-08-18 09:50:35.243 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.sr_radar_temperature with state: unavailable
+2024-08-18 09:50:35.248 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.sr_radar_humidity, state: unavailable
+2024-08-18 09:50:35.332 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.mdf_humidity, state: unavailable
+2024-08-18 09:50:35.363 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.mdf_temperature with state: unavailable
+2024-08-18 09:50:35.559 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse humidity sensor sensor.toilet_airfreshener_humidity, state: unavailable
+2024-08-18 09:50:35.564 ERROR (MainThread) [homeassistant.components.mold_indicator.sensor] Unable to parse temperature sensor sensor.toilet_airfreshener_temperature with state: unavailable

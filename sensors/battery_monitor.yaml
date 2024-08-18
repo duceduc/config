@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                      BATTERY MONITOR                                                     #
-#                                                                                                    #
+#                                                                                                    
+#                      BATTERY MONITOR                                                     
+#                                                                                                    
 ####################################################
 
   - platform: template
@@ -10,14 +10,14 @@
         friendly_name: 'Devices with low battery'
         unit_of_measurement: devices
         value_template: >-
-          {% set ignore_entities = ['sensor.cr_curtain_lt_battery', 'sensor.cr_curtain_rt_battery','sensor.id_battery_level', 'sensor.devices_with_low_battery'] %}
+          {% set ignore_entities = ['sensor.cr_curtain_lt_battery', 'sensor.cr_curtain_rt_battery','sensor.id_battery_level','sensor.ie_battery_level', 'sensor.devices_with_low_battery'] %}
           {{ states.sensor
             | selectattr('attributes.device_class', 'defined')
             | selectattr('attributes.device_class', 'eq', 'battery')
             | rejectattr('entity_id', 'in', ignore_entities)
             | map(attribute='state')
             | reject('in', ['unknown', 'unavailable'])
-            | map('int', -1) | select('le', 6)
+            | map('int', -1) | select('le', 46)
             |select('ge', 0)
             | list | count
           }}
@@ -31,7 +31,7 @@
 
 
 ####################################################
-#                                                                                                    #
-#            END OF CONFIGURATION FILE                                                 #
-#                                                                                                    #
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
 ####################################################

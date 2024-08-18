@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                    WEATHER VIEW                                                           #
-#                                                                                                    #
+#                                                                                                    
+#                    WEATHER VIEW                                                           
+#                                                                                                    
 ####################################################
 
 title: Weather
@@ -16,15 +16,12 @@ cards:
     layout:
       max_cols: 3
     cards:
-
-
-
-      - type: picture-entity
-        title: Camera Entrance
-        show_header_toggle: false
-        aspect_ratio: 16x9
-        entity: camera.security_entrance
-        camera_view: live
+#      - type: picture-entity
+#        title: Camera Entrance
+#        show_header_toggle: false
+#        aspect_ratio: 16x9
+#        entity: camera.security_entrance
+#        camera_view: live
 
       - type: picture-entity
         title: Camera MDF
@@ -40,11 +37,35 @@ cards:
         entity: camera.security_balcony
         camera_view: live
 
-      
-      - type: weather-forecast
-        name: Kawaguchi
-        entity: weather.weatherbit
+      - type: picture-entity
+        title: Camera Livingroom
+        show_header_toggle: false
+        aspect_ratio: 16x9
+        entity: camera.security_entrance
+        camera_view: live
+
+
+      - type: custom:hui-element
+        card_type: weather-forecast
+        entity: weather.my_weather
+        forecast_type: daily
         secondary_info_attribute: humidity
+#        style:
+#            top: 20%
+#            left: 50%
+      - type: custom:weather-card
+        entity: weather.my_weather
+#        style:
+#            top: 65%
+#            left: 50%
+
+
+
+
+
+
+
+
       - type: entities
         entities:
           - sun.sun
@@ -62,12 +83,13 @@ cards:
             icon: mdi:weather-sunset
           - entity: sensor.rainfall_today
             icon: mdi:weather-pouring
-            name: Rain today        
+            name: Rain today
           - entity: sensor.earthquake_daily_count
             icon: mdi:home-flood
             name: Daily Earthquakes
 
-            
+
+
       - type: vertical-stack
         cards:
           - type: entities
@@ -75,7 +97,7 @@ cards:
             state_color: true
             entities:
               - entity: sensor.school_start_days2go
-                name: School Starts in        
+                name: School Starts in
               - entity: sensor.school_end_days2go
                 name: School Ends in
               - entities:
@@ -83,12 +105,12 @@ cards:
                     name: First Day of School
                   - entity: input_datetime.school_last_day
                     name: Last Day of School
-                   
+
                   - entity: input_datetime.school_day_start
                     name: School Day Start
                   - entity: input_datetime.school_day_end
                     name: School Day End
-                   
+
                   - entity: input_datetime.school_day_start_reminder
                     name: School Day Start Reminder
                   - entity: input_datetime.school_day_end_reminder
@@ -98,33 +120,33 @@ cards:
                   type: section
                 padding: 0
                 type: 'custom:fold-entity-row'
-                
+
               - entities:
                   - entity: input_datetime.spring_break_start
                     name: Spring Break
                   - entity: input_datetime.summer_break_start
                     name: Summer Break
                   - entity: input_datetime.christmas_break_start
-                    name: Christmas Break                                 
+                    name: Christmas Break
                 head:
                   label: Vacation Dates
                   type: section
                 padding: 0
                 type: 'custom:fold-entity-row'
-                   
+
               - entities:
                   - entity: input_datetime.audible_notification_on
                     name: Audible Notification On
                   - entity: input_datetime.audible_notification_off
                     name: Audible Notification Off
                   - entity: input_datetime.morning_report
-                    name: Morning Reports                
+                    name: Morning Reports
                   - entity: input_datetime.daily_report
                     name: Daily Report
                   - entity: input_datetime.nightly_briefing
-                    name: Nightly Briefing                
+                    name: Nightly Briefing
                   - entity: input_datetime.event_briefing
-                    name: Event Briefing                
+                    name: Event Briefing
                 head:
                   label: Briefing Time
                   type: section
@@ -137,7 +159,7 @@ cards:
                   - entity: input_datetime.shion_bedtime_holiday
                     name: Shion Bedtime Holiday
                   - entity: input_datetime.shion_nightly_report
-                    name: Auto Nightly Report                
+                    name: Auto Nightly Report
                 head:
                   label: Shion Time
                   type: section
@@ -149,6 +171,16 @@ cards:
             style: |
               ha-card {
               }
+
+      - type: custom:lunar-phase-card
+        entity: sensor.tokyo_moon_phase
+        use_default: false
+        show_background: true
+        compact_view: false
+
+
+
+
 
       - type: custom:decluttering-card
         template: three_sensors_tpl
@@ -162,9 +194,8 @@ cards:
           - name_3: Weed
 
 
-
 ####################################################
-#                                                                                                    #
-#          END OF CONFIGURATION FILE                                                   #
-#                                                                                                    #
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
 ####################################################

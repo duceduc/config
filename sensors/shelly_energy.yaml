@@ -24,9 +24,6 @@
     scan_interval: 300
     unit_of_measurement: kWh
 
-
-
-
 #  - platform: mqtt
 #    name: "Tariff 31 Power"
 #    state_topic: "shellies/shellyem-06209A/emeter/0/power"
@@ -49,9 +46,6 @@
 #    qos: 1
 #    unit_of_measurement: "V"
 #    icon: mdi:flash
-
-
-
 
 
   - platform: statistics

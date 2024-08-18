@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                                             
+#
 #                    AUTOMATIONS VIEW
-#                                                                                                                             
+#
 ####################################################
 
 title: Automations
@@ -25,7 +25,7 @@ cards:
             state_color: true
             entities:
               - entities:
-                  - entity: automation.lr_room_aircon
+                  - entity: automation.lr_aircon
                     name: Living Room AC Control
                     icon: mdi:fan
                     secondary_info: last-triggered
@@ -37,7 +37,7 @@ cards:
                     name: Living Room AC PM Schedule
                     icon: mdi:fan
                     secondary_info: last-triggered
-                    
+
                   - entity: automation.lr_aircon_am_off
                     name: Living Room AC AM Off
                     icon: mdi:fan
@@ -50,7 +50,7 @@ cards:
                     name: Living Room Air Cool Temp Adjust
                     icon: mdi:fan
                     secondary_info: last-triggered
-                    
+
                   - entity: automation.lr_room_aircon_heat_temperature_adjust
                     name: Living Room Air Heat Temp Adjust
                     icon: mdi:fan
@@ -59,7 +59,7 @@ cards:
                     name: Living Room Heating Seasonal Adjustment AM
                     icon: mdi:fan
                     secondary_info: last-triggered
-                    
+
                   - entity: automation.lr_heating_seasonal_adjustment_pm
                     name: Living Room Heating Seasonal Adjustment PM
                     icon: mdi:fan
@@ -221,15 +221,15 @@ cards:
         title: Climate Automations
         show_header_toggle: false
         entities:
-          - entity: automation.enable_toilet_seat_heater
-            name: Turn On Toilet Seat Heat
+          - entity: automation.enable_toilet_seat_heater_upon_arrival
+            name: Turn On Toilet Seat Heat Upon Arrival
             icon: mdi:toilet
             secondary_info: last-triggered
           - entity: automation.adjust_toilet_seat_heater_temperature
             name: Adjust Toilet Seat Temperature
             icon: mdi:thermometer-plus
             secondary_info: last-triggered
-            
+
       - type: entities
         title: Automation Modes
         show_header_toggle: false
@@ -252,8 +252,8 @@ cards:
             name: Turn on Apple Tv - Plex
             icon: si:plex
             secondary_info: last-triggered
-            
-            
+
+
 
       - type: entities
         title: Other Automations
@@ -262,11 +262,11 @@ cards:
           - entity: automation.presence_restart_daily
             name: Restart Monitor Presence
             icon: mdi:target-account
-            secondary_info: last-triggered 
+            secondary_info: last-triggered
           - entity: automation.turn_on_light_flash
             name: Workout
             icon: mdi:weight-lifter
-            secondary_info: last-triggered 
+            secondary_info: last-triggered
           - entity: automation.morning_briefings
             name: Morning Briefings
             icon: mdi:notebook-edit
@@ -298,7 +298,7 @@ cards:
         show_header_toggle: false
         entities:
           - entity: automation.presence_scan_arrival
-            name: Presence Detection - Arrival Scan 
+            name: Presence Detection - Arrival Scan
             icon: mdi:hail
             secondary_info: last-triggered
 
@@ -318,7 +318,7 @@ cards:
             name: Welcome Guest Announcement
             icon: si:amazonalexa
             secondary_info: last-triggered
-            
+
       - type: entities
         title: Disable Device Automations
         show_header_toggle: false
@@ -344,7 +344,7 @@ cards:
             name: Replace Toilet Airfreshener
             icon: mdi:toilet
             secondary_info: last-triggered
-          - entity: automation.holiday_and_birthday_notification
+          - entity: automation.holiday_notification
             name: Holidays & Birthdays
             icon: mdi:cake-variant
             secondary_info: last-triggered
@@ -365,10 +365,10 @@ cards:
 
 
 
-            
+
 
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

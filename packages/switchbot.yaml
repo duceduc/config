@@ -1,6 +1,6 @@
 
 ###############################################################################
-#   @author         :   Duc SU 
+#   @author         :   Duc SU
 #   @date           :   03/03/2022
 #   @package        :   Switchbot
 #   @description    :   All the Switchbot related stuff. Built from https://community.home-assistant.io/t/switchbot-bot-curtain-meter-contact-motion-mqtt-esp32-bridge-local-control/286468 AND a little of API for humidifier
@@ -12,6 +12,7 @@
 # jcom tv battery replaced on 8/20/2022
 # meter battery repalced on 10/3/2022
 # floor heater battery repalced on 11/23/2022
+# genkan door lock replace on ---
 
 input_boolean:
   sb_humidifier:
@@ -102,8 +103,8 @@ mqtt:
       state_topic: 'switchbotmqtt/esp32/lastwill'
       value_template: '{{ value }}'
       icon: mdi:server-network-off
-    
-sensor:    
+
+sensor:
   - platform: template
     sensors:
       cr_curtain_batteries:
@@ -122,7 +123,7 @@ sensor:
   - platform: template
     sensors:
       fr_curtains:
-        value_template: >-        
+        value_template: >-
           {% if is_state('cover.cr_curtain_rt_curtain', 'open') or is_state('cover.lr_curtain_rt_curtain', 'open') %}
             open
           {% else %}
@@ -158,9 +159,9 @@ switch:
              entity_id: cover.cr_curtain_lt_curtain
        icon_template: >-
          {% if is_state('cover.cr_curtain_lt_curtain', 'open') %}
-           mdi:blinds-open
+           mdi:window-open
          {% else %}
-            mdi:blinds
+           mdi:window-closed
          {% endif %}
 
   - platform: template
@@ -183,9 +184,9 @@ switch:
              entity_id: cover.lr_curtain_lt_curtain
        icon_template: >-
          {% if is_state('cover.lr_curtain_lt_curtain', 'open') %}
-           mdi:blinds-open
+           mdi:window-open
          {% else %}
-            mdi:blinds
+           mdi:window-closed
          {% endif %}
 
   - platform: template
@@ -288,13 +289,13 @@ switch:
             data_template:
               entity_id: input_select.sb_humidifier_mode
               option: High
-          
+
         turn_off:
           - service: input_select.select_option
             data_template:
               entity_id: input_select.sb_humidifier_mode
               option: 'Off'
-          
+
         icon_template: >-
           {% if is_state('input_boolean.sb_humidifier', 'on') %}
              mdi:air-humidifier
@@ -322,7 +323,8 @@ cover:
   - platform: template
     covers:
       fr_curtains:
-        friendly_name: "Front Room Curtains"
+        friendly_name: "Front Room Curtains" # Both Curtains
+        unique_id: e689c8e6-18b7-459d-ba9a-603e6c060ac4
         open_cover:
           service: script.fr_curtains
           data:
@@ -347,6 +349,60 @@ cover:
             mdi:window-closed
           {% endif %}
 
+
+  - platform: template
+    covers:
+      living_room_curtain:
+        friendly_name: "Living Room Curtain"
+        unique_id: 5fa6f820-e8a4-445b-827e-87f7461f6efc
+        open_cover:
+          service: cover.open_cover
+          data:
+            entity_id: cover.lr_curtain_lt_curtain
+        close_cover:
+          service: cover.close_cover
+          data:
+            entity_id: cover.lr_curtain_lt_curtain
+        stop_cover:
+          service: cover.stop_cover
+          data:
+            entity_id: cover.lr_curtain_lt_curtain
+        value_template: "{{ is_state('cover.lr_curtain_lt_curtain', 'open') }}"
+        icon_template: >-
+          {% if is_state('sensor.fr_curtains', 'open') %}
+            mdi:window-open
+          {% else %}
+            mdi:window-closed
+          {% endif %}
+
+
+  - platform: template
+    covers:
+      computer_room_curtain:
+        friendly_name: "Computer Room Curtain"
+        unique_id: c289274f-ebd5-474f-b202-887e075a2e16
+        open_cover:
+          service: cover.open_cover
+          data:
+            entity_id: cover.cr_curtain_lt_curtain
+        close_cover:
+          service: cover.close_cover
+          data:
+            entity_id: cover.cr_curtain_lt_curtain
+        stop_cover:
+          service: cover.stop_cover
+          data:
+            entity_id: cover.cr_curtain_lt_curtain
+        value_template: "{{ is_state('cover.cr_curtain_lt_curtain', 'open') }}"
+        icon_template: >-
+          {% if is_state('sensor.fr_curtains', 'open') %}
+            mdi:window-open
+          {% else %}
+            mdi:window-closed
+          {% endif %}
+
+
+
 script:
   fr_curtains:
     sequence:
@@ -354,7 +410,7 @@ script:
         target:
           entity_id:
           - cover.lr_curtain_lt_curtain
-          - cover.cr_curtain_lt_curtain          
+          - cover.cr_curtain_lt_curtain
   fr_curtains_position:
     sequence:
       - service: cover.set_cover_position
@@ -372,7 +428,7 @@ script:
           entity: cover.lr_curtain_lt_curtain
   lr_curtains_toggle_mode:
     sequence:
-      - service_template: script.lr_curtains_toggle_mode_{{ 'on' if is_state('cover.lr_curtain_lt_curtain', 'closed') else 'off' }}           
+      - service_template: script.lr_curtains_toggle_mode_{{ 'on' if is_state('cover.lr_curtain_lt_curtain', 'closed') else 'off' }}
         data_template:
           entity: '{{ entity }}'
   lr_curtains_toggle_mode_on:
@@ -393,7 +449,7 @@ script:
           entity: cover.cr_curtain_lt_curtain
   cr_curtains_toggle_mode:
     sequence:
-      - service_template: script.cr_curtains_toggle_mode_{{ 'on' if is_state('cover.cr_curtain_lt_curtain', 'closed') else 'off' }}           
+      - service_template: script.cr_curtains_toggle_mode_{{ 'on' if is_state('cover.cr_curtain_lt_curtain', 'closed') else 'off' }}
         data_template:
           entity: '{{ entity }}'
   cr_curtains_toggle_mode_on:
@@ -422,13 +478,13 @@ script:
           command: 'setMode'
           parameter: 101
       - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.configure
+        entity_id: input_boolean.sb_humidifier
+      - service: counter.set_value
         target:
           entity_id: counter.humidifier_toggle
         data:
           value: 2
-        
+
   humidifier_med:
     sequence:
       - service: rest_command.switchbot_device_command
@@ -437,8 +493,8 @@ script:
           command: 'setMode'
           parameter: 102
       - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.configure
+        entity_id: input_boolean.sb_humidifier
+      - service: counter.set_value
         target:
           entity_id: counter.humidifier_toggle
         data:
@@ -452,7 +508,7 @@ script:
           command: 'setMode'
           parameter: 103
       - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
+        entity_id: input_boolean.sb_humidifier
       - service: counter.reset
         target:
           entity_id: counter.humidifier_toggle
@@ -465,13 +521,13 @@ script:
           command: 'setMode'
           parameter: auto
       - service: input_boolean.turn_on
-        entity_id: input_boolean.sb_humidifier          
-      - service: counter.configure
+        entity_id: input_boolean.sb_humidifier
+      - service: counter.set_value
         target:
           entity_id: counter.humidifier_toggle
         data:
           value: 1
-          
+
   humidifier_off:
     sequence:
       - service: rest_command.switchbot_device_command
@@ -480,7 +536,7 @@ script:
           command: 'turnOff'
           parameter: default
       - service: input_boolean.turn_off
-        entity_id: input_boolean.sb_humidifier          
+        entity_id: input_boolean.sb_humidifier
       - service: counter.reset
         target:
           entity_id: counter.humidifier_toggle
@@ -514,8 +570,8 @@ script:
                 option: High
             - service: counter.reset
               target:
-                entity_id: counter.humidifier_toggle  
-      default:                
+                entity_id: counter.humidifier_toggle
+      default:
         - service: input_select.select_option
           data_template:
             entity_id: input_select.sb_humidifier_mode
@@ -536,21 +592,21 @@ automation:
   - alias: '24hr fan toggle on-off'
     trigger:
       - platform: time
-        at: '05:29:00'
+        at: '04:00:00'
       - platform: time
         at: '23:00:00'
     condition:
       - condition: template # Don't run if on vacation
         value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
     action:
-      - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:29') else 'off' }}
+      - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '04:00') else 'off' }}
         data:
           entity_id: switch.24hr_fan
 
   - alias: '24hr fan toggle speed'
     trigger:
       - platform: time
-        at: '05:29:00'
+        at: '04:01:30'
       - platform: state
         entity_id: sensor.period_of_the_day
         to: 'dusklight'
@@ -558,7 +614,7 @@ automation:
       - condition: template # Don't run if on vacation
         value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
     action:
-      - delay: 60
+      - delay: 90
       - service: script.holdpress_bot
         data:
           bot: '24hr_fan'
@@ -569,15 +625,19 @@ automation:
       - entity_id: sensor.period_of_the_day
         platform: state
         to:
-         - 'dawnlight'
-         - 'daylight'
+        - 'dawnlight'
+        - 'daylight'
     condition:
       - condition: template # Someone is home
         value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+#      - condition: template
+#        value_template: "{{ states('sensor.fr_curtains') != 'open' }}"        
       - condition: template # Not in Vacation
         value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+      - condition: template # open after 6am
+        value_template: "{{ states('sensor.time') > '05:00' }}"
       - condition: template # don't run if eri is front area
-        value_template: "{{ not states('sensor.eri_espresense').lower() in ['kitchen', 'livingroom'] }}"        
+        value_template: "{{ not states('sensor.eri_espresense').lower() in ['kitchen', 'livingroom'] }}"
     action:
       - service: cover.set_cover_position
         data:
@@ -593,16 +653,29 @@ automation:
          - 'dusklight'
          - 'nightlight'
     condition:
-      - condition: template 
+      - condition: template
         value_template: "{{ states('sensor.fr_curtains') != 'closed' }}"
       - condition: template # Not in Vacation
-        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"      
+        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
     action:
       - service: cover.set_cover_position
         data:
           position: '{% if is_state("sensor.period_of_the_day", "dusklight") %} 50 {% else %} 0 {% endif %}'
           entity_id:
           - cover.fr_curtains
+
+# LR swithbot contact sensor button
+  - alias: 'Close Computer Room Curtains'
+    trigger:
+      - entity_id: binary_sensor.cr_window_button
+        platform: state
+        to: 'on'
+    condition:
+      - condition: template
+        value_template: "{{ is_state('cover.cr_curtain_lt_curtain', 'open') }}"
+    action:
+      - service: script.cr_curtains_toggle
+
 
 rest_command:
   switchbot_device_command:
@@ -612,5 +685,4 @@ rest_command:
     headers:
       Authorization: !secret switchbot_api
     payload: '{ "command": "{{ command }}", "parameter": "{{ parameter }}" }'
-    
-          
+

@@ -20,7 +20,7 @@
   trigger:
 #    - entity_id: group.bed_sensors
     - entity_id: binary_sensor.middle
-      for: '00:00:30'
+      for: 30
       from: 'off'
       platform: state
       to: 'on'
@@ -99,9 +99,6 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.audible_notifications
 
-
-
-
 #########################################################
 #
 #             Shion Calendar Events
@@ -110,10 +107,10 @@
 
 - alias: Shion Event Starting Soon
   trigger:
-  - platform: state
+  - platform: calendar
+    event: start
+    offset: "-0:45:0"
     entity_id: calendar.shion_events
-    attribute: offset_reached
-    to: True
   action:
     - service: script.status_annc
       data:
@@ -121,27 +118,26 @@
         call_interuption: 1
         call_shion_events: 1
 
-- alias: School Pickup Reminder
-  trigger:
+
+#- alias: School Pickup Reminder
+#  trigger:
 #    - platform: time
-#      at: input_datetime.school_day_start_reminder
-    - platform: time
-      at: input_datetime.school_day_end_reminder
-  condition:
-    - condition: state
-      entity_id: calendar.shion_school
-      attribute: offset_reached
-      state: True
-  action:
-    - service: script.status_annc
-      data:
-        who: "{{ states('sensor.room_audio') }}"
-        call_interuption: 1
-        call_school_pickup_reminder: 1
-    - service: script.text_notify
-      data_template:
-        who: duc
-        message: It's almost time to head for school.
+#      at: input_datetime.school_day_end_reminder
+#  condition:
+#    - condition: state
+#      entity_id: calendar.shion_school
+#      attribute: offset_reached
+#      state: True
+#  action:
+#    - service: script.status_annc
+#      data:
+#        who: "{{ states('sensor.room_audio') }}"
+#        call_interuption: 1
+#        call_school_pickup_reminder: 1
+#    - service: script.text_notify
+#      data_template:
+#        who: duc
+#        message: It's almost time to head for school.
 
 
 #########################################################
@@ -152,10 +148,10 @@
 
 - alias: Appointments Reminder
   trigger:
-  - platform: state
+  - platform: calendar
+    event: start
+    offset: '-0:45:0'
     entity_id: calendar.appointments
-    attribute: offset_reached
-    to: True
   action:
     - service: script.status_annc
       data:
@@ -163,24 +159,6 @@
         call_interuption: 1
         call_appointments: 1
 
-#########################################################
-#
-#             Calendar Reminders
-#
-#########################################################
-
-- alias: Calendar Reminder
-  trigger:
-  - platform: state
-    entity_id: calendar.reminders
-    attribute: offset_reached
-    to: True
-  action:
-    - service: script.status_annc
-      data:
-        who: ai_1
-        call_interuption: 1
-        call_reminders: 1
 
 #########################################################
 #
@@ -188,7 +166,6 @@
 #
 #########################################################
 
-#Make sure to enable this automation when done testing.
 - alias: announce who is arriving
   trigger:
     - platform: state
@@ -210,7 +187,7 @@
             - service: script.standby # turn off alarm
             - service: input_boolean.turn_off
               data:
-                entity_id: >
+                entity_id: |
                  {% if trigger.to_state.attributes.friendly_name == 'iE' %}
                     input_boolean.eri_travel_monitor
                  {% elif trigger.to_state.attributes.friendly_name == 'id' %}
@@ -233,7 +210,7 @@
             brightness: 200
         - service: input_boolean.turn_off
           data:
-            entity_id: >
+            entity_id: |
              {% if trigger.to_state.attributes.friendly_name == 'iE' %}
                 input_boolean.eri_travel_monitor
              {% elif trigger.to_state.attributes.friendly_name == 'id' %}
@@ -258,7 +235,7 @@
   action:
     - service: switch.turn_on
       data:
-        entity_id: >-
+        entity_id: |
           {% if is_state('input_boolean.toggle_guest_presence', 'on') %}
              switch.momentary_activate_guest
           {% elif is_state('binary_sensor.duc_presence', 'on') %}
@@ -274,7 +251,7 @@
 
 #########################################################
 #
-#             Alexa Greets Faimly at Genkan
+#             Alexa Greets Person at Genkan
 #
 #########################################################
 

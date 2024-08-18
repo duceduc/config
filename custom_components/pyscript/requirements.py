@@ -4,8 +4,6 @@ import logging
 import os
 import sys
 
-from pkg_resources import Requirement
-
 from homeassistant.loader import bind_hass
 from homeassistant.requirements import async_process_requirements
 
@@ -90,19 +88,14 @@ def process_all_requirements(pyscript_folder, requirements_paths, requirements_f
                 pkg = pkg[:i]
             pkg = pkg.strip()
 
-            if not pkg:
+            if not pkg or len(pkg) == 0:
                 continue
 
             try:
                 # Attempt to get version of package. Do nothing if it's found since
                 # we want to use the version that's already installed to be safe
-                requirement = Requirement.parse(pkg)
-                pkg_name = requirement.project_name
-
-                # Requirements must be pinned and will be skipped if they aren't
-                if len(requirement.specs) == 1 and (
-                    len(requirement.specs[0]) != 2 or requirement.specs[0][0] != "=="
-                ):
+                parts = pkg.split("==")
+                if len(parts) > 2 or "," in pkg or ">" in pkg or "<" in pkg:
                     _LOGGER.error(
                         (
                             "Ignoring invalid requirement '%s' specified in '%s'; if a specific version"
@@ -112,11 +105,12 @@ def process_all_requirements(pyscript_folder, requirements_paths, requirements_f
                         pkg,
                     )
                     continue
-
-                if not requirement.specs:
+                if len(parts) == 1:
                     new_version = UNPINNED_VERSION
                 else:
-                    new_version = requirement.specs[0][1]
+                    new_version = parts[1]
+                pkg_name = parts[0]
+
                 current_pinned_version = all_requirements_to_install.get(pkg_name, {}).get(ATTR_VERSION)
                 current_sources = all_requirements_to_install.get(pkg_name, {}).get(ATTR_SOURCES, [])
                 # If a version hasn't already been recorded, record this one
@@ -297,16 +291,17 @@ async def install_requirements(hass, config_entry, pyscript_folder):
 
     if requirements_to_install:
         _LOGGER.info(
-            "Installing the following packages: %s", str(requirements_to_install),
+            "Installing the following packages: %s",
+            str(requirements_to_install),
         )
         await async_process_requirements(
             hass,
             DOMAIN,
             [
-                f"{package}=={requirements_to_install[package][ATTR_VERSION]}"
-                if requirements_to_install[package][ATTR_VERSION] != UNPINNED_VERSION
+                f"{package}=={pkg_info[ATTR_VERSION]}"
+                if pkg_info[ATTR_VERSION] != UNPINNED_VERSION
                 else package
-                for package in requirements_to_install
+                for package, pkg_info in requirements_to_install.items()
             ],
         )
     else:
@@ -314,7 +309,7 @@ async def install_requirements(hass, config_entry, pyscript_folder):
 
     # Update package tracker in config entry for next time
     pyscript_installed_packages.update(
-        {package: requirements_to_install[package][ATTR_VERSION] for package in requirements_to_install}
+        {package: pkg_info[ATTR_VERSION] for package, pkg_info in requirements_to_install.items()}
     )
 
     # If any requirements were unpinned, get their version now so they can be pinned later

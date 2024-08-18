@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#                   Backup Config to Github                                                           
-#                                                                                                              
+#
+#                   Backup Config to Github
+#
 #########################################################
 
   - alias: 'Backup Config Github'
@@ -9,15 +9,15 @@
       platform: time
       at: '18:00:00'
     action:
-#      - service: shell_command.update_github    
+#      - service: shell_command.update_github
       - service: homeassistant.turn_on
         entity_id: switch.update_github
 
 
 ####################################################
-#                                                                                                    
-#                    SENSOR BATTERY LOW                                                 
-#                                                                                                    
+#
+#                    SENSOR BATTERY LOW
+#
 ####################################################
 
   - alias: "Sensor Low Battery"
@@ -25,37 +25,38 @@
     trigger:
       - platform: numeric_state
         entity_id:
-          - sensor.motion_security_battery
-          - sensor.aio_controller_battery
-          - sensor.shion_room_battery
-          - sensor.computer_room_battery
-          - sensor.living_room_battery
-          - sensor.meter_battery
-          - sensor.jcom_tv_box_battery
-          - sensor.floor_heat_battery
-          - sensor.hallway_door_battery
-          - sensor.genkan_door_battery
-          - sensor.24hr_fan_battery
-          
-          - sensor.master_dimmer_battery
-          - sensor.shion_dimmer_battery
-          - sensor.lr_curtains_battery
-          - sensor.cr_curtains_battery
-          - sensor.shower_room_battery
+        - sensor.motion_security_battery
+        - sensor.aio_controller_battery
+        - sensor.shion_room_battery
+        - sensor.computer_room_battery
+        - sensor.living_room_battery
+        - sensor.meter_battery
+        - sensor.jcom_tv_box_battery
+        - sensor.floor_heat_battery
+        - sensor.hallway_door_battery
+        - sensor.genkan_door_battery
+        - sensor.24hr_fan_battery
+        - sensor.washer_door_battery
 
-          - sensor.motion_s1_battery
-          - sensor.motion_c1_battery
-        below: 6
+        - sensor.master_dimmer_battery
+        - sensor.shion_dimmer_battery
+        - sensor.lr_curtains_battery
+        - sensor.cr_curtains_battery
+        - sensor.shower_room_battery
+
+        - sensor.motion_s1_battery
+        - sensor.motion_c1_battery
+        below: 46
     action:
       - service: notify.notify_events
         data_template:
-          message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 5 percent."
+          message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 46 percent."
 
 
 #########################################################
-#                                                                                                              
-#                  Startup Automation to update some sensor after reboot                                                       
-#                                                                                                              
+#
+#                  Startup Automation to update some sensor after reboot
+#
 #########################################################
 
   - alias: startup automations
@@ -66,13 +67,16 @@
     action:
       - service: frontend.set_theme
         data:
-          name: midnight    
-      - delay: 24
+          name: midnight
+      - delay: 25 # possible ok to remove this
+      - service: script.set_device_tracker_shion # need to run x2 between 3 mins
+      - delay: 15
       - service: automation.trigger
-        entity_id: automation.presence_restart_daily
+        entity_id: automation.presence_restart_daily # restart monitor every reboot of Ha
+      - delay: 270 # 280 300
+      - service: script.set_device_tracker_shion # need to run x2 between 3 mins
 
-
-  - alias: Refresh special event sensors
+  - alias: Refresh special event sensors # daily at midnight
     initial_state: true
     trigger:
       - platform: time
@@ -104,18 +108,32 @@
         data:
           name: Golden Week
           type: holiday
-          date: '29/04/2022'
-#      - service: script.seismom5p_reset #remove if not needed. prevent from going unavailable
+          date: '29/04/2023'
+      - service: script.mailbox_reset # reset mqtt state or it will never retrigger
+      - service: python_script.set_state # reset mail sensor
+        data:
+          entity_id: sensor.lora_mailbox
+          state: received
+#      - service: script.enable_devices # reenable internet/tv lock for devices
 
-          
+  - alias: Renable Shion Devices
+    initial_state: true
+    trigger:
+      - platform: time
+        at: '02:00:00'
+    action:
+      - service: script.enable_devices # reenable internet/tv lock for devices
+
+
+
 #########################################################
-#                                                                                                              
-#                  TEMPLATE SENSOR UPDATE                                                       
-#                                                                                                              
+#
+#                  TEMPLATE SENSOR UPDATE
+#
 #########################################################
 
   - alias: Update Template Sensors
-    initial_state: true  
+    initial_state: true
     trigger:
         platform: time_pattern
         minutes: '/59'
@@ -129,16 +147,16 @@
         - sensor.script_count
         - sensor.switch_count
         - sensor.binary_sensor_count
-        - sensor.lights_count
+        - sensor.light_count
 
 #########################################################
-#                                                                                                              
-#             New Homeassistant Version                                                             
-#                                                                                                              
+#
+#             New Homeassistant Version
+#
 #########################################################
 
   - alias: "New Home Assistant Version"
-    initial_state: true  
+    initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.hassio_version
@@ -154,9 +172,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Disable Pwned Notifications                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Disable Pwned Notifications                                                             
+#                                                                                                              
 #########################################################
 
   - alias: persistent_notification_clear_pwned
@@ -179,13 +197,13 @@
 
 # Suppress esp32 cam desktop login error
   - alias: persistent_notification_clear_ip
-    mode: single 
+    mode: single
     trigger:
       - platform: state
         entity_id: persistent_notification.http_login
         to: notifying
     condition:
-      - condition: template 
+      - condition: template
         value_template: >
           {% if states.persistent_notification.http_login.state is defined %}
             {% set str= state_attr('persistent_notification.http_login', 'message') %}
@@ -200,38 +218,24 @@
           notification_id: http-login
 
 #########################################################
-#                                                                                                              
-#             Restore Samba Backup on Startup                                                    
-#                                                                                                              
+#
+#             Restore Samba Backup on Startup
+#
 #########################################################
 
   - alias: Restore Samba Backup sensor on startup
     trigger:
-    - event: start
-      platform: homeassistant
+    - platform: homeassistant
+      event: start
     action:
     - service: hassio.addon_stdin
       data:
         addon: 15d21743_samba_backup
         input: restore-sensor
 
-#########################################################
-#                                                                                                              
-#             Set Location of device_tracker_shion on Startup                                 
-#                                                                                                              
-#########################################################
-
-  - alias: Restore Shion Location on startup
-    trigger:
-    - platform: homeassistant
-      event: start
-    action:
-      - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
-
-
 
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

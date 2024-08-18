@@ -32,8 +32,8 @@
 #    - platform: state
 #      entity_id:
 #       - binary_sensor.motion_lr_occupancy
-#       - binary_sensor.motion_mr_occupancy
-#       - binary_sensor.motion_sr_occupancy
+#       - binary_sensor.mr_has_moving_target
+#       - binary_sensor.sr_has_moving_target
 #      to: 'on'
 #  condition:
 #    - condition: template 
@@ -104,25 +104,25 @@
       to: 'off'
   action:
     - choose:
-      - conditions:
-        - condition: trigger
-          id: sundown
-        - condition: state
-          entity_id: input_boolean.vacation_mode
-          state: 'on'
-        sequence:
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.randomize_vacation_lights
-      - conditions:
-        - condition: or
-          conditions:
-          - condition: trigger
-            id: sunup
-          - condition: trigger
-            id: cancel
-        sequence:
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.randomize_vacation_lights
+        - conditions:
+            - condition: trigger
+              id: sundown
+            - condition: state
+              entity_id: input_boolean.vacation_mode
+              state: 'on'
+          sequence:
+            - service: input_boolean.turn_on
+              entity_id: input_boolean.randomize_vacation_lights
+        - conditions:
+            - condition: or
+              conditions:
+              - condition: trigger
+                id: sunup
+              - condition: trigger
+                id: cancel
+          sequence:
+            - service: input_boolean.turn_off
+              entity_id: input_boolean.randomize_vacation_lights
 
 
 

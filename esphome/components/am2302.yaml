@@ -1,0 +1,19 @@
+sensor:
+  - platform: dht
+    model: AM2302
+    pin: $am2302
+    update_interval: 15s
+    temperature:
+      name: '$name temperature'
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+           send_first_at: 1
+    humidity:
+      name: '$name humidity'
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+           send_first_at: 1

@@ -23,8 +23,8 @@
 # SR Mold Chance
   - platform: mold_indicator
     name: Sr Condensation Chance
-    indoor_temp_sensor: sensor.sr_temperature
-    indoor_humidity_sensor: sensor.sr_humidity
+    indoor_temp_sensor: sensor.sr_radar_temperature
+    indoor_humidity_sensor: sensor.sr_radar_humidity
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 1.4
 
@@ -63,8 +63,8 @@
 # Computer Room Mold Chance
   - platform: mold_indicator
     name: Computerroom Condensation Chance
-    indoor_temp_sensor: sensor.espresense_computerroom_temperature
-    indoor_humidity_sensor: sensor.espresense_computerroom_humidity
+    indoor_temp_sensor: sensor.cr_temperature #sensor.espresense_computerroom_temperature
+    indoor_humidity_sensor: sensor.cr_humidity # sensor.espresense_computerroom_humidity
     outdoor_temp_sensor: sensor.oa_temperature
     calibration_factor: 0.6
 

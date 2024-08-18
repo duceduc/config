@@ -6,6 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 For more details about this platform, please refer to the documentation at
 https://community.home-assistant.io/t/echo-devices-alexa-as-media-player-testers-needed/58639
 """
+
 from datetime import timedelta
 
 from homeassistant.const import (
@@ -14,8 +15,8 @@ from homeassistant.const import (
     PERCENTAGE,
 )
 
-__version__ = "4.6.0"
-PROJECT_URL = "https://github.com/custom-components/alexa_media_player/"
+__version__ = "4.12.7"
+PROJECT_URL = "https://github.com/alandtse/alexa_media_player/"
 ISSUE_URL = f"{PROJECT_URL}issues"
 NOTIFY_URL = f"{PROJECT_URL}wiki/Configuration%3A-Notification-Component#use-the-notifyalexa_media-service"
 
@@ -46,6 +47,7 @@ CONF_HASS_URL = "hass_url"
 CONF_INCLUDE_DEVICES = "include_devices"
 CONF_EXCLUDE_DEVICES = "exclude_devices"
 CONF_QUEUE_DELAY = "queue_delay"
+CONF_PUBLIC_URL = "public_url"
 CONF_EXTENDED_ENTITY_DISCOVERY = "extended_entity_discovery"
 CONF_SECURITYCODE = "securitycode"
 CONF_OTPSECRET = "otp_secret"
@@ -57,9 +59,13 @@ DATA_LISTENER = "listener"
 
 EXCEPTION_TEMPLATE = "An exception of type {0} occurred. Arguments:\n{1!r}"
 
+DEFAULT_DEBUG = False
 DEFAULT_EXTENDED_ENTITY_DISCOVERY = False
+DEFAULT_HASS_URL = "http://homeassistant.local:8123"
+DEFAULT_PUBLIC_URL = ""
 DEFAULT_QUEUE_DELAY = 1.5
-SERVICE_CLEAR_HISTORY = "clear_history"
+DEFAULT_SCAN_INTERVAL = 60
+
 SERVICE_UPDATE_LAST_CALLED = "update_last_called"
 SERVICE_FORCE_LOGOUT = "force_logout"
 
@@ -131,3 +137,5 @@ ALEXA_ICON_CONVERSION = {
     "Alexa.AirQuality.IndoorAirQuality": "mdi:numeric",
 }
 ALEXA_ICON_DEFAULT = "mdi:molecule"
+
+UPLOAD_PATH = "www/alexa_tts"

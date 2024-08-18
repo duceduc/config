@@ -1,37 +1,48 @@
 ####################################################
-#                                                                                                    #
-#                      SHELLY EM                                                               #
-#                                                                                                    #
+#                                                                                                    
+#                      SHELLY EM                                                               
+#                                                                                                    
 ####################################################
+
+# Alternative not working
+#  - name: "Shelly T31 Total Energyz"
+#    state_topic: "shellies/shellyem-06209A/emeter"
+#    value_template: '{{ (value_json.0.total | float /1000)|round(3) }}'
+#    unit_of_measurement: "kWh"
+#    icon: mdi:gauge
+#    qos: 1
+
 
 
   - name: "Tariff 31 Power"
     state_topic: "shellies/shellyem-06209A/emeter/0/power"
-    value_template: '{{ value|round(1) }}'
-    qos: 1
+    value_template: '{{ value|round(3) }}'
     unit_of_measurement: "W"
     icon: mdi:gauge
+    qos: 1
 
   - name: "Tariff 41 Power"
     state_topic: "shellies/shellyem-06209A/emeter/1/power"
     value_template: '{{ value|round(1) }}'
-    qos: 1
     unit_of_measurement: "W"
     icon: mdi:gauge
+    qos: 1
 
   - name: "Mains Voltage"
     state_topic: "shellies/shellyem-06209A/emeter/0/voltage"
-    qos: 1
     unit_of_measurement: "V"
     icon: mdi:flash
-
+    qos: 1
 
 
 ####################################################
 #
-#                      Shelly Smart Plug
+#                      Shelly fridge Plug
 #
 ####################################################
+
+
+
 
 #Gosund plug -  192.168.1.78
 #  - name: "Gosund Washer Power"
@@ -65,7 +76,7 @@
 
 
 ####################################################
-#                                                                                                    #
-#            END OF CONFIGURATION FILE                                                 #
-#                                                                                                    #
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
 ####################################################

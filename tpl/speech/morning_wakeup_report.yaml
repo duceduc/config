@@ -11,24 +11,24 @@
     </p>
 
     <p>
-      The Weather in Kawagoodchi is {{ states.sensor.wbio_current_temperature.state }} degrees 
-      {% if is_state('weather.weatherbit', 'rainy') %}
+      The Weather in Kawagoodchi is {{ states('sensor.wbio_current_temperature') }} degrees 
+      {% if is_state('weather.my_weather', 'rainy') %}
         {{ [
         'with rain.', 
         'with showers.'
         ] | random }}
-      {% elif is_state('weather.weatherbit', 'cloudy') %}
+      {% elif is_state('weather.my_weather', 'cloudy') %}
         {{ [
         'with clouds.', 
         'with cloudy skies.'
         ] | random }}
-      {% elif is_state('weather.weatherbit', 'partlycloudy') %}
+      {% elif is_state('weather.my_weather', 'partlycloudy') %}
         {{ [
         'with some clouds.', 
         'with partly cloudy skies.',
         'with scatterd clouds.'
         ] | random }}
-      {% elif is_state('weather.weatherbit', 'sunny') %}
+      {% elif is_state('weather.my_weather', 'sunny') %}
         {% if is_state('sun.sun', 'above_horizon') %}
           {{ [
           'and sunny.', 
@@ -41,7 +41,7 @@
           ] | random }}
         {% endif %}
       {% else %}
-        and  {{ states.weather.weatherbit.state }}
+        and {{ states('weather.my_weather') }}
       {% endif %}
 
 
@@ -82,7 +82,7 @@
           ] | random }} 
           today. So I suggest wearing shorts.
         {% else %}
-          It is going to be {{ states.sensor.clothing_forecast.state }} today so I suggest wearing shorts.
+          It is going to be {{ states('sensor.clothing_forecast') }} today so I suggest wearing shorts.
         {% endif %} 
       {% endif %}
 
@@ -105,7 +105,7 @@
       {% if 'Walking Home' in states('sensor.school_event') %}
         But Sheon will be walking home from school.
       {% endif %}
-      {% if states.sensor.school_end_days2go.state | int == 0 -%}
+      {% if states('sensor.school_end_days2go')| int == 0 -%}
         But today is the last day of School!
       {%- endif %}
     {% endif %}
@@ -113,11 +113,11 @@
       {% if is_state('sensor.school_lunch', 'Nothing') %}
         I am not sure what the school menu is for today, so plan on She on taking his lunch 
       {% else %}
-        Today's school lunch is {{ states.sensor.school_lunch.state }}, lets hope Sheon is not too picky on his plate.
+        Today's school lunch is {{ states('sensor.school_lunch') }}, lets hope Sheon is not too picky on his plate.
       {% endif %}
     {% endif %}
 
-    {% if states.sensor.school_end_days2go.state | int == -1 -%}
+    {% if states('sensor.school_end_days2go')| int == -1 -%}
       Today is the first day of Summer Break! 
     {%- endif %}
 
@@ -126,25 +126,27 @@
     {% endif %} 
 
     {% if is_state('calendar.shion_events', 'on') %}
-      Skylar has {{ states.calendar.shion_events.attributes.message }} today as well!
+      Skylar has {{ state_attr('calendar.shion_events', 'message') }} today as well!
     {% endif %}
     </p>
 
     <p>
       {% if is_state('sensor.date_weekday', 'on') and is_state('calendar.holidays_in_japan', 'off') %}
-         {%- if states.sensor.duc_destinations.state|round > 45 %}
+         {%- if states('sensor.duc_destinations')|round > 46 %}
            Traffic to jcb office appears heavy than normnal.
          {% else %}
            Traffic to the jcb office is normal.
          {% endif %}
-         Currently it will take {{states.sensor.duc_destinations.state|round}} minutes to get to the office.
+         Currently it will take {{states('sensor.duc_destinations')|round}} minutes to get to the office.
 
-         {%- if states.sensor.eri_destinations.state|round > 67 %}
-           Traffic to costco headquarter appears heavy than normnal.
+         {%- if not is_state('device_tracker.ie', 'home') %}
+           Eddie appears to be enroute to work and
+         {%- elif states('sensor.eri_destinations')|round > 67 %}
+           Traffic to the costco headquarter appears heavy than normnal.
          {% else %}
            Traffic to the costco headquarter is normal.
          {% endif %}
-         Currently it will take {{states.sensor.eri_destinations.state|round}} minutes to get to costco.
+         Currently it will take {{states('sensor.eri_destinations')|round}} minutes to get to costco.
       {% endif %}
     </p>
 

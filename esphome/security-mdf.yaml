@@ -1,35 +1,14 @@
-# ESP32 CAM... 10-52-1C-62-EC-48
+# [10:52:1C:62:EC:48]
 substitutions:
   name: security-mdf
-  platform: ESP32
-  board: esp-wrover-kit 
+#  ssid: !secret ssid2
+
+<<: !include .base.yaml #.249
 
 esphome:
   name: $name
-  platform: $platform
-  board: $board
-
-wifi:
-  ssid: !secret ssid1
-  password: !secret ssid_pass
-  fast_connect : true
-  power_save_mode: none
-  reboot_timeout: 0s
-  manual_ip:
-    static_ip: 192.168.1.94
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
-
-captive_portal:
-logger:
-
-api:
-  encryption:
-    key: !secret esphome_apikey
-
-ota:
-  password: !secret ota_pass
-
+  platform: ESP32
+  board: nodemcu-32s
 
 esp32_camera:
   name: $name
@@ -46,30 +25,54 @@ esp32_camera:
   power_down_pin: GPIO32
 
 # Image settings
+  vertical_flip: false
   max_framerate: 1 fps
   resolution: SXGA
   jpeg_quality: 20
   contrast: 2
   saturation: 2
 
+output:
+  - platform: gpio
+    pin:
+      number: GPIO3
+      allow_other_uses: true
+    id: gpio_3
+    
+light:
+  - platform: binary
+    name: $name light  
+    output: gpio_3
+
+
 sensor:
   - platform: wifi_signal
-    name: '$name WiFi Signal'
+    name: '$name wifi signal'
     update_interval: 15s
     filters:
       - sliding_window_moving_average:
           window_size: 15
           send_every: 15
-          send_first_at: 1
 
   - platform: dht
     model: AM2302
-    update_interval: 15s    
-    pin: GPIO3
+    update_interval: 15s
+    pin: 
+      number: GPIO3
+      allow_other_uses: true
+
     temperature:
       name: "mdf Temperature"
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
     humidity:
       name: "mdf Humidity"
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
 
 binary_sensor:
   - platform: status
@@ -78,4 +81,4 @@ binary_sensor:
 switch:
   - platform: restart
     name: "$name Restart"
-    icon: mdi:restart    
+    icon: mdi:restart

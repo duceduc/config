@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#                    Momentary Switches                                                    
-#                                                                                                    
+#
+#                    Momentary Switches
+#
 ####################################################
 
   - platform: momentary
@@ -22,28 +22,20 @@
     toggle_for: 40
     cancellable: True
 
-
 ####################################################
-#                                                                                                    
-#                    Internet Kill Switches                                                    
-#                                                                                                    
+#
+#                    Internet Kill Switches
+#
 ####################################################
-
+# MOVE TO disable_devices.yaml packages
 
 #  - platform: command_line
 #    switches:
-
-#      is_internet:
-#        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
-#        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
-#        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
-#        value_template: '{{ value == "1" }}'
-
-## old ip for iphone 6+ 192.168.1.104 .Now is shion school laptop
-#      laptop_internet:
-#        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.251"
-#        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.251"
-#        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.251"
+# automation in homeassistant package disable_devices
+#      ai3_internet:
+#        command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.107"
+#        command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.107"
+#        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.107"
 #        value_template: '{{ value == "1" }}'
 
 #      switch_internet:
@@ -52,11 +44,10 @@
 #        command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.102"
 #        value_template: '{{ value == "1" }}'
 
-
 ####################################################
-#                                                                                                    
-#                    Customize Switches                                                     
-#                                                                                                    
+#
+#                    Customize Switches
+#
 ####################################################
 
 # Christmas Light Switch
@@ -83,27 +74,41 @@
          {% endif %}
 
 # Desktop Switch
-  - platform: template
-    switches:
-     desktop:
-       friendly_name: 'Desktop'
-       value_template: "{{ states('binary_sensor.desktop_status') }}"
-       turn_on:
-         - service: script.desktop_wol_on
-       turn_off:
-         - service: script.desktop_wol_off       
-       icon_template: >-
-         {% if is_state('binary_sensor.desktop_status', 'on') %}
-            mdi:monitor-dashboard
-         {% else %}
-            mdi:desktop-mac
-         {% endif %}
+#  - platform: template
+#    switches:
+#     desktop:
+#       friendly_name: 'Desktop' # desktop-3l5pa48
+#       value_template: "{{ states('binary_sensor.desktop_status') }}"
+#       turn_on:
+#         - service: script.desktop_wol_on
+#       turn_off:
+#         - service: script.desktop_wol_off
+#         - service: light.turn_off
+#           entity_id: light.pc_desktop_led
+#       icon_template: >-
+#         {% if is_state('binary_sensor.desktop_status', 'on') %}
+#            mdi:monitor-dashboard
+#         {% else %}
+#            mdi:monitor-off
+#         {% endif %}
+
+
+# TESTING
+  - platform: wake_on_lan
+    name: Desktop
+    mac: 9C-6B-00-59-D2-6D
+    host: 192.168.1.112 # desktop-3l5pa48.local 
+    turn_off:
+      - service: script.desktop_wol_off
+#      - service: script.pc_desktop_led
+#      - service: light.turn_off
+#        entity_id: light.pc_desktop_led
 
 
 #########################################################
-#                                                                                                              
-#             Emulated Aircon Switches                                                              
-#                                                                                                              
+#
+#             Emulated Aircon Switches
+#
 #########################################################
 
   - platform: template
@@ -213,7 +218,7 @@
          {% else %}
             mdi:fan-off
          {% endif %}
- 
+
 # Shion Aircon
      ac_sr_unit:
        friendly_name: 'AC SR Unit'
@@ -268,8 +273,13 @@
          {% endif %}
 
 
+
+
+
+
+
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

@@ -1,13 +1,13 @@
 ####################################################
-#                                                                                                    
-#                    SWITCHES VIEW                                                          
-#                                                                                                    
+#
+#                    SWITCHES VIEW
+#
 ####################################################
 
 title: Switches
 path: switches
 icon: mdi:light-switch
-# background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+#background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
 panel: true
 cards:
 
@@ -25,28 +25,34 @@ cards:
             name: Living Room
           - entity: light.computer
             name: Computer Room
+          - entity: light.pc_desktop_led
+            name: Desk Led
           - entity: light.ceiling_fan_light
-            name: Dining Room
+            name: Dining Room            
           - type: divider
-          - entity: switch.ceiling_fan_summer
+          - entity: fan.ceiling_fan_summer
             icon: mdi:pinwheel
             name: Ceiling Fan
           - entity: fan.yuasa_fan
             name: Yuasa Fan
+          - entity: switch.cr_airfreshener
+            name: Computer Airfreshener
+          - entity: switch.kt_airfreshener
+            name: Kitchen Airfreshener
+          - entity: switch.toilet_airfreshener
+            name: Toilet Airfreshener
           - entity: switch.floor_heat
             name: Floor Heater
           - entity: switch.sb_humidifier
             name: Humidifier
-
           - entity: switch.sb_humidifier_mode
             name: Humidifier Mode
 
-            
-            
           - entity: switch.jcom_tv
             name: Jcom Tv
           - entity: switch.desktop
             name: Desktop
+
 #          - entity: switch.christmas_lights
 #            name: Christmas Lights
           - type: divider
@@ -117,18 +123,27 @@ cards:
         title: Disable Devices
         show_header_toggle: false
         entities:
+          - entity: switch.desktop_internet
+            name: Desktop
+          - entity: switch.iphonex
+            name: iX
+          - entity: switch.ai_4
+            name: Ai4        
+          - entity: switch.iphone8
+            name: iPhone8
+          - entity: switch.ipad
+            name: iPad
+          - entity: switch.tv_lock
+            name: Tv Lock
+          - entity: input_boolean.disable_motion_lights
+            name: Motion Lights
+
 #          - entity: switch.is_internet
 #            name: iPhone 6
-#            icon: mdi:wifi
-#          - entity: switch.laptop_internet
-#            name: School Laptop
 #            icon: mdi:wifi
 #          - entity: switch.switch_internet
 #            name: Nintendo Switch
 #            icon: mdi:wifi
-          - entity: switch.tv_lock
-            name: Tv Lock
-
 
       - type: custom:decluttering-card
         template: humidifier_tpl
@@ -142,9 +157,8 @@ cards:
 
 
 
-
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

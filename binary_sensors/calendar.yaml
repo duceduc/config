@@ -54,16 +54,10 @@
     before: '20:00'
 
 
-#########################################################
-#                                                                                                              
-#            Workday                                                                                           
-#                                                                                                              
-#########################################################
-
-
-  - platform: workday
-    country: JP
-    workdays: [mon, tue, wed, thu, fri]
+# Remove below. Now in UI
+#  - platform: workday
+#    country: JP
+#    workdays: [mon, tue, wed, thu, fri]
 
 
 #########################################################

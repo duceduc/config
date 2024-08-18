@@ -32,7 +32,7 @@
       # Save your message for recall
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/lastmsg'
+          topic: 'house/alerts/alexa/lastmsg'
           payload: >
             {% if msg_summary == 'recall' %}
               {% set msg_summary = '{{ states("sensor.alexa_last_msg") }}' %}
@@ -50,14 +50,14 @@
         # Save time of last message
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/msgtime'
+          topic: 'house/alerts/alexa/msgtime'
           payload: >
             {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}
           retain: true  
        # Save location   
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/lastloc'
+          topic: 'house/alerts/alexa/lastloc'
           payload: '{{ who }}'
           retain: true
 
@@ -97,7 +97,7 @@
       # Save your message for recall
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/lastmsg'
+          topic: 'house/alerts/alexa/lastmsg'
           payload: >
             {% if msg_summary == 'recall' %}
               {% set msg_summary = '{{ states("sensor.alexa_last_msg") }}' %}
@@ -115,14 +115,14 @@
         # Save time of last message
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/msgtime'
+          topic: 'house/alerts/alexa/msgtime'
           payload: >
             {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}
           retain: true  
        # Save location   
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/lastloc'
+          topic: 'house/alerts/alexa/lastloc'
           payload: '{{ who }}'
           retain: true
 

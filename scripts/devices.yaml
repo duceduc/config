@@ -1,78 +1,22 @@
 #########################################################
-#                                                                                                              
-#             Ceiling Fan                                                                                   
-#                                                                                                              
+#
+#             Ceiling Fan
+#
 #########################################################
 
-# Broadlink Cmd -> Emulated Hue
-  turn_on_all_fans:
-    sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Yuasa Fan
-          command:
-          - power
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Ceiling Fan
-          num_repeats: 2
-          command:
-          - toggle summer fan
-
-  turn_off_all_fans:
-    sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Yuasa Fan
-          command:
-          - power
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Ceiling Fan
-          command:
-          - turn off fan
-
-  toggle_winter_fan:
-    sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Ceiling Fan
-          command:
-          - toggle winter fan
 
 
-  toggle_summer_fan:
-    sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Ceiling Fan
-          command:
-          - toggle summer fan
-
-
-  ceiling_fan_lights:
-    sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Ceiling Fan
-          command:
-          - lights
 
 #########################################################
-#                                                                                                              
-#             Turn Off Devices If Left On: No One Home                                          
-#                                                                                                              
+#
+#             Turn Off Devices If Left On: No One Home
+#
 #########################################################
 
   appliances_off:
     sequence:
+      - condition: template
+        value_template: "{{ states('input_select.home_mode') != 'Home' }}"
       - service: script.aclr_off
         data_template:
           room: 'lr'
@@ -128,6 +72,7 @@
         data_template:
           entity_id:  script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
 
+
   xmas_off:
     sequence:
       - condition: template
@@ -136,12 +81,16 @@
         data:
           entity_id: switch.christmas_lights
 
+
+
+
 #########################################################
-#                                                                                                              
-#             Enable Devices at midnight                                                             
-#                                                                                                              
+#
+#             Enable Devices at midnight
+#
 #########################################################
 
+# automation at homeassistant.yaml
   enable_devices:
     sequence:
       - service: script.enable_dev1
@@ -158,65 +107,24 @@
   enable_dev2:
     sequence:
       - condition: template
-        value_template: "{{ is_state('switch.is_internet', 'on') or is_state('switch.laptop_internet', 'on') }}"
+        value_template: "{{ is_state('switch.ipad', 'on') }}"
       - service: switch.turn_off
         data:
-          entity_id: switch.is_internet, switch.laptop_internet, switch.switch_internet
+          entity_id: switch.ipad, switch.iphonex, switch.ai_4, switch.iphone8
+
+
+#########################################################
+#
+#             Toilet Seat Heater/Cleaning
+#
+#########################################################
 
 
 
 #########################################################
-#                                                                                                              
-#             Toilet Seat Heater/Cleaning                                                             
-#                                                                                                              
-#########################################################
-
-  toilet_seat_low_heat:
-    sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm32_remote
-          device: Toilet
-          command: heat seat low
-
-  toilet_seat_med_heat:
-    sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm32_remote
-        device: Toilet
-        command: heat seat med
-  toilet_seat_high_heat:
-    sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm32_remote
-        device: Toilet
-        command:
-        - heat seat high
-  toilet_seat_off_heat:
-    sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm32_remote
-        device: Toilet
-        command:
-        - heat seat off
-
-  toilet_nozzle_cleaning:
-    sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm32_remote
-        device: Toilet
-        command:
-        - nozzle cleaning
-
-
-#########################################################
-#                                                                                                              
-#             Tv Source                                                                                   
-#                                                                                                              
+#
+#             Tv Source
+#
 #########################################################
 
   tv_source:
@@ -230,37 +138,41 @@
 
 
 #########################################################
-#                                                                                                              
-#             Desktop WOL                                                                       
-#                                                                                                              
+#
+#             Desktop WOL
+#
 #########################################################
-
 
   desktop_wol_on:
     alias: "Desktop WOL On"
     sequence:
       - service: wake_on_lan.send_magic_packet
         data:
-          mac: "B4:4B:D6:27:22:55"
+          mac: "9C:6B:00:59:D2:6D"
 
   desktop_wol_off:
     alias: "Desktop WOL Off"
     sequence:
       - service: switch.turn_on
         data:
-          entity_id: switch.desktop_fddl8i4_shutdown
+          entity_id: switch.desktop_3l5pa48_shutdown
+#Led
+      - service: script.turn_off
+        entity_id:  script.pc_desktop_led
+      - service: light.turn_off
+        entity_id: light.pc_desktop_led
+# pc room lights
       - condition: template
         value_template: "{{ states('light.computer') == 'on' }}"
       - service: script.tradfri_transition_down
         data:
           entity_id: light.computer
           transition: 120
-        entity_id: light.computer        
-        
+        entity_id: light.computer
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

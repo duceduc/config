@@ -83,16 +83,5 @@ automation:
 #        data:
 #          file: '/config/www/img/security/balcony/security_balcony_camera_last.jpg'
 #          caption: Balcony motion detected
-
       - service: shell_command.clean_balcony_images
-
-
-
-
-
-
-
-
-
-
 

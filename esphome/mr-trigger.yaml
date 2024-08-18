@@ -1,0 +1,39 @@
+# [40:91:51:4F:90:90]
+substitutions:
+  name: mr-trigger
+  upper: Aio Trigger
+  lower: aio trigger
+#  ssid: !secret ssid2
+
+packages:
+  ld2410: !include components/ld2410.yaml
+
+<<: !include .base.yaml # .186
+
+esphome:
+  name: $name
+  platform: ESP8266
+  board: nodemcuv2
+  includes:
+    - /config/esphome/components/ld2410_uart.h
+  on_boot:
+    priority: 600
+    # ...
+    then:
+      - lambda: |-
+          auto uart_component = static_cast<LD2410 *>(ld2410);
+          uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);
+
+sensor:
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+binary_sensor:
+  - platform: status
+    name: $name status

@@ -6,6 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 For more details about this platform, please refer to the documentation at
 https://community.home-assistant.io/t/echo-devices-alexa-as-media-player-testers-needed/58639
 """
+
 import datetime
 import json
 import logging
@@ -17,14 +18,13 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import UnitOfTemperature, __version__ as HA_VERSION
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady, NoEntitySpecifiedError
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt
 from packaging import version
-import pytz
 
 from . import (
     CONF_EMAIL,
@@ -64,7 +64,13 @@ async def async_setup_platform(hass, config, add_devices_callback, discovery_inf
         "Timer": TimerSensor,
         "Reminder": ReminderSensor,
     }
-    account = config[CONF_EMAIL] if config else discovery_info["config"][CONF_EMAIL]
+    account = None
+    if config:
+        account = config.get(CONF_EMAIL)
+    if account is None and discovery_info:
+        account = discovery_info.get("config", {}).get(CONF_EMAIL)
+    if account is None:
+        raise ConfigEntryNotReady
     include_filter = config.get(CONF_INCLUDE_DEVICES, [])
     exclude_filter = config.get(CONF_EXCLUDE_DEVICES, [])
     account_dict = hass.data[DATA_ALEXAMEDIA]["accounts"][account]
@@ -251,9 +257,9 @@ class TemperatureSensor(SensorEntity, CoordinatorEntity):
         self._attr_name = name + " Temperature"
         self._attr_device_class = SensorDeviceClass.TEMPERATURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_value: Optional[
-            datetime.datetime
-        ] = parse_temperature_from_coordinator(coordinator, entity_id)
+        self._attr_native_value: Optional[datetime.datetime] = (
+            parse_temperature_from_coordinator(coordinator, entity_id)
+        )
         self._attr_native_unit_of_measurement: Optional[str] = UnitOfTemperature.CELSIUS
         # This includes "_temperature" because the Alexa entityId is for a physical device
         # A single physical device could have multiple HA entities
@@ -300,12 +306,12 @@ class AirQualitySensor(SensorEntity, CoordinatorEntity):
         self._attr_name = name + " " + self._sensor_name
         self._attr_device_class = self._sensor_name
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_value: Optional[
-            datetime.datetime
-        ] = parse_air_quality_from_coordinator(coordinator, entity_id, instance)
-        self._attr_native_unit_of_measurement: Optional[
-            str
-        ] = ALEXA_UNIT_CONVERSION.get(unit)
+        self._attr_native_value: Optional[datetime.datetime] = (
+            parse_air_quality_from_coordinator(coordinator, entity_id, instance)
+        )
+        self._attr_native_unit_of_measurement: Optional[str] = (
+            ALEXA_UNIT_CONVERSION.get(unit)
+        )
         self._attr_unique_id = entity_id + " " + self._sensor_name
         self._attr_icon = ALEXA_ICON_CONVERSION.get(sensor_name, ALEXA_ICON_DEFAULT)
         self._attr_device_info = (
@@ -329,6 +335,8 @@ class AirQualitySensor(SensorEntity, CoordinatorEntity):
 
 class AlexaMediaNotificationSensor(SensorEntity):
     """Representation of Alexa Media sensors."""
+
+    _unrecorded_attributes = frozenset({"sorted_active", "sorted_all"})
 
     def __init__(
         self,
@@ -422,7 +430,7 @@ class AlexaMediaNotificationSensor(SensorEntity):
             "alexa_media_notification_event",
             dt.as_local(time_date),
         )
-        self.hass.bus.async_fire(
+        self.hass.bus.fire(
             "alexa_media_notification_event",
             event_data={
                 "email": hide_email(self._account),
@@ -439,11 +447,11 @@ class AlexaMediaNotificationSensor(SensorEntity):
         ):
             return value
         naive_time = dt.parse_datetime(value[1][self._sensor_property])
-        timezone = pytz.timezone(
+        timezone = dt.get_time_zone(
             self._client._timezone  # pylint: disable=protected-access
         )
         if timezone and naive_time:
-            value[1][self._sensor_property] = timezone.localize(naive_time)
+            value[1][self._sensor_property] = naive_time.replace(tzinfo=timezone)
         elif not naive_time:
             # this is typically an older alarm
             value[1][self._sensor_property] = datetime.datetime.fromtimestamp(
@@ -486,7 +494,7 @@ class AlexaMediaNotificationSensor(SensorEntity):
         r_rule_data = next_item.get("rRuleData")
         if (
             r_rule_data
-        ):  # the new recurrence pattern; https://github.com/custom-components/alexa_media_player/issues/1608
+        ):  # the new recurrence pattern; https://github.com/alandtse/alexa_media_player/issues/1608
             next_trigger_times = r_rule_data.get("nextTriggerTimes")
             weekdays = r_rule_data.get("byWeekDays")
             if next_trigger_times:
@@ -549,8 +557,8 @@ class AlexaMediaNotificationSensor(SensorEntity):
     def _handle_event(self, event):
         """Handle events.
 
-        This will update PUSH_NOTIFICATION_CHANGE events to see if the sensor
-        should be updated.
+        This will update PUSH_ACTIVITY or NOTIFICATION_UPDATE events to see if
+        the sensor should be updated.
         """
         try:
             if not self.enabled:
@@ -564,6 +572,13 @@ class AlexaMediaNotificationSensor(SensorEntity):
             ):
                 _LOGGER.debug("Updating sensor %s", self)
                 self.schedule_update_ha_state(True)
+        if "push_activity" in event:
+            if (
+                event["push_activity"]["key"]["serialNumber"]
+                == self._client.device_serial_number
+            ):
+                _LOGGER.debug("Updating sensor %s", self)
+                self.schedule_update_ha_state(True)
 
     @property
     def hidden(self):
@@ -573,9 +588,7 @@ class AlexaMediaNotificationSensor(SensorEntity):
     @property
     def should_poll(self):
         """Return the polling state."""
-        return not (
-            self.hass.data[DATA_ALEXAMEDIA]["accounts"][self._account]["websocket"]
-        )
+        return not (self.hass.data[DATA_ALEXAMEDIA]["accounts"][self._account]["http2"])
 
     def _process_state(self, value) -> Optional[datetime.datetime]:
         return dt.as_local(value[self._sensor_property]) if value else None
@@ -597,7 +610,7 @@ class AlexaMediaNotificationSensor(SensorEntity):
             self._n_dict = None
         self._process_raw_notifications()
         try:
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
         except NoEntitySpecifiedError:
             pass  # we ignore this due to a harmless startup race condition
 
@@ -626,6 +639,11 @@ class AlexaMediaNotificationSensor(SensorEntity):
         }
         return attr
 
+    @callback
+    def exclude_attributes(hass: HomeAssistant) -> set[str]:
+        """Exclude sorted_active and sorted_all from being recorded in the database."""
+        return {"sorted_active", "sorted_all"}
+
 
 class AlarmSensor(AlexaMediaNotificationSensor):
     """Representation of a Alexa Alarm sensor."""
@@ -652,9 +670,11 @@ class TimerSensor(AlexaMediaNotificationSensor):
             "remainingTime",
             account,
             f"next {self._type}",
-            "mdi:timer-outline"
-            if (version.parse(HA_VERSION) >= version.parse("0.113.0"))
-            else "mdi:timer",
+            (
+                "mdi:timer-outline"
+                if (version.parse(HA_VERSION) >= version.parse("0.113.0"))
+                else "mdi:timer"
+            ),
         )
 
     def _process_state(self, value) -> Optional[datetime.datetime]:
@@ -683,6 +703,18 @@ class TimerSensor(AlexaMediaNotificationSensor):
             else "mdi:timer-off"
         )
         return self._attr_icon if not self.paused else off_icon
+
+    @property
+    def timer(self):
+        """Return the timer of the sensor."""
+        return self._next.get("timerLabel") if self._next else None
+
+    @property
+    def extra_state_attributes(self):
+        """Return the scene state attributes."""
+        attr = super().extra_state_attributes
+        attr.update({"timer": self.timer})
+        return attr
 
 
 class ReminderSensor(AlexaMediaNotificationSensor):

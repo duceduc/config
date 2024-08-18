@@ -1,95 +1,111 @@
 #########################################################
-#                                                                                                              #
-#             Auto Mode Lights On/Off                                                                #
-#                                                                                                              #
+#                                                                                                              
+#             Auto Mode Lights On/Off                                                                
+#                                                                                                              
 #########################################################
-
+# usb plug order. Top -> bottom -> right [espresense,radar,monitor]
 
 - alias: Shionroom Occupancy
   description: 'Defines occupancy state for room'
-  mode: single  
+  mode: single
   trigger:
-  - platform: time_pattern
-    id: time
-    seconds: '10'
-  - platform: state
-    entity_id: binary_sensor.motion_sr_occupancy
-    id: motion
-    to: 'on'
+    - platform: time_pattern
+      id: time
+      seconds: '10'
+    - platform: state
+      entity_id: binary_sensor.motion_sr_trigger_on, binary_sensor.sr_trigger_has_moving_target # add this binary_sensor.sr_has_moving_target
+      id: motion
+      to: 'on'
   condition:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
-#    - condition: template # mcl is off
-#      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"      
 
   action:
-  - service: python_script.room_occupancy
-    data:
-      roomname: shionroom 
-      entities_toggle: # entities that can mark a room as occupied
-      - binary_sensor.motion_sr_occupancy
-      entities_keep: # entities that can keep a room occupied
-       - input_boolean.shionroom_mcl
-       - binary_sensor.middle
-#       - sensor.eri_espresense
-      timeout: 2 # timeout of the room, timer gets set to this
+    - service: python_script.room_occupancy
+      data:
+        roomname: shionroom
+        timeout: 2 # timeout of the room, timer gets set to this
+        entities_toggle: # entities that can mark a room as occupied
+        - binary_sensor.motion_sr_trigger_on
+        - binary_sensor.sr_trigger_has_moving_target
+        entities_keep: # entities that can keep a room occupied
+        - binary_sensor.sr_sensor_has_still_target
+        - group.bed_sensors
+        - input_boolean.shionroom_mcl
 
-- alias: Shionroom Light
+- alias: Shionroom Light 
   description: 'toggle light depending on timer state'
-  mode: single  
+  mode: single
   trigger:
-  - platform: state
-    entity_id: timer.shionroom_timer
-    id: 'on'
-    from: idle
-    to: active
-  - platform: state
-    entity_id: timer.shionroom_timer
-    id: 'off'
-    from: active
-    to: idle
-  - platform: state
-    entity_id: light.shion
-    id: 'off'
-    from: 'on'    
-    to: 'off'
-    
+    - platform: state
+      entity_id: timer.shionroom_timer
+      id: 'on'
+      from: idle
+      to: active
+
+    - platform: state
+      entity_id: timer.shionroom_timer
+      id: 'off'
+      from: active
+      to: idle
+    - platform: state
+      entity_id: light.shion
+      id: 'off'
+      from: 'on'
+      to: 'off'
+    - platform: state # lights off if not occupied. presence_sensors.yaml
+      entity_id: binary_sensor.sr_occupancy_lights
+      id: 'off'
+      from: 'on'
+      to: 'off'
+      for: 45
   condition:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-#    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
-#      value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
-#    - condition: template
-#      value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"
-
   action:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: 'on'
-      sequence:
-      - service: light.turn_on
-        target:
-          entity_id: light.shion
-        data:
-          brightness: '{% if states.sensor.front_illuminance.state | float(0) >= 0.78 %} 255 {% else %} 160 {% endif %}'          
-    - conditions:
-      - condition: trigger
-        id: 'off'
-      sequence:
-      - service: light.turn_off
-        target:
-          entity_id: light.shion
-      - service: timer.finish
-        target:
-          entity_id: timer.shionroom_timer
-    default: []
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'on'
+          sequence:
+            - service: script.tradfri_transition
+              data:
+                entity_id: light.shion
+                color_temp: 143
+                transition: 2
+                brightness: '{% if states.sensor.front_illuminance.state | float(0) < 0.15 %} 160 {% else %} 255 {% endif %}'
+
+#            - service: light.turn_on
+#              target:
+#                entity_id: light.shion
+#              data:
+#                brightness: '{% if states.sensor.front_illuminance.state | float(0) < 0.15 %} 160 {% else %} 255 {% endif %}'
+                
+        - conditions:
+            - condition: trigger
+              id: 'off'
+            - condition: template
+              value_template: "{{ not is_state('input_boolean.shionroom_mcl', 'on') }}"
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id: light.shion
+            - service: timer.finish
+              target:
+                entity_id: timer.shionroom_timer
+      default: []
 
 ##############################
+## CAN DELETE BETWEEN HASHES    
+
 - alias: 'motion shion room auto-on'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_sr_occupancy
+      entity_id: binary_sensor.sr_has_moving_target
       from: 'off'
       to: 'on'
   condition:
@@ -102,8 +118,8 @@
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
     - condition: template
       value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"
-    - condition: template # bed occupied 
-      value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
+    - condition: template # bed occupied
+      value_template: "{{ is_state('group.bed_sensors', 'off') }}"
 
   action:
     - service: light.turn_on
@@ -114,7 +130,7 @@
 - alias: 'motion shion room auto-off'
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_sr_occupancy
+      entity_id: binary_sensor.sr_has_moving_target
       to: 'off'
       for: '00:02:00'
   condition:
@@ -122,16 +138,21 @@
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
     - condition: template
       value_template: "{{ is_state('input_boolean.shionroom_mcl', 'off') }}"
-    - condition: template # bed occupied 
-      value_template: "{{ is_state('binary_sensor.middle', 'off') }}"
+    - condition: template # bed occupied
+      value_template: "{{ is_state('group.bed_sensors', 'off') }}"
   action:
     - service: light.turn_off
       entity_id: light.shion
 
+##############################
+
+
+
+
 #########################################################
-#                                                                                                              #
-#             Override Auto Mode Lights On/Off                                                    #
-#                                                                                                              #
+#                                                                                                              
+#             Override Auto Mode Lights On/Off                                                    
+#                                                                                                              
 #########################################################
 
 - alias: 'SR light turned off'
@@ -163,10 +184,10 @@
       entity_id: input_boolean.shionroom_mcl
   condition:
     - condition: template
-      value_template: "{{ is_state('input_boolean.audible_notifications', 'on') }}"          
+      value_template: "{{ is_state('input_boolean.audible_notifications', 'on') }}"
   action:
     - service: script.speech_engine_echo
-      data: 
+      data:
         who: ai_3
         voice: "{{ states('input_select.jarvis_voice') }}"
         message:  >
@@ -185,235 +206,275 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Shion Room Air Conditioning                                                            #
-#                                                                                                              #
+#                                                                                                              
+#             Shion Room Air Conditioning                                                            
+#                                                                                                              
 #########################################################
+# binary_sensor.sr_ac_flaps battery start 6/30
 
-
-- alias: 'SR  Aircon'
+- alias: 'SR Aircon'
   initial_state: true
   trigger:
-    platform: state
-    entity_id: input_select.sr_ac_mode
+    - platform: template
+      value_template: "{{ (now() - states.binary_sensor.sr_ac_flaps_contact.last_changed).seconds < 3 }}"
+      id: flaps
+    - platform: state
+      entity_id: input_select.sr_ac_mode
+      id: mode
   action:
-  - service_template: >
-      {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} script.sr_ac_powerful_heat
-      {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} script.sr_ac_normal_heat
-      {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} script.sr_ac_silent_heat
-      {% elif is_state('input_select.sr_ac_mode', 'Powerful Cool') %} script.sr_ac_powerful_cool
-      {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} script.sr_ac_normal_cool
-      {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} script.sr_ac_silent_cool
-      {% elif is_state('input_select.sr_ac_mode', 'Normal Humidifier') %} script.sr_ac_normal_humidifier
-      {% elif is_state('input_select.sr_ac_mode', 'Ai Auto') %} script.sr_ac_ai
-      {% elif is_state('input_select.sr_ac_mode', 'Fan') %} script.sr_ac_fan
-      {% elif is_state('input_select.sr_ac_mode', 'Off') %} script.sr_ac_off
-      {% endif %}
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: mode
+          sequence:
+            - service_template: |
+                {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} script.sr_ac_powerful_heat
+                {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} script.sr_ac_normal_heat
+                {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} script.sr_ac_silent_heat
+                {% elif is_state('input_select.sr_ac_mode', 'Powerful Cool') %} script.sr_ac_powerful_cool
+                {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} script.sr_ac_normal_cool
+                {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} script.sr_ac_silent_cool
+                {% elif is_state('input_select.sr_ac_mode', 'Normal Humidifier') %} script.sr_ac_normal_humidifier
+                {% elif is_state('input_select.sr_ac_mode', 'Ai Auto') %} script.sr_ac_ai
+                {% elif is_state('input_select.sr_ac_mode', 'Fan') %} script.sr_ac_fan
+                {% elif is_state('input_select.sr_ac_mode', 'Off') %} script.sr_ac_off
+                {% endif %}
+        - conditions:
+            - condition: trigger
+              id: flaps
+          sequence:
+            - condition: template
+              value_template: "{{ not states('binary_sensor.sr_ac_flaps_contact').lower() in ['unknown','unavailable','none'] }}"
+            - service: input_select.select_option
+              data_template:
+                entity_id: input_select.sr_ac_mode
+                option: |
+                  {% if (now() - states.input_select.sr_ac_mode.last_changed).seconds < 10 %}
+                    {{ states('input_select.sr_ac_mode') }}
+                  {% elif is_state('binary_sensor.sr_ac_flaps_contact', 'on') %} Man Auto
+                  {% elif is_state('binary_sensor.sr_ac_flaps_contact', 'off') %} Off
+                  {% else %}
+                  {% endif %}
+      default: []
+
 
 #########################################################
-#                                                                                                              #
-#             AM Schedule Auto Timer                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             AM Schedule Auto Timer                                                                 
+#                                                                                                              
 #########################################################
 
 - alias: 'SR Aircon AM Schedule'
   trigger:
-  - platform: state
-    entity_id:
-      - binary_sensor.sr_ac_am_automation_time_active # AM on time trigger (only if temperature condition below is met)
-      - binary_sensor.sr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
-      - binary_sensor.sr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
-    to: 'on'
-    for:
-      seconds: 10 #(prevents start up glitches).
-  - platform: state
-    entity_id: binary_sensor.shion_door # ac turns off when door is open
-    to: 'off'
+    - platform: state
+      entity_id:
+       - binary_sensor.sr_ac_am_automation_time_active # AM on time trigger (only if temperature condition below is met)
+       - binary_sensor.sr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
+       - binary_sensor.sr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
+      to: 'on'
+      for: 10
+    - platform: state
+      entity_id: binary_sensor.shion_door # ac turns off when door is open
+      to: 'off'
   condition:
-  - condition: template # Vacation mode is not On
-    value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
-  - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
-    entity_id: input_select.sr_ac_mode
-    state: 'Off'
-  - condition: state # only if shion door is closed
-    entity_id: binary_sensor.shion_door
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.sr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
-    state: 'on'
-  - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
-    conditions:
-    - condition: state
-      entity_id: binary_sensor.sr_ac_heat_required
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.sr_ac_cool_required
-      state: 'on'
-  - condition: state # And only if current time is within AM automation time range (for the case of a temperature trigger)
-    entity_id: binary_sensor.sr_ac_am_automation_time_active
-    state: 'on'
-  - condition: template # Someone is home
-    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-  action:
-    service: input_select.select_option
-    data_template:
+    - condition: template # Vacation mode is not On
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
       entity_id: input_select.sr_ac_mode
-      option: >
-        {% if is_state('binary_sensor.sr_ac_heat_required', 'on') %}
-          Normal Heat
-        {% elif is_state('binary_sensor.sr_ac_cool_required', 'on') %}
-          Normal Cool
-        {% else %}
-          'Off','Off'
-        {% endif %}
+      state: 'Off'
+    - condition: state # only if shion door is closed
+      entity_id: binary_sensor.shion_door
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.sr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+      state: 'on'
+    - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.sr_ac_heat_required
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.sr_ac_cool_required
+          state: 'on'
+    - condition: state # And only if current time is within AM automation time range (for the case of a temperature trigger)
+      entity_id: binary_sensor.sr_ac_am_automation_time_active
+      state: 'on'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.sr_ac_mode
+        option: >
+          {% if is_state('binary_sensor.sr_ac_heat_required', 'on') %}
+            Normal Heat
+          {% elif is_state('binary_sensor.sr_ac_cool_required', 'on') %}
+            Normal Cool
+          {% else %}
+            'Off','Off'
+          {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             PM Schedule Auto Timer                                                                 #
-#                                                                                                              #
+#                                                                                                              
+#             PM Schedule Auto Timer                                                                 
+#                                                                                                              
 #########################################################
 
 - alias: 'SR Aircon PM Schedule'
   trigger:
-  - platform: state
-    entity_id:
-      - binary_sensor.sr_ac_pm_automation_time_active # PM on time trigger (only if temperature condition below is met)
-      - binary_sensor.sr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
-      - binary_sensor.sr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
-    to: 'on'
-    for:
-      seconds: 10 #(prevents start up glitches).
-  - platform: state
-    entity_id: binary_sensor.shion_door # ac turns off when door is open
-    to: 'off'
+    - platform: state
+      entity_id:
+       - binary_sensor.sr_ac_pm_automation_time_active # PM on time trigger (only if temperature condition below is met)
+       - binary_sensor.sr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
+       - binary_sensor.sr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
+      to: 'on'
+      for: 10
+    - platform: state
+      entity_id: binary_sensor.shion_door # ac turns off when door is open
+      to: 'off'
   condition:
-  - condition: template # Vacation mode is not On
-    value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
-  - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
-    entity_id: input_select.sr_ac_mode
-    state: 'Off'
-  - condition: state # only if shion door is closed
-    entity_id: binary_sensor.shion_door
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.sr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
-    state: 'on'
-  - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
-    conditions:
-    - condition: state
-      entity_id: binary_sensor.sr_ac_heat_required
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.sr_ac_cool_required
-      state: 'on'
-  - condition: state # And only if current time is within PM automation time range (for the case of a temperature trigger)
-    entity_id: binary_sensor.sr_ac_pm_automation_time_active
-    state: 'on'
-  - condition: template # Someone is home
-    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-  action:
-    service: input_select.select_option
-    data_template:
+    - condition: template # Vacation mode is not On
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
       entity_id: input_select.sr_ac_mode
-      option: >
-        {% if is_state('binary_sensor.sr_ac_heat_required', 'on') %}
-          Normal Heat
-        {% elif is_state('binary_sensor.sr_ac_cool_required', 'on') %}
-          Normal Cool
-        {% else %}
-          'Off'
-        {% endif %}
+      state: 'Off'
+    - condition: state # only if shion door is closed
+      entity_id: binary_sensor.shion_door
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.sr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+      state: 'on'
+    - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.sr_ac_heat_required
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.sr_ac_cool_required
+          state: 'on'
+    - condition: state # And only if current time is within PM automation time range (for the case of a temperature trigger)
+      entity_id: binary_sensor.sr_ac_pm_automation_time_active
+      state: 'on'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.sr_ac_mode
+        option: >
+          {% if is_state('binary_sensor.sr_ac_heat_required', 'on') %}
+            Normal Heat
+          {% elif is_state('binary_sensor.sr_ac_cool_required', 'on') %}
+            Normal Cool
+          {% else %}
+            'Off'
+          {% endif %}
 
 #########################################################
-#                                                                                                              #
-#             Turn Aircon Off At Time                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#             Turn Aircon Off At Time                                                                  
+#                                                                                                              
 #########################################################
 
 - alias: 'SR Aircon AM Off'
   initial_state: true
   trigger:
-    platform: state # AM off time trigger
-    entity_id:
-      - binary_sensor.sr_ac_am_automation_time_active
-    to: 'off'
+    - platform: state # AM off time trigger
+      entity_id: binary_sensor.sr_ac_am_automation_time_active
+      to: 'off'
   condition:
-  - condition: state # Only if AM Automation is enabled
-    entity_id: automation.sr_aircon_am_schedule
-    state: 'on'
-  - condition: template # And only if AC is on
-    value_template: '{{ states("input_select.sr_ac_mode") != "Off" }}'
-  - condition: template # Someone is home
-    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: state # Only if AM Automation is enabled
+      entity_id: automation.sr_aircon_am_schedule
+      state: 'on'
+    - condition: template # And only if AC is on
+      value_template: '{{ states("input_select.sr_ac_mode") != "Off" }}'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    service: input_select.select_option
-    data:
-      entity_id: input_select.sr_ac_mode
-      option: 'Off'
+    - service: input_select.select_option
+      data:
+        entity_id: input_select.sr_ac_mode
+        option: 'Off'
 
 - alias: 'SR Aircon PM Off'
   initial_state: true
   trigger:
-    platform: state # PM off time trigger
-    entity_id:
-      - binary_sensor.sr_ac_pm_automation_time_active
-    to: 'off'
+    - platform: state # PM off time trigger
+      entity_id: binary_sensor.sr_ac_pm_automation_time_active
+      to: 'off'
   condition:
-  - condition: state # Only if PM Automation is enabled
-    entity_id: automation.sr_aircon_pm_schedule
-    state: 'on'
-  - condition: template # And only if AC is on
-    value_template: '{{ states("input_select.sr_ac_mode") != "Off" }}'
-  - condition: template # Someone is home
-    value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: state # Only if PM Automation is enabled
+      entity_id: automation.sr_aircon_pm_schedule
+      state: 'on'
+    - condition: template # And only if AC is on
+      value_template: '{{ states("input_select.sr_ac_mode") != "Off" }}'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
   action:
-    service: input_select.select_option
-    data:
-      entity_id: input_select.sr_ac_mode
-      option: 'Off'
+    - service: input_select.select_option
+      data:
+        entity_id: input_select.sr_ac_mode
+        option: 'Off'
 
 #########################################################
-#                                                                                                              #
-#             Manual Adjust Temperature                                                             #
-#                                                                                                              #
+#                                                                                                              
+#             Manual Adjust Temperature / Humidity       
+#                                                                                                              
 #########################################################
 
 - alias: 'SR Aircon Cool Temperature Adjust'
   initial_state: true
   trigger:
-    platform: state
-    entity_id: input_number.sr_ac_temp_set_cool
+    - platform: state
+      entity_id: input_number.sr_ac_temp_set_cool
   condition:
-    condition: template # If currently running a cool mode
-    value_template: "{{ 'Cool' in states.input_select.sr_ac_mode.state }}"
+    - condition: template # If currently running a cool mode
+      value_template: "{{ 'Cool' in states.input_select.sr_ac_mode.state }}"
   action:
-    service_template: >
-      {% if is_state('input_select.sr_ac_mode', 'Powerful Cool') %} script.sr_ac_powerful_cool
-      {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} script.sr_ac_normal_cool
-      {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} script.sr_ac_silent_cool
-      {% endif %}
+    - service_template: |
+        {% if states('input_number.sr_ac_temp_set_cool')| int != 0  %} script.sr_cool_man
+        {% endif %}
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.sr_ac_mode
+        option: 'Manual Cool'
 
 - alias: 'SR Aircon Heat Temperature Adjust'
   initial_state: true
   trigger:
-    platform: state
-    entity_id: input_number.sr_ac_temp_set_heat
+    - platform: state
+      entity_id: input_number.sr_ac_temp_set_heat
   condition:
-    condition: template # If currently running a heat mode
-    value_template: "{{ 'Heat' in states.input_select.sr_ac_mode.state }}"
+    - condition: template # If currently running a heat mode
+      value_template: "{{ 'Heat' in states.input_select.sr_ac_mode.state }}"
   action:
-    service_template: >
-      {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} script.sr_ac_powerful_heat
-      {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} script.sr_ac_normal_heat
-      {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} script.sr_ac_silent_heat
-      {% endif %}
+    - service_template: |
+        {% if states('input_number.sr_ac_temp_set_heat')| int != 0  %} script.sr_heat_man
+        {% endif %}
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.sr_ac_mode
+        option: 'Manual Heat'
+
+- alias: 'SR Room Aircon Humidity Set'
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: input_number.sr_humidity_set
+  condition:
+    - condition: template
+      value_template: "{{ 'Cool' in states.input_select.sr_ac_mode.state }}"
+  action:
+    - service_template: |
+        {% if states('input_number.sr_humidity_set')| int != 0  %} script.sr_humidity_set
+        {% endif %}
 
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################
 
 

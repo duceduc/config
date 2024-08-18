@@ -18,27 +18,73 @@
                light.k_1, light.k_3
             {% endif %}
 
+#< 9 1 light
+#<15 2 light
+#<20 3 lights inline
+#<25 3 lights over the counter
+#<30 4 lights
+#<45 all lights
+
+#< 3 light
+#< 6 lights (12 for pre lights)
+#<11 3 lights inline
+#<13 3 lights over the counter
+#<17 4 lights
+#<22 all lights
+
+# setting up stage
+#< 9 1 light
+#<15 2 light
+#<20 3 lights inline
+#<25 3 lights over the counter
+#<30 4 lights
+#<45 all lights
+
+
+# sensor replaced on 12/17/2023
   motion_kitchen_lights_illuminance_online:
     alias: Motion Kitchen Lights Illuminance Online
     sequence:
+      - service: script.kitchen_status_on
+
       - service: light.turn_on
         data_template:
           entity_id: >
-            {% if states.sensor.lr_radar_illuminance.state | float <= 0.10 %}
+            {% if states.sensor.lr_radar_illuminance.state | float <= 0.09 %}
                light.k_1
             {% elif states.sensor.lr_radar_illuminance.state | float <= 0.15 %}
                light.k_1, light.k_3
-            {% elif states.sensor.lr_radar_illuminance.state | float <= 0.20 %}
-               light.k_1, light.k_2, light.k_3               
+            {% elif states.sensor.lr_radar_illuminance.state | float <= 0.20 %} 
+               light.k_1, light.k_2, light.k_3
             {% elif states.sensor.lr_radar_illuminance.state | float <= 0.25 %}
                light.k_1, light.k_3, light.k_5
             {% elif states.sensor.lr_radar_illuminance.state | float <= 0.30 %}
                light.k_1, light.k_3, light.counter
+            {% elif states.sensor.lr_radar_illuminance.state | float <= 0.45 %}
+               light.counter, light.cabinet
             {% elif now().hour > 22 or now().hour < 5 %}
                light.k_1, light.k_3
             {% else %}
                light.counter, light.cabinet
             {% endif %}
+
+
+## TESTING
+  kitchen_status_on:
+    sequence:
+      - condition: template
+        value_template: "{{ states('sensor.lr_radar_illuminance') == '0.01' }}"
+      - service: light.turn_off
+        data_template:
+          entity_id: >
+            {% set include_light = [
+              'light.k_1',
+              'light.k_2',
+              'light.k_3',
+              'light.k_4',
+              'light.k_5'
+            ] %}
+            {%- for device in states.light|selectattr('entity_id','in',include_light)|rejectattr('state','in','off') %}{%- if loop.first %}{%- else %}, {% endif %}{{ device.entity_id }}{%- if loop.last %}{% endif %}{%- endfor  %}
 
 
 #########################################################
@@ -277,10 +323,15 @@
   turn_on_lr_lights:
     alias: Turn on LR lights
     sequence:
-      - service: light.turn_on
-        data_template:
-          entity_id: light.living
-          brightness: 255
+#      - service: light.turn_on
+#        data_template:
+#          entity_id: light.living
+#          brightness: 255
+      - service: scene.turn_on # Fix for living lights flashing at 100% bright.
+        data:
+          entity_id: scene.living_1_fix
+
+
       - service: script.christmas_lights_on
       - delay: 1
       - condition: template # Turn on pc/tv only if Duc is home
@@ -409,9 +460,9 @@
       - service: input_boolean.turn_on
         data:
           entity_id: input_boolean.ceiling_fan_lights
-      - service: counter.increment
-        target:
-          entity_id: counter.dining_lights_toggle
+#      - service: counter.increment
+#        target:
+#          entity_id: counter.dining_lights_toggle
 
   dining_lights_mode_off:
     sequence:
@@ -423,9 +474,9 @@
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.ceiling_fan_lights
-      - service: counter.reset
-        target:
-          entity_id: counter.dining_lights_toggle
+#      - service: counter.reset
+#        target:
+#          entity_id: counter.dining_lights_toggle
 
 
 #########################################################
@@ -640,7 +691,50 @@
               'light.genkan',
               'light.h_1'
             ] %}
-            {%- for device in states.light|rejectattr('entity_id','in',exclude_light)|rejectattr('state','in','off') %}{%- if loop.first %}{%- else %}, {% endif %}{{device.entity_id }}{%- if loop.last %}{% endif %}{%- endfor  %}
+            {%- for device in states.light|rejectattr('entity_id','in',exclude_light)|rejectattr('state','in','off') %}{%- if loop.first %}{%- else %}, {% endif %}{{ device.entity_id }}{%- if loop.last %}{% endif %}{%- endfor  %}
+
+
+  pc_desktop_led:
+    sequence:
+      - repeat:
+          while:
+            - condition: state
+              entity_id: light.pc_desktop_led
+              state: "on"
+          sequence:
+            - service: light.turn_on
+              data_template:
+                entity_id: light.pc_desktop_led
+                rgbw_color:
+                  - "255"
+                  - "{{ (range(0, 100)|random) }}"
+                  - "{{ (range(0, 100)|random) }}"
+                  - "0"
+                brightness: "{{ (range(50, 250)|random) }}"
+                transition: 0.3
+            - delay: "{{ states.input_number.pc_desktop_led_speed.state }}"
+            - service: light.turn_on
+              data_template:
+                entity_id: light.pc_desktop_led
+                rgbw_color:
+                  - "{{ (range(0, 100)|random) }}"
+                  - "255"
+                  - "{{ (range(0, 100)|random) }}"
+                  - "0"
+                brightness: "{{ (range(50, 250)|random) }}"
+                transition: 0.3
+            - delay: "{{ states.input_number.pc_desktop_led_speed.state }}"
+            - service: light.turn_on
+              data_template:
+                entity_id: light.pc_desktop_led
+                rgbw_color:
+                  - "{{ (range(0, 100)|random) }}"
+                  - "{{ (range(0, 100)|random) }}"
+                  - "255"
+                  - "0"
+                brightness: "{{ (range(50, 250)|random) }}"
+                transition: 0.3
+            - delay: "{{ states.input_number.pc_desktop_led_speed.state }}"
 
 
 #########################################################

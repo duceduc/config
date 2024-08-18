@@ -1,0 +1,31 @@
+# [40:91:51:4F:1B:91]
+# https://github.com/CDaxi/esphome-projects/tree/master/airfreshener
+substitutions:
+  name: cr-airfreshener
+  counter: Spray counter
+  reset: Reset spray counter
+#  ssid: !secret ssid3
+
+packages:
+  airfresh: !include components/airfresh.yaml
+
+<<: !include .base.yaml #.243
+
+esphome:
+  name: $name
+  platform: ESP8266
+  board: nodemcuv2
+
+sensor:
+  - platform: wifi_signal
+    name: ${name} wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+
+binary_sensor:
+  - platform: status
+    name: ${name} status
+

@@ -32,7 +32,7 @@ midnight:
   input-disabled-fill-color: '#424A56'  
   input-hover-line-color: 'var(--primary-text-color)'
   input-dropdown-icon-color: 'var(--primary-text-color)'
-  input-hover-line-color: 'var(--primary-text-color)'
+#  input-hover-line-color: 'var(--primary-text-color)'
   input-idle-line-color: 'var(--secondary-text-color)'
 
 

@@ -5,8 +5,8 @@
       {% set alias = {"Duc":"Duck", "Shion":"She-on", "Eri":"Eddie"} %}
       {% set family = state_attr(('group.family_presence'), 'entity_id') %}
       {% set t_family = states.binary_sensor | selectattr('entity_id', 'in', family) | list | count %}
-      {% set n_home = states.binary_sensor   | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | list | count %}
-      {% set people_home = states.binary_sensor  | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | map(attribute='name') | list %}
+      {% set n_home = states.binary_sensor | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | list | count %}
+      {% set people_home = states.binary_sensor | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | map(attribute='name') | list %}
       {% set ns = namespace(occupants = '') %}
       {% for i in people_home %}
         {% set ns.occupants = ns.occupants ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
@@ -146,9 +146,9 @@
     {% if is_state('sensor.front_door_motion_away_count','0') %}
       While you were gone there was no motion detected at the front door.
     {% elif is_state('sensor.front_door_motion_away_count','1') %}
-      While you were out I detected motion at the front door {{ states.sensor.front_door_motion_away_count.state | int }} time.      
+      While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} time.      
     {% else %}
-      While you were out I detected motion at the front door {{ states.sensor.front_door_motion_away_count.state | int }} times.
+      While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} times.
     {% endif %}
     </p>
 

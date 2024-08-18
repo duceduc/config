@@ -13,7 +13,6 @@
      - 'date_time_iso'
      - 'time_date'
      - 'time_utc'
-     - 'beat'
 
   - platform: template
     sensors:
@@ -128,16 +127,17 @@
             off
           {% endif %}
 
-  - platform: template
-    sensors:
-      holiday_g:
-        friendly_name: 'Holiday G'
-        value_template: >-
-          {% if states.calendar.holidays_in_japan.state == 'on' %}
-            {{ states.calendar.holidays_in_japan.attributes.message }}
-          {% else %}
-            none
-          {% endif %}
+# moved to holiday_birthdays.yaml
+#  - platform: template
+#    sensors:
+#      holiday_g:
+#        friendly_name: 'Holiday G'
+#        value_template: >-
+#          {% if states.calendar.holidays_in_japan.state == 'on' %}
+#            {{ states.calendar.holidays_in_japan.attributes.message }}
+#          {% else %}
+#            none
+#          {% endif %}
 
 ####################################################
 #                                                                                                    

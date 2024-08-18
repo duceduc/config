@@ -1,5 +1,5 @@
 ###############################################################################
-#   @author           :   Duc Su 
+#   @author           :   Duc Su
 #   @date              :   08/14/2022
 #   @package        :   Disable Devices
 #   @description    :   Time sensitive chores arund the house.
@@ -9,7 +9,7 @@ input_datetime:
   weekday_lock_tv:
     name: Weekday Lock Tv
     has_time: true
-    initial: '21:25'
+    initial: '21:10'
 
   weekend_lock_tv:
     name: Weekend Lock Tv
@@ -19,47 +19,112 @@ input_datetime:
   weekday_disable_internet:
     name: Weekday Disable Internet
     has_time: true
-    initial: '21:15'
+    initial: '21:30'
 
   weekend_disable_internet:
     name: Weekend Disable Interent
     has_time: true
-    initial: '21:45'
+    initial: '22:30'
 
 input_boolean:
   lock_tv:
-    name: Lock Tv
+    name: Enable Lock Tv
     icon: mdi:television-off
     initial: off
+
+command_line:
+#ai3: .163; nes: .102 for laptop use .104  (.104 was .251 [70:66:55:D0:4E:C9])
+  - switch:
+      name: Ai 4
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.163"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.163"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.163"
+      value_template: '{{ value == "1" }}'
+
+  - switch: 
+      name: Desktop Internet
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.112"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.112"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.112"
+      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: iPhoneX
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.101"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.101"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.101"
+      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: iPad # combine portainer & pihole switch
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
+      value_template: '{{ value == "1" }}'
+
+#  - switch:
+#      name: iPad
+#      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
+#      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
+#      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
+#      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: iphone8 # combine portainer & pihole switch
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.220"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.220"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.220"
+      value_template: '{{ value == "1" }}'
+
+
+# pihole testing
+  - switch:
+      name: Pihole Shion NoAccess
+      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'
+      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'
+      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess status'
+      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: Pihole Shion Novideos
+      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos enable'
+      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos disable'
+      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos status'
+      value_template: '{{ value == "1" }}'
+
+
+
+
 
 sensor:
   - platform: template
     sensors:
       lock_tv:
         value_template: >-
-          {% set wend = states('input_datetime.weekend_lock_tv') %}        
+          {% set wend = states('input_datetime.weekend_lock_tv') %}
           {% set wday = states('input_datetime.weekday_lock_tv') %}
-          {% if states("sensor.date_dayoftheweek").lower() in ["friday", "saturday"] %} {{wend}} {% else %} {{wday}} {% endif %}    
+          {% if states("sensor.date_dayoftheweek").lower() in ["friday", "saturday"] %} {{wend}} {% else %} {{wday}} {% endif %}
       disable_internet:
         value_template: >-
-          {% set wend = states('input_datetime.weekend_disable_internet') %}        
+          {% set wend = states('input_datetime.weekend_disable_internet') %}
           {% set wday = states('input_datetime.weekday_disable_internet') %}
           {% if states("sensor.date_dayoftheweek").lower() in ["friday", "saturday"] %} {{wend}} {% else %} {{wday}} {% endif %}
 
 automation:
+# switch.tv_lock renable every midnight via automation Refresh special event sensors in homeassistant.yaml
   - alias: enable tv lock
     variables:
       digit: 5
     trigger:
       - platform: template
-        value_template: '{{ states.sensor.time.state == states.sensor.lock_tv.state[0:5] }}'
+        value_template:  "{{ states('sensor.time') == states('sensor.lock_tv')[0:5] }}" # {{ states.sensor.time.state == states.sensor.lock_tv.state[0:5] }}
     condition:
       - condition: template # Tv Lock is on
         value_template: "{{ is_state('input_boolean.lock_tv', 'on') }}"
       - condition: template # Someone is home
         value_template: "{{ is_state('group.family_presence', 'on') }}"
-      - condition: template # Eri is in shion room
-        value_template: "{{ is_state('sensor.eri_espresense', 'shionroom') }}"           
+#      - condition: template # Eri is in shion room
+#        value_template: "{{ is_state('sensor.eri_espresense', 'shionroom') }}"
     action:
       - service: script.speech_engine
         data:
@@ -75,7 +140,7 @@ automation:
             'A reminder',
             'It appears'
             ]|random }}
-             the time is {{ states('sensor.human_time') }}.            
+             the time is {{ states('sensor.human_time') }}.
             The tv will shutoff in {{ digit }} minutes.
       - delay:
           minutes: "{{ digit }}"
@@ -85,11 +150,7 @@ automation:
   - alias: disable device internet
     trigger:
       - platform: template
-        value_template: "{{ states.sensor.time.state == states.sensor.disable_internet.state[0:5] }}"
+        value_template: "{{ states('sensor.time') == states('sensor.disable_internet')[0:5] }}"
     action:
-      - condition: template
-        value_template: "{{ not is_state('switch.is_internet', 'on') or not is_state('switch.laptop_internet', 'on') }}"
       - service: switch.turn_on
-        entity_id: switch.is_internet, switch.switch_internet, switch.laptop_internet
-
-
+        entity_id: switch.ipad

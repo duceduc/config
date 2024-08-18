@@ -20,10 +20,10 @@
 # M5 Stick
   - unique_id: seismom5_reset_btn
     name: "SeismoM5 Restart"
-    command_topic: "house/earthquake/seismom5/state"
+    command_topic: "house/earthquake/seismom5P/seismom5/state"
     payload_press: "RESET"
     availability:
-      - topic: "house/earthquake/seismom5/status"
+      - topic: "house/earthquake/seismom5P/seismom5/status"
     qos: 0
     retain: false
     entity_category: "config"

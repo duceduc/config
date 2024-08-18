@@ -26,8 +26,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.4142136"
-     inkscape:cx="855.95277"
-     inkscape:cy="414.36458"
+     inkscape:cx="856.65984"
+     inkscape:cy="414.36456"
      inkscape:window-width="1920"
      inkscape:window-height="1027"
      inkscape:window-x="1912"
@@ -518,7 +518,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:14px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:1px;opacity:0.5;fill:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="470.07315"
        y="787.49774"
-       id="sensor.espresense_computerroom_temperature"
+       id="sensor.cr_temperature"
        transform="skewY(-43.482535)"><tspan
          sodipodi:role="line"
          id="tspan2046"
@@ -528,7 +528,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:20px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:1px;opacity:0.5;fill:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="1358.4141"
        y="-562.01862"
-       id="sensor.sr_temperature"
+       id="sensor.sr_radar_temperature"
        transform="skewY(37.867964)"
        sodipodi:insensitive="true"><tspan
          sodipodi:role="line"

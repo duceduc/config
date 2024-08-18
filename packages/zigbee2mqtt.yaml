@@ -16,7 +16,6 @@ mqtt:
       state_topic: "zigbee2mqtt/bridge/state"
       icon: mdi:router-wireless
 
-
 automation:
   - id: enable_zigbee_join
     alias: Enable Zigbee joining

@@ -1,0 +1,94 @@
+device:
+  template: 
+    - basic_card
+    - badge_battery
+  variables:
+    entity: ''
+    name: ''
+    label_on: 'Active'
+    on_state: 
+      - 'on'
+      - 'cleaning'
+    label_off: 'Inactive'
+    off_state: 
+      - 'off'
+      - 'docked'
+      - 'idle'
+      - 'paused'
+    icon_tap_action: ''
+    icon_hold_action: ''
+    name_tap_action: ''
+  styles:
+    card:
+      - background-color: |
+          [[[
+            if (variables.entity && (variables.on_state.includes(states[variables.entity].state))) {
+              return 'var(--device-background-active)';
+            } else {
+              return 'var(--device-background-inactive)';
+            }
+          ]]]
+  custom_fields:
+    icon:
+      card:
+        icon: |
+          [[[
+            if (variables.entity) {
+              if (variables.icon) {
+                return variables.icon;
+              } else {
+                return '';
+              }
+            } else {
+              return 'mdi:help';
+            }
+          ]]]
+        styles:
+          card:
+            - overflow: visible
+            - background-color: |
+                [[[
+                  if (variables.entity && (variables.on_state.includes(states[variables.entity].state))) {
+                    return 'var(--device-icon-background-active)';
+                  } else {
+                    return 'var(--device-icon-background-inactive)';
+                  }
+                ]]]
+          icon:
+            - color: |
+                [[[
+                  if (variables.entity && (variables.on_state.includes(states[variables.entity].state))) {
+                    return 'var(--device-icon-active)';
+                  } else {
+                    return 'var(--device-icon-inactive)';
+                  }
+                ]]]
+        custom_fields:
+          badge:
+            type: custom:button-card # calls for the 'badge_battery' template
+    name:
+      card:
+        label:  |
+          [[[
+            if (variables.entity) {
+              if (states[variables.entity].state === 'unavailable' || states[variables.entity].state === 'unknown') {
+                return "Unavailable";
+              } else if (variables.label) {
+                return variables.label;
+              } else {
+                var state = states[variables.entity].state;
+                var unit = states[variables.entity].attributes.unit_of_measurement || '';
+                var stateLabel = '';
+                if (variables.on_state.includes(state)) {
+                  stateLabel = variables.label_on;
+                } else if (variables.off_state.includes(state)) {
+                  stateLabel = variables.label_off;
+                } else {
+                  stateLabel = `${state} ${unit}`;
+                }
+                return stateLabel.charAt(0).toUpperCase() + stateLabel.slice(1);
+              }
+            } else {
+              return "Label";
+            }                
+          ]]]

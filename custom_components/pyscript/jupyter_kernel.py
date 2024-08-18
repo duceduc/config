@@ -200,7 +200,8 @@ class Kernel:
         self.no_connect_timeout = self.config.get("no_connect_timeout", 30)
         self.signature_schemes = {"hmac-sha256": hashlib.sha256}
         self.auth = hmac.HMAC(
-            self.secure_key, digestmod=self.signature_schemes[self.config["signature_scheme"]],
+            self.secure_key,
+            digestmod=self.signature_schemes[self.config["signature_scheme"]],
         )
         self.execution_count = 1
         self.engine_id = str(uuid.uuid4())
@@ -295,7 +296,13 @@ class Kernel:
         }
 
     async def send(
-        self, stream, msg_type, content=None, parent_header=None, metadata=None, identities=None,
+        self,
+        stream,
+        msg_type,
+        content=None,
+        parent_header=None,
+        metadata=None,
+        identities=None,
     ):
         """Send message to the Jupyter client."""
         header = self.new_header(msg_type)
@@ -337,6 +344,7 @@ class Kernel:
                 "code": msg["content"]["code"],
             }
             await self.send(self.iopub_socket, "execute_input", content, parent_header=msg["header"])
+            result = None
 
             code = msg["content"]["code"]
             #
@@ -401,7 +409,10 @@ class Kernel:
                     "metadata": {},
                 }
                 await self.send(
-                    self.iopub_socket, "execute_result", content, parent_header=msg["header"],
+                    self.iopub_socket,
+                    "execute_result",
+                    content,
+                    parent_header=msg["header"],
                 )
 
             metadata = {
@@ -484,7 +495,11 @@ class Kernel:
                 "metadata": {},
             }
             await self.send(
-                shell_socket, "complete_reply", content, parent_header=msg["header"], identities=identities,
+                shell_socket,
+                "complete_reply",
+                content,
+                parent_header=msg["header"],
+                identities=identities,
             )
 
         elif msg["header"]["msg_type"] == "is_complete_request":
@@ -546,15 +561,26 @@ class Kernel:
         elif msg["header"]["msg_type"] == "comm_info_request":
             content = {"comms": {}}
             await self.send(
-                shell_socket, "comm_info_reply", content, parent_header=msg["header"], identities=identities,
+                shell_socket,
+                "comm_info_reply",
+                content,
+                parent_header=msg["header"],
+                identities=identities,
             )
 
         elif msg["header"]["msg_type"] == "history_request":
             content = {"history": []}
             await self.send(
-                shell_socket, "history_reply", content, parent_header=msg["header"], identities=identities,
+                shell_socket,
+                "history_reply",
+                content,
+                parent_header=msg["header"],
+                identities=identities,
             )
 
+        elif msg["header"]["msg_type"] in {"comm_open", "comm_msg", "comm_close"}:
+            # _LOGGER.debug(f"ignore {msg['header']['msg_type']} message ")
+            ...
         else:
             _LOGGER.error("unknown msg_type: %s", msg["header"]["msg_type"])
 
@@ -721,7 +747,7 @@ class Kernel:
                         await asyncio.sleep(10000)
                 elif msg[0] == "shutdown":
                     asyncio.create_task(self.session_shutdown())
-                    await asyncio.sleep(10000)
+                    return
             except asyncio.CancelledError:
                 raise
             except Exception:
@@ -752,7 +778,9 @@ class Kernel:
             except OSError:
                 self.avail_port += 1
         _LOGGER.error(
-            "unable to find an available port from %d to %d", first_port, self.avail_port - 1,
+            "unable to find an available port from %d to %d",
+            first_port,
+            self.avail_port - 1,
         )
         return None, None
 

@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Christmas Lightings                                                                        
-#                                                                                                              
+#
+#             Christmas Lightings
+#
 #########################################################
 
 - alias: Automate Christmas Lights
@@ -14,11 +14,11 @@
     at: '23:00:00'
   - platform: numeric_state
     entity_id: sensor.lr_radar_illuminance
-    below: 0.29    
+    below: 0.28
   condition:
-  - condition: template 
+  - condition: template
     value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
-  - condition: template 
+  - condition: template
     value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
 
   action:
@@ -26,14 +26,13 @@
       - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) < 0.29 or now().hour == 23 and now().minute == 00 }}"
         sequence:
           - service: script.christmas_lights_off
-    
       - conditions: "{{ states('sensor.lr_radar_illuminance')| float(0) > 0.38 }}"
         sequence:
           - service: script.christmas_lights_on
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

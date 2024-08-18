@@ -37,7 +37,7 @@
 
   - platform: statistics
     name: "Shion Room Temp Sats"
-    entity_id: sensor.sr_temperature
+    entity_id: sensor.sr_radar_temperature
     state_characteristic: mean
     sampling_size: 20
 
@@ -68,7 +68,7 @@
   - platform: min_max
     name: Inside Temp Stats
     entity_ids:
-    - sensor.sr_temperature
+    - sensor.sr_radar_temperature
     - sensor.mr_temperature
     - sensor.toilet_airfreshener_temperature
     - sensor.lr_radar_temperature

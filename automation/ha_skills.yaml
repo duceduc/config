@@ -13,8 +13,8 @@
       for: '00:00:30'
     - platform: numeric_state
       entity_id: sensor.lr_radar_temperature
-      above: 31 # input_number.lr_ac_cool_temp_set
-      for: '00:00:10'
+      above: input_number.lr_ac_cool_temp_set # 31 # input_number.lr_ac_cool_temp_set
+      for: '00:00:20'
 
   condition:
     - condition: template # Someone is home
@@ -40,7 +40,6 @@
         event_id: 'ask_to_turn_on_lr_aircon'
         event_response_type: ResponseYes
   action:
-#    - service: script.lr_ac_normal_cool
     - service: switch.turn_on
       entity_id: switch.ac_lr_unit
 

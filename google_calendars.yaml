@@ -54,3 +54,15 @@
     ignore_availability: true
     name: Shion Events
     track: true
+
+#- cal_id: duceduc@gmail.com
+#  entities:
+#  - device_id: duc_g
+#    ignore_availability: true
+#    name: Duc G
+
+- cal_id: duceduc@gmail.com
+  entities:
+  - device_id: duc_g
+    ignore_availability: true
+    name: Duc G

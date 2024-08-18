@@ -1,0 +1,36 @@
+
+  allow_all_imports: true
+  hass_is_global: true
+#  meross:
+#    - name: sp1 #switch.sp1_0 192.168.1.187
+#      id: 2009221460240251802948e1e934ad13
+#      channels: 1
+#      model: mss110
+#       user: 48:e1:e9:34:ad:13
+#       pass: 0_7240b2b4575cd1537fc375f38668045e
+
+#    - name: sp2 #switch.sp2_0 192.168.1.159
+#      id: 2009224970321851802948e1e934b628 (641dcce03032c46c10b7399948d74cd5)
+#      channels: 1
+#      model: mss110
+#       user: 48:e1:e9:34:b6:28
+#       pass: 0_ebe6d34b72234b15959c8ceefdb7408d
+
+#    - name: sp3 #switch.sp3_0 192.168.1.176
+#      id: 2009228897861651802948e1e934c745
+#      channels: 1
+#      model: mss110
+#       user: 48:e1:e9:34:c7:45
+#       pass: 0_ae280005e7b4f475841023c93124c44b
+
+#    - name: sp4 #switch.sp4_0 192.168.1.190
+#      id: 2009228823079551802948e1e934c753
+#      channels: 1
+#      model: mss110
+#       user: 48:e1:e9:34:c7:53
+#       pass: 0_63358177d3fb9912e6d967bb176950a8
+
+
+
+
+

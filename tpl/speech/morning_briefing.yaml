@@ -38,11 +38,11 @@
           'Do you know what day of the week it is? Today is ',
           'I hate to be the bearer of bad news, but today is '
       ]|random }}
-      {{states.sensor.date_dayoftheweek.state }}.
+      {{states('sensor.date_dayoftheweek') }}.
       </p>
       
       <p>
-        It is currently {{states.sensor.wbio_current_forecast.state }} and {{states.sensor.oa_temperature.state|round}} degrees in Kawagoodchi. 
+        It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.oa_temperature')|round}} degrees in Kawagoodchi. 
       </p>
 
 
@@ -52,11 +52,11 @@
             'The rest of the day should be,',
             'Todays forecast should be,'
         ]|random }}
-          {{ states.sensor.wbio_current_condition.state }}. 
+          {{ states('sensor.wbio_current_condition') }}. 
         </p>
 
       <p>
-        {% if states.sensor.pollen_tree.state | int > 1 %}
+        {% if states('sensor.pollen_tree')| int > 1 %}
         {{ [
          'Todays pollen count is Level, CT.',
          'The current pollen count is Level, CT',
@@ -64,7 +64,7 @@
          'Pollen level CT is expected today in Japan.',
          'Japans pollen count level is at CT today.'
          ]| random | replace('CT', states('sensor.pollen_tree')) }}
-        {% endif %}
+        {% endif %}   
       </p>
 
         <p>
@@ -79,14 +79,14 @@
         </p>
         
         <p>
-        {% if is_state('sensor.halloween_countdown','0') %}
+        {% if is_state('sensor.halloween_countdown', '0') %}
           Happy Halloween!
         {% endif %}
-        {% if is_state('sensor.christmas_countdown','0') %}
+        {% if is_state('sensor.christmas_countdown', '0') %}
           Merry Christmas Everyone!
         {% endif %}
-        {% if is_state('sensor.anniversary_our_wedding','0') %}
-          Happy Anniversary! It been an amazing {{ states.sensor.anniversary_our_wedding.attributes.years }} years!
+        {% if is_state('sensor.anniversary_our_wedding', '0') %}
+          Happy Anniversary! It been an amazing {{ state_attr('sensor.anniversary_our_wedding', 'years') }} years!          
         {% endif %}
         </p>
 
@@ -106,7 +106,7 @@
             {% if 'Walking Home' in states('sensor.school_event') %}
               But Sheon will be walking home from school.
             {% endif %}
-            {% if states.sensor.school_end_days2go.state | int == 0 -%}
+            {% if states('sensor.school_end_days2go')| int == 0 -%}
               But today is the last day of School! 
             {%- endif %}
           {% endif %}
@@ -114,11 +114,11 @@
             {% if is_state('sensor.school_lunch', 'Nothing') %}
               I am not sure what the school menu is for today, so plan on She on taking his lunch 
             {% else %}
-              Today's school lunch is {{ states.sensor.school_lunch.state }}, lets hope She on is not too picky on his plate.
+              Today's school lunch is {{ states('sensor.school_lunch') }}, lets hope She on is not too picky on his plate.
             {% endif %}
           {% endif %}
 
-          {% if states.sensor.school_end_days2go.state | int == -1 -%}
+          {% if states('sensor.school_end_days2go')| int == -1 -%}
             Today is the first day of Summer Break! 
           {%- endif %}
 
@@ -127,25 +127,27 @@
           {% endif %} 
 
           {% if is_state('calendar.shion_events', 'on') %}
-            Shion has {{ states.calendar.shion_events.attributes.message }} today as well!
+            Shion has {{ state_attr('calendar.shion_events', 'message') }} today as well!
           {% endif %}
         </p>
 
         <p>
           {% if is_state('sensor.date_weekday', 'on') and is_state('calendar.holidays_in_japan', 'off') %}
-             {%- if states.sensor.duc_destinations.state|round > 45 %}
+             {%- if states('sensor.duc_destinations')|round > 46 %}
                Traffic to jcb office appears heavy than normnal.
              {% else %}
                Traffic to the jcb office is normal.
              {% endif %}
-             Currently it will take {{states.sensor.duc_destinations.state|round}} minutes to get to the office.
+             Currently it will take {{states('sensor.duc_destinations')|round}} minutes to get to the office.
 
-             {%- if states.sensor.eri_destinations.state|round > 67 %}
+             {%- if not is_state('device_tracker.ie', 'home') %}
+               Eddie appears to be enroute to work and
+             {%- elif states('sensor.eri_destinations')|round > 67 %}
                Traffic to the costco headquarter appears heavy than normnal.
              {% else %}
                Traffic to the costco headquarter is normal.
              {% endif %}
-             Currently it will take {{states.sensor.eri_destinations.state|round}} minutes to get to costco.
+             Currently it will take {{states('sensor.eri_destinations')|round}} minutes to get to costco.
           {% endif %}
       </p>
       

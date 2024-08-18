@@ -1,51 +1,55 @@
 #########################################################
-#                                                                                                              
-#             School                                                                                       
-#                                                                                                              
+#
+#             School
+#
 #########################################################
-
+# Set time for pickup
   - alias: School today
     initial_state: true
     trigger:
     - platform: time
       at: '05:00:00'
     condition:
-    - condition: template
-      value_template: >
-        {%- if as_timestamp(strptime(state_attr('calendar.shion_school', 'start_time'), '%Y-%m-%d %H:%M:%S')) | timestamp_custom("%Y-%m-%d") == now().strftime("%Y-%m-%d") %}
-          true
-        {%- endif -%}
+      - condition: and
+        conditions:
+          - condition: template
+            value_template: >
+              {%- if as_timestamp(strptime(state_attr('calendar.shion_school', 'start_time'), '%Y-%m-%d %H:%M:%S')) | timestamp_custom("%Y-%m-%d") == now().strftime("%Y-%m-%d") %}
+                true
+              {%- endif -%}
+          - condition: template
+            value_template: "{{ states('sensor.holiday') == 'none' }}"
     action:
-    - choose:
-      - conditions:
-        - condition: template
-          value_template: >
-            {{ 'Home School' in states('sensor.school_event') }}
-        sequence:
-        - service: input_boolean.turn_on
-          entity_id: input_boolen.school_early_release
-        - service: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.school_day_end
-          data:
-            time: "15:15:00"
-      default:
-      - service: input_datetime.set_datetime
-        target:
-          entity_id: input_datetime.school_day_end
-        data:
-          time: "18:15:00" 
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.school_today  
-    - service: script.turn_on
-      entity_id: script.school_in_session
-    
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >
+                  {{ 'home school' in states('sensor.school_event') }}
+            sequence:
+              - service: input_boolean.turn_on
+                entity_id: input_boolen.school_early_release
+              - service: input_datetime.set_datetime
+                target:
+                  entity_id: input_datetime.school_day_end
+                data:
+                  time: "15:15:00"
+        default:
+          - service: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.school_day_end
+            data:
+              time: "18:15:00"
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.school_today
+          - service: script.turn_on
+            entity_id: script.school_in_session
+
 
 
 #########################################################
-#                                                                                                              
-#             Shion Bedtime Announcement                                                                   
-#                                                                                                              
+#
+#             Shion Bedtime Announcement
+#
 #########################################################
 
   - alias: Shion Night Briefing
@@ -83,8 +87,6 @@
               target:
                 entity_id: script.shion_nightly_briefing
         default: []
-      
-
 
   - alias: set shion nightly bedtime time
     trigger:
@@ -94,17 +96,25 @@
       - service: input_datetime.set_datetime
         entity_id: input_datetime.shion_nightly_report
         data_template:
-          time: > 
-            {% if is_state('sensor.school_tomorrow', 'on') %}
+          time: >
+            {% if is_state('sensor.school_tomorrow', 'on') or
+            is_state('sensor.school_event', 'school off') %}
               21:00
             {% else %}
               21:30
             {% endif %}
-
+#      - service_template: >
+#          {% if is_state('sensor.school_tomorrow', 'on') or
+#          not is_state('sensor.holidaytomorrow', 'none') %}
+#            input_boolean.turn_on
+#          {% else %}
+#            input_boolean.turn_off
+#          {% endif %}
+#        entity_id: input_boolean.wakeup
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

@@ -15,7 +15,7 @@
       entity_id: input_datetime.school_day_end_reminder
       data:
         time: >
-          {% if states.calendar.shion_school.attributes.description == 'early-release' %}
+          {% if state_attr('calendar.shion_school', 'description' ) == 'early-release' %}
             12:45
           {% else %}
             16:30
@@ -32,25 +32,25 @@
       value_template: "{{ is_state('input_boolean.school_today', 'on') }}"
   action:
     - service: script.text_notify_image
-      data_template:
+      data:
         who: 'desktop'
         title: 'School Time'
         message: "Time for Shion to go to school."
         image: "http://homeassistant.local:8123/local/img/misc/school-bell.png"
 
-- alias: bed time notification
-  trigger:
-    - platform: time
-      at: '21:15:00'
-  condition:
-    - condition: template # is the weekday
-      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
-  action:
-    - service: script.text_notify
-      data_template:
-        who: 'isp'
-        title: '就寝時間'
-        message: 'シオン、今寝てください.'
+#- alias: bed time notification
+#  trigger:
+#    - platform: time
+#      at: '21:15:00'
+#  condition:
+#    - condition: template # is the weekday
+#      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+#  action:
+#    - service: script.text_notify
+#      data_template:
+#        who: 'isp'
+#        title: '就寝時間'
+#        message: 'シオン、今寝てください.'
 
 
 #########################################################
@@ -62,8 +62,8 @@
 - alias: "Replace Toilet Airfreshener Notification"
   trigger:
     - platform: numeric_state
-      entity_id: counter.toilet_airfreshener
-      above: 350
+      entity_id: sensor.toilet_airfreshener_spray_counter
+      above: 320
   action:
     - service: script.email_notify
       data:
@@ -72,16 +72,8 @@
         message: >-
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          The toilet air freshener bottle needs to be replaced. It has sprayed over {{ states('counter.toilet_airfreshener') }} times.<br>
+          The toilet air freshener bottle needs to be replaced. It has sprayed over {{ states('sensor.toilet_airfreshener_spray_counter') }} times.<br>
           <br>
-
-#    - condition: template # Reset if bottle over threshold
-#      value_template: "{{ states('counter.toilet_airfreshener')| int(0) > 390 }}"
-#    - service: counter.reset
-#      target:
-#        entity_id: counter.toilet_airfreshener
-
-
 
 
 #########################################################
@@ -90,48 +82,44 @@
 #
 #########################################################
 
-- alias: ISP/HA Internet Status Notification
-  variables:
-    status_msg: "Internet/HA is {{ states('binary_sensor.home_assistant')|lower }}line."
-  trigger:
-    platform: state
-    entity_id: binary_sensor.home_assistant
-    to: 'off'
-    for: 10
-  action:
-    - service: script.email_notify
-      data:
-        who: duc
-        title: "Internet/HA {{ states('binary_sensor.home_assistant')| title }}line Notification"
-        message: >
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          The Internet or Home-Assistant appears to be {{ states('binary_sensor.home_assistant') }}line.
-          <br>
-
-    - service: script.text_notify
-      data:
-        who: amber
-        title: '*Internet Status*'
-        message: '{{ status_msg }}'
-
-    - service: script.text_notify
-      data:
-        who: desktop
-        title: '*Internet Status*'
-        message: '{{ status_msg }}'
-
-    - service: script.text_notify
-      data_template:
-        who: 'duc'
-        message: '{{ status_msg }}'
-        title: '*Internet Status*'
-
-    - service: logbook.log
-      data_template:
-        name: Internet Status
-        message: "{{ states('binary_sensor.home_assistant')|lower }}line"
-
+# Using intergation Uptime robot, but flaky atm.2/16/2024
+#- alias: ISP/HA Internet Status Notification
+#  variables:
+#    status_msg: "Internet/HA is {{ states('binary_sensor.home_assistant')| lower }}line."
+#  trigger:
+#    platform: state
+#    entity_id: binary_sensor.home_assistant
+#    to: 'off'
+#    for: 10
+#  action:
+#    - service: script.email_notify
+#      data:
+#        who: duc
+#        title: "Internet/HA {{ states('binary_sensor.home_assistant')| title }}line Notification"
+#        message: >
+#          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+#          <br>
+#          The Internet or Home-Assistant appears to be {{ states('binary_sensor.home_assistant') }}line.
+#          <br>
+#    - service: script.text_notify
+#      data:
+#        who: amber
+#        title: '*Internet Status*'
+#        message: '{{ status_msg }}'
+#    - service: script.text_notify
+#      data:
+#        who: desktop
+#        title: '*Internet Status*'
+#        message: '{{ status_msg }}'
+#    - service: script.text_notify
+#      data_template:
+#        who: 'duc'
+#        message: '{{ status_msg }}'
+#        title: '*Internet Status*'
+#    - service: logbook.log
+#      data_template:
+#        name: Internet Status
+#        message: "{{ states('binary_sensor.home_assistant')| lower }}line"
 
 
 #########################################################
@@ -140,7 +128,43 @@
 #
 #########################################################
 
-- alias: "Vehicle Delivery Notification"
+# MAKE SURE IT IS NOT DISABLED IN HA
+- alias: "Vehicles Arriving Notification"
+  trigger:
+    - platform: state
+      entity_id: sensor.units_arriving
+      to: 'on'
+  condition:
+    - condition: template
+      value_template: "{{ states('sensor.units_arriving') != 'unknown' }}"
+#    - platform: calendar # alternative use
+#      event: start
+#      entity_id: calendar.units_arriving
+#      offset: -288:00:00 #12days
+#  condition:
+#    - "{{ trigger.calendar_event.summary == 'Units Arriving' }}"
+  action:
+    - service: script.text_notify
+      data:
+        who: discord_eta
+        message: >
+          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+
+          **Today is {{ now().strftime( '%B %d, %Y') }}**
+
+          List of Containers | Roro Arriving on {{ today }}.
+
+          Please make arrangements to have BL docs send to customers.
+
+          ---
+
+          {{ state_attr('sensor.units_arriving', 'description') }}
+#          {{ states('sensor.units_arriving') }}
+#          {{ trigger.calendar_event.description }}
+
+
+## delete when testing for discord is ok or use for MACK
+- alias: "Vehicle Delivery Notifications"
   initial_state: true
   trigger:
     - platform: state
@@ -150,18 +174,42 @@
     - condition: template
       value_template: "{{ states('sensor.deliveryin2week') != 'unknown' }}"
     - condition: template
-      value_template: "{{ states.sensor.deliveryin2week.state | trim != '' }}"
+      value_template: "{{ states('sensor.deliveryin2week')| trim != '' }}"
   action:
+# Email
     - service: script.email_notify
       data:
         who: jcb
-        title: "Vehicle Delivery Notification"
+        title: "Vehicle Delivery Notification: ETA {{ as_timestamp(now() + timedelta(days = 11))|timestamp_custom('%-m/%d/%Y', true ) }}"
         message: >
+          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          <b> List of Containers/Vehicles Arriving Soon </b> <br>
-          {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %} The following units are arriving in about 10 days. Please make arrangement to have BL send to customers.<br><br> {{ states('sensor.deliveryin2week') }} {% endif %} <br>
+          <b> List of Containers / Roro Arriving on  {{ today }}.</b> <br>
+          {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %} The following units are arriving in about 10 days. Please make arrangements to have BL send to customers.<br><br> {{ states('sensor.deliveryin2week') }} {% endif %} <br>
           <br>
+# Discord NOTE: In Json file, max character is 268 total.
+#    - service: script.text_notify
+#      data:
+#        who: discord_eta
+#        message: >
+#          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+
+#          **Today is {{ now().strftime( '%B %d, %Y') }}**
+
+#          List of Containers | Roro Arriving on  {{ today }}.
+
+#          {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %}The following units are arriving in about 10 days.
+
+#          Please make arrangements to have BL send to customers.
+
+#          ---
+
+#          {{ states('sensor.deliveryin2week') }}
+#          {% endif %}
+
+
 
 #########################################################
 #
@@ -169,7 +217,7 @@
 #
 #########################################################
 
-- alias: "Holiday and Birthday Notification"
+- alias: "Holiday Notification"
   initial_state: true
   trigger:
     - platform: state
@@ -178,13 +226,13 @@
     - condition: template
       value_template: "{{ states('sensor.holiday') != 'unknown' }}"
     - condition: template
-      value_template: "{{ states.sensor.holiday.state | trim != '' }}"
+      value_template: "{{ states('sensor.holiday')| trim != 'none' }}"
   action:
     - service: script.text_notify
       data:
         who: duc
-        title: '{{ states.sensor.holiday.state }}'
-        message: 'Today is {{ states.sensor.holiday.state }}.'
+        title: "{{ states('sensor.holiday') }}"
+        message: "Today is {{ states('sensor.holiday') }}."
 
 
 
@@ -198,16 +246,13 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: sensor.is_payday
-  condition:
-    - condition: template
-      value_template: "{{ states('sensor.is_payday') != 'unknown' }}"
-    - condition: template
-      value_template: "{{ states.sensor.is_payday.state | trim != '' }}"
+      entity_id: binary_sensor.payday
+      to: 'on'
+  condition: []
   action:
     - service: script.text_notify
       data:
-        who: duc
+        who: viber
         title: 'Payday'
         message: >-
           {{ [
@@ -239,11 +284,11 @@
       data:
         who: duc
         title: '*Information*'
-        message: "Samba backup {{ states('sensor.samba_backup')|lower }}."
+        message: "Samba backup {{ states('sensor.samba_backup')| lower }}."
     - service: logbook.log
       data_template:
         name: Samba Backup
-        message: "{{ states('sensor.samba_backup')|lower }}"
+        message: "{{ states('sensor.samba_backup')| lower }}"
 
 #########################################################
 #
@@ -251,6 +296,8 @@
 #
 #########################################################
 
+
+#  CAN DELETE
 - alias: "VJ SSL Certificate Expiry Notification"
   initial_state: true
   trigger:
@@ -291,7 +338,7 @@
         message: >-
           <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
           <br>
-          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states.sensor.ha_ssl_cert_expiry.state }} days. <br>
+          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states('sensor.ha_ssl_cert_expiry') }} days. <br>
           <br>
 
 - alias: "Mqtt SSL Certificate Expiry Notification"
@@ -333,11 +380,18 @@
     - condition: template
       value_template: "{{ states('sensor.earthquake_alert') != 'unknown' }}"
     - condition: template
-      value_template: "{{ states('sensor.earthquake_alert') | trim != '' }}"
+      value_template: "{{ states('sensor.earthquake_alert')| trim != '' }}"
   action:
-    - service: notify.earthquake_log
-      data_template:
+    - service: notify.send_message
+      target:
+        entity_id: notify.earthquake_log
+      data:
         message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
+
+# Depreciate in 2024.12 
+#    - service: notify.earthquake_log
+#      data_template:
+#        message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
     - condition: template
       value_template: "{{ state_attr('sensor.earthquake_alert', 'mag')| float(0) >= 4 }}"
@@ -353,7 +407,6 @@
         message: "Location: {{ state_attr('sensor.earthquake_alert', 'en_anm') }} M{{ state_attr('sensor.earthquake_alert', 'mag') }}"
 
 
-# daily reset in homeassistant.yaml
 - alias: Earthquake Status Notification
   trigger:
     - platform: state
@@ -374,17 +427,30 @@
       entity_id: sensor.seismoM5p_state
       to: "unavailable"
       id: "status"
+    - platform: numeric_state
+      entity_id: sensor.seismom5p_pga
+      below: 0.1
+      for: 60
+      id: "offline"
 
   action:
     choose:
       - conditions:
-        - condition: trigger
-          id: 'status'
+          - condition: trigger
+            id: 'status'
         sequence:
           - service: script.text_notify
             data:
               who: duc
-              message: "SeismoM5P is {{ states('sensor.seismoM5p_state')|lower() }}..."
+              message: "SeismoM5P is {{ states('sensor.seismoM5p_state')| lower() }}..."
+      - conditions:
+          - condition: trigger
+            id: 'offline'
+        sequence:
+          - service: script.text_notify
+            data:
+              who: duc
+              message: "Seismom sensors are offline"
     default:
       - service: script.text_notify
         data:

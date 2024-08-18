@@ -1,0 +1,8 @@
+binary_sensor:
+  - platform: gpio
+    pin: D2
+    name: 'motion $name occupancy'
+    device_class: motion
+
+#  - platform: status
+#    name: "$name status"

@@ -12,7 +12,7 @@
     <p>
       {% if is_state('sun.sun', 'below_horizon') %}
         You have
-        {% set seconds = as_timestamp(states.sun.sun.attributes.next_rising)-now().timestamp() %}
+        {% set seconds = as_timestamp(state_attr('sun.sun', 'next_rising'))-now().timestamp() %}
         {% set hours = seconds / 60 %}
         {% if seconds / ( 60 * 60 ) > 1 %}
           {{ (seconds //  ( 60 * 60 )) | int }} hours
@@ -26,7 +26,7 @@
         ]|random }}
       {% else %}
         You have
-        {% set seconds = as_timestamp(states.sun.sun.attributes.next_setting)-now().timestamp() %}
+        {% set seconds = as_timestamp(state_attr('sun.sun', 'next_setting'))-now().timestamp() %}
         {% set hours = seconds / 60 %}
         {% if seconds / ( 60 * 60 ) > 1 %}
           {{ (seconds //  ( 60 * 60 )) | int }} hours

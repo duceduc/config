@@ -1,143 +1,45 @@
-# ESP8266 NodeMCU.... BC-DD-C2-7A-CC-B4
+# C4:5B:BE:60:96:28
+# https://github.com/CDaxi/esphome-projects/tree/master/airfreshener
 substitutions:
   name: toilet-airfreshener
-  platform: ESP8266
-  board: nodemcuv2
+  counter: Spray counter
+  reset: Reset spray counter
+  upper: Toilet
+  lower: toilet
+  am2302: D3
+
+packages:
+  ld2410: !include components/ld2410.yaml
+  am2302: !include components/am2302.yaml
+  airfresh: !include components/airfresh.yaml
+
+<<: !include .base.yaml 
 
 esphome:
   name: $name
-  platform: $platform
-  board: $board
-  libraries:
-   - ESP8266WiFi
-   - https://github.com/akaJes/AsyncPing#95ac7e4
-
-external_components:
-  - source:
-      type: local
-      path: components/esphome-component-ping/components
-
-wifi:
-  ssid: !secret ssid2
-  password: !secret ssid_pass
-  fast_connect : true
-  manual_ip:
-    static_ip: 192.168.1.89
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
-
-logger:
-
-api:
-  encryption:
-    key: !secret esphome_apikey
-
-ota:
-  password: !secret ota_pass
-
-number:
-  - platform: template
-    icon: mdi:counter
-    id: spray_counter
-    restore_value: true
-    update_interval: 30s
-    min_value: 0
-    max_value: 400
-    mode: box
-    step: 1
-    optimistic: true
-    internal: true
-
-button:
-  - platform: template
-    name: ${name} counter reset
-    icon: mdi:restart
-    on_press:
-      then:
-        - number.set:
-            id: spray_counter
-            value: 0
-
-switch:
-  - platform: gpio
-    name: $name
-    id: relay
-    pin: D2 # use D1, D2, D5, D6, D7 for relays  was D1
-    icon: mdi:spray
-    restore_mode: ALWAYS_OFF
-    on_turn_on:
-      then:
-        if:
-          condition:
-            not:
-              script.is_running: do_spray
-          then:
-            script.execute: do_spray
-
-  - platform: restart
-    name: "$name Restart"
-    icon: mdi:restart
-
-script:
-  - id: do_spray
+  platform: ESP8266
+  board: nodemcuv2
+  includes:
+    - /config/esphome/components/ld2410_uart.h
+  on_boot:
+    priority: 600
+    # ...
     then:
-      - number.increment: spray_counter
-      - component.update: spray_counter
-      - component.update: spray_counter_template
-      - homeassistant.service:
-           service: counter.increment
-           data:
-             entity_id: counter.toilet_airfreshener
-      - delay: 12s
-      - switch.turn_off: relay
+      - lambda: |-
+          auto uart_component = static_cast<LD2410 *>(ld2410);
+          uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);
 
 sensor:
-  - platform: template
-    name: ${name} counter
-    icon: mdi:counter
-    id: spray_counter_template
-    state_class: measurement
-    unit_of_measurement: ""
-    accuracy_decimals: 0
-    lambda: |-
-      return id(spray_counter).state;
-    update_interval: 60s
-
-  - platform: dht
-    model: AM2302
-    pin: D3 #Avoid D4. LED Driven. Use D3
-    temperature:
-      name: '$name temperature'
-    humidity:
-      name: '$name humidity'
-    update_interval: 30s
-
   - platform: wifi_signal
-    name: $name wifi signal
+    name: ${name} wifi signal
     update_interval: 15s
-
-  - platform: ping
-    ip_address: 8.8.8.8
-    num_attempts: 17
-    # the timeout. however, this is not what you usually expect from `ping`
-    # implementation: the timeout is also the interval to send packets. if you
-    # set this value to 10 sec, and the network is fine (no packet loss), then
-    # the component sends a packet at 10 sec interval, and the total time to
-    # finish would be 10 sec * num_attempts = 10 * 17 = 170 sec.
-    timeout: 1sec
-    loss:
-      name: $name Packet loss
-    latency:
-      name: $name Latency
-      accuracy_decimals: 3
-    update_interval: 30s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
 
 binary_sensor:
   - platform: status
-    name: $name status
-
-  - platform: gpio
-    pin: D1 # was D5
-    name: 'motion tr1 occupancy'
-    device_class: motion
+    name: ${name} status
 

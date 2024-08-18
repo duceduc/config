@@ -52,7 +52,7 @@
       - service: mqtt.publish
         data:
           topic: house/earthquake/daily_count
-          payload_template: "{{ states.sensor.earthquake_daily_count.state | int + 1 }}"
+          payload: "{{ states.sensor.earthquake_daily_count.state | int + 1 }}"
           retain: true
 
   reset_earthquake_daily_count:
@@ -60,7 +60,7 @@
       - service: mqtt.publish
         data:
           topic: house/earthquake/daily_count
-          payload_template: 0
+          payload: 0
           retain: true
 
   seismom5p_reset:
@@ -74,48 +74,26 @@
     sequence:
       - service: mqtt.publish
         data:
-          topic: house/earthquake/seismom5/command
+          topic: house/earthquake/seismom5P/seismom5/command
           payload: '{"reset": true}'
 
-
-
 #########################################################
 #                                                                                                              
-#            Set Custom Device Tracker Location                                                  
+#             Mailbox                                                                                    
 #                                                                                                              
 #########################################################
 
-  set_device_tracker_shion_home:
-    alias: Set Device Tracker Shion Home
+# automation in telegram_bot.yaml in automation
+  mailbox_reset:
     sequence:
-      - service: device_tracker.see
+      - service: mqtt.publish # reset mqtt state or it will never retrigger
         data:
-          dev_id: shion
-          location_name: "home"
-          gps:
-          - '35.8182373046875'
-          - '139.70377148641893'
+          topic: house/alerts/lora_mailbox/state
+          payload: received
+          retain: true
 
-  set_device_tracker_shion_not_home:
-    alias: Set Device Tracker Shion Not Home
-    sequence:
-      - service: device_tracker.see # Set to away
-        data:
-          dev_id: shion
-          location_name: "not_home"
-          gps:
-          - '00.0'
-          - '000.0'
-      - condition: template
-        value_template: "{{ is_state('binary_sensor.shion_at_school_baysn', 'on') }}"
-      - delay: 30
-      - service: device_tracker.see # Set to at school
-        data:
-          dev_id: shion
-          location_name: "not_home"
-          gps:
-          - '35.81214930237013'
-          - '139.71171706362946'
+
+
 
 #########################################################
 #                                                                                                              

@@ -1,41 +1,28 @@
-# ESP32 NodeMCU
+# ESP32 NodeMCU [08:3A:F2:B5:80:0C]
+
 substitutions:
   name: razer-leviathan-player
-  platform: ESP32
-  board: nodemcu-32s
+
+packages:
+  stats: !include components/stats.yaml
+
+<<: !include .base.yaml 
 
 esphome:
   name: $name
-  platform: $platform
-  board: $board
+  platform: ESP32
+  board: nodemcu-32s
 
-wifi:
-  ssid: !secret ssid3
-  password: !secret ssid_pass
-  manual_ip:
-    static_ip: 192.168.1.113
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
-
-captive_portal:
-logger:
-
-api:
-  encryption:
-    key: !secret esphome_apikey
-
-ota:
-  password: !secret ota_pass
+i2s_audio:
+  i2s_lrclk_pin: GPIO25
+  i2s_bclk_pin: GPIO26
 
 media_player:
   - platform: i2s_audio
     name: $name
     dac_type: external
-    i2s_lrclk_pin: GPIO25
     i2s_dout_pin: GPIO22
-    i2s_bclk_pin: GPIO26
     mode: mono
-
     on_play:
       - logger.log: "Playback started!"
     on_pause:
@@ -43,23 +30,7 @@ media_player:
     on_idle:
       - logger.log: "Playback finished!"
 
-sensor:
-  - platform: wifi_signal
-    name: $name wifi signal
-    update_interval: 15s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
-          send_first_at: 1
-
-binary_sensor:
-  - platform: status
-    name: "$name status"
-
 switch:
   - platform: restart
     name: "$name Restart"
     icon: mdi:restart
-
-

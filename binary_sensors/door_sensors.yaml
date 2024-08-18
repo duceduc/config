@@ -43,18 +43,17 @@
 
 #########################################################
 #                                                                                                              
-#            SWITCHBOT CONTACT SENSORS                                                                  
+#            Aqara genkan door                                                                
 #                                                                                                              
 #########################################################
-
-# CURRENTLY USING
+##   TESTING 
 #  - platform: template
 #    sensors:
-#      genkan_door_lock:
+#      genkan_doorlock:
 #        friendly_name: "Front Door Lock"
 #        device_class: lock
 #        value_template: >-
-#          {% if states('sensor.genkan_doorlock_contact').lower() in ['locked', 'open', 'timeout'] %}off{% else %}on{% endif %}
+#          {% if states('sensor.genkan_doorlock_contact').lower() in ['open', 'timeout', 'unavailable'] %}off{% else %}on{% endif %}
 
 
 

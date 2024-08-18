@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Turn on Netflix on ATV                                                                   #
-#                                                                                                              #
+#                                                                                                              
+#             Turn on Netflix on ATV                                                                   
+#                                                                                                              
 #########################################################
 
 - alias: 'turn on appletv netflix'
@@ -16,9 +16,9 @@
       entity_id: input_boolean.appletv_netflix
 
 #########################################################
-#                                                                                                              #
-#             Turn on Plex on ATV                                                                      #
-#                                                                                                              #
+#                                                                                                              
+#             Turn on Plex on ATV                                                                      
+#                                                                                                              
 #########################################################
 
 - alias: 'turn on appletv plex'
@@ -33,9 +33,9 @@
       entity_id: input_boolean.appletv_plex
 
 #########################################################
-#                                                                                                              #
-#             Toggle Jcom Tv Box                                                                       #
-#                                                                                                              #
+#                                                                                                              
+#             Toggle Jcom Tv Box                                                                       
+#                                                                                                              
 #########################################################
 
 #- alias: 'toggle jcom tv box'
@@ -51,9 +51,9 @@
 #      entity_id: input_boolean.jcom_tv_box
 
 #########################################################
-#                                                                                                              #
-#             Toggle Floor Heater                                                                       #
-#                                                                                                              #
+#                                                                                                              
+#             Toggle Floor Heater                                                                       
+#                                                                                                              
 #########################################################
 
 #- alias: 'toggle floor heater'
@@ -69,19 +69,18 @@
 #      entity_id: input_boolean.floor_heater     
 
 #########################################################
-#                                                                                                              #
-#             Desktop Automations                                                                     #
-#                                                                                                              #
+#                                                                                                              
+#             Desktop Automations                                                                     
+#                                                                                                              
 #########################################################
 
 - alias: 'Turn on desktop in morning'
   trigger:
     - platform: time
-      at: '04:25:00'
+      at: '04:15:00'
   condition:
     - condition: template # Vacation mode is not On
       value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
-  
     - condition: template # Duc is home
       value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
     - condition: template # PC is not on
@@ -89,9 +88,56 @@
   action:
     - service: script.desktop_wol_on
 
+#########################################################
+#                                                                                                              
+#             ESPresense Status                                                                        
+#                                                                                                              
+#########################################################
+
+#- alias: "ESPresense Status"
+#  trigger:
+#    - platform: template
+#      value_template : "{{ not is_state('sensor.espresense_devices', 'on') }}"
+#      for: 600
+#  action:
+#    - service: script.email_notify
+#      data:
+#        who: duc
+#        title: 'ESPresense Offline'
+#        message: "{{ states('sensor.espresense_devices') }} appears to be offline."
+
+
+
+- alias: "ESPresense Status"
+  trigger:
+    - platform: template
+      value_template : "{{ not is_state('sensor.espresense_devices', 'on') }}"
+      for: 600
+      id: 'offline'
+  action:
+    - choose:
+      - conditions:
+          - condition: trigger
+            id: 'offline'
+        sequence:
+          - condition: template
+            value_template: "{{ not is_state('sensor.espresense_devices', 'on') }}"
+          - service: script.email_notify
+            data:
+              who: duc
+              title: 'ESPresense Offline'
+              message: "{{ states('sensor.espresense_devices') }} appears to be {{ states('group.espresense_devices') }}line."
+      default:
+        - service: script.email_notify
+          data:
+            who: duc
+            title: 'ESPresense Online'
+            message: "ESPresense devices appear to be {{ states('group.espresense_devices') }}line."
+
+
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

@@ -1,58 +1,15 @@
 #########################################################
-#                            
-#             Main Configuration Settings...                     
-#                                                 
+#
+#             Main Configuration Settings...
+#
 #########################################################
 
+# Custom Components
 default_config:
 python_script:
 momentary:
 wake_on_lan:
 lovelace_gen:
-
-tts:
-  - platform: google_translate
-    service_name: google_say
-    cache_dir: /config/www/tts
-    time_memory: 300
-    cache: true
-
-notify_events:
-  token: !secret notify_token
-
-zone: !include zones.yaml
-group: !include groups.yaml
-scene: !include scenes.yaml
-timer: !include timers.yaml
-light: !include lights.yaml
-cover: !include cover.yaml
-pyscript: !include pyscript.yaml
-alert: !include alerts.yaml
-frontend: !include frontend.yaml
-lovelace: !include lovelace.yaml
-input_number: !include input_number.yaml
-input_datetime: !include input_datetime.yaml
-input_select: !include input_select.yaml
-input_boolean: !include input_boolean.yaml
-emulated_hue: !include emulated_hue.yaml
-shell_command: !include shell_commands.yaml
-utility_meter: !include utility_meter.yaml
-template: !include template.yaml
-automation blueprint: !include automations.yaml
-
-binary_sensor: !include_dir_merge_list binary_sensors/
-automation: !include_dir_merge_list automation/
-sensor: !include_dir_merge_list sensors/
-switch: !include_dir_merge_list switches/
-notify: !include_dir_merge_list notify/
-script: !include_dir_merge_named scripts/
-
-mqtt:
- sensor: !include_dir_merge_list mqtt/sensors/
- binary_sensor: !include_dir_merge_list mqtt/binary_sensors/
- button: !include_dir_merge_list mqtt/buttons/ 
-# cover: !include_dir_merge_list mqtt/cover/
-# certificate: auto
 
 homeassistant:
   name: Home
@@ -65,22 +22,68 @@ homeassistant:
   currency: USD
   internal_url: !secret internal_url
   external_url: !secret external_url
-  customize: !include customize.yaml
+  customize: !include includes/customize.yaml
   packages: !include_dir_named packages
   allowlist_external_dirs:
     - '/config'
     - '/media/music'
 
+tts:
+  - platform: google_translate
+    service_name: google_say
+    cache_dir: /config/www/tts
+    time_memory: 300
+    cache: true
+
+notify_events:
+  token: !secret notify_token
+
+alert: !include includes/alerts.yaml
+zone: !include includes/zones.yaml
+group: !include includes/groups.yaml
+scene: !include includes/scenes.yaml
+timer: !include includes/timers.yaml
+light: !include includes/lights.yaml
+cover: !include includes/cover.yaml
+pyscript: !include includes/pyscript.yaml
+climate: !include includes/climate.yaml
+input_number: !include includes/input_number.yaml
+input_datetime: !include includes/input_datetime.yaml
+input_select: !include includes/input_select.yaml
+input_boolean: !include includes/input_boolean.yaml
+emulated_hue: !include includes/emulated_hue.yaml
+shell_command: !include includes/shell_commands.yaml
+utility_meter: !include includes/utility_meter.yaml
+#template: !include includes/template.yaml
+command_line: !include includes/command_line.yaml
+automation blueprint: !include includes/automations.yaml
+
+frontend: !include frontend.yaml
+lovelace: !include lovelace.yaml
+
+binary_sensor: !include_dir_merge_list binary_sensors/
+automation: !include_dir_merge_list automation/
+sensor: !include_dir_merge_list sensors/
+template: !include_dir_merge_list templates/
+switch: !include_dir_merge_list switches/
+notify: !include_dir_merge_list notify/
+script: !include_dir_merge_named scripts/
+
+mqtt:
+ sensor: !include_dir_merge_list mqtt/sensors/
+ binary_sensor: !include_dir_merge_list mqtt/binary_sensors/
+ button: !include_dir_merge_list mqtt/buttons/
+
 # https://community.home-assistant.io/t/reverse-proxy-error/312936
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - 192.168.1.15 #ws1
+    - 192.168.1.5 #ser    
     - 172.30.33.0/24 # Docker network
 
 #########################################################
-#                                                                                           
-#             Device Tracker                                                              
+#
+#             Device Tracker
 #
 #########################################################
 
@@ -95,34 +98,31 @@ person:
      - device_tracker.ie
 
 #########################################################
-#                                                                                                              
-#             Sensor Integrations                                                     
-#                                                                                                              
+#
+#             Sensor Integrations
+#
 #########################################################
 
 rest:
   - resource: !secret switchbot_wohumi_url
     scan_interval: 900
-    method: GET    
+    method: GET
     headers:
       Authorization: !secret switchbot_api
       Content-Type: 'application/json'
     sensor:
       - name: SB Humidifier Power
         value_template: "{{ value_json.body.power }}"
-        device_class: power
-    
       - name: SB Humidifier Lack Water
         value_template: "{{ value_json.body.lackWater }}"
-        device_class: carbon_dioxide
       - name: SB Humidifier Nebulization Efficiency
         value_template: "{{ value_json.body.nebulizationEfficiency }}"
-        unit_of_measurement: '%'        
-        device_class: ozone 
+        unit_of_measurement: '%'
+        device_class: ozone
       - name: SB Humidifier Temperature
         value_template: "{{ value_json.body.temperature }}"
         unit_of_measurement: '°C'
-        device_class: temperature 
+        device_class: temperature
       - name: SB Humidifier Humidity
         value_template: "{{ value_json.body.humidity }}"
         unit_of_measurement: '%'
@@ -130,7 +130,7 @@ rest:
 
 # Tomorrowio Pollen Count
   - resource: !secret tomorrowio_pollen_api
-    scan_interval: 600
+    scan_interval: 1800
     sensor:
     ### Pollen - Tree Index
       - name: "Pollen - Tree Index - Day 0"
@@ -146,7 +146,7 @@ rest:
         json_attributes:
         - grassIndex
         - weedIndex
-        - temperature     
+        - temperature
       - name: "Pollen - Tree Index - Day 2"
         value_template: "{{ value_json.data.timelines[0].intervals[2]['values']['treeIndex'] }}"
         json_attributes_path: "$.data.timelines[0].intervals[2].values"
@@ -170,19 +170,26 @@ rest:
         - temperature
 
 #########################################################
-#                                                                                                              
-#             Integration                                                         
-#                                                                                                              
+#
+#             Integration
+#
 #########################################################
+
+#influxdb:
+#  host: a0d7b954-influxdb
+#  port: 8086
+#  database: homeassistant
+#  username: !secret influx_user
+#  password: !secret influx_pass
+#  max_retries: 3
+#  default_measurement: state
 
 spotcast:
   sp_dc: !secret duc_sp_dc
   sp_key: !secret duc_sp_key
 #  country: US #optional, added in 3.6.24
 
-
-
-#media_player: 
+#media_player:
 #  name: "agent mediaplayer"
 #  platform: hass_agent_mediaplayer
 #  host: 192.168.1.111
@@ -190,9 +197,6 @@ spotcast:
 
 
 counter:
-  dining_lights_toggle:
-    initial: 1
-    step: 1
 #Glade
   toilet_airfreshener:
     initial: 1
@@ -211,60 +215,11 @@ input_text:
 
   room_presence:
     name: Room Presence
-  
+
   alexa_actionable_notification:
     name: Alexa Actionable Notification Holder
     max: 255
     initial: '{"text": "This is a test of the alexa actions custom skill. Did it work?", "event": "actionable.skill.test"}'
-
-#################
-  status_fan_speed:
-    name: Status Fan Speed
-
-fan:
-  - platform: template
-    fans:
-      yuasa_fan:
-        speed_count: 3
-        value_template: "{{ states('input_boolean.status_fan_power') }}"
-        percentage_template: "{{ states('input_text.status_fan_speed') | int }}"
-        turn_on:
-          - condition: state
-            entity_id: input_boolean.status_fan_power
-            state: 'off'
-          - service: remote.send_command
-            data:
-              entity_id: remote.rm4_remote
-              device: Yuasa Fan
-              command: power
-          - service: input_boolean.turn_on
-            entity_id: input_boolean.status_fan_power
-        turn_off:
-          - service: remote.send_command
-            data:
-              entity_id: remote.rm4_remote
-              device: Yuasa Fan
-              command: power
-          - service: input_boolean.turn_off
-            entity_id: input_boolean.status_fan_power
-
-        set_percentage:
-          - service: python_script.fan_speed_control
-            data_template:
-              fan_speed: "{{ percentage }}"
-              fan_speed_entity_id: 'input_text.status_fan_speed'
-              fan_entity_id: 'fan.yuasa_fan'
-              fan_speed_count: 3
-              service_domain: 'remote'
-              service: 'send_command'
-              service_data_increase:
-                entity_id: remote.rm4_remote
-                device: Yuasa Fan
-                command: speed
-              service_data_decrease:
-                entity_id: remote.rm4_remote
-                device: Yuasa Fan
-                command: speed
 
 #################
 
@@ -294,9 +249,9 @@ rest_command:
       }
 
 #########################################################
-#                                                                                                              
-#             Panel Redirect                                                  
-#                                                                                                              
+#
+#             Panel Redirect
+#
 #########################################################
 
 panel_custom:
@@ -308,13 +263,13 @@ panel_custom:
     config:
       target: /hassio/ingress/45df7312_zigbee2mqtt
 
-  - name: panel-redirect
-    url_path: redirect-server-controls
-    sidebar_title: Server Controls
-    sidebar_icon: mdi:server
-    module_url: /local/custom_ui/panel-redirect.js
-    config:
-      target: /developer-tools/yaml
+#  - name: panel-redirect
+#    url_path: redirect-server-controls
+#    sidebar_title: Server Controls
+#    sidebar_icon: mdi:server
+#    module_url: /local/custom_ui/panel-redirect.js
+#    config:
+#      target: /developer-tools/yaml
 
   - name: panel-redirect
     url_path: redirect-system
@@ -326,7 +281,7 @@ panel_custom:
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                   
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

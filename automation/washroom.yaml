@@ -4,227 +4,76 @@
 #                                                                                                              
 #########################################################
 
-
 - alias: 'motion washroom auto-on'
+  mode: parallel
   trigger:
+    - platform: template # alt if false positive occurs above
+      value_template: |
+       {%- set trig = (now() - states.binary_sensor.motion_washroom_sensor_occupancy.last_changed).seconds -%}
+       {% if is_state('group.motion_showerroom_occupancy', 'on') and trig <= 300 %} true
+       {% else %} false {% endif %}
     - platform: state
-      entity_id: group.motion_showerroom_occupancy ##
+      entity_id: light.wash
       to: 'on'
-#  condition:
-#    - condition: template # Prevent sink false triggers. remove if not needed
-#      value_template: >-
-#        {%- set seconds = (now() - states.binary_sensor.motion_washroom_sensor_occupancy.last_changed).seconds -%}
-#        {{ seconds <= 180 }}
-
+      id: 'sink'
+    - platform: state
+      entity_id: binary_sensor.washer_door_button
+      to: 'on'
   action:
-#    - service: script.tradfri_transition
-#      data:
-#        entity_id: light.wash
-#        color_temp: 400
-#        transition: 2
-#        brightness: 255
-#      entity_id: light.wash  
-  
-    - service: light.turn_on
-      entity_id: light.wash
-
-    - condition: template # Don't run if on
-      value_template: "{{ not is_state('light.sink_cool', 'on') }}"      
-    - service: script.tradfri_transition
-      data:
-        entity_id: light.sink_cool
-        color_temp: 153
-        transition: 2
-        brightness: 255
-      entity_id: light.sink_cool
-    - service: script.tradfri_transition
-      data:
-        entity_id: light.w_4
-        color_temp: 370
-        transition: 2
-        brightness: 255
-      entity_id: light.w_4
-
-#    - service: light.turn_on
-#      entity_id: light.sink_all
-
-- alias: 'Washroom Switch Light on'
-  trigger:
-    - entity_id: binary_sensor.washer_door_button 
-      platform: state
-      to: 'on' 
-  action:
-    - service: script.tradfri_transition
-      data:
-        entity_id: light.wash
-        color_temp: 400
-        transition: 2
-        brightness: 254
-      entity_id: light.wash
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'sink'
+          sequence:
+            - condition: template
+              value_template: "{{ not is_state('light.sink_cool', 'on') }}"        
+#            - service: script.tradfri_transition
+#              data:
+#                entity_id: light.sink_cool
+#                color_temp: 153 # white color
+#                transition: 2
+#                brightness: 254
+#              entity_id: light.sink_cool
+            - service: light.turn_on
+              entity_id: light.sink_cool              
+            - service: script.tradfri_transition
+              data:
+                entity_id: light.w_4
+                color_temp: 370 # beige color
+                transition: 2
+                brightness: 254
+              entity_id: light.w_4
+      default:
+        - service: light.turn_on
+          entity_id: light.wash
 
 - alias: 'motion washroom auto-off'
+  mode: parallel
   trigger:
     - platform: state
-      entity_id: group.motion_showerroom_occupancy ##
+      entity_id: group.motion_showerroom_occupancy
       to: 'off'
-      for: '00:00:40'
-  action:
-    - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
-      entity_id: 
-       - light.wash
-
-- alias: 'motion sink auto-off'
-  trigger:
+      for: 30
     - platform: state
       entity_id: light.wash
       to: 'off'
-      for: '00:00:30'
+      for: 30
+      id: sink
+  condition:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"       
+      
   action:
-    - service_template: light.turn_off
-      entity_id: light.sink_all
-
-
-#########################################################
-#                                                                                                              
-#             Automate Washroom 24hr Fan                                                         
-#                                                                                                              
-#########################################################
-
-# CURRENTLY USING #
-#- alias: '24hr fan toggle on-off'
-#  trigger:
-#    - platform: time
-#      at: '05:29:00'
-#    - platform: time
-#      at: '23:00:00'
-#  condition:
-#    - condition: template # Don't run if on vacation
-#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
-#  action:
-#    - service_template: switch.turn_{{ 'on' if is_state('sensor.time', '05:29') else 'off' }}
-#      data:
-#        entity_id: switch.24hr_fan
-#
-#- alias: '24hr fan toggle speed'
-#  trigger:
-#    - platform: time
-#      at: '05:29:00'
-#    - platform: state
-#      entity_id: sensor.period_of_the_day
-#      to: 'dusklight'
-#  condition:
-#    - condition: template # Don't run if on vacation
-#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
-#  action:
-#    - delay: 60
-#    - service: script.holdpress_bot
-#      data:
-#        bot: '24hr_fan'
-#        press: 0
-
-
-#########################################################
-#                                                                                                              
-#             Washing Machine Status                                                           
-#                                                                                                              
-#########################################################
-
-#- alias: Washer Running
-#  initial_state: true
-#  trigger:
-#    - platform: state
-#      entity_id: sensor.shelly_washer_state
-#      from: 'fill'
-#      to: 'run'
-#  condition:
-#    - condition: numeric_state
-#      entity_id: sensor.shelly_washer_power
-#      above: 3      
-#  action:
-#    - service: script.washer_running
-#
-#- alias: Washer Complete
-#  initial_state: true
-#  trigger:
-#    - platform: state
-#      entity_id: sensor.shelly_washer_state
-#      from: 'wait'
-#      to: 'stop'
-#  condition:
-#    - condition: state
-#      entity_id: sensor.washer_status_m
-#      state: running
-#  action:
-#    - service: script.washer_complete
-#
-#
-## Washer State
-#- alias: Washer Operation
-#  trigger:
-#  - platform: state 
-#    entity_id: sensor.shelly_washer_state
-#  action:
-#    - service: input_select.select_option
-#      data:
-#        entity_id: input_select.shelly_washer_state
-#        option: >
-#          {% set s = states('input_select.shelly_washer_state') %}
-#          {% set fr = trigger.from_state.state %}
-#          {% set to = trigger.to_state.state %}
-#          {% if fr == 'stop' and to == 'fill' %} wash fill
-#          {% elif fr == 'fill' and to == 'run' %} wash
-#          {% elif fr == 'stop' and to == 'run' %} wash
-#          {% elif fr == 'wait' and to == 'pulse' %} dryer
-#          {% elif fr == 'run' and to == 'pulse' and s == 'wash' %} wash spin
-#          {% elif fr == 'pulse' and to == 'run' and s == 'wash spin' %} wash drain
-#          {% elif fr == 'run' and to == 'fill' %} rinse fill
-#          {% elif fr in ['fill', 'run'] and to == 'wait' %} rinse wait
-#          {% elif fr == 'wait' and to == 'run' %} rinse               
-#          {% elif fr == 'run' and to == 'pulse' and s == 'rinse' %} rinse spin
-#          {% elif fr == 'pulse' and to == 'run' and s == 'rinse spin' %} rinse drain
-#          {% elif fr in ['run', 'fill', 'wait', 'unknown'] and to == 'stop' %} stop
-#          {% else %} unknown
-#          {% endif %}
-#
-#
-#
-#- alias: Washer Notification
-#  initial_state: true
-#  trigger:
-#    - platform: state
-#      entity_id: sensor.washer_status_m
-#      from: running
-#      to: complete  
-#  action:
-#    - service: script.turn_on
-#      entity_id: script.washer_finished_notification_audible
-#
-##    - condition: template
-##      value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
-##    - service: cover.open_cover
-##      entity_id:
-##       - cover.lr_curtain_lt_curtain
-#
-#
-#
-#- alias: Washer Emptied
-#  initial_state: true
-#  trigger:
-#    - platform: state
-#      entity_id: binary_sensor.motion_washroom_occupancy
-#      from: 'off'
-#      to: 'on'
-#  condition:
-#    - condition: state
-#      entity_id: sensor.washer_status_m
-#      state: complete
-#  action:
-#    - service: script.washer_emptied
-
-
-
-
-
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'sink'
+          sequence:
+            - service: light.turn_off
+              entity_id: light.sink_all
+      default:
+        - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
+          entity_id: light.wash
 
 
 

@@ -32,17 +32,6 @@
             data:
               title: '{{ title }}'
               message: '{{ message }}'
-        - conditions:
-          - condition: template
-            value_template: '{{ who == "isp"}}'
-          - condition: state
-            entity_id: input_boolean.text_notify_isp
-            state: 'on'
-          sequence:
-          - service: notify.mobile_app_isp
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
               
         - conditions:
           - condition: template
@@ -70,12 +59,20 @@
           - condition: template
             value_template: '{{ who == "desktop"}}'
           sequence:
-          - service: notify.agent_desktop
+          - service: notify.desktop_fddl8i4
             data:
               title: '{{ title }}'
               message: '{{ message }}'
 
-
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "discord_eta"}}'
+          sequence:
+          - service: notify.discord_bot
+            data:
+              target:
+              - "1093135539277942784"            
+              message: '{{ message }}'
 
   text_notify_image:
     sequence:
@@ -90,7 +87,7 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.agent_desktop
+          - service: notify.desktop_fddl8i4
             data:
               title: '{{ title }}'
               message: '{{ message }}'
@@ -115,12 +112,6 @@
                        {{ caption }}
 
 
-
-
-
-
-
-
 #########################################################
 #                                                                                                              
 #             Text Alert                                                                             
@@ -134,8 +125,6 @@
               notify.mobile_app_id
            {% elif who == 'eri' %}  
               notify.mobile_app_ie
-           {% elif who == 'isp' %}  
-              notify.mobile_app_isp
            {% endif %}        
         data:
           title: '{{ title }}'
@@ -154,8 +143,6 @@
               notify.mobile_app_id
            {% elif who == 'eri' %}  
               notify.mobile_app_ie
-           {% elif who == 'isp' %}  
-              notify.mobile_app_isp
            {% endif %}        
         data:
           title: '{{ title }}'
@@ -176,7 +163,7 @@
     sequence:
       - service: mqtt.publish
         data_template:
-          topic: 'house/alexa/lastmsg'
+          topic: 'house/alerts/alexa/lastmsg'
           payload: 'This message is from {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}. {{ message | striptags | truncate(220)}}'
           retain: true
       - service: >-
@@ -238,7 +225,6 @@
 #                                                                                                              
 #########################################################
 
-
   email_notify_image:
     sequence:
       - choose:
@@ -272,8 +258,6 @@
               message: '{{ message }}'
               data:
                 images: '{{ path }}'
-
-
 
 #########################################################
 #                                                                                                              

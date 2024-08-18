@@ -22,24 +22,24 @@
         {% endif %}
       
       <p>
-        The Weather in Kawagoodchi is {{ states.sensor.wbio_current_temperature.state }} degrees 
-        {% if is_state('weather.weatherbit', 'rainy') %}
+        The Weather in Kawagoodchi is {{ states('sensor.wbio_current_temperature') }} degrees 
+        {% if is_state('weather.my_weather', 'rainy') %}
           {{ [
           'with rain.', 
           'with showers.'
           ] | random }}
-        {% elif is_state('weather.weatherbit', 'cloudy') %}
+        {% elif is_state('weather.my_weather', 'cloudy') %}
           {{ [
           'with clouds.', 
           'with cloudy skies.'
           ] | random }}
-        {% elif is_state('weather.weatherbit', 'partlycloudy') %}
+        {% elif is_state('weather.my_weather', 'partlycloudy') %}
           {{ [
           'with some clouds.', 
           'with partly cloudy skies.',
           'with scattered clouds.'
           ] | random }}
-        {% elif is_state('weather.weatherbit', 'sunny') %}
+        {% elif is_state('weather.my_weather', 'sunny') %}
           {% if is_state('sun.sun', 'above_horizon') %}
             {{ [
             'and sunny.', 
@@ -52,13 +52,13 @@
             ] | random }}
           {% endif %}
         {% else %}
-          and {{ states.weather.weatherbit.state }}
+          and {{ states('weather.my_weather') }}
         {% endif %}
       </p>
 
 
       <p>
-        {% if states.sensor.pollen_tree.state | int(0) > 1 %}
+        {% if states('sensor.pollen_tree') | int(0) > 1 %}
         {{ [
          'Todays pollen count is Level, CT.',
          'The current pollen count is Level, CT.',         
@@ -73,17 +73,17 @@
 
 
         {% if is_state('binary_sensor.evening','on') %}
-          The overnight forecast says we can expect {{ states.weather.weatherbit.attributes.forecast[0].condition }}.    
+          The overnight forecast says we can expect {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].condition }}.
         {% else %}
-          The current forecast says we should expect  {{states.sensor.wbio_current_forecast.state }}.
+          The current forecast says we should expect {{ states('sensor.wbio_current_forecast') }}.
           {% if is_state('binary_sensor.freeze_warning','on') %}
           And based on the forecasted low, It will be near or below freezing.
             {{ [ 'So, Someone might want to bring the lemon tree in. ',
-                'Like, the turn water solid kind of cold. Do not leave the lemon tree out to die.',
+                'Like the term water solid kind of cold. Do not leave the lemon tree out to die.',
                 'I suggest bringing in the laundry other wise, the temperature might shrink them to kids size. And you will be the laughing clown at work.',
                 'I would bring in the laundry but I lack legs. And Arms. So I am forced to rely on you. Do not let me down.'                
                 'I suggest bringing in the plants other wise, the temperature might kill them. And that will be on you.',
-                'I would say wint(0)er is coming. But, based on the weather forecast it appears to be here.',
+                'I would say winter is coming. But, based on the weather forecast it appears to be here.',
                 'I would bring in the plants but I lack legs. And Arms. So I am forced to rely on you. Do not let me down.'
               ] | random }}
           {% endif %}
@@ -93,7 +93,7 @@
       <p>
         {% if is_state('sun.sun', 'below_horizon') %}
           You have
-          {% set seconds = as_timestamp(states.sun.sun.attributes.next_rising)-now().timestamp() %}
+          {% set seconds = as_timestamp(state_attr('sun.sun', 'next_rising'))-now().timestamp() %}
           {% set hours = seconds / 60 %}
           {% if seconds / ( 60 * 60 ) > 1 %}
             {{ (seconds //  ( 60 * 60 )) | int(0) }} hours
@@ -107,7 +107,7 @@
           ]|random }}
         {% else %}
           You have
-          {% set seconds = as_timestamp(states.sun.sun.attributes.next_setting)-now().timestamp() %}
+          {% set seconds = as_timestamp(state_attr('sun.sun', 'next_setting'))-now().timestamp() %}
           {% set hours = seconds / 60 %}
           {% if seconds / ( 60 * 60 ) > 1 %}
             {{ (seconds //  ( 60 * 60 )) | int(0) }} hours
@@ -141,7 +141,7 @@
           {%- if is_state('sensor.front_door_motion_night_count','0') %}
             There was no motion detected at the front door.
           {% else %}
-            I detected motion at the front door {{ states.sensor.front_door_motion_night_count.state | int(0) }} times.
+            I detected motion at the front door {{ states('sensor.front_door_motion_night_count') | int(0) }} times.
           {% endif %}
           </p>
         {% endif %}
@@ -152,7 +152,7 @@
         {% if dow == 'Saturday' and is_state('binary_sensor.midday','on') %}
           {% if now().strftime('%H')|int(0) > 11 %}
           {{ [ 'Do not forget to wash all body and hand towels. ',
-            'The body and face towels needs to be washed today. ',
+            'The body and face towels need to be wash today. ',
           ] | random }}
           {% endif %}
         {% endif %}
@@ -169,7 +169,7 @@
         {% if dow == 'Tuesday' and is_state('binary_sensor.midday','on') %}
           {% if now().strftime('%H')|int(0) > 11 %}
           {{ [ 'Do not forget to wash all body and hand towels. ',
-            'The body and face towels needs to be washed today. ',
+            'The body and face towels need to be washed today. ',
           ] | random }}
           {% endif %}
         {% endif %}
@@ -186,14 +186,14 @@
  
         {% if is_state('binary_sensor.evening','on') %}
         
-          {% if states.sensor.halloween_countdown.state | int(0) == 1 %}
+          {% if states('sensor.halloween_countdown')| int(0) == 1 %}
             Tomorrow is Halloween. I hope you have picked out a costume.
             {{ [ 'I will be going as a dumb home. ',
             'I have prepped the scary music. Just in case.',
             'I will be going as HAL 9000. The Pod Bay Doors are being installed today. I dare you to ask me to open them. '
             ] | random }}
-          {% elif states.sensor.halloween_countdown.state | int(0) < 30 %}
-            There are only {{states.sensor.halloween_countdown.state}} days 
+          {% elif states('sensor.halloween_countdown')| int(0) < 30 %}
+            There are only {{states('sensor.halloween_countdown') }} days 
             {{ [ 'until Halloween.',
             'until Halloween. It might not be enough time. ',
             'and counting until the best holiday ever.',
@@ -202,10 +202,10 @@
           {% else %}  
           {% endif %}
         
-          {% if states.sensor.christmas_countdown.state | int(0) == 1 %}
+          {% if states('sensor.christmas_countdown')| int(0) == 1 %}
             Tomorrow is Christmas. <break time="1s"/> It is practically here! <break time="1s"/> Santa is coming tonight! Do not forget the cookies!
-          {% elif states.sensor.christmas_countdown.state | int(0) < 31 %}
-            There are only {{states.sensor.christmas_countdown.state}} days until christmas.
+          {% elif states('sensor.christmas_countdown')| int(0) < 31 %}
+            There are only {{states('sensor.christmas_countdown') }} days until christmas.
             {{ [ 'All I want for Christmas, is a hippopotamus.',
             'Hey She on, I know what you are getting for Christmas. But I am not telling.',
             'Do not forget to put something under the tree for your favorite smarthome.',
@@ -216,7 +216,7 @@
           {% else %}
           {% endif %}
 
-          {% if states.sensor.anniversary_our_wedding.state | int(0) == 1 %}
+          {% if states('sensor.anniversary_our_wedding')| int(0) == 1 %}
             Tomorrow is Duc and Eddie's Wedding Anniversary. 
           {% endif %}
       
@@ -227,22 +227,22 @@
           {% if is_state('sensor.christmas_countdown','0') %}
             Merry Christmas!
           {% endif %}
-          {% if states.calendar.birthdays.state == 'on' %}
-            Today is {{ states.calendar.birthdays.attributes.message }}! 
+          {% if states('calendar.birthdays') == 'on' %}
+            Today is {{ state_attr('calendar.birthdays', 'message') }}! 
             So Happy Birthday! The confetti cannon is not working 
             otherwise I would shower you in paper garbage that 
             someone else would have to pick up.
           {% endif %}
           
           {% if is_state('sensor.anniversary_our_wedding','0') %}
-            Happy Anniversary! It been an amazing {{ states.sensor.anniversary_our_wedding.attributes.years }} years!
+            Happy Anniversary! It been an amazing {{ state_attr('sensor.anniversary_our_wedding', 'years') }} years!
           {% endif %}
           
-          {% if states.sensor.vacation_days2go.state | int(0) < 32 and states.sensor.vacation_days2go.state | int(0) > 0 and states.sensor.vacation_days2go.state != 'unavailable' %}
-            {% if states.sensor.vacation_days2go.state | int(0) > 1 %}
-              There are {{ states.sensor.vacation_days2go.state }} days until {{ states.calendar.vacation.attributes.message }}!
+          {% if states('sensor.vacation_days2go')| int(0) < 32 and states('sensor.vacation_days2go')| int(0) > 0 and states('sensor.vacation_days2go') != 'unavailable' %}
+            {% if states('sensor.vacation_days2go')| int(0) > 1 %}
+              There are {{ states('sensor.vacation_days2go') }} days until {{ state_attr('calendar.vacation', 'message') }}!
             {% else %}
-              Oh, and there is {{ states.sensor.vacation_days2go.state }} one more sleep until {{ states.calendar.vacation.attributes.message }}!
+              Oh, and there is {{ states('sensor.vacation_days2go') }} one more sleep until {{ state_attr('calendar.vacation', 'message') }}!
             {% endif %}
           {% endif %}
 

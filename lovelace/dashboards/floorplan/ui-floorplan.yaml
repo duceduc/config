@@ -14,7 +14,6 @@ custom_header:
   chevrons: false
 background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
 views:
-
   - !include floorplan.yaml
 
 honeycomb_menu_templates:

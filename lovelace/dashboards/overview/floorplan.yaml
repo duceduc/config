@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#                    FLOOR PLAN VIEW                                                           
-#                                                                                                    
+#
+#                    FLOOR PLAN VIEW
+#
 ####################################################
 
 title: Floor Plan
@@ -25,14 +25,14 @@ cards:
         --divider-color: rgba(0, 0, 0, 0);
          {% if is_state('person.duc', 'not_home')%}
         --duc-state-opacity: 0.6;
-        {% endif %}        
+        {% endif %}
         {% if is_state('person.eri', 'not_home')%}
         --eri-state-opacity: 0.6;
         {% endif %}
          {% if is_state('person.shion', 'not_home')%}
         --shion-state-opacity: 0.6;
         {% endif %}
-        
+
       }
 
     elements:
@@ -49,8 +49,8 @@ cards:
               left: 18.2%
               font-size: 14px
               color: transparent
-              opacity: var(--duc-state-opacity)              
-              #'--ha-label-badge-size': 50px              
+              opacity: var(--duc-state-opacity)
+              #'--ha-label-badge-size': 50px
 
       - type: conditional
         conditions:
@@ -161,7 +161,7 @@ cards:
               border: 2px solid green
               top: 28%
               left: 35%
-              width: 2.5%              
+              width: 2.5%
 
       # Presence SR
       - type: conditional
@@ -202,7 +202,7 @@ cards:
               border: 2px solid green
               bottom: 38%
               left: 30%
-              width: 2.5%              
+              width: 2.5%
 
       # Presence KT
       - type: conditional
@@ -329,9 +329,9 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#                    TEMPERATURE STATS                                                          
-#                                                                                                    
+#
+#                    TEMPERATURE STATS
+#
 ####################################################
 
 
@@ -351,7 +351,7 @@ cards:
           bottom: 42.5%
           right: 48%
       - type: state-label
-        entity: sensor.sr_temperature
+        entity: sensor.sr_radar_temperature
         style:
           bottom: 42.5%
           left: 31%
@@ -405,7 +405,7 @@ cards:
         style:
           top: 4%
           right: 1.2%
-          font-size: 16px          
+          font-size: 16px
       - type: state-label
         entity: sensor.lr_radar_illuminance
         prefix: '{ '
@@ -421,7 +421,7 @@ cards:
         style:
           top: 4%
           left: 8.3%
-          font-size: 16px          
+          font-size: 16px
       - type: state-label
         entity: sensor.front_illuminance
         prefix: '{ '
@@ -437,7 +437,7 @@ cards:
         style:
           bottom: 32%
           right: 1.7%
-          font-size: 16px   
+          font-size: 16px
       - type: state-label
         entity: sensor.rainfall_today
         prefix: '{ '
@@ -449,9 +449,9 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#                    APPLIANCE                                                           
-#                                                                                                    
+#
+#                    APPLIANCE
+#
 ####################################################
 
       - type: image
@@ -462,11 +462,12 @@ cards:
         state_image:
           "Off": /local/lovelace/floorplan/img/aircon-off.svg
           Fan: /local/lovelace/floorplan/img/aircon-fan-on.svg
-          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg          
-          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg          
+          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Man Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
           Normal Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
           Silent Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
-          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg          
+          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Normal Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Silent Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Normal Humidifier: /local/lovelace/floorplan/img/aircon-humidifier--on.svg
@@ -484,11 +485,12 @@ cards:
         state_image:
           "Off": /local/lovelace/floorplan/img/aircon-off.svg
           Fan: /local/lovelace/floorplan/img/aircon-fan-on.svg
-          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg          
-          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg          
+          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Man Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
           Normal Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
           Silent Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
-          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg          
+          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Normal Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Silent Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Normal Humidifier: /local/lovelace/floorplan/img/aircon-humidifier--on.svg
@@ -511,11 +513,12 @@ cards:
         state_image:
           "Off": /local/lovelace/floorplan/img/aircon-off.svg
           Fan: /local/lovelace/floorplan/img/aircon-fan-on.svg
-          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg          
-          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg          
+          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Man Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
           Normal Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
           Silent Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
-          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg          
+          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Normal Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Silent Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
           Normal Humidifier: /local/lovelace/floorplan/img/aircon-humidifier--on.svg
@@ -525,13 +528,13 @@ cards:
           width: 6.5%
           transform: translate(-50%,-50%) rotate(0.25turn)
 
-      - type: image  
+      - type: image
         tap_action:
           action: toggle
           service: switch.turn_on
           service_data:
-            entity_id: switch.ceiling_fan_summer
-        entity: switch.ceiling_fan_summer
+            entity_id: fan.ceiling_fan_summer
+        entity: fan.ceiling_fan_summer
         state_image:
           "off": /local/lovelace/floorplan/img/ceiling-fan-off.svg
           "on": /local/lovelace/floorplan/img/ceiling-fan-on.gif
@@ -541,7 +544,7 @@ cards:
           width: 8.5%
 
 
-      - type: image  
+      - type: image
         hold_action:
           action: more-info
           entity_id: input_select.sb_humidifier_mode
@@ -550,14 +553,14 @@ cards:
           "Off": /local/lovelace/floorplan/img/humidifier-off.svg
           "auto": /local/lovelace/floorplan/img/humidifier-on.svg
           "Low": /local/lovelace/floorplan/img/humidifier-on.svg
-          "Med": /local/lovelace/floorplan/img/humidifier-on.svg         
+          "Med": /local/lovelace/floorplan/img/humidifier-on.svg
           "High": /local/lovelace/floorplan/img/humidifier-on.svg
         style:
           bottom: 20%
           right: 34.2%
           width: 3%
 
-      - type: image  
+      - type: image
         tap_action:
           action: toggle
           service: switch.turn_on
@@ -570,9 +573,9 @@ cards:
         style:
           bottom: 14.1%
           right: 19%
-          width: 8%        
+          width: 8%
 
-      - type: image  
+      - type: image
         tap_action:
           action: toggle
           service: switch.turn_on
@@ -590,9 +593,9 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#                    CONTACT SENSORS                                                           
-#                                                                                                    
+#
+#                    CONTACT SENSORS
+#
 ####################################################
 
       - type: image
@@ -600,7 +603,7 @@ cards:
         state_image:
           running: /local/lovelace/floorplan/img/washing-machine-on.gif
           complete: /local/lovelace/floorplan/img/washing-machine-off.svg
-          idle: /local/lovelace/floorplan/img/washing-machine-off.svg          
+          idle: /local/lovelace/floorplan/img/washing-machine-off.svg
         style:
           top: 34.5%
           right: 34%
@@ -628,7 +631,7 @@ cards:
           width: 9%
 
       - type: image
-        entity: binary_sensor.master_door
+        entity: binary_sensor.master_door_contact
         state_image:
           "off": /local/lovelace/floorplan/img/window-mr-close.svg
           "on": /local/lovelace/floorplan/img/window-mr-open.svg
@@ -637,10 +640,8 @@ cards:
           left: 28.6%
           width: 15%
 
-
-
       - type: image
-        entity: binary_sensor.shion_door
+        entity: binary_sensor.shion_door_contact
         state_image:
           "off": /local/lovelace/floorplan/img/window-mr-close.svg
           "on": /local/lovelace/floorplan/img/window-mr-open.svg
@@ -650,16 +651,10 @@ cards:
           width: 15%
 
 
-
-
-
-
-
-
 ####################################################
-#                                                                                                    
-#                    CAMERAS                                                           
-#                                                                                                    
+#
+#                    CAMERAS
+#
 ####################################################
 
       - type: conditional
@@ -708,9 +703,9 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#                    MISC                                                         
-#                                                                                                    
+#
+#                    MISC
+#
 ####################################################
 
       - type: conditional
@@ -727,7 +722,7 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

@@ -33,30 +33,30 @@
               '寝ることができます. '
             ] | random }} 
       {% endif %} 
-      {% if states.sensor.school_start_days2go.state | int < 10 and states.sensor.school_start_days2go.state | int > 1 -%}
+      {% if states('sensor.school_start_days2go')| int < 10 and states('sensor.school_start_days2go')| int > 1 -%}
         {{ [ '私はそれを言うのは嫌いですが ',
             '不運にも,',
             'すべての良いことは終わらせなければなりません.'
           ] | random }}
-        しかありません {{ states.sensor.school_start_days2go.state }} 日々  
+        しかありません {{ states('sensor.school_start_days2go') }} 日々  
         {{ [ '夏休みの左. ',
             ' 夏休みの左.',
             '学校が再開するまで.'
           ] | random }}
-      {% elif states.sensor.school_start_days2go.state | int == 1 -%}
+      {% elif states('sensor.school_start_days2go')| int == 1 -%}
         明日は学校の初日です。準備はできたか 
       {%- endif %}
-      {% if states.sensor.school_end_days2go.state | int < 15 and states.sensor.school_end_days2go.state | int > 0 -%}
+      {% if states('sensor.school_end_days2go')| int < 15 and states('sensor.school_end_days2go')| int > 0 -%}
       {{ [ '学校はもうすぐ終わります.',
           'あなたは学年の終わりに到達しました.',
           'あなたはほとんど学校を終えています.'
         ] | random }}
-      しかありません {{ states.sensor.school_end_days2go.state }} 日々  
+      しかありません {{ states('sensor.school_end_days2go') }} 日々  
       {{ [ '学年に残った ',
           ' 学校の左.',
           '学校の最終日まで.'
         ] | random }}
-      {% elif states.sensor.school_end_days2go.state | int == 0 -%}
+      {% elif states('sensor.school_end_days2go')| int == 0 -%}
         明日は夏の初日です. 準備はできたか 
       {%- endif %}
         {{ [ '私はあなたがそれを好きなようにあなたの部屋を準備しました.',

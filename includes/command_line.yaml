@@ -1,0 +1,167 @@
+####################################################
+#
+#                      JCB
+#
+####################################################
+# Best to restart HA rather than reload command line
+
+#  Can use for another event
+  - sensor:
+      name: Deliveryin2week
+      command: 'cat /config/www/data/days.json'
+      scan_interval: 14400
+      value_template: >
+        {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+        {% set delivery = value_json.MAJOR_JP.jcb[ today ] %}
+          {{ delivery }}
+
+####################################################
+#
+#                      HOLIDAYS / BIRTHDAYS
+#
+####################################################
+
+
+
+#  - sensor:
+#      name: Holiday
+#      command: 'cat /config/www/data/days.json'
+#      scan_interval: 14400
+#      value_template: >
+#        {% set today = now().month  ~ '/' ~ now().day  %}
+#        {% set holiday = value_json.MAJOR_JP.static[ today ] %}
+#        {% if holiday | trim == "" %}
+#          {% set today = now().month  ~ '/' ~ now().day ~ '/' ~ now().year %}
+#          {% set holiday = value_json.MAJOR_JP.dynamic[ today ] %}
+#        {% endif %}
+#        {{ holiday }}
+
+#  - sensor:
+#      name: Holidaytomorrow
+#      command: 'cat /config/www/data/days.json'
+#      scan_interval: 14400
+#      value_template: >
+#        {% set today = as_timestamp(now() + timedelta(days = 1))|timestamp_custom('%-m/%-d', true )  %}
+#        {% set holiday = value_json.MAJOR_JP.static[ today ] %}
+#        {% if holiday | trim == "" %}
+#          {% set today = as_timestamp(now() + timedelta(days = 1))|timestamp_custom('%-m/%-d', true ) ~ '/' ~ now().year  %}
+#          {% set holiday = value_json.MAJOR_JP.dynamic[ today ] %}
+#        {% endif %}
+#        {{ holiday }}
+
+#  - sensor:
+#      name: Holidayinaweek
+#      command: 'cat /config/www/data/days.json'
+#      scan_interval: 14400
+#      value_template: >
+#        {% set today = as_timestamp(now() + timedelta(days = 7))|timestamp_custom('%-m/%-d', true )  %}
+#        {% set holiday = value_json.MAJOR_JP.static[ today ] %}
+#        {% if holiday | trim == "" %}
+#          {% set today = as_timestamp(now() + timedelta(days = 7))|timestamp_custom('%-m/%-d', true ) ~ '/' ~ now().year  %}
+#          {% set holiday = value_json.MAJOR_JP.dynamic[ today ] %}
+#        {% endif %}
+#        {{ holiday }}
+
+
+####################################################
+#
+#                      Lunch
+#
+####################################################
+
+  - sensor:
+      name: School Lunch
+      command: 'cat /config/www/data/days.json'
+      scan_interval: 14400
+      value_template: >
+        {% set today = now().month  ~ '/' ~ now().day  %}
+        {% set lunch =  value_json.MAJOR_JP.lunch[ today ] %}
+        {%- if lunch %}
+          {{ lunch  }}
+        {% else %}
+          Nothing
+        {%- endif %}
+
+####################################################
+#
+#                      Events
+#
+####################################################
+
+  - sensor:
+      name: School Event
+      command: 'cat /config/www/data/days.json'
+      scan_interval: 14400
+      value_template: >
+        {% set today = now().month  ~ '/' ~ now().day ~ '/' ~ now().year %}
+        {% set event = value_json.MAJOR_JP.events[ today ] %}
+        {%- if event %}
+          {{ event  }}
+        {% else %}
+          Nothing
+        {%- endif %}
+
+####################################################
+#
+#                      Local SSL Certs
+#
+####################################################
+
+  - sensor:
+      name: mqtt ssl cert issued
+      scan_interval: 14400
+      command: "python3 /ssl/pem2json.py mqtt-server.crt"
+      value_template: '{{ value_json.notBefore }}'
+
+  - sensor:
+      name: mqtt ssl cert cn
+      scan_interval: 14400
+      command: "python3 /ssl/pem2json.py mqtt-server.crt"
+      value_template: '{{ value_json.subject }}'
+
+####################################################
+#
+#                      ser/External SSL Certs
+#
+####################################################
+
+  - sensor:
+      name: ha ssl cert issued
+      scan_interval: 21600
+      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+      value_template: '{{ value_json.notBefore }}'
+
+  - sensor:
+      name: ha ssl cert cn
+      scan_interval: 21600
+      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+      value_template: '{{ value_json.subjectAltName }}'
+
+  - sensor:
+      name: ig token expiry
+      scan_interval: 43200
+      command: !secret ig_token
+      value_template: '{{ (value_json.expires_in / 86400) |  round(0) }}'
+
+####################################################
+#
+#                      SYSTEM MONITOR
+#
+####################################################
+
+  - sensor:
+      name: HA CPU Temperature
+      command: "cat /sys/class/thermal/thermal_zone2/temp"
+      unit_of_measurement: "°C"
+      value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+  - sensor:
+      name: "Number of Lines of Code"
+      command: "find /config/ -name '*.yaml' | xargs cat | wc -l"
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################
+

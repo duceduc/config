@@ -1,43 +1,30 @@
-# ESP8266 NodeMCU.... C4-5B-BE-70-D3-D2
+# [C4:5B:BE:70:D3:D2]
 substitutions:
-  name: sr-sensor
-  platform: ESP8266
-  board: nodemcuv2
+  name: "sr-sensor"
+  upper: Sr Sensor
+  lower: sr sensor
+#  ssid: !secret ssid2
+
+packages:
+  ld2410: !include components/ld2410.yaml
+
+<<: !include .base.yaml # .99 static
 
 esphome:
   name: $name
-  platform: $platform
-  board: $board
-
-wifi:
-  ssid: !secret ssid2
-  password: !secret ssid_pass
-  fast_connect : true
-  reboot_timeout: 0s
-  manual_ip:
-    static_ip: 192.168.1.99 
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
-
-logger:
-
-api:
-  encryption:
-    key: !secret esphome_apikey
-  
-ota:
-  password: !secret ota_pass
+  platform: ESP8266
+  board: nodemcuv2
+  includes:
+    - /config/esphome/components/ld2410_uart.h
+  on_boot:
+    priority: 600
+    # ...
+    then:
+      - lambda: |-
+          auto uart_component = static_cast<LD2410 *>(ld2410);
+          uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);
 
 sensor:
-  - platform: dht
-    model: AM2302
-    pin: D3 #Avoid D4 LED Driven. Use D3(GPIO0)
-    temperature:
-      name: 'sr temperature'
-    humidity:
-      name: 'sr humidity'
-    update_interval: 20s
-
   - platform: wifi_signal
     name: $name wifi signal
     update_interval: 15s
@@ -49,15 +36,4 @@ sensor:
 
 binary_sensor:
   - platform: status
-    name: $name dht Status
-
-  - platform: gpio
-    pin: D6 # Use D5 D6 D7. No luck with D1 D5
-    name: 'motion sr occupancy'
-    device_class: motion
-
-switch:
-  - platform: restart
-    name: "$name Restart"
-    icon: mdi:restart
-
+    name: $name status

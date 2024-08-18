@@ -264,50 +264,50 @@
     type: max
     round_digits: 0
     entity_ids:
-      - sensor.id_genkan
-      - sensor.id_shionroom
-      - sensor.id_masterroom
-      - sensor.id_livingroom
+     - sensor.id_genkan
+     - sensor.id_shionroom
+     - sensor.id_masterroom
+     - sensor.id_livingroom
 
   - platform: min_max
     name: 'iE Presence'
     type: max
     round_digits: 0
     entity_ids:
-      - sensor.ie_genkan
-      - sensor.ie_shionroom
-      - sensor.ie_masterroom
-      - sensor.ie_livingroom
-
-  - platform: min_max
-    name: 'iS Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-      - sensor.is_genkan
-      - sensor.is_livingroom
-      - sensor.is_shionroom
-      - sensor.is_masterroom
-
-  - platform: min_max
-    name: 'iSp Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-      - sensor.isp_genkan
-      - sensor.isp_livingroom
-      - sensor.isp_shionroom
-      - sensor.isp_masterroom
+     - sensor.ie_genkan
+     - sensor.ie_shionroom
+     - sensor.ie_masterroom
+     - sensor.ie_livingroom
 
   - platform: min_max
     name: 'tms Presence'
     type: max
     round_digits: 0
     entity_ids:
-      - sensor.tms_genkan
-      - sensor.tms_livingroom
-      - sensor.tms_shionroom
-      - sensor.tms_masterroom
+     - sensor.tms_genkan
+     - sensor.tms_shionroom
+     - sensor.tms_livingroom
+     - sensor.tms_masterroom
+
+  - platform: min_max
+    name: 'iS Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+#     - sensor.is_genkan
+     - sensor.is_shionroom
+     - sensor.is_livingroom
+     - sensor.is_masterroom
+
+  - platform: min_max
+    name: 'iSp Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+#     - sensor.isp_genkan
+     - sensor.isp_shionroom
+     - sensor.isp_livingroom
+     - sensor.isp_masterroom
 
 # Guests
   - platform: min_max
@@ -315,20 +315,20 @@
     type: max
     round_digits: 0
     entity_ids:
-      - sensor.sachiko_genkan
-      - sensor.sachiko_livingroom
-      - sensor.sachiko_shionroom
-      - sensor.sachiko_masterroom
+#     - sensor.sachiko_genkan
+     - sensor.sachiko_shionroom
+     - sensor.sachiko_livingroom
+     - sensor.sachiko_masterroom
 
   - platform: min_max
     name: 'Tomokun Presence'
     type: max
     round_digits: 0
     entity_ids:
-      - sensor.tomokun_genkan
-      - sensor.tomokun_livingroom
-      - sensor.tomokun_shionroom
-      - sensor.tomokun_masterroom
+#     - sensor.tomokun_genkan
+     - sensor.tomokun_shionroom
+     - sensor.tomokun_livingroom
+     - sensor.tomokun_masterroom
       
 
 ####################################################
@@ -375,9 +375,8 @@
     sensors:
       duc_location:
         friendly_name: 'Duc Location'
-        unit_of_measurement: ''
         value_template: >-
-          {% set person = states.person.duc.state %}
+          {% set person = states('person.duc') %}
           {% if person in ['iida','tobu','matsumoto'] %}
             grocery store
           {% elif person in ['ario','aeon','lalaport'] %}
@@ -398,9 +397,8 @@
     sensors:
       eri_location:
         friendly_name: 'Eri Location'
-        unit_of_measurement: ''
         value_template: >-
-          {% set person = states.person.eri.state %}
+          {% set person = states('person.eri') %}
           {% if person in ['iida','tobu','matsumoto'] %}
             grocery store
           {% elif person in ['ario','aeon','lalaport'] %}
@@ -421,9 +419,8 @@
     sensors:
       shion_location:
         friendly_name: 'Shion Location'
-        unit_of_measurement: ''
         value_template: >-
-          {% set person = states.person.shion.state %}
+          {% set person = states('person.shion') %}
           {% if person in ['iida','tobu','matsumoto'] %}
             grocery store
           {% elif person in ['ario','aeon','lalaport'] %}
@@ -439,7 +436,6 @@
               {{ states('person.shion') }}
             {%- endif %}
           {%- endif %}
-
 
 ####################################################
 #                                                                                                    

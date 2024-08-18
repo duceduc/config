@@ -1,71 +1,19 @@
-# ESP8266 NodeMCU.... 98-CD-AC-30-E9-4F
+# ESP8266 NodeMCU.... 98:CD:AC:30:E9:4F
 substitutions:
   name: ikea-pm25
-  platform: ESP8266
-  board: nodemcuv2 # d1_mini
+#  ssid: !secret ssid3
+
+packages:
+  pm1006k: !include components/pm1006k.yaml
+
+<<: !include .base.yaml
 
 esphome:
   name: $name
-  platform: $platform
-  board: $board
+  platform: ESP8266
+  board: nodemcuv2
 
-wifi:
-  ssid: !secret ssid3
-  password: !secret ssid_pass
-  fast_connect : true
-  power_save_mode: none
-  manual_ip:
-    static_ip: 192.168.1.97
-    subnet: 255.255.255.0
-    gateway: 192.168.1.1
-  
-captive_portal:
-
-logger:
-
-api:
-  encryption:
-    key: !secret esphome_apikey
-
-ota:
-  password: !secret ota_pass
-
-uart:
-  - id: uart_1
-    rx_pin: D2
-    baud_rate: 9600
-    
-  - id: uart_2
-    rx_pin: D3
-    tx_pin: D4
-    baud_rate: 9600
-
-# Sensors
 sensor:
-  - platform: pm1006
-    pm_2_5:
-      name: $name
-    uart_id: uart_1
-    
-  - platform: mhz19
-    co2:
-      name: "Carbon Dioxide"
-    temperature:
-      name: "$name Temperature"
-    update_interval: 120s
-    automatic_baseline_calibration: false
-    uart_id: uart_2
-    
-# Danger above 50% CO    
-  - platform: adc
-    pin: A0
-    name: "Carbon Monoxide"
-    update_interval: 60s
-    filters:
-      - lambda: return (x * 1024/5);
-    unit_of_measurement: "ppm"
-    icon: mdi:fire
-
   - platform: wifi_signal
     name: $name wifi signal
     update_interval: 15s
@@ -78,8 +26,3 @@ sensor:
 binary_sensor:
   - platform: status
     name: "$name status"
-
-switch:
-  - platform: restart
-    name: "$name Restart"
-    icon: mdi:restart

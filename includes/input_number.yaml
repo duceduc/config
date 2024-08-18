@@ -1,0 +1,287 @@
+# Automate Lights For Shion Room
+  wakeup_hour:
+    name: Hour
+    icon: mdi:clock-in
+    initial: 7
+    min: 0
+    max: 23
+    step: 1
+  wakeup_minutes:
+    name: Minutes
+    icon: mdi:clock-in
+    initial: 0
+    min: 0
+    max: 55
+    step: 5
+  wakeup_duration:
+    name: Light fade-in duration
+    icon: mdi:clock-in
+    initial: 30
+    min: 5
+    max: 60
+    step: 5
+  brightness_start:
+    name: Brightness Start
+    icon: mdi:lightbulb-outline
+    initial: 3
+    min: 1
+    max: 255
+    step: 1
+  brightness_end:
+    name: Brightness End
+    icon: mdi:lightbulb-on-outline
+    initial: 255
+    min: 0
+    max: 255
+    step: 1
+
+#####
+  lr_humidity_set:
+    name: Set Humidity Percent
+    icon: mdi:water-percent
+    min: 40
+    max: 70
+    step: 10
+
+  lr_heater_heat_temp_set:
+    name: Heat If Less Than
+    icon: mdi:thermometer
+    initial: 16
+    min: 0
+    max: 40
+    step: 1
+  lr_ac_cool_temp_set:
+    name: Cool If Greater Than
+    icon: mdi:thermometer
+    initial: 31
+    min: 0
+    max: 40
+    step: 1
+  lr_ac_temp_set_cool:
+    name: Cool Set Point
+    icon: mdi:thermometer
+    initial: 22
+    min: 16
+    max: 31
+    step: 1
+  lr_ac_temp_set_heat:
+    name: Heat Set Point
+    icon: mdi:thermometer
+    initial: 26
+    min: 16
+    max: 31
+    step: 1
+#####
+  mr_humidity_set:
+    name: Set Humidity Percent
+    icon: mdi:water-percent
+    min: 40
+    max: 70
+    step: 10
+    
+  mr_heater_heat_temp_set:
+    name: Heat If Less Than
+    icon: mdi:thermometer
+    initial: 14
+    min: 0
+    max: 40
+    step: 1
+  mr_ac_cool_temp_set:
+    name: Cool If Greater Than
+    icon: mdi:thermometer
+    initial: 31
+    min: 0
+    max: 40
+    step: 1
+  mr_ac_temp_set_cool:
+    name: Cool Set Point
+    icon: mdi:thermometer
+    initial: 22
+    min: 16
+    max: 31
+    step: 1
+  mr_ac_temp_set_heat:
+    name: Heat Set Point
+    icon: mdi:thermometer
+    initial: 26
+    min: 16
+    max: 31
+    step: 1
+#####
+  sr_humidity_set:
+    name: Set Humidity Percent
+    icon: mdi:water-percent
+    min: 40
+    max: 70
+    step: 10
+    
+  sr_heater_heat_temp_set:
+    name: Heat If Less Than
+    icon: mdi:thermometer
+    initial: 13
+    min: 0
+    max: 40
+    step: 1
+  sr_ac_cool_temp_set:
+    name: Cool If Greater Than
+    icon: mdi:thermometer
+    initial: 31
+    min: 0
+    max: 40
+    step: 1
+  sr_ac_temp_set_cool:
+    name: Cool Set Point
+    icon: mdi:thermometer
+    initial: 22
+    min: 16
+    max: 31
+    step: 1
+  sr_ac_temp_set_heat:
+    name: Heat Set Point
+    icon: mdi:thermometer
+    initial: 26
+    min: 16
+    max: 31
+    step: 1
+
+  sr_ac_temp_set_cool:
+    name: Cool Set Point
+    icon: mdi:thermometer
+    initial: 22
+    min: 16
+    max: 31
+    step: 1
+  sr_ac_temp_set_heat:
+    name: Heat Set Point
+    icon: mdi:thermometer
+    initial: 26
+    min: 16
+    max: 31
+    step: 1
+
+
+#######################
+  t31_daily_cost:
+    name: T31 Daily Cost
+    mode: box
+    initial: 38
+    min: 0
+    max: 2000
+    unit_of_measurement: "¥/day"
+    icon: mdi:currency-jpy
+
+  t31_1_energy_cost:
+    name: T31-1 Energy Cost
+    mode: box
+    initial: 19
+    min: 0
+    max: 1000
+    unit_of_measurement: "¥/kWh"
+    icon: mdi:currency-jpy
+
+  t31_2_energy_cost:
+    name: T31-2 Energy Cost
+    mode: box
+    initial: 26
+    min: 0
+    max: 1000
+    unit_of_measurement: "¥/kWh"
+    icon: mdi:currency-jpy
+
+  t31_3_energy_cost:
+    name: T31-3 Energy Cost
+    mode: box
+    initial: 30
+    min: 0
+    max: 1000
+    unit_of_measurement: "¥/kWh"
+    icon: mdi:currency-jpy
+
+  t41_daily_cost:
+    name: T41 Daily Cost
+    mode: box
+    min: 0
+    max: 1000
+    unit_of_measurement: "¥/day"
+    icon: mdi:currency-jpy
+
+  t41_energy_cost:
+    name: T41 Energy Cost
+    mode: box
+    min: 0
+    max: 1000
+    unit_of_measurement: "¥/kWh"
+    icon: mdi:currency-jpy
+
+  cumulative_energy_cost:
+    name: Cumulative Energy Cost
+    mode: box
+    min: 0
+    max: 9000000
+    unit_of_measurement: "¥"
+    icon: mdi:currency-jpy
+
+
+##################
+  sr_target_temperature:
+    icon: mdi:thermometer
+    initial: 27
+    min: 10
+    max: 40
+    step: 1
+
+  lr_target_temperature:
+    icon: mdi:thermometer
+    initial: 27
+    min: 10
+    max: 40
+    step: 1
+
+  mr_target_temperature:
+    icon: mdi:thermometer
+    initial: 27
+    min: 10
+    max: 40
+    step: 1
+
+##################
+
+# use for 30 fade in 
+# https://youtu.be/JpC13mLuiQg?t=436
+  light_wakeup:
+    name: Light Wakeup
+    initial: 8.5
+    min: 8.5
+    max: 255
+    step: 8.5
+
+
+  pc_desktop_led_speed:
+    initial: 60
+    min: 10
+    max: 300
+    step: 10
+
+
+
+
+## TEST
+  rssi_present:
+    name: RSSI present threshold
+    initial: -75
+    min: -100
+    max: -40
+    step: 1
+    unit_of_measurement: dBm
+    
+  rssi_not_present:
+    name: RSSI not-present threshold
+    initial: -86
+    min: -100
+    max: -40
+    step: 1
+    unit_of_measurement: dBm
+
+
+
+    

@@ -23,9 +23,10 @@ cards:
           - title: Livingroom Aircon Controls
           - room: lr
           - entity_1: input_select.lr_ac_mode
-          - entity_2: sensor.lr_radar_temperature
-          - entity_3: sensor.livingroom_humidity
-          - entity_4: sensor.lr_condensation_chance
+          - entity_2: sensor.lr_aircon_target
+          - entity_3: sensor.lr_radar_temperature
+          - entity_4: sensor.livingroom_humidity
+#          - entity_5: sensor.lr_condensation_chance
 
       - type: custom:decluttering-card
         template: aircon_tpl
@@ -33,9 +34,10 @@ cards:
           - title: Shion Room Aircon Controls
           - room: sr
           - entity_1: input_select.sr_ac_mode
-          - entity_2: sensor.sr_temperature
-          - entity_3: sensor.sr_humidity
-          - entity_4: sensor.sr_condensation_chance
+          - entity_2: sensor.sr_aircon_target
+          - entity_3: sensor.sr_radar_temperature
+          - entity_4: sensor.sr_radar_humidity
+#          - entity_5: sensor.sr_condensation_chance
 
       - type: custom:decluttering-card
         template: aircon_tpl
@@ -43,9 +45,10 @@ cards:
           - title: Master Room Aircon Controls
           - room: mr
           - entity_1: input_select.mr_ac_mode
-          - entity_2: sensor.mr_temperature
-          - entity_3: sensor.mr_humidity
-          - entity_4: sensor.mr_condensation_chance
+          - entity_2: sensor.mr_aircon_target
+          - entity_3: sensor.mr_temperature
+          - entity_4: sensor.mr_humidity
+#          - entity_5: sensor.mr_condensation_chance
 
       - type: 'custom:vertical-stack-in-card'
         cards:
@@ -97,7 +100,7 @@ cards:
       - type: vertical-stack
         cards:
         - !include /config/lovelace/tpl/media_interface.yaml
-      
+
       - type: vertical-stack
         cards:
           - type: custom:stack-in-card
@@ -154,11 +157,11 @@ cards:
                 name: Dining Table
           - type: custom:stack-in-card
             mode: horizontal
-            title: Computer Room 
+            title: Computer Room
             cards:
               - type: light
                 entity: light.computer
-                name: Work 
+                name: Work
                 icon: mdi:lightbulb-outline
               - type: light
                 entity: light.c_1
@@ -166,7 +169,7 @@ cards:
                 icon: mdi:lightbulb-outline
               - type: light
                 entity: light.computer
-                name: Nap 
+                name: Nap
                 icon: mdi:lightbulb-outline
           - type: custom:stack-in-card
             mode: horizontal
@@ -174,7 +177,7 @@ cards:
             cards:
               - type: light
                 entity: light.kitchen
-                name: Island 
+                name: Island
                 icon: mdi:lightbulb-outline
               - type: light
                 entity: light.counter
@@ -182,7 +185,7 @@ cards:
                 icon: mdi:lightbulb-outline
               - type: light
                 entity: light.cabinet
-                name: Cabinent 
+                name: Cabinet
                 icon: mdi:lightbulb-outline
 
 
@@ -213,7 +216,7 @@ cards:
             name: TV
             icon: mdi:television-shimmer
           - type: section
-            label: Jarvis Voice        
+            label: Jarvis Voice
           - entity: input_select.jarvis_voice
             name: Select a Voice
             icon: si:amazonalexa
@@ -223,7 +226,7 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

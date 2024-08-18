@@ -8,8 +8,8 @@
 group:
   chore_tasks:
     entities:
-      - sensor.change_bed_sheets
-      - sensor.clean_air_filters
+     - sensor.change_bed_sheets
+     - sensor.clean_air_filters
       
 automation:
   - alias: "Notify Chore Task Due"

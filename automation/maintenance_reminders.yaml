@@ -1,12 +1,12 @@
 #########################################################
-#                                                                                                              #
-#             Maintenance Reminders                                                                  #
-#                                                                                                              #
+#                                                                                                              
+#             Maintenance Reminders                                                                  
+#                                                                                                              
 #########################################################
 
 
 # Clean Aircon Filters Start of Season
-# https://www.almanac.com/content/first-day-seasons                                          
+# https://www.almanac.com/content/first-day-seasons
 - alias: 'Clean Nozzle Filters'
   trigger:
     platform: state
@@ -15,28 +15,28 @@
   - condition: template # Not on Vacation
     value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
   action:
-    - service: switch.turn_on # Aircon Filters
+    - service: switch.toggle # Aircon Filters
       entity_id: group.clean_aircon_filter
     - service: script.toilet_nozzle_cleaning
 
 
 #########################################################
-#                                                                                                              #
-#            Turn on Shion Lights During School Days                                             #
-#                                                                                                              #
+#                                                                                                              
+#            Turn on Shion Lights During School Days                                             
+#                                                                                                              
 #########################################################
 
 # sensors located at sensors/wakeup.yaml
 - alias: 'wakeup light bedroom'
   trigger:
     platform: template
-    value_template: '{{ states.sensor.time.state == states.sensor.wakeup_start_time_lights.state }}'
+    value_template: "{{ states('sensor.time') == states('sensor.wakeup_start_time_lights') }}"
   condition:
     - condition: state
       entity_id: input_boolean.wakeup
       state: 'on'
     - condition: template
-      value_template: "{{ states.sensor.holiday.state | trim == '' }}"
+      value_template: "{{ states('sensor.holiday')| trim == 'none' }}"
     - condition: or
       conditions:
         - condition: state
@@ -47,7 +47,7 @@
   action:
     - service: python_script.smooth_fader
       data:
-        entity_id: "{{ states('sensor.wakeup_map') }}" 
+        entity_id: "{{ states('sensor.wakeup_map') }}"
         duration: "00:{{ states('input_number.wakeup_duration')|int }}:00"
         brightness_start: "{{ states('input_number.brightness_start')|int }}"
         brightness_end: "{{ states('input_number.brightness_end')|int }}"
@@ -56,9 +56,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Sensors that need a little push                                                 
-#                                                                                                              #
+#                                                                                                              
+#             Sensors that need a little push
+#                                                                                                              
 #########################################################
 
 - alias: Daily Entity Refresh
@@ -73,7 +73,7 @@
   initial_state: true
   trigger:
     - platform: time
-      at: '22:30:00'
+      at: '22:15:00'
   action:
     - service: script.turn_on
       entity_id: script.school_year_over
@@ -88,7 +88,6 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.daily_report
     - service: script.reset_earthquake_daily_count
-    - service: script.enable_devices
     - service: input_boolean.turn_off
       entity_id: input_boolean.jcom_tv
 
@@ -96,20 +95,22 @@
       data:
         who: amber
         image: >-
-          {{ [ "/config/www/img/misc/off.jpg",
-               "/config/www/img/misc/clock.jpg"] | random }}
+          {{ [ "/config/www/img/misc/off-01.jpg",
+               "/config/www/img/misc/off-02.jpg",
+               "/config/www/img/misc/off-03.jpg",
+               "/config/www/img/misc/off-04.jpg"] | random }}
         caption: >-
-          {{ [ 
-          "Good Night from Lions Mansion. ", 
+          {{ [
+          "Good Night from Lions Mansion. ",
           "Time to shut down this party. Good Night from Lions Mansion. ",
           "I'm feeling tired. Think I'll take a quick nap. Good Night!",
           "Things are getting quiet. Time to say Good Night.",
-          "We have come to the end of our broadcast day. Oh, who am I kidding. I''ll be up all night watching over Lions Mansion. " 
+          "We have come to the end of our broadcast day. Oh, who am I kidding. I''ll be up all night watching over Lions Mansion. "
           ] | random }}
 
 
 #########################################################
-#                                                                                                              #
-#             END OF CONFIGURATION FILE                                                          #
-#                                                                                                              #
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
 #########################################################

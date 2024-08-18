@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Depart                                                                                        #
-#                                                                                                              #
+#                                                                                                              
+#             Depart                                                                                        
+#                                                                                                              
 #########################################################
 
 
@@ -23,6 +23,10 @@
       - service: mqtt.publish
         data:
           topic: monitor/scan/depart
+      - delay: 20 # Testing only. can delete this combo entry
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
 
       - delay: 50
       - service: mqtt.publish
@@ -33,9 +37,9 @@
 
 
 #########################################################
-#                                                                                                              #
-#             Arrive                                                                                         #
-#                                                                                                              #
+#                                                                                                              
+#             Arrive                                                                                         
+#                                                                                                              
 #########################################################
 
 
@@ -45,7 +49,7 @@
 
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

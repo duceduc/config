@@ -1,0 +1,40 @@
+
+# for the light ???
+#i2c:
+#  sda: GPIO1
+#  scl: GPIO3
+#  scan: true
+
+esp32_camera:
+  name: $name
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+
+# Image settings
+  vertical_flip: $vertical_flip
+  max_framerate: 1 fps
+  resolution: SXGA
+  jpeg_quality: 20
+  contrast: 2
+  saturation: 2
+
+output:
+  - platform: gpio
+    pin:
+      number: GPIO3
+      allow_other_uses: false
+    id: gpio_3
+    
+light:
+  - platform: binary
+    name: $name light  
+    output: gpio_3

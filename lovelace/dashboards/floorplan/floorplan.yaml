@@ -7,8 +7,8 @@
 title: Floorplan
 path: floorplan
 icon: mdi:floor-plan
-panel: true
 theme: midnight
+panel: true
 cards:
   - type: horizontal-stack
     cards:
@@ -16,6 +16,7 @@ cards:
 #################################################
 ### Battery States
 #################################################
+
 
 
       - type: custom:mod-card
@@ -123,7 +124,6 @@ cards:
                         service: script.tv_volume_up
 
 
-
 #################################################
 ### Motions and Sensors
 #################################################
@@ -142,7 +142,6 @@ cards:
                 service_data:
                   class: '${(entity.state > 700) ? "washer-drying" : (entity.state >= 5) ? "washer-running" : "washer-stop"}'
 
-
             - entity: binary_sensor.desktop_status
               state_action:
                 service: floorplan.class_set
@@ -154,8 +153,6 @@ cards:
                 service: floorplan.class_set
                 service_data:
                   class: '${(entity.state === "off") ? "detect-off" : "detect-on"}'
-
-
 
             - entities:
               - input_select.lr_ac_mode
@@ -178,7 +175,6 @@ cards:
                     else if (stat === "Fan") return "aircon status-fan";
                     else if (stat === "Off") return "aircon status-off";
                     else return "unknown";
-
 
             - entity: input_select.mr_ac_mode
               tap_action: false
@@ -209,10 +205,11 @@ cards:
 
             - entities:
               - sensor.espresense_computerroom_temperature
+              - sensor.cr_temperature
               - sensor.espresense_kitchen_temperature
               - sensor.oa_temperature
               - sensor.oa_humidity                    
-              - sensor.sr_temperature
+              - sensor.sr_radar_temperature
               - sensor.mr_temperature
               - sensor.toilet_airfreshener_temperature
               - sensor.lr_radar_temperature
@@ -227,9 +224,10 @@ cards:
          
             - entities:
               - sensor.espresense_computerroom_temperature
+              - sensor.cr_temperature
               - sensor.espresense_kitchen_temperature
               - sensor.oa_temperature
-              - sensor.sr_temperature
+              - sensor.sr_radar_temperature
               - sensor.mr_temperature
               - sensor.toilet_airfreshener_temperature
               - sensor.lr_radar_temperature
@@ -454,7 +452,7 @@ cards:
   
   
       - type: custom:weather-card
-        entity: weather.weatherbit
+        entity: weather.my_weather
         current: true
         details: false
         forecast: false
@@ -500,8 +498,10 @@ cards:
                 font-size: .9em !important;
                 vertical-align: super;
             }
-
-
+ 
+ 
+ 
+ 
  
  
 ####################################################

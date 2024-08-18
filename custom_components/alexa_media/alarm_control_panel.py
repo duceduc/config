@@ -6,6 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 For more details about this platform, please refer to the documentation at
 https://community.home-assistant.io/t/echo-devices-alexa-as-media-player-testers-needed/58639
 """
+
 from asyncio import sleep
 import logging
 from typing import List, Optional
@@ -50,7 +51,13 @@ async def async_setup_platform(
 ) -> bool:
     """Set up the Alexa alarm control panel platform."""
     devices = []  # type: List[AlexaAlarmControlPanel]
-    account = config[CONF_EMAIL] if config else discovery_info["config"][CONF_EMAIL]
+    account = None
+    if config:
+        account = config.get(CONF_EMAIL)
+    if account is None and discovery_info:
+        account = discovery_info.get("config", {}).get(CONF_EMAIL)
+    if account is None:
+        raise ConfigEntryNotReady
     include_filter = config.get(CONF_INCLUDE_DEVICES, [])
     exclude_filter = config.get(CONF_EXCLUDE_DEVICES, [])
     account_dict = hass.data[DATA_ALEXAMEDIA]["accounts"][account]
@@ -227,11 +234,11 @@ class AlexaAlarmControlPanel(AlarmControlPanel, AlexaMedia, CoordinatorEntity):
         # pylint: disable=import-outside-toplevel
         try:
             from homeassistant.components.alarm_control_panel import (
-                SUPPORT_ALARM_ARM_AWAY,
+                AlarmControlPanelEntityFeature,
             )
         except ImportError:
             return 0
-        return SUPPORT_ALARM_ARM_AWAY
+        return AlarmControlPanelEntityFeature.ARM_AWAY
 
     @property
     def assumed_state(self) -> bool:

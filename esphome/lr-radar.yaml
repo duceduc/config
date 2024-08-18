@@ -1,261 +1,71 @@
-#ESP8266 with LD1115H Radar Sensor
+#ESP8266 with LD1115H Radar Sensor [E0:98:06:91:07:C2]
 substitutions:
-  devicename: "lr-radar" #Rename the device what you want.
-  upper_devicename: LR Radar #Rename the device what you want.
+  name: lr-radar
+  upper: Lr
+  lower: lr
+  am2302: D7
+
+packages:
+  ld2410: !include components/ld2410.yaml
+  am2302: !include components/am2302.yaml
+
 esphome:
-  name: $devicename
-  on_boot:  #LD1115H Initial Setting 
-    priority: -200
+  name: $name
+  platform: ESP8266
+  board: nodemcuv2 #d1_mini
+  includes:
+    - /config/esphome/components/ld2410_uart.h
+  on_boot:
+    priority: 600
+    # ...
     then:
-      - uart.write:
-          id: LD1115H_UART_BUS
-          data: !lambda |-
-            std::string th1st = "th1=" + str_sprintf("%.0f",id(LD1115H_TH1).state) +" \n";
-            return std::vector<uint8_t>(th1st.begin(), th1st.end());
-      - uart.write:
-          id: LD1115H_UART_BUS
-          data: !lambda |-
-            std::string th2st = "th2=" + str_sprintf("%.0f",id(LD1115H_TH2).state) +" \n";
-            return std::vector<uint8_t>(th2st.begin(), th2st.end());
-esp8266:
-  board: esp01_1m
-  framework:
-    version: latest
-external_components:
-  - source:
-      type: git
-      url: https://github.com/ssieb/custom_components
-    components: [ serial ]
+      - lambda: |-
+          auto uart_component = static_cast<LD2410 *>(ld2410);
+          uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);
+
 logger:
-  level: INFO  #You Can Use "INFO" Level
   baud_rate: 0
-  
+
 api:
   encryption:
     key: !secret esphome_apikey
 
 ota:
-  password: !secret ota_pass
-  
+  - platform: esphome
+    password: !secret ota_pass
+
 wifi:
-  ssid: !secret ssid3
-  password: !secret ssid_pass
-  fast_connect : true  
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+  fast_connect : true
   power_save_mode: none
   reboot_timeout: 0s
   manual_ip:
     static_ip: 192.168.1.51
     subnet: 255.255.255.0
     gateway: 192.168.1.1
-  
-uart:
-  id: LD1115H_UART_BUS
-  rx_pin: GPIO3  #ESP8266 UART_0
-  tx_pin: GPIO1  #ESP8266 UART_0
-  baud_rate: 115200
-  data_bits: 8
-  stop_bits: 1
-  parity: NONE
-#  debug:
-#    direction: BOTH
-#    dummy_receiver: false
-#    after:
-#      delimiter: "\n"
-#    sequence:
-#      - lambda: UARTDebug::log_string(direction, bytes);
-globals:
-  - id: LD1115H_Last_Time
-    type: time_t
-    restore_value: no
-    initial_value: time(NULL)
-  - id: LD1115H_Last_Mov_Time
-    type: time_t
-    restore_value: no
-    initial_value: time(NULL)
-  - id: LD1115H_Clearence_Status
-    type: bool
-    restore_value: no
-    initial_value: "false"
-status_led:
-  pin:
-    number: GPIO2 #ESP8266 OnBroad LED
-    inverted: false
-interval:
-  - interval: 1s #Clearance Scan Time
-    setup_priority: -200
-    then:
-      lambda: |-
-        if ((time(NULL)-id(LD1115H_Last_Time))>id(LD1115H_Clear_Time).state) {
-          if ((id(LD1115H_Clearence_Status) == false) || (id(LD1115H_Occupancy).state != "Clearance")) {
-            id(LD1115H_Occupancy).publish_state("Clearance");
-            id(LD1115H_Clearence_Status) = true;
-          }
-          if (id(LD1115H_MovOcc_Binary).state == true) {
-            id(LD1115H_MovOcc_Binary).publish_state(false);
-          }
-          if (id(LD1115H_Mov_Binary).state == true) {
-            id(LD1115H_Mov_Binary).publish_state(false);
-          }
-        }
-number:
-  - platform: template
-    name: ${upper_devicename} TH1 #TH1 is Movement/Motion Sensitivity
-    id: LD1115H_TH1
-    icon: "mdi:cogs"
-    optimistic: true
-    restore_value: true #If you don't want to store the setting at ESP, set it to false.
-    initial_value: "800"
-    min_value: 20
-    max_value: 1200
-    step: 10
-    set_action:
-      then:
-        - uart.write:
-            id: LD1115H_UART_BUS
-            data: !lambda |-
-              std::string th1st = "th1=" + str_sprintf("%.0f",x) +" \n";
-              return std::vector<uint8_t>(th1st.begin(), th1st.end());
-  - platform: template
-    name: ${upper_devicename} TH2 #TH2 is Occupancy/Presence Sensitivity
-    id: LD1115H_TH2
-    icon: "mdi:cogs"
-    optimistic: true
-    restore_value: true #If you don't want to store the setting at ESP, set it to false.
-    initial_value: "150"
-    min_value: 50
-    max_value: 2500
-    step: 10
-    set_action:
-      then:
-        - uart.write:
-            id: LD1115H_UART_BUS
-            data: !lambda |-
-              std::string th2st = "th2=" + str_sprintf("%.0f",x) +" \n";
-              return std::vector<uint8_t>(th2st.begin(), th2st.end());
-  - platform: template
-    name: ${upper_devicename} Clearence Time
-    id: LD1115H_Clear_Time
-    icon: "mdi:cogs"
-    optimistic: true
-    restore_value: true #If you don't want to store the setting at ESP, set it to false.
-    initial_value: "5" #LD1115H Mov/Occ > Clearence Time Here
-    min_value: 0.5
-    max_value: 20
-    step: 0.5
-  - platform: template
-    name: ${upper_devicename} Movement Time
-    id: LD1115H_Mov_Time
-    icon: "mdi:cogs"
-    optimistic: true
-    restore_value: true #If you don't want to store the setting at ESP, set it to false.
-    initial_value: "1" #LD1115H Mov > Occ Time Here
-    min_value: 0.5
-    max_value: 10
-    step: 0.5
+
 sensor:
-  - platform: template
-    name: ${upper_devicename} Spectral line
-    id: LD1115H_Direction
-    icon: "mdi:radar"
-    unit_of_measurement: ""
-    accuracy_decimals: 0
-  - platform: template
-    name: ${upper_devicename} Signal Strength
-    id: LD1115H_Signal
-    icon: "mdi:signal-distance-variant"
-    unit_of_measurement: ""
-    accuracy_decimals: 0
-    filters:    # Use Fliter To Debounce
-    - sliding_window_moving_average:
-        window_size: 8
-        send_every: 2
-    - heartbeat: 0.2s
+  - platform: adc
+    pin: A0
+    name: '$name illuminance'
+    unit_of_measurement: lux
+    update_interval: 5s
+
   - platform: wifi_signal
-    name: ${upper_devicename} wifi signal
+    name: $name wifi signal
     update_interval: 15s
     filters:
       - sliding_window_moving_average:
           window_size: 15
           send_every: 15
-          send_first_at: 1    
-  - platform: dht
-    model: AM2302
-    pin: GPIO13
-    temperature:
-      name: '${upper_devicename} temperature'
-    humidity:
-      name: '${upper_devicename} humidity'
-    update_interval: 20s    
-
-  - platform: adc
-    pin: A0
-    name: '${upper_devicename} illuminance'
-    unit_of_measurement: lux
-    update_interval: 5s
-
-text_sensor:
-  - platform: serial
-    uart_id: LD1115H_UART_BUS
-    name: ${upper_devicename} UART Text
-    id: LD1115H_UART_Text
-    icon: "mdi:format-text"
-    internal: False #If Don't Want to See UART Receive Data, Set To True
-    on_value:
-      lambda: |-
-        if (id(LD1115H_UART_Text).state.substr(0,3) == "occ") {
-          id(LD1115H_Signal).publish_state(atof(id(LD1115H_UART_Text).state.substr(7).c_str()));
-          id(LD1115H_Direction).publish_state(atof(id(LD1115H_UART_Text).state.substr(5,2).c_str()));
-          if ((time(NULL)-id(LD1115H_Last_Mov_Time))>id(LD1115H_Mov_Time).state) {
-            id(LD1115H_Occupancy).publish_state("Occupancy");
-            if (id(LD1115H_MovOcc_Binary).state == false) {
-              id(LD1115H_MovOcc_Binary).publish_state(true);
-            }
-            if (id(LD1115H_Mov_Binary).state == true) {
-              id(LD1115H_Mov_Binary).publish_state(false);
-            }
-          }
-          if (id(LD1115H_MovOcc_Binary).state == false) {
-            id(LD1115H_MovOcc_Binary).publish_state(true);
-          }
-          id(LD1115H_Last_Time) = time(NULL);
-          if (id(LD1115H_Clearence_Status) == true) {
-            id(LD1115H_Clearence_Status) = false;
-          }
-        }
-        else if (id(LD1115H_UART_Text).state.substr(0,3) == "mov") {
-          id(LD1115H_Signal).publish_state(atof(id(LD1115H_UART_Text).state.substr(7).c_str()));
-          id(LD1115H_Direction).publish_state(atof(id(LD1115H_UART_Text).state.substr(5,2).c_str()));
-          id(LD1115H_Occupancy).publish_state("Movement");
-          if (id(LD1115H_MovOcc_Binary).state == false) {
-            id(LD1115H_MovOcc_Binary).publish_state(true);
-          }
-          if (id(LD1115H_Mov_Binary).state == false) {
-            id(LD1115H_Mov_Binary).publish_state(true);
-          }
-          id(LD1115H_Last_Mov_Time) = time(NULL);
-          id(LD1115H_Last_Time) = time(NULL);
-          if (id(LD1115H_Clearence_Status) == true) {
-            id(LD1115H_Clearence_Status) = false;
-          }
-        }
-  - platform: template
-    name: ${upper_devicename} Occupancy Status
-    id: LD1115H_Occupancy
-    icon: "mdi:motion-sensor"
-binary_sensor:
-  - platform: template
-    name: ${upper_devicename} Occupancy or Movement
-    id: LD1115H_MovOcc_Binary
-    device_class: occupancy
-  - platform: template
-    name: ${upper_devicename} Movement
-    id: LD1115H_Mov_Binary
-    device_class: motion
-  - platform: status
-    name: "${upper_devicename} status"
+          send_first_at: 1
 
 switch:
   - platform: restart
-    name: "${upper_devicename} Restart"
-    icon: mdi:restart    
-    
+    name: "$name Restart"
+    icon: mdi:restart
+
+binary_sensor:
+  - platform: status
+    name: $name status

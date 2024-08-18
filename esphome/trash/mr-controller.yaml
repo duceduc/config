@@ -1,0 +1,42 @@
+# ESP32 NodeMCU [08:3A:F2:B5:7E:5C]
+substitutions:
+  name: mr-controller
+
+packages:
+  aircon: !include components/zw5620s_mr.yaml
+
+<<: !include .base.yaml 
+
+esphome:
+  name: $name
+  platform: ESP32
+  board: nodemcu-32s
+
+mqtt:
+  topic_prefix: esphome/$name
+#  discovery: false
+  broker: 192.168.1.20
+  username: !secret mqtt_user
+  password: !secret mqtt_pass
+
+sensor:
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+# Remote Control
+remote_receiver:
+  pin:
+    number: GPIO15 # Pin is adjacent to GPIO2
+    inverted: true
+    mode: INPUT_PULLUP
+  dump: raw
+
+remote_transmitter:
+  pin: GPIO2 # Pin is adjacent to GPIO15
+  carrier_duty_percent: 66%

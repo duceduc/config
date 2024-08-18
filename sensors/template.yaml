@@ -1,13 +1,13 @@
 ####################################################
-#                                                                                                    #
-#                    TEMPLATE                                                                  #
-#                                                                                                    #
+#                                                                                                    
+#                    TEMPLATE                                                                  
+#                                                                                                    
 ####################################################
 
 
-  - platform: command_line
-    name: "Number of Lines of Code"
-    command: " find /config/ -name '*.yaml' | xargs cat | wc -l"
+#  - platform: command_line
+#    name: "Number of Lines of Code"
+#    command: " find /config/ -name '*.yaml' | xargs cat | wc -l"
 
   - platform: template
     sensors:
@@ -26,7 +26,7 @@
       binary_sensor_count:
         friendly_name: 'Number of Binary Sensors'
         value_template: '{{ states.binary_sensor | count }}'
-      lights_count:
+      light_count:
         friendly_name: 'Number of Lights'
         value_template: '{{ states.light | count }}'
       tracker_count:
@@ -42,14 +42,9 @@
           {{ as_timestamp(states.sun.sun.attributes.next_setting) | timestamp_custom(' %I:%M%p') | replace(" 0", "") }}
       hoursdaylight:
         value_template: "{% set nr = as_timestamp(state_attr('sun.sun','next_rising')) %} {% set ns = as_timestamp(state_attr('sun.sun','next_setting')) %} {% if nr > ns %} {% set nr = nr - 60*60*24 %} {% endif %} {{ (ns - nr)|timestamp_custom('%H:%M',false) }}"
-      home_windspeed:
-        friendly_name: 'Home Wind Speed'
-        unit_of_measurement: "m/s"
-        value_template: >
-          {{ state_attr('weather.weatherbit', 'wind_speed') }}
 
 ####################################################
-#                                                                                                    #
-#          END OF CONFIGURATION FILE                                                   #
-#                                                                                                    #
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
 ####################################################

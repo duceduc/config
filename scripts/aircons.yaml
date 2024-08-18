@@ -1,101 +1,103 @@
 #########################################################
-#                                                                                                              
-#             Livingroom Aircon                                                                          
-#                                                                                                              
+#
+#             Livingroom Aircon
+#
 #########################################################
-
-  lr_ac_powerful_heat:
-    sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - heat
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - temperature heat increase
-        hold_secs: 6
 
   lr_ac_normal_heat:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - heat
-        
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: heat # 26
+
+  lr_ac_powerful_heat:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: temperature heat increase # 31
+
   lr_ac_silent_heat:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - heat
-        - temperature heat decrease
-        hold_secs: 6
-  lr_ac_powerful_cool:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: temperature heat decrease # 22
+
+# LR Man Heat
+  lr_heat_man:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - cool
-        - temperature increase
-        hold_secs: 6
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.lr_heat_man_{{ states('input_number.lr_ac_temp_set_heat')|int(0) }}
 
   lr_ac_normal_cool:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - cool
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: cool # 23
+
+  lr_ac_powerful_cool:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: temperature decrease #ai 16
 
   lr_ac_silent_cool:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - cool
-        - temperature decrease
-        hold_secs: 6
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: temperature increase #28
+
+# LR Man Cool
+  lr_cool_man:
+    sequence:
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.lr_cool_man_{{ states('input_number.lr_ac_temp_set_cool')|int(0) }}
+
+# Set humidity during on mode
+  lr_humidity_set:
+    sequence:
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.lr_humidity_set_{{ states('input_number.lr_humidity_set')|int(0) }}
 
   lr_ac_normal_humidifier:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - humidifier
-        
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: humidifier # 70%
+
   lr_ac_ai:
     sequence:
-     - service: switch.turn_on
-       entity_id: switch.ai_lr_unit
+      - service: switch.turn_on
+        entity_id: switch.ai_lr_unit
   lr_ac_fan:
     sequence:
-     - service: switch.turn_on
-       entity_id: switch.fan_lr_unit
+      - service: switch.turn_on
+        entity_id: switch.fan_lr_unit
 
   lr_ac_off:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm4_remote
-        device: Living Room Aircon
-        command:
-        - 'off'
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: 'off'
+
 
 # LR Toggle Script
   lr_ac_heat_toggle:
@@ -107,7 +109,7 @@
   lr_ac_heat_toggle_active:
     sequence:
      - service_template: >
-            script.lr_ac_heat_toggle_active_{{ 'on' if is_state(entity, 'off') else 'off' }}           
+            script.lr_ac_heat_toggle_active_{{ 'on' if is_state(entity, 'off') else 'off' }}
        data_template:
          entity: '{{ entity }}'
 
@@ -120,9 +122,9 @@
   lr_ac_heat_toggle_active_off:
     sequence:
      - service: switch.turn_off
-       data: 
+       data:
          entity_id: '{{ entity }}'
-         
+
   lr_ac_cool_toggle:
     sequence:
      - service: script.lr_ac_cool_toggle_active
@@ -132,7 +134,7 @@
   lr_ac_cool_toggle_active:
     sequence:
      - service_template: >
-            script.lr_ac_cool_toggle_active_{{ 'on' if is_state(entity, 'off') else 'off' }}           
+            script.lr_ac_cool_toggle_active_{{ 'on' if is_state(entity, 'off') else 'off' }}
        data_template:
          entity: '{{ entity }}'
 
@@ -145,14 +147,22 @@
   lr_ac_cool_toggle_active_off:
     sequence:
      - service: switch.turn_off
-       data: 
+       data:
          entity_id: '{{ entity }}'
 
 #########################################################
-#                                                                                                              
-#             Master Room Aircon                                                                       
-#                                                                                                              
+#
+#             Master Room Aircon
+#
 #########################################################
+
+  mr_ac_normal_heat:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command: heat # 26
 
   mr_ac_powerful_heat:
     sequence:
@@ -160,40 +170,22 @@
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command:
-        - heat
-        - temperature heat increase
-        hold_secs: 6
-  mr_ac_normal_heat:
-    sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm31_remote
-        device: Master Room Aircon
-        command:
-        - heat
-        
+        command: temperature heat increase # ai 31
+
   mr_ac_silent_heat:
     sequence:
     - service: remote.send_command
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command:
-        - heat
-        - temperature heat decrease
-        hold_secs: 6
+        command: temperature heat decrease # 22
 
-  mr_ac_powerful_cool:
+# MR Man Heat
+  mr_heat_man:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm31_remote
-        device: Master Room Aircon
-        command:
-        - cool
-        - temperature increase
-        hold_secs: 6
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.mr_heat_man_{{ states('input_number.mr_ac_temp_set_heat')|int(0) }}
 
   mr_ac_normal_cool:
     sequence:
@@ -201,8 +193,15 @@
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command:
-        - cool
+        command: cool # 23        
+        
+  mr_ac_powerful_cool:
+    sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.rm31_remote
+        device: Master Room Aircon
+        command: temperature decrease #ai 16
 
   mr_ac_silent_cool:
     sequence:
@@ -210,10 +209,22 @@
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command:
-        - cool
-        - temperature decrease
-        hold_secs: 6
+        command: temperature increase #28
+
+# MR Man Cool
+  mr_cool_man:
+    sequence:
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.mr_cool_man_{{ states('input_number.mr_ac_temp_set_cool')|int(0) }}
+
+# Set humidity during cool mode
+  mr_humidity_set:
+    sequence:
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.mr_humidity_set_{{ states('input_number.mr_humidity_set')|int(0) }}
+
 
   mr_ac_normal_humidifier:
     sequence:
@@ -221,9 +232,8 @@
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command:
-        - humidifier
-        
+        command: humidifier # 70%
+
   mr_ac_ai:
     sequence:
      - service: switch.turn_on
@@ -239,65 +249,90 @@
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command:
-        - 'off'
+        command: 'off'
+
 
 
 #########################################################
-#                                                                                                              
-#             Shion Room Aircon                                                                         
-#                                                                                                              
+#
+#             Shion Room Aircon
+#
 #########################################################
+
+  sr_ac_normal_heat:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.bed_sensor_sr_heater # 26
 
   sr_ac_powerful_heat:
     sequence:
      - service: switch.turn_on
-       entity_id: switch.sr_heater
-     - service: switch.turn_on
-       entity_id: switch.sr_temperature_heat_ctrl
-  sr_ac_normal_heat:
-    sequence:
-     - service: switch.turn_on
-       entity_id: switch.sr_heater
+       entity_id: switch.bed_sensor_sr_temperature_heat_ctrl # ai 31
+
   sr_ac_silent_heat:
     sequence:
      - service: switch.turn_on
-       entity_id: switch.sr_heater
-     - service: switch.turn_off
-       entity_id: switch.sr_temperature_heat_ctrl
+       entity_id: switch.bed_sensor_sr_temperature_heat_decrease # 22 [newly added]
 
-  sr_ac_powerful_cool:
+# SR Man heat
+  sr_heat_man:
     sequence:
-     - service: switch.turn_on
-       entity_id: switch.sr_ac
-     - service: switch.turn_on
-       entity_id: switch.sr_temperature_ac_ctrl
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.bed_sensor_sr_heat_man_{{ states('input_number.sr_ac_temp_set_heat')|int(0) }} # need to add switches
+
+####
   sr_ac_normal_cool:
     sequence:
      - service: switch.turn_on
-       entity_id: switch.sr_ac
+       entity_id: switch.bed_sensor_sr_ac # 23
+       
+  sr_ac_powerful_cool:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.bed_sensor_sr_temperature_ac_ctrl # ai 16
+
   sr_ac_silent_cool:
     sequence:
      - service: switch.turn_on
-       entity_id: switch.sr_ac
-     - service: switch.turn_off
-       entity_id: switch.sr_temperature_ac_ctrl
+       entity_id: switch.bed_sensor_sr_temperature_ac_decrease # 28 [newly added]
+
+# SR Man Cool
+  sr_cool_man:
+    sequence:
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.bed_sensor_sr_cool_man_{{ states('input_number.sr_ac_temp_set_cool')|int(0) }}  # need to add switches
+
+# Set humidity during cool mode
+  sr_humidity_set:
+    sequence:
+      - service: switch.turn_on
+        data_template:
+          entity_id: switch.bed_sensor_sr_humidity_set_{{ states('input_number.sr_humidity_set')|int(0) }}
+
+
 
   sr_ac_normal_humidifier:
     sequence:
      - service: switch.turn_on
-       entity_id: switch.sr_humidifier
+       entity_id: switch.bed_sensor_sr_humidifier # 50%
   sr_ac_ai:
     sequence:
      - service: switch.turn_on
-       entity_id: switch.sr_ai
+       entity_id: switch.bed_sensor_sr_ai # need to add a switch
+  sr_ac_fan:
+    sequence:
+     - service: switch.turn_on
+       entity_id: switch.bed_sensor_sr_fan # need to add a switch
   sr_ac_off:
     sequence:
-     - service: switch.turn_off
-       entity_id: switch.sr_ac
+     - service: switch.turn_on
+       entity_id: switch.bed_sensor_sr_ac_off # turn off
+
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################
