@@ -3,21 +3,21 @@
 #                    CUSTOM SWITCHES                                                     
 #                                                                                                    
 ####################################################
-
-  - platform: template
-    switches:
-      update_github:
-        value_template: "{{ is_state_attr('switch.update_github', 'sensor_state', 'on') }}"
-        turn_on:
-          - service: hassio.addon_stdin
-            data:
-              addon: a0d7b954_ssh
-              input: /bin/sh "/config/scripts/sh/gitupdate.sh"
-        turn_off:
-          - service: hassio.addon_stdin
-            data:
-              addon: a0d7b954_ssh
-              input: /bin/sh "/config/scripts/sh/gitupdate.sh"
+# CAN DELETE. NOT WORKING
+#  - platform: template
+#    switches:
+#      update_github:
+#        value_template: "{{ is_state_attr('switch.update_github', 'sensor_state', 'on') }}"
+#        turn_on:
+#          - service: hassio.addon_stdin
+#            data:
+#              addon: a0d7b954_ssh
+#              input: /bin/sh "/config/scripts/sh/gitupdate.sh"
+#        turn_off:
+#          - service: hassio.addon_stdin
+#            data:
+#              addon: a0d7b954_ssh
+#              input: /bin/sh "/config/scripts/sh/gitupdate.sh"
 
 ####################################################
 #                                                                                                    
