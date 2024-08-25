@@ -45,6 +45,23 @@ cards:
       - entity: sensor.sniffer0_temperature
         name: Kitchen Temperature
 
+  - type: entities
+    title: Master Air Quality
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.sniffer1_temperature
+      detail: 3
+    entities:
+      - entity: sensor.sniffer1_pm_2_5_aqi
+        name: Air Quality
+      - entity: sensor.sniffer1_pm_2_5_mm
+        name:  Pollutant Level
+      - entity: sensor.sniffer1_gas_resistance
+        name: Carbon Monoxide
+      - type: divider
+      - entity: sensor.sniffer1_temperature
+        name: Master Temperature
 
 
   - type: entities
@@ -116,6 +133,30 @@ cards:
       - entity: sensor.gosund_washer_power
         name: Power
         icon: mdi:lightning-bolt
+
+  - type: entities
+    title: Refrigerator
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.gosund_fridge_power # sensor.fridge_plug_apower
+      detail: 3
+    entities:
+      - entity: sensor.gosund_fridge_voltage # sensor.fridge_plug_voltage
+        name: Current Voltage
+        icon: mdi:lightning-bolt
+      - entity: sensor.gosund_fridge_amperage # sensor.fridge_plug_temperature
+        name: Current Amperage  # Temperature
+        icon: mdi:thermometer-lines
+      - entity: sensor.energy_fridge_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.gosund_fridge_power # sensor.fridge_plug_apower
+        name: Power
+        icon: mdi:lightning-bolt
+
+
 
   - type: vertical-stack
     cards:
@@ -190,27 +231,10 @@ cards:
           ha-card {
           }
 
-  - type: entities
-    title: Refrigerator
-    show_header_toggle: false
-    footer:
-      type: graph
-      entity: sensor.gosund_fridge_power # sensor.fridge_plug_apower
-      detail: 3
-    entities:
-      - entity: sensor.gosund_fridge_voltage # sensor.fridge_plug_voltage
-        name: Current Voltage
-        icon: mdi:lightning-bolt
-      - entity: sensor.gosund_fridge_amperage # sensor.fridge_plug_temperature
-        name: Current Amperage  # Temperature
-        icon: mdi:thermometer-lines
-      - entity: sensor.energy_fridge_power_monthly
-        name: Monthly Total Power
-        icon: mdi:gauge
-      - type: divider
-      - entity: sensor.gosund_fridge_power # sensor.fridge_plug_apower
-        name: Power
-        icon: mdi:lightning-bolt
+
+
+
+
 
   # Hide when turned off
   - type: entities
