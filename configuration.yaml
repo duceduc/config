@@ -32,11 +32,12 @@ homeassistant:
 #influxdb:
 #  host: 192.168.1.55
 #  port: 8015
-#  organization: ngx
 #  bucket: homeassistant
-#  token: !secret influx_token
 #  username: !secret influx_user
 #  password: !secret influx_pass
+#  organization: ngx
+#  token: !secret influx_token
+
 
 tts:
   - platform: google_translate
