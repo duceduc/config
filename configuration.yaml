@@ -28,17 +28,6 @@ homeassistant:
     - '/config'
     - '/media/music'
 
-# TESTING
-#influxdb:
-#  host: 192.168.1.55
-#  port: 8015
-#  bucket: homeassistant
-#  username: !secret influx_user
-#  password: !secret influx_pass
-#  organization: ngx
-#  token: !secret influx_token
-
-
 tts:
   - platform: google_translate
     service_name: google_say
