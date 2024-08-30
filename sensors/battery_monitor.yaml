@@ -10,7 +10,7 @@
         friendly_name: 'Devices with low battery'
         unit_of_measurement: devices
         value_template: >-
-          {% set ignore_entities = ['sensor.cr_curtain_lt_battery', 'sensor.cr_curtain_rt_battery','sensor.id_battery_level','sensor.ie_battery_level', 'sensor.devices_with_low_battery'] %}
+          {% set ignore_entities = ['sensor.hdmi_selector_battery','sensor.cr_curtain_lt_battery', 'sensor.cr_curtain_rt_battery','sensor.id_battery_level','sensor.ie_battery_level', 'sensor.devices_with_low_battery'] %}
           {{ states.sensor
             | selectattr('attributes.device_class', 'defined')
             | selectattr('attributes.device_class', 'eq', 'battery')

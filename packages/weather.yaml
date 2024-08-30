@@ -258,8 +258,6 @@ template:
           forecast: "{{ daily['weather.my_weather'].forecast }}"
 
 
-
-
 # My Weather Entities Hourly
   - trigger:
       - platform: time_pattern
@@ -315,6 +313,7 @@ template:
 
 
 # Rain Guage
+# Battery replaced on 8/30/2024
   - sensor:
       - name: Rainfall today
         unit_of_measurement: 'mm'
