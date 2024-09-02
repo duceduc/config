@@ -43,6 +43,12 @@ improv_serial:
 logger:
   hardware_uart: uart0
 
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+
+captive_portal:
+
 api:
   encryption:
     key: !secret esphome_apikey
@@ -57,17 +63,12 @@ ota:
 #  package_import_url: github://screekworkshop/screek-human-sensor/1u/yaml/Screek-Humen-Dectet-1u.yaml@2023.06
 #  import_full_config: False
 
-wifi:
-  ssid: !secret ssid
-  password: !secret ssid_pwd
-
-captive_portal:
 
 web_server:
   port: 80
 
 binary_sensor:
-  - platform: status
+  - platform: status # consolidate
     name: Online
     id: ink_ha_connected
   - platform: ld2410
@@ -109,7 +110,7 @@ sensor:
     id: sys_uptime
     update_interval: 10s
 
-  - platform: wifi_signal 
+  - platform: wifi_signal # consolidate
     name: RSSI
     id: wifi_signal_db
     update_interval: 5s

@@ -95,7 +95,7 @@
 
 
   lr_ac_mode:
-    name: LR AC Mode
+    name: Livingroom AC Mode
     icon: mdi:air-conditioner
     options:
      - 'Off'
@@ -113,7 +113,7 @@
      - Normal Humidifier
 
   mr_ac_mode:
-    name: MR AC Mode
+    name: Masterroom AC Mode
     icon: mdi:air-conditioner
     options:
      - 'Off'
@@ -131,7 +131,7 @@
      - Normal Humidifier
 
   sr_ac_mode:
-    name: SR AC Mode
+    name: Shionroom AC Mode
     icon: mdi:air-conditioner
     options:
      - 'Off'
