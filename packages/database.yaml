@@ -100,6 +100,7 @@ influxdb:
       - sensor.rainfall*
       - sensor.sniffer*
     entities:
+      - sensor.sniffer0_pm_2_5_aqi
       - sensor.speedtest_download
       - sensor.speedtest_upload
       - sensor.home_assistant_v2_db_size_gb

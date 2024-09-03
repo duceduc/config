@@ -1,0 +1,12 @@
+substitutions:
+  name: atom-bt-proxy
+packages:
+  esphome.bluetooth-proxy: github://esphome/firmware/bluetooth-proxy/m5stack-atom-lite.yaml@main
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+api:
+
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd

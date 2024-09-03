@@ -27,6 +27,7 @@ views:
   - !include lovelace/dashboards/overview/energy.yaml
   - !include lovelace/dashboards/overview/chores.yaml
   - !include lovelace/dashboards/overview/signals.yaml
+  - !include lovelace/dashboards/overview/stats.yaml
 
 
 ####################################################

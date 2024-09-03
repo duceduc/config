@@ -1,0 +1,30 @@
+####################################################
+#
+#                    Stats
+#
+####################################################
+
+title: Statistics
+path: stats
+icon: mdi:chart-bar
+background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+panel: true
+cards:
+
+  - type: iframe
+    url: 'https://graf.snailmsg.com/d/o3kbHKqSz/iot-dashboard?orgId=1&kiosk=tv&fullscreen&kiosk=1&refresh=30s'
+    aspect_ratio: 100%
+
+
+
+
+
+
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################
