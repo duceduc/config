@@ -3,7 +3,7 @@
 
 esphome:
   name: kt-human-sensor
-  name_add_mac_suffix: True
+  name_add_mac_suffix: false
   platformio_options:
     board_build.flash_mode: dio
     board_build.f_cpu: 80000000L

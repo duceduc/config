@@ -10,6 +10,8 @@ recorder:
   db_url: sqlite:////media/data/hassio_db/home-assistant_v2.db
 #  purge_keep_days: 10
   exclude:
+    entity_globs:
+      - sensor.flightradar24*
     domains:
      - group
      - automation

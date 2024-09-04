@@ -1,0 +1,55 @@
+###############################################################################
+#   @author         :   Duc Su
+#   @date           :   09/3/2024
+#   @package        :   Flightradar24
+#   @description    :   Tracking aircrafts.
+###############################################################################
+
+#rest:
+#  scan_interval: 1200
+#  resource: https://api.adsb.lol/v2/reg/NJET
+#  sensor:
+#    - name: njet_adsb
+#      value_template: '{% if value_json.total != 0 %}online{% else %}offline{% endif %}'
+#    - name: njet_flight
+#      value_template: '{{ value_json.ac[0].flight }}'
+#    - name: njet_squawk
+#      value_template: '{{ value_json.ac[0].squawk }}'
+#    - name: njet_emergency
+#      value_template: '{{ value_json.ac[0].emergency }}'
+#    - name: njet_lat
+#      value_template: '{{ value_json.ac[0].lat }}'
+#    - name: njet_lon
+#      value_template: '{{ value_json.ac[0].lon }}'
+#    - name: njet_alt
+#      value_template: '{{ value_json.ac[0].alt_baro }}'
+#    - name: njet_track
+#      value_template: '{{ value_json.ac[0].track }}'
+#    - name: njet_gs
+#      value_template: '{{ value_json.ac[0].gs }}'
+
+
+automation:
+  - alias: 'Flight entry notification'
+    trigger:
+      - platform: event
+        event_type: flightradar24_entry
+    condition:
+      - condition: template # duc is home
+        value_template: "{{ is_state('person.duc', 'home') }}"
+    action:
+      - service: notify.amberthebot
+        data_template:
+          message: >-
+            The plane you hear now is from {{ trigger.event.data.airline }}({{ trigger.event.data.callsign }}). It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+
+  - alias: 'Scheduled flight takes off'
+    trigger:
+      - platform: event
+        event_type: flightradar24_tracked_took_off
+    action:
+      - service: notify.amberthebot
+        data_template:
+          message: >-
+             The plane you hear now is from {{ trigger.event.data.airline }}({{ trigger.event.data.callsign }}). It took off from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+
