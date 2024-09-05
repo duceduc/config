@@ -239,6 +239,7 @@
 #########################################################
 
 # https://community.home-assistant.io/t/tradfri-transition/17530/23
+
   tradfri_transition:
     sequence:
       - service: light.turn_on
@@ -255,18 +256,18 @@
     mode: parallel # default 10
 
 
-  tradfri_transition_down:
-    sequence:
-      - service: light.turn_off
-        data_template:
-          entity_id: '{{ entity_id }}'
-          transition: '{{ transition | int / 2 }}'
-      - delay: '00:00:{{ transition | int / 2 + 1}}'
-      - service: light.turn_off
-        data_template:
-          entity_id: '{{ entity_id }}'
-          transition: '{{ transition | int / 2 }}'
-    mode: parallel # default 10
+#  tradfri_transition_down:
+#    sequence:
+#      - service: light.turn_off
+#        data_template:
+#          entity_id: '{{ entity_id }}'
+#          transition: '{{ transition | int / 2 }}'
+#      - delay: '00:00:{{ transition | int / 2 + 1}}'
+#      - service: light.turn_off
+#        data_template:
+#          entity_id: '{{ entity_id }}'
+#          transition: '{{ transition | int / 2 }}'
+#    mode: parallel # default 10
 
 
 #########################################################
