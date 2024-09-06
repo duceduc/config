@@ -216,6 +216,7 @@ sensor.pollen_grass:
      if ( state === '5' ) return 'rgb(27, 157, 44)';
 
 sensor.sniffer0_pm_2_5_aqi:
+  friendly_name: Kitchen
   templates:
     icon_color: >
      if ( state <  51 ) return 'RGB(3, 169, 245)';
@@ -224,7 +225,12 @@ sensor.sniffer0_pm_2_5_aqi:
      if ( state < 351 ) return 'RGB(221, 156, 72)';
      if ( state > 350 ) return 'RGB(252, 88, 18)';
 
-
-
-
-
+sensor.sniffer1_pm_2_5_aqi:
+  friendly_name: Master
+  templates:
+    icon_color: >
+     if ( state <  51 ) return 'RGB(3, 169, 245)';
+     if ( state < 101 ) return 'RGB(16, 128, 8)';    
+     if ( state < 201 ) return 'RGB(240, 240, 10)';
+     if ( state < 351 ) return 'RGB(221, 156, 72)';
+     if ( state > 350 ) return 'RGB(252, 88, 18)';
