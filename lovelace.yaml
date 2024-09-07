@@ -35,6 +35,9 @@
       - url: /local/custom_ui/lunar-phase-card.js?v=1.0.0
         type: module
 
+      - url: /local/custom_ui/streamline-card.js?v=1
+        type: module
+
       - url: /local/custom_ui/decluttering-card.js
         type: module
       - url: /local/custom_ui/button-card.js

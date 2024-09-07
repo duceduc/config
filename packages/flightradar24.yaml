@@ -34,14 +34,50 @@ automation:
     trigger:
       - platform: event
         event_type: flightradar24_entry
-    condition:
-      - condition: template # duc is home
-        value_template: "{{ is_state('person.duc', 'home') }}"
+    condition: []
     action:
-      - service: notify.amberthebot
-        data_template:
-          message: >-
-            The plane you hear now is from {{ trigger.event.data.airline }}({{ trigger.event.data.callsign }}). It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+      - choose:
+          - conditions:
+              - condition: template 
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|shizuoka|kawasaki|okayama|hiratagakuen|asahi') }}"
+            sequence:
+              - service: notify.amberthebot
+                data_template:
+                  message: >-
+                    🚁{{ trigger.event.data.airline }} helicopter is flying in your neighborhood.
+          - conditions:
+              - condition: template 
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('honda|none|private owner') }}"
+              - condition: template 
+                value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none') }}"
+            sequence:
+              - service: notify.amberthebot
+                data_template:
+                  message: >-
+                    ‼️ No flight plan. The aircraft is either private or goverment operated.
+
+          - conditions:
+              - condition: template # duc is at home
+                value_template: "{{ is_state('person.duc', 'home') }}" #home
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' }}"
+            sequence:
+              - service: notify.amberthebot
+                data_template:
+                  message: >-
+                    📍The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+          - conditions:
+              - condition: template # duc isat jcb
+                value_template: "{{ is_state('person.duc', 'jcb') }}" #jcb
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' }}"
+            sequence:
+              - service: notify.amberthebot
+                data_template:
+                  message: >-
+                    💼The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+        default: []
+
 
   - alias: 'Scheduled flight takes off'
     trigger:
@@ -51,5 +87,5 @@ automation:
       - service: notify.amberthebot
         data_template:
           message: >-
-             The plane you hear now is from {{ trigger.event.data.airline }}({{ trigger.event.data.callsign }}). It took off from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+             The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It took off from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
 

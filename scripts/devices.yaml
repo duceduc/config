@@ -143,13 +143,6 @@
 #
 #########################################################
 
-  desktop_wol_on:
-    alias: "Desktop WOL On"
-    sequence:
-      - service: wake_on_lan.send_magic_packet
-        data:
-          mac: "9C:6B:00:59:D2:6DDDDD"
-
   desktop_wol_off:
     alias: "Desktop WOL Off"
     sequence:
@@ -169,6 +162,8 @@
           data:
             entity_id: light.computer
             sec: 70
+
+
 
 
 #  desktop_wol_off:

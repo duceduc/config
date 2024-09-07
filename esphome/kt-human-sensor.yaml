@@ -64,6 +64,15 @@ ota:
 #  import_full_config: False
 
 
+## TEST
+i2c: # for bme280
+  sda: GPIO9
+  scl: GPIO11
+  scan: true
+
+
+
+
 web_server:
   port: 80
 
@@ -140,6 +149,55 @@ sensor:
       name: Detection Distance
     light:
       name: Sun Light
+
+
+
+
+### TESTING
+  - platform: bme280_i2c
+    update_interval: 10s
+    address: 0x76
+    temperature:
+      name: "Kitchen Temperature"
+      oversampling: 16x
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+    pressure:
+      name: "Kitchen Pressure"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+    humidity:
+      name: "Kitchen Humidity"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+
+
+### TESTING
+  - platform: adc
+    pin: GPIO7
+    name: 'Kitchen illuminance'
+    unit_of_measurement: lux
+    update_interval: 5s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 light:
   - platform: status_led

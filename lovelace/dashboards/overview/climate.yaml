@@ -11,8 +11,8 @@ icon: mdi:home-thermometer-outline
 # background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
 cards:
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Outside
       - icon: weather-windy
@@ -23,8 +23,8 @@ cards:
       - entity_3: sensor.oa_temperature
       - name_3: Outside Temperature
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Master Room
       - icon: weather-rainy
@@ -37,8 +37,8 @@ cards:
 
 
 
-  #  - type: custom:decluttering-card
-  #    template: temperature_tpl
+  #  - type: custom:streamline-card
+  #    template: climate_tpl
   #    variables:
   #      - title: Hallway
   #      - icon: weather-rainy
@@ -49,8 +49,8 @@ cards:
   #      - entity_3: sensor.hr_sensor_temperature
   #      - name_3: Hallway Temperature
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Genkan
       - icon: weather-rainy
@@ -62,8 +62,8 @@ cards:
       - name_3: Genkan Temperature
 
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: MDF
       - icon: weather-rainy
@@ -74,8 +74,8 @@ cards:
       - entity_3: sensor.mdf_temperature
       - name_3: Shoe Closet Temperature
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Shion Room
       - icon: weather-rainy
@@ -86,8 +86,8 @@ cards:
       - entity_3: sensor.sr_radar_temperature
       - name_3: Room Temperature
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Livingroom
       - icon: weather-rainy
@@ -100,8 +100,8 @@ cards:
 
 
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Kitchen
       - icon: weather-rainy
@@ -112,8 +112,8 @@ cards:
       - entity_3: sensor.espresense_kitchen_temperature
       - name_3: Room Temperature
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Computer Room
       - icon: weather-rainy
@@ -124,8 +124,8 @@ cards:
       - entity_3: sensor.cr_temperature # sensor.espresense_computerroom_temperature
       - name_3: Room Temperature
 
-  - type: custom:decluttering-card
-    template: temperature_tpl
+  - type: custom:streamline-card
+    template: climate_tpl
     variables:
       - title: Toilet Room
       - icon: weather-rainy

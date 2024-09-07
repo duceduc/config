@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    #
-#                    ROOMS VIEW                                                              #
-#                                                                                                    #
+#                                                                                                    
+#                    ROOMS VIEW                                                              
+#                                                                                                    
 ####################################################
 
 title: Rooms
@@ -17,7 +17,7 @@ cards:
       max_cols: 3
     cards:
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: aircon_tpl
         variables:
           - title: Livingroom Aircon Controls
@@ -28,7 +28,7 @@ cards:
           - entity_4: sensor.livingroom_humidity
 #          - entity_5: sensor.lr_condensation_chance
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: aircon_tpl
         variables:
           - title: Shion Room Aircon Controls
@@ -39,7 +39,7 @@ cards:
           - entity_4: sensor.sr_radar_humidity
 #          - entity_5: sensor.sr_condensation_chance
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: aircon_tpl
         variables:
           - title: Master Room Aircon Controls

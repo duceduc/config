@@ -29,17 +29,16 @@ views:
   - !include lovelace/dashboards/overview/signals.yaml
   - !include lovelace/dashboards/overview/stats.yaml
 
-
 ####################################################
 #
-#                    DECLUTTERING TPL
+#                    STREAMLINE TPL
 #
 ####################################################
 
 
 # climate.yaml
-decluttering_templates:
-  temperature_tpl:
+streamline_templates:
+  climate_tpl:
     card:
         type: entities
         title: '[[title]]'
@@ -101,15 +100,15 @@ decluttering_templates:
                 label: Automation
                 type: section
               items:
-              - input_datetime.[[room]]_ac_am_on_time
-              - input_datetime.[[room]]_ac_am_off_time
-              - input_datetime.[[room]]_ac_pm_on_time
-              - input_datetime.[[room]]_ac_pm_off_time
-              - input_number.[[room]]_ac_cool_temp_set
-              - input_number.[[room]]_heater_heat_temp_set
-              - input_number.[[room]]_ac_temp_set_cool
-              - input_number.[[room]]_ac_temp_set_heat
-              - input_number.[[room]]_humidity_set
+                - input_datetime.[[room]]_ac_am_on_time
+                - input_datetime.[[room]]_ac_am_off_time
+                - input_datetime.[[room]]_ac_pm_on_time
+                - input_datetime.[[room]]_ac_pm_off_time
+                - input_number.[[room]]_ac_cool_temp_set
+                - input_number.[[room]]_heater_heat_temp_set
+                - input_number.[[room]]_ac_temp_set_cool
+                - input_number.[[room]]_ac_temp_set_heat
+                - input_number.[[room]]_humidity_set
               type: 'custom:fold-entity-row'
           show_header_toggle: false
           type: entities
@@ -215,7 +214,7 @@ decluttering_templates:
             icon: mdi:thermometer
 
 # data.yaml
-  person_card_new:
+  person_card:
     default:
       - size: 60%
       - color: auto

@@ -17,8 +17,8 @@ cards:
       max_cols: 3
     cards:
 
-      - type: custom:decluttering-card
-        template: person_card_new
+      - type: custom:streamline-card
+        template: person_card
         variables:
           - entity: sensor.duc_location #person.duc
           - name: Duc
@@ -33,8 +33,8 @@ cards:
               action: more-info
               haptic: light
 
-      - type: custom:decluttering-card
-        template: person_card_new
+      - type: custom:streamline-card
+        template: person_card
         variables:
           - entity: sensor.eri_location # person.eri
           - name: Eri
@@ -49,8 +49,8 @@ cards:
               action: more-info
               haptic: light
 
-      - type: custom:decluttering-card
-        template: person_card_new
+      - type: custom:streamline-card
+        template: person_card
         variables:
           - entity: sensor.shion_location # person.shion
           - name: Shion
@@ -66,7 +66,7 @@ cards:
               haptic: light
 
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: four_sensors_tpl
         variables:
           - title: Door Detection Status
@@ -80,7 +80,7 @@ cards:
           - name_4: Shion
 
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: four_sensors_tpl
         variables:
           - title: Home Status
@@ -97,7 +97,7 @@ cards:
         cards:
           - type: custom:config-template-card
             entities:
-            - sensor.combustible_days
+              - sensor.combustible_days
             variables:
               DAYS: states['sensor.combustible_days'].attributes['days']+'d'
             card:
@@ -113,7 +113,7 @@ cards:
 
           - type: custom:config-template-card
             entities:
-            - sensor.plastic_days
+              - sensor.plastic_days
             variables:
               DAYS: states['sensor.plastic_days'].attributes['days']+'d'
             card:
@@ -129,7 +129,7 @@ cards:
 
           - type: custom:config-template-card
             entities:
-            - sensor.metal_paper_days
+              - sensor.metal_paper_days
             variables:
               DAYS: states['sensor.metal_paper_days'].attributes['days']+'d'
             card:
@@ -145,7 +145,7 @@ cards:
 
           - type: custom:config-template-card
             entities:
-            - sensor.bottle_can_days
+              - sensor.bottle_can_days
             variables:
               DAYS: states['sensor.bottle_can_days'].attributes['days']+'d'
             card:
@@ -161,7 +161,7 @@ cards:
 
           - type: custom:config-template-card
             entities:
-            - sensor.pet_clothes_days
+              - sensor.pet_clothes_days
             variables:
               DAYS: states['sensor.pet_clothes_days'].attributes['days']+'d'
             card:
@@ -177,7 +177,7 @@ cards:
 
 
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: four_sensors_tpl
         variables:
           - title: Motion Detection Hallway
@@ -192,7 +192,7 @@ cards:
           - entity_5: sensor.toilet
           - name_5: Restroom
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: four_sensors_tpl
         variables:
           - title: Motion Detection Kitchen
@@ -205,7 +205,7 @@ cards:
           - entity_4: sensor.storageroom
           - name_4: Storage
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: five_sensors_tpl
         variables:
           - title: Motion Detection Rooms
@@ -223,7 +223,7 @@ cards:
 
 
 
-#      - type: custom:decluttering-card
+#      - type: custom:streamline-card
 #        template: server_tpl
 #        variables:
 #          - title: ds1
@@ -232,7 +232,7 @@ cards:
 #          - entity_3: sensor.ds1_cpu_usage
 #          - entity_4: sensor.ds1_temperature
 #
-#      - type: custom:decluttering-card
+#      - type: custom:streamline-card
 #        template: server_tpl
 #        variables:
 #          - title: ws1
@@ -241,7 +241,7 @@ cards:
 #          - entity_3: sensor.ws1_cpu_usage
 #          - entity_4: sensor.ws1_temperature
 #
-#      - type: custom:decluttering-card
+#      - type: custom:streamline-card
 #        template: server_tpl
 #        variables:
 #          - title: ps1
@@ -251,7 +251,7 @@ cards:
 #          - entity_4: sensor.ps1_temperature
 
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: server_tpl
         variables:
           - title: ms1
@@ -260,7 +260,7 @@ cards:
           - entity_3: sensor.ms1_cpu_usage
           - entity_4: sensor.ms1_temperature
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: server_tpl
         variables:
           - title: ms2
@@ -269,7 +269,7 @@ cards:
           - entity_3: sensor.ms2_cpu_usage
           - entity_4: sensor.ms2_temperature
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: server_tpl
         variables:
           - title: ms3
@@ -278,7 +278,7 @@ cards:
           - entity_3: sensor.ms3_cpu_usage
           - entity_4: sensor.ms3_temperature
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: server_tpl
         variables:
           - title: ser
@@ -287,7 +287,7 @@ cards:
           - entity_3: sensor.ser_cpu_usage
           - entity_4: sensor.ser_clock_speed
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: server_tpl
         variables:
           - title: ngx
@@ -296,7 +296,7 @@ cards:
           - entity_3: sensor.ngx_cpu_usage
           - entity_4: sensor.ngx_temperature
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: server_tpl
         variables:
           - title: media

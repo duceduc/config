@@ -11,7 +11,8 @@ recorder:
 #  purge_keep_days: 10
   exclude:
     entity_globs:
-      - sensor.flightradar24*
+      - sensor.homeft24*
+      - sensor.jcbft24*
     domains:
      - group
      - automation
