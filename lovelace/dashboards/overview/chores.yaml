@@ -66,10 +66,6 @@ cards:
         aspect_ratio: 75%
 
       - type: iframe
-        url: 'https://graf.snailmsg.com/d-solo/o3kbHKqSz/iot-dashboard?from=1725326110473&to=1725347710473&orgId=1&panelId=2&kiosk=tv'
-        aspect_ratio: 75%
-
-      - type: iframe
         url: 'https://graf.snailmsg.com/d-solo/o3kbHKqSz/iot-dashboard?orgId=1&panelId=6&kiosk=tv'
         aspect_ratio: 75%
 

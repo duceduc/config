@@ -47,7 +47,7 @@ automation:
                     🚁{{ trigger.event.data.airline }} helicopter is flying in your neighborhood.
           - conditions:
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('honda|none|private owner') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner') }}"
               - condition: template 
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none') }}"
             sequence:

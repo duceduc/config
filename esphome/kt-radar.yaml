@@ -1,9 +1,12 @@
 # This is a custom firmware for Human Presence Sensor 1U
 # https://screek.io/1u
 
+substitutions:
+  name: kt-radar
+  room: kt
+
 esphome:
-  name: kt-human-sensor
-  name_add_mac_suffix: false
+  name: $name
   platformio_options:
     board_build.flash_mode: dio
     board_build.f_cpu: 80000000L
@@ -13,7 +16,7 @@ esphome:
        lambda: |-
         id(cpu_speed) = ESP.getCpuFreqMHz() ;
   project: 
-    name: Screek.Human_Presence_Sensor
+    name: Screek.Human Presence Sensor
     version: 1U
   min_version: 2023.6.1
 
@@ -57,57 +60,39 @@ ota:
   - platform: esphome
     password: !secret ota_pass
 
-# By automatically importing to the console, 
-# subsequent adjustments can be easily made without having to manually fix a specific name.
-#dashboard_import:
-#  package_import_url: github://screekworkshop/screek-human-sensor/1u/yaml/Screek-Humen-Dectet-1u.yaml@2023.06
-#  import_full_config: False
-
-
 ## TEST
 i2c: # for bme280
   sda: GPIO9
   scl: GPIO11
   scan: true
 
-
-
-
 web_server:
   port: 80
 
 binary_sensor:
   - platform: status # consolidate
-    name: Online
+    name: $name Online
     id: ink_ha_connected
   - platform: ld2410
     has_target:
-      name: Presence
+      name: $room Presence
     has_moving_target:
-      name: Moving Target
+      name: $room Moving Target
     has_still_target:
-      name: Still Target
+      name: $room Still Target
 
 sensor:
   - platform: template
-    name: "ESP Cpu Speed"
+    name: $name ESP Cpu Speed
     accuracy_decimals: 0
     unit_of_measurement: Mhz
     lambda: |-
       return (id(cpu_speed));
     entity_category: "diagnostic"
 
-  # - platform: internal_temperature
-  #   id: sys_esp_temperature
-  #   name: ESP Temperature
-  #   unit_of_measurement: °C
-  #   device_class: TEMPERATURE
-  #   update_interval: 1s
-  #   entity_category: "diagnostic"
-
   - platform: template
     id: sys_esp_temperature
-    name: ESP Temperature
+    name: $name ESP Temperature
     lambda: return temperatureRead();
     unit_of_measurement: °C
     device_class: TEMPERATURE
@@ -115,12 +100,12 @@ sensor:
     entity_category: "diagnostic"
 
   - platform: uptime
-    name: Uptime
+    name: $name Uptime
     id: sys_uptime
     update_interval: 10s
 
   - platform: wifi_signal # consolidate
-    name: RSSI
+    name: $name RSSI
     id: wifi_signal_db
     update_interval: 5s
     entity_category: "diagnostic"
@@ -128,7 +113,7 @@ sensor:
   - platform: template
     id: esp_memory
     icon: mdi:memory
-    name: ESP Free Memory
+    name: $name ESP Free Memory
     lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
     unit_of_measurement: 'kB'
     state_class: measurement
@@ -136,20 +121,19 @@ sensor:
 
   - platform: ld2410
     moving_distance:
-      name : Moving Distance
+      name: $room Moving Distance
       id: moving_distance
     still_distance:
-      name: Still Distance
+      name: $room Still Distance
       id: still_distance
     moving_energy:
-      name: Move Energy
+      name: $room Move Energy
     still_energy:
-      name: Still Energy
+      name: $room Still Energy
     detection_distance:
-      name: Detection Distance
+      name: $room Detection Distance
     light:
-      name: Sun Light
-
+      name: $room Sun Light
 
 
 
@@ -158,41 +142,31 @@ sensor:
     update_interval: 10s
     address: 0x76
     temperature:
-      name: "Kitchen Temperature"
+      name: "$name Temperature"
       oversampling: 16x
       filters:
         - sliding_window_moving_average:
             window_size: 15
             send_every: 15
     pressure:
-      name: "Kitchen Pressure"
+      name: "$name Pressure"
       filters:
         - sliding_window_moving_average:
             window_size: 15
             send_every: 15
     humidity:
-      name: "Kitchen Humidity"
+      name: "$name Humidity"
       filters:
         - sliding_window_moving_average:
             window_size: 15
             send_every: 15
 
-
 ### TESTING
-  - platform: adc
-    pin: GPIO7
-    name: 'Kitchen illuminance'
-    unit_of_measurement: lux
-    update_interval: 5s
-
-
-
-
-
-
-
-
-
+#  - platform: adc
+#    pin: GPIO5
+#    name: '$name illuminance'
+#    unit_of_measurement: lux
+#    update_interval: 5s
 
 
 
@@ -201,7 +175,7 @@ sensor:
 
 light:
   - platform: status_led
-    name: sys_status
+    name: $name sys_status
     pin: GPIO15
     internal: True
     restore_mode: ALWAYS_OFF
@@ -244,7 +218,7 @@ ld2410:
 
 button:
   - platform: template
-    name: "Enable LD2410 BLE"
+    name: "$name Enable LD2410 BLE"
     # disabled_by_default: True
     entity_category: "config"
     icon: mdi:bluetooth
@@ -253,7 +227,7 @@ button:
         id(ld2410_radar) -> ble_control(true);
 
   - platform: template
-    name: "Disable LD2410 BLE"
+    name: "$name Disable LD2410 BLE"
     # disabled_by_default: True
     entity_category: "config"
     icon: mdi:bluetooth-off

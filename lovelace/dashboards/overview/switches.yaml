@@ -145,7 +145,7 @@ cards:
 #            name: Nintendo Switch
 #            icon: mdi:wifi
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: humidifier_tpl
         variables:
           - title: Humidifier Controls

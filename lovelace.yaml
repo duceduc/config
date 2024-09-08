@@ -38,8 +38,8 @@
       - url: /local/custom_ui/streamline-card.js?v=1
         type: module
 
-      - url: /local/custom_ui/decluttering-card.js
-        type: module
+#      - url: /local/custom_ui/decluttering-card.js
+#        type: module
       - url: /local/custom_ui/button-card.js
         type: module
       - url: /local/custom_ui/layout-card.js

@@ -182,7 +182,7 @@ cards:
 
 
 
-      - type: custom:decluttering-card
+      - type: custom:streamline-card
         template: three_sensors_tpl
         variables:
           - title: Pollen Index
