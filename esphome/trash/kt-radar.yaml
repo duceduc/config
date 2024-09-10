@@ -68,10 +68,10 @@ ota:
 
 
 ## TEST
-i2c: # for bme280
-  sda: GPIO9
-  scl: GPIO11
-  scan: true
+#i2c: # for bme280
+#  sda: GPIO9
+#  scl: GPIO11
+#  scan: true
 
 web_server:
   port: 80
@@ -145,28 +145,30 @@ sensor:
 
 
 ### TESTING
-  - platform: bme280_i2c
-    update_interval: 10s
-    address: 0x76
-    temperature:
-      name: "$name Temperature"
-      oversampling: 16x
-      filters:
-        - sliding_window_moving_average:
-            window_size: 15
-            send_every: 15
-    pressure:
-      name: "$name Pressure"
-      filters:
-        - sliding_window_moving_average:
-            window_size: 15
-            send_every: 15
-    humidity:
-      name: "$name Humidity"
-      filters:
-        - sliding_window_moving_average:
-            window_size: 15
-            send_every: 15
+#  - platform: bme280_i2c
+#    update_interval: 10s
+#    address: 0x76
+#    temperature:
+#      name: "$name Temperature"
+#      oversampling: 16x
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 15
+#            send_every: 15
+#    pressure:
+#      name: "$name Pressure"
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 15
+#            send_every: 15
+#    humidity:
+#      name: "$name Humidity"
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 15
+#            send_every: 15
+
+
 
 ### TESTING
 #  - platform: adc
@@ -243,7 +245,7 @@ button:
         id(ld2410_radar) -> ble_control(false);
 
   - platform: template
-    name: "LD2410 Reboot"
+    name: "$name LD2410 Reboot"
     icon: mdi:radar
     entity_category: "config"
     on_press:
@@ -254,9 +256,9 @@ button:
 
   - platform: restart
     icon: mdi:power-cycle
-    name: "ESP Reboot"
+    name: "$name ESP Reboot"
 
   - platform: factory_reset
     disabled_by_default: True
-    name: Factory Reset
+    name: $name Factory Reset
     id: factory_reset_all

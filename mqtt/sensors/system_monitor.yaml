@@ -17,9 +17,9 @@
   - name: ser memory use
     state_topic: "house/system_monitor/servers/ser/memory"
     unit_of_measurement: '%'
-#  - name: ser temperature
-#    state_topic: "house/system_monitor/servers/ser/cputemp"
-#    unit_of_measurement: "°C"
+  - name: ser temperature
+    state_topic: "house/system_monitor/servers/ser/cputemp"
+    unit_of_measurement: "°C"
 
   - name: ngx cpu usage
     state_topic: "house/system_monitor/servers/ngx/cpuload"

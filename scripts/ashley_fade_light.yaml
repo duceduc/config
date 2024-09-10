@@ -13,7 +13,7 @@
           endBrightnessPercent: 0
           autoCancelThreshold: 10
           endBrightnessEntityScale: zeroToTwoFiftyFive
-          minimumStepDelayInMilliseconds: 100
+          minimumStepDelayInMilliseconds: 1000
           isDebugMode: false
           light: '{{ entity_id }}'
           transitionTime:

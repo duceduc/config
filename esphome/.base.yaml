@@ -8,6 +8,7 @@ captive_portal:
 logger:
 #  level: WARN
   baud_rate: 0
+#  hardware_uart: uart0
 
 api:
   encryption:

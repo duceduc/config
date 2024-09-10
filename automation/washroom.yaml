@@ -7,6 +7,8 @@
 - alias: 'motion washroom auto-on'
   mode: parallel
   trigger:
+#    - platform: state 
+#      entity_id: group.motion_showerroom_occupancy
     - platform: template # alt if false positive occurs above
       value_template: |
        {%- set trig = (now() - states.binary_sensor.motion_washroom_sensor_occupancy.last_changed).seconds -%}

@@ -1,32 +1,10 @@
 ###############################################################################
-#   @author         :   Duc Su
-#   @date           :   09/3/2024
-#   @package        :   Flightradar24
-#   @description    :   Tracking aircrafts.
+#   @author          :   Duc Su
+#   @date             :   09/3/2024
+#   @package        :  Flightradar24
+#   @description    :  Tracking aircrafts.
 ###############################################################################
 
-#rest:
-#  scan_interval: 1200
-#  resource: https://api.adsb.lol/v2/reg/NJET
-#  sensor:
-#    - name: njet_adsb
-#      value_template: '{% if value_json.total != 0 %}online{% else %}offline{% endif %}'
-#    - name: njet_flight
-#      value_template: '{{ value_json.ac[0].flight }}'
-#    - name: njet_squawk
-#      value_template: '{{ value_json.ac[0].squawk }}'
-#    - name: njet_emergency
-#      value_template: '{{ value_json.ac[0].emergency }}'
-#    - name: njet_lat
-#      value_template: '{{ value_json.ac[0].lat }}'
-#    - name: njet_lon
-#      value_template: '{{ value_json.ac[0].lon }}'
-#    - name: njet_alt
-#      value_template: '{{ value_json.ac[0].alt_baro }}'
-#    - name: njet_track
-#      value_template: '{{ value_json.ac[0].track }}'
-#    - name: njet_gs
-#      value_template: '{{ value_json.ac[0].gs }}'
 
 
 automation:
@@ -38,14 +16,18 @@ automation:
     action:
       - choose:
           - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|shizuoka|kawasaki|okayama|hiratagakuen|asahi') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - service: notify.amberthebot
                 data_template:
                   message: >-
                     🚁{{ trigger.event.data.airline }} helicopter is flying in your neighborhood.
           - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner') }}"
               - condition: template 
@@ -57,26 +39,47 @@ automation:
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
 
           - conditions:
-              - condition: template # duc is at home
-                value_template: "{{ is_state('person.duc', 'home') }}" #home
               - condition: template
-                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' }}"
+                value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
+              - condition: template 
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
+            sequence:
+              - service: notify.amberthebot
+                data_template:
+                  message: >-
+                    🚁{{ trigger.event.data.airline }} helicopter is flying in your neighborhood.
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
+              - condition: template 
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner') }}"
+              - condition: template 
+                value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none') }}"
+            sequence:
+              - service: notify.amberthebot
+                data_template:
+                  message: >-
+                    ‼️ No flight plan. The aircraft is either private or goverment operated.
+
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
             sequence:
               - service: notify.amberthebot
                 data_template:
                   message: >-
                     📍The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
           - conditions:
-              - condition: template # duc isat jcb
-                value_template: "{{ is_state('person.duc', 'jcb') }}" #jcb
               - condition: template
-                value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' }}"
+                value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
             sequence:
               - service: notify.amberthebot
                 data_template:
                   message: >-
                     💼The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
         default: []
+
+
 
 
   - alias: 'Scheduled flight takes off'

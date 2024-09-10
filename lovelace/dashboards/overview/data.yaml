@@ -285,7 +285,7 @@ cards:
           - entity_1: sensor.ser_memory_use
           - entity_2: sensor.ser_disk_use
           - entity_3: sensor.ser_cpu_usage
-          - entity_4: sensor.ser_clock_speed
+          - entity_4: sensor.ser_temperature
 
       - type: custom:streamline-card
         template: server_tpl
