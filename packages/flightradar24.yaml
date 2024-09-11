@@ -5,8 +5,6 @@
 #   @description    :  Tracking aircrafts.
 ###############################################################################
 
-
-
 automation:
   - alias: 'Flight entry notification'
     trigger:
