@@ -154,14 +154,14 @@
     alias: "Desktop WOL Off"
     sequence:
       - parallel:
-        - service: switch.turn_on
-          data:
-            entity_id: switch.desktop_3l5pa48_shutdown
+#        - service: switch.turn_on
+#          data:
+#            entity_id: switch.desktop_3l5pa48_shutdown
 #Led
-        - service: script.ashley_fadeout
-          data:
-            entity_id: light.pc_desktop_led
-            sec: 70
+#        - service: script.ashley_fadeout
+#          data:
+#            entity_id: light.pc_desktop_led
+#            sec: 70
 #pc room lights
         - condition: template
           value_template: "{{ states('light.computer') == 'on' }}"
@@ -169,8 +169,6 @@
           data:
             entity_id: light.computer
             sec: 70
-
-
 
 
 #  desktop_wol_off:

@@ -4,6 +4,8 @@
 #                                                                                                              
 #########################################################
 
+
+# TESTING.CAN DELETE
   ashley_fadeout:
     sequence:
       - service: script.ashley_fade_light
@@ -20,6 +22,7 @@
             hours: 0
             minutes: 0
             seconds: '{{ sec }}'
+
     mode: parallel
     max: 10
     icon: mdi:lightbulb-on-50

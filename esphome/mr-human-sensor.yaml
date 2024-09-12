@@ -2,8 +2,8 @@
 # https://screek.io/1u
 
 substitutions:
-  name: wr-human-sensor
-  room: wr
+  name: mr-human-sensor
+  room: mr
 
 esphome:
   name: $name
@@ -65,6 +65,13 @@ ota:
 #dashboard_import:
 #  package_import_url: github://screekworkshop/screek-human-sensor/1u/yaml/Screek-Humen-Dectet-1u.yaml@2023.06
 #  import_full_config: False
+
+
+## TEST
+#i2c: # for bme280
+#  sda: GPIO9
+#  scl: GPIO11
+#  scan: true
 
 web_server:
   port: 80
@@ -134,6 +141,43 @@ sensor:
       name: $room Detection Distance
     light:
       name: $room Sun Light
+
+
+
+### TESTING
+#  - platform: bme280_i2c
+#    update_interval: 10s
+#    address: 0x76
+#    temperature:
+#      name: "$name Temperature"
+#      oversampling: 16x
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 15
+#            send_every: 15
+#    pressure:
+#      name: "$name Pressure"
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 15
+#            send_every: 15
+#    humidity:
+#      name: "$name Humidity"
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 15
+#            send_every: 15
+
+
+
+### TESTING
+#  - platform: adc
+#    pin: GPIO5
+#    name: '$name illuminance'
+#    unit_of_measurement: lux
+#    update_interval: 5s
+
+
 
 light:
   - platform: status_led
