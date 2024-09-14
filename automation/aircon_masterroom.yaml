@@ -31,7 +31,7 @@
         entities_toggle: # entities that can mark a room as occupied
         - binary_sensor.mr_moving_target
         entities_keep:
-        - binary_sensor.mr_still_energy        
+        - binary_sensor.mr_presence        
         - input_boolean.masterroom_mcl
 
 - alias: Masterroom Light
