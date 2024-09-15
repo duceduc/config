@@ -3,7 +3,7 @@
 
 substitutions:
   name: mr-human-sensor
-  room: mr
+  room: Mr
 
 esphome:
   name: $name

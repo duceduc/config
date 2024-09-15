@@ -3,8 +3,8 @@
 
 substitutions:
   name: entry-human-sensor
-  hlk1: hallway
-  hlk2: genkan
+  hlk1: Hallway
+  hlk2: Genkan
 
 esphome:
   name: $name
@@ -50,6 +50,8 @@ logger:
 wifi:
   ssid: !secret ssid
   password: !secret ssid_pwd
+  power_save_mode: none
+
 
 captive_portal:
 

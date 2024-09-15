@@ -113,9 +113,9 @@
   motion_showerroom_occupancy:
     name: Motion Shower Room Occupancy
     entities:
-#      - binary_sensor.wr_moving_target
-      - binary_sensor.motion_washroom_sensor_occupancy
-      - binary_sensor.motion_sink_sensor_occupancy
+      - binary_sensor.wr_has_moving_target
+#      - binary_sensor.motion_washroom_sensor_occupancy
+#      - binary_sensor.motion_sink_sensor_occupancy
 
 
   hallway_motion:

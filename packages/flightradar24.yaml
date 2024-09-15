@@ -22,7 +22,7 @@ automation:
               - service: notify.amberthebot
                 data_template:
                   message: >-
-                    📍🚁{{ trigger.event.data.airline }} is flying in your neighborhood.
+                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood.
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
@@ -34,7 +34,7 @@ automation:
               - service: notify.amberthebot
                 data_template:
                   message: >-
-                    📍‼️ No flight plan. The aircraft is either private or goverment operated.
+                    ‼️ No flight plan. The aircraft is either private or goverment operated.
 
           - conditions:
               - condition: template

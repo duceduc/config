@@ -98,7 +98,7 @@
 #          {% endif %}
 
 
-###############
+# CAN DELETE IF USING HUMAN SENSOR
       motion_mr_trigger_on:
         value_template: |
           {% set trig = (now() - states.binary_sensor.aio_trigger_has_moving_target.last_changed).seconds %}
@@ -123,10 +123,9 @@
       sr_occupancy_lights:
         device_class: light
         value_template: |
-          {% if is_state('binary_sensor.sr_sensor_has_still_target', 'on') and
-            is_state('input_boolean.shionroom_mcl', 'off') %} on
-          {% elif is_state('input_boolean.shionroom_mcl', 'on')  or
-            is_state('binary_sensor.motion_sr_auto_on', 'off') %} on
+          {% if is_state('binary_sensor.sr_still_target', 'on') and
+                    is_state('input_boolean.shionroom_mcl', 'off') %} on
+          {% elif is_state('input_boolean.shionroom_mcl', 'on') %} on
           {% elif is_state('binary_sensor.sr_study_occupancy', 'on') %} on
           {% else %} off
           {% endif %}
@@ -135,6 +134,7 @@
           {% else %} mdi:lightbulb-outline
           {% endif %}
 
+# CAN DELETE IF USING HUMAN SENSOR
       motion_sr_trigger_on:
         value_template: |
           {% set trig = (now() - states.binary_sensor.sr_trigger_has_moving_target.last_changed).seconds %}

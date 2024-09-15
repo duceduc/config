@@ -143,12 +143,13 @@
 #
 #########################################################
 
-  desktop_wol_on:
-    alias: "Desktop WOL On"
-    sequence:
-      - service: wake_on_lan.send_magic_packet
-        data:
-          mac: "9C:6B:00:59:D2:6D"
+##CAN DELETE
+#  desktop_wol_on:
+#    alias: "Desktop WOL On"
+#    sequence:
+#      - service: wake_on_lan.send_magic_packet
+#        data:
+#          mac: "9C:6B:00:59:D2:6D"
 
   desktop_wol_off:
     alias: "Desktop WOL Off"
@@ -170,23 +171,13 @@
             entity_id: light.computer
             sec: 70
 
-
-#  desktop_wol_off:
-#    alias: "Desktop WOL Off"
-#    sequence:
-#      - service: switch.turn_on
-#        data:
-#          entity_id: switch.desktop_3l5pa48_shutdown
-#Led
-#      - service: light.turn_off
-#        entity_id: light.pc_desktop_led
-# pc room lights
-#      - condition: template
-#        value_template: "{{ states('light.computer') == 'on' }}"
-#      - service: script.ashley_fadeout
-#        data:
-#          entity_id: light.computer
-#          sec: 70
+  ser8_wol_off:
+    alias: "SER8 WOL Off"
+    sequence:
+      - parallel:
+        - service: switch.turn_on
+          data:
+            entity_id: switch.desktop_g8i0hbj_shutdown
 
 
 #########################################################

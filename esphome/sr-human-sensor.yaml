@@ -2,8 +2,8 @@
 # https://screek.io/1u
 
 substitutions:
-  name: wr-human-sensor
-  room: wr
+  name: sr-human-sensor
+  room: Sr
 
 esphome:
   name: $name
@@ -49,6 +49,7 @@ logger:
 wifi:
   ssid: !secret ssid
   password: !secret ssid_pwd
+  power_save_mode: none # possibly a fix for wifi disconnect indefinately
 
 captive_portal:
 

@@ -47,9 +47,10 @@ cards:
             name: Humidifier
           - entity: switch.sb_humidifier_mode
             name: Humidifier Mode
-
           - entity: switch.jcom_tv
             name: Jcom Tv
+          - entity: switch.ser8
+            name: Ser8
           - entity: switch.desktop
             name: Desktop
 

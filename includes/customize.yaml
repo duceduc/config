@@ -149,6 +149,10 @@ switch.desktop:
   templates:
     icon: if ( state === 'on' ) return 'mdi:monitor-dashboard'; return 'mdi:monitor-off';
 
+switch.ser8:
+  templates:
+    icon: if ( state === 'on' ) return 'mdi:monitor-dashboard'; return 'mdi:monitor-off';
+
 input_select.home_mode:
   templates:
     icon: if ( state === 'Home' ) return 'mdi:home'; if ( state === 'Away' ) return
