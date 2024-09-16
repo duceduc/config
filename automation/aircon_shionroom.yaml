@@ -13,24 +13,21 @@
       id: time
       seconds: '10'
     - platform: state
-      entity_id: binary_sensor.sr_moving_target
+      entity_id: binary_sensor.sr_trigger_has_moving_target
       id: motion
       to: 'on'
   condition:
     - condition: template # disable motion light
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
-    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
-      value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
-
   action:
     - service: python_script.room_occupancy
       data:
         roomname: shionroom
         timeout: 2 # timeout of the room, timer gets set to this
         entities_toggle: # entities that can mark a room as occupied
-        - binary_sensor.sr_moving_target
+        - binary_sensor.sr_trigger_has_moving_target
         entities_keep: # entities that can keep a room occupied
-        - binary_sensor.sr_presence
+        - binary_sensor.sr_trigger_has_target
         - group.bed_sensors
         - input_boolean.shionroom_mcl
 
@@ -65,6 +62,8 @@
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
+      value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
   action:
     - choose:
         - conditions:

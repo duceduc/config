@@ -104,7 +104,7 @@
           {% set trig = (now() - states.binary_sensor.aio_trigger_has_moving_target.last_changed).seconds %}
           {% if is_state("binary_sensor.mr_has_moving_target", "on") and trig <= 10 %} on
           {% elif is_state("binary_sensor.aio_trigger_has_target", "on") or
-                        is_state("binary_sensor.aio_trigger_has_moving_target", "on") %} on
+                       is_state("binary_sensor.aio_trigger_has_moving_target", "on") %} on
           {% else %} off {% endif %}
 
 #          {% set trig = (now() - states.binary_sensor.motion_aio_trigger_occupancy.last_changed).seconds %}
@@ -123,7 +123,7 @@
       sr_occupancy_lights:
         device_class: light
         value_template: |
-          {% if is_state('binary_sensor.sr_still_target', 'on') and
+          {% if is_state('binary_sensor.sr_trigger_has_still_target', 'on') and
                     is_state('input_boolean.shionroom_mcl', 'off') %} on
           {% elif is_state('input_boolean.shionroom_mcl', 'on') %} on
           {% elif is_state('binary_sensor.sr_study_occupancy', 'on') %} on
@@ -141,7 +141,7 @@
           {% if is_state("binary_sensor.sr_sensor_has_moving_target", "on") and trig <= 10 %} on
           {% elif is_state("binary_sensor.sr_study_occupancy", "on") %} on
           {% elif is_state("binary_sensor.sr_trigger_has_target", "on") or
-                        is_state("binary_sensor.sr_trigger_has_moving_target", "on") %} on
+                       is_state("binary_sensor.sr_trigger_has_moving_target", "on") %} on
           {% else %} off {% endif %}
 
 

@@ -8,7 +8,8 @@
   mode: parallel
   trigger:
     - platform: state 
-      entity_id: group.motion_showerroom_occupancy
+      entity_id: group.motion_showerroom_occupancy, binary_sensor.wr_has_target
+      to: 'on'
 #    - platform: template # alt if false positive occurs above
 #      value_template: |
 #       {%- set trig = (now() - states.binary_sensor.motion_washroom_sensor_occupancy.last_changed).seconds -%}
@@ -53,9 +54,9 @@
   mode: parallel
   trigger:
     - platform: state
-      entity_id: group.motion_showerroom_occupancy
+      entity_id: group.motion_showerroom_occupancy, binary_sensor.wr_has_target
       to: 'off'
-      for: 30
+      for: 20
     - platform: state
       entity_id: light.wash
       to: 'off'

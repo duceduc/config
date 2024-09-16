@@ -49,7 +49,6 @@ logger:
 wifi:
   ssid: !secret ssid
   password: !secret ssid_pwd
-  power_save_mode: none # possibly a fix for wifi disconnect indefinately
 
 captive_portal:
 
