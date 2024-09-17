@@ -335,9 +335,10 @@
 
       - service: script.christmas_lights_on
       - delay: 1
-      - condition: template # Turn on pc/tv only if Duc is home
-        value_template: "{{ is_state('switch.momentary_activate_tv', 'on') }}"
-      - service: script.desktop_wol_on
+      - condition: template # Turn on pc/tv only if Duc is home & pc is not already on
+        value_template: "{{ is_state('switch.momentary_activate_tv', 'on') and is_state('switch.desktop', 'off') }}"
+      - service: switch.turn_on
+        entity_id: switch.desktop
       - condition: template # Is NOT daylight
 #        value_template: "{{ not is_state('sensor.period_of_the_day', 'daylight') }}"
         value_template: "{{ is_state('binary_sensor.evening', 'on') }}"

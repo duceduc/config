@@ -13,7 +13,7 @@
       id: time
       seconds: '10'
     - platform: state
-      entity_id: binary_sensor.sr_trigger_has_moving_target
+      entity_id: binary_sensor.sr_moving_target
       id: motion
       to: 'on'
   condition:
@@ -25,9 +25,9 @@
         roomname: shionroom
         timeout: 2 # timeout of the room, timer gets set to this
         entities_toggle: # entities that can mark a room as occupied
-        - binary_sensor.sr_trigger_has_moving_target
+        - binary_sensor.sr_moving_target
         entities_keep: # entities that can keep a room occupied
-        - binary_sensor.sr_trigger_has_target
+        - binary_sensor.sr_presence
         - group.bed_sensors
         - input_boolean.shionroom_mcl
 

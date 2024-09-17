@@ -27,7 +27,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner') }}"
               - condition: template 
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
             sequence:

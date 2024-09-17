@@ -3,7 +3,6 @@ substitutions:
   name: sr-trigger
   upper: SR Trigger
   lower: sr trigger
-  ssid: !secret ssid2
 
 packages:
   ld2410: !include components/ld2410.yaml

@@ -1,13 +1,13 @@
 #########################################################
-#                                                                                                              
-#             Washroom                                                                                   
-#                                                                                                              
+#
+#             Washroom
+#
 #########################################################
 
 - alias: 'motion washroom auto-on'
   mode: parallel
   trigger:
-    - platform: state 
+    - platform: state
       entity_id: group.motion_showerroom_occupancy, binary_sensor.wr_has_target
       to: 'on'
 #    - platform: template # alt if false positive occurs above
@@ -29,7 +29,7 @@
               id: 'sink'
           sequence:
             - condition: template
-              value_template: "{{ not is_state('light.sink_cool', 'on') }}"        
+              value_template: "{{ not is_state('light.sink_cool', 'on') }}"
 #            - service: script.tradfri_transition
 #              data:
 #                entity_id: light.sink_cool
@@ -38,7 +38,7 @@
 #                brightness: 254
 #              entity_id: light.sink_cool
             - service: light.turn_on
-              entity_id: light.sink_cool              
+              entity_id: light.sink_cool
             - service: script.tradfri_transition
               data:
                 entity_id: light.w_4
@@ -54,18 +54,17 @@
   mode: parallel
   trigger:
     - platform: state
-      entity_id: group.motion_showerroom_occupancy, binary_sensor.wr_has_target
+      entity_id: binary_sensor.wr_has_target
       to: 'off'
       for: 20
     - platform: state
       entity_id: light.wash
       to: 'off'
-      for: 20
+      for: 15
       id: sink
   condition:
     - condition: template # disable motion light
-      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"       
-      
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   action:
     - choose:
         - conditions:
@@ -81,7 +80,7 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################
