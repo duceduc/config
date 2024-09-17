@@ -47,7 +47,7 @@ logger:
   hardware_uart: uart0
 
 wifi:
-  ssid: !secret ssid
+  ssid: !secret ssid1
   password: !secret ssid_pwd
 
 captive_portal:
