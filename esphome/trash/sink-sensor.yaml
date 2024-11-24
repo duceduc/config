@@ -1,0 +1,16 @@
+# [40:91:51:4F:89:61]
+substitutions:
+  name: "sink-sensor"
+#  ssid: !secret ssid3
+
+packages:
+  stats: !include components/stats.yaml
+  am312: !include components/am312.yaml
+
+<<: !include .base.yaml #.134
+
+esphome:
+  name: $name
+  platform: ESP8266
+  board: nodemcuv2
+

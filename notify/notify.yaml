@@ -1,0 +1,98 @@
+#########################################################
+#                                                                                                              
+#             Email                                                                                          
+#                                                                                                              
+#########################################################
+
+  - name: home_assistant
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: !secret gmail_email
+    encryption: starttls
+    username: !secret gmail_email
+    password: !secret gmail_pass
+    sender_name: Home Assistant    
+    recipient:
+      - !secret recipient_1
+
+  - name: eri
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: !secret gmail_email
+    encryption: starttls
+    username: !secret gmail_email
+    password: !secret gmail_pass
+    sender_name: Home Assistant    
+    recipient:
+      - !secret recipient_2
+
+  - name: jcb
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: !secret gmail_email
+    encryption: starttls
+    username: !secret gmail_email
+    password: !secret gmail_pass
+    sender_name: Duc Su    
+    recipient:
+      - !secret recipient_3
+
+
+#########################################################
+#                                                                                                              
+#             Social Media                                                                                 
+#                                                                                                              
+#########################################################
+
+# Free Basic 300 msg/ month
+  - name: notify-events # viber
+    platform: notify_events
+
+  - name: amberthebot
+    platform: telegram
+    chat_id: !secret telegram_chatid 
+
+
+#########################################################
+#                                                                                                              
+#             Notification for TTS Service                                                                                 
+#                                                                                                              
+#########################################################
+
+
+
+
+#########################################################
+#                                                                                                              
+#             Misc                                                                                          
+#                                                                                                              
+#########################################################
+
+## Removed. File has it's own integration.
+#  - name: energy_log
+#    platform: file
+#    filename: /config/www/data/csv_logs/energy_log.csv
+#    timestamp: false
+#
+#  - name: fridge_log
+#    platform: file
+#    filename: /config/www/data/csv_logs/fridge_log.csv
+#    timestamp: false
+#
+#  - name: earthquake_log
+#    platform: file
+#    filename: /config/www/data/csv_logs/earthquake_log.csv
+#    timestamp: false
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

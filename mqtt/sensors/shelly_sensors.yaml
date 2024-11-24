@@ -1,0 +1,95 @@
+####################################################
+#                                                                                                    
+#                      SHELLY DOOR SENSORS                                               
+#                                                                                                    
+####################################################
+## upate firmware manually
+## http://archive.shelly-tools.de/ ##
+
+# genkan door sensor [D8BFC01A8C6A] - 192.168.1.82 [batt installed on 2/28/2023]
+# hallway door sensor [D8BFC01A8C33] - 192.168.1.83 [batt installed on 3/3/2022]
+# shion door sensor [483FDA81F69D] - 192.168.1.92  [batt installed on 3/3/2022]
+# master door sensor [483FDA81F97F] - 192.168.1.93
+# shellyem sensor [8CAAB506209A] - 192.168.1.87
+# smart plug sensor [FCF5C4AAF6E1] - 192.168.1.91
+
+# Battery   CONVERTING NOW
+#  - name: "Genkan Door Battery"
+#    state_topic: "shellies/D8BFC01A8C6A/sensor/battery"
+#    value_template: '{{ value|round(0) }}'
+#    qos: 0
+#    unit_of_measurement: "%"
+#    icon: mdi:battery
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  - name: "Hallway Door Battery"
+#    state_topic: "shellies/D8BFC01A8C33/sensor/battery"
+#    value_template: '{{ value|round(0) }}'
+#    qos: 0
+#    unit_of_measurement: "%"
+#    icon: mdi:battery
+
+#  - name: "Master Door Battery"
+#    state_topic: "shellies/483FDA81F97F/sensor/battery"
+#    value_template: '{{ value|round(0) }}'
+#    qos: 0
+#    unit_of_measurement: "%"
+#    icon: mdi:battery
+
+#  - name: "Shion Door Battery"
+#    state_topic: "shellies/483FDA81F69D/sensor/battery"
+#    value_template: '{{ value|round(0) }}'
+#    qos: 0
+#    unit_of_measurement: "%"
+#    icon: mdi:battery
+
+# Temperature
+#  - name: "Genkan Door Temperature"
+#    state_topic: "shellies/D8BFC01A8C6A/sensor/temperature"
+#    value_template: '{{ value|round(1) }}'
+#    qos: 1
+#    unit_of_measurement: "C"
+#    icon: mdi:thermometer
+
+#  - name: "Hallway Door Temperature"
+#    state_topic: "shellies/D8BFC01A8C33/sensor/temperature"
+#    value_template: '{{ value|round(1) }}'
+#    qos: 1
+#    unit_of_measurement: "C"
+#    icon: mdi:thermometer
+
+#  - name: "Master Door Temperature"
+#    state_topic: "shellies/483FDA81F97F/sensor/temperature"
+#    value_template: '{{ value|round(1) }}'
+#    qos: 1
+#    unit_of_measurement: "C"
+#    icon: mdi:thermometer
+
+#  - name: "Shion Door Temperature"
+#    state_topic: "shellies/483FDA81F69D/sensor/temperature"
+#    value_template: '{{ value|round(1) }}'
+#    qos: 1
+#    unit_of_measurement: "C"
+#    icon: mdi:thermometer
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

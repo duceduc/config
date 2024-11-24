@@ -1,0 +1,164 @@
+#########################################################
+#
+#            PRESENCE DETECTION [GEO/BLE]
+#
+#########################################################
+
+
+# Local BLE Detection [Family]
+  - platform: template
+    sensors:
+      duc_presence:
+        friendly_name: 'Duc'
+        device_class: presence
+        value_template: >-
+          {{ is_state('input_boolean.duc_presence', 'on') }}
+        icon_template: >-
+          {% if is_state('binary_sensor.duc_presence','on') %} mdi:home-account
+          {% else %} mdi:home-outline
+          {% endif %}
+
+  - platform: template
+    sensors:
+      duc_presence_alone: # for auto light triggers
+        device_class: presence
+        friendly_name: 'Duc Presence Alone'
+        value_template: "{{ not is_state('device_tracker.ie', 'home') and not is_state('device_tracker.shion', 'home') and is_state('device_tracker.id', 'home' ) }}"
+        icon_template: >-
+          {% if is_state('binary_sensor.duc_presence_alone','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+
+      eri_presence:
+        friendly_name: 'Eri'
+        device_class: presence
+        value_template: >-
+          {{ is_state('input_boolean.eri_presence', 'on') }}
+        icon_template: >-
+          {% if is_state('binary_sensor.eri_presence','on') %} mdi:home-account
+          {% else %} mdi:home-outline
+          {% endif %}
+
+      shion_presence:
+        friendly_name: 'Shion'
+        device_class: presence
+        value_template: >-
+          {{ is_state('input_boolean.shion_presence', 'on') }}
+        icon_template: >-
+          {% if is_state('binary_sensor.shion_presence','on') %} mdi:home-account
+          {% else %} mdi:home-outline
+          {% endif %}
+
+# Local BLE Detection [Guest]
+  - platform: template
+    sensors:
+      sachiko_presence:
+        device_class: presence
+        friendly_name: 'Sachiko'
+        value_template: >-
+          {{ is_state('input_boolean.sachiko_presence', 'on') }}
+        icon_template: >-
+          {% if is_state('binary_sensor.sachiko_presence','on') %} mdi:home-account
+          {% else %} mdi:home-outline
+          {% endif %}
+
+  - platform: template
+    sensors:
+      tomokun_presence:
+        device_class: presence
+        friendly_name: 'Tomokun'
+        value_template: >-
+          {{ is_state('input_boolean.tomokun_presence', 'on') }}
+        icon_template: >-
+          {% if is_state('binary_sensor.tomokun_presence','on') %} mdi:home-account
+          {% else %} mdi:home-outline
+          {% endif %}
+
+#########################################################
+#
+#            ROOM HUMAN PRESENCE
+#
+#########################################################
+
+  - platform: template
+    sensors:
+      mr_occupancy_lights:
+        device_class: light
+        value_template: |
+          {% if is_state('binary_sensor.mr_still_target', 'on') and
+                 is_state('input_boolean.masterroom_mcl', 'off') %} on
+          {% elif is_state('input_boolean.masterroom_mcl', 'on') %} on
+          {% else %} off
+          {% endif %}
+        icon_template: |
+          {% if is_state('binary_sensor.mr_occupancy_lights','on') %} mdi:lightbulb
+          {% else %} mdi:lightbulb-outline
+          {% endif %}
+
+#        value_template: |
+#          {% if is_state('binary_sensor.mr_has_still_target', 'on') and
+#            is_state('input_boolean.masterroom_mcl', 'off') %} on
+#          {% elif is_state('binary_sensor.aio_trigger_has_still_target', 'on') %} on
+#          {% elif is_state('input_boolean.masterroom_mcl', 'on') %} on
+#          {% else %} off
+#          {% endif %}
+#        icon_template: |
+#          {% if is_state('binary_sensor.mr_occupancy_lights','on') %} mdi:lightbulb
+#          {% else %} mdi:lightbulb-outline
+#          {% endif %}
+
+
+# CAN DELETE IF USING HUMAN SENSOR
+#      motion_mr_trigger_on:
+#        value_template: |
+#          {% set trig = (now() - states.binary_sensor.aio_trigger_has_moving_target.last_changed).seconds %}
+#          {% if is_state("binary_sensor.mr_has_moving_target", "on") and trig <= 10 %} on
+#          {% elif is_state("binary_sensor.aio_trigger_has_target", "on") or
+#                       is_state("binary_sensor.aio_trigger_has_moving_target", "on") %} on
+#          {% else %} off {% endif %}
+
+#          {% set trig = (now() - states.binary_sensor.motion_aio_trigger_occupancy.last_changed).seconds %}
+#          {% if is_state("binary_sensor.mr_has_moving_target", "on") and trig <= 10 %} on
+#          {% elif is_state("binary_sensor.motion_aio_trigger_occupancy", "on") %} on
+#          {% else %} off {% endif %}
+
+# binary_sensor.sr_has_still_target
+# binary_sensor.sr_has_moving_target
+
+# binary_sensor.sr_sensor_has_still_target
+# binary_sensor.sr_sensor_has_moving_target
+
+  - platform: template
+    sensors:
+      sr_occupancy_lights:
+        device_class: light
+        value_template: |
+          {% if is_state('binary_sensor.sr_still_target', 'on') or 
+                   is_state('binary_sensor.sr_has_still_target', 'on') and
+                   is_state('input_boolean.shionroom_mcl', 'off') %} on
+          {% elif is_state('input_boolean.shionroom_mcl', 'on') %} on
+          {% elif is_state('binary_sensor.sr_study_occupancy', 'on') %} on
+          {% else %} off
+          {% endif %}
+        icon_template: |
+          {% if is_state('binary_sensor.sr_occupancy_lights','on') %} mdi:lightbulb
+          {% else %} mdi:lightbulb-outline
+          {% endif %}
+
+# CAN DELETE IF USING HUMAN SENSOR
+#      motion_sr_trigger_on:
+#        value_template: |
+#          {% set trig = (now() - states.binary_sensor.sr_trigger_has_moving_target.last_changed).seconds %}
+#          {% if is_state("binary_sensor.sr_sensor_has_moving_target", "on") and trig <= 10 %} on
+#          {% elif is_state("binary_sensor.sr_study_occupancy", "on") %} on
+#          {% elif is_state("binary_sensor.sr_trigger_has_target", "on") or
+#                       is_state("binary_sensor.sr_trigger_has_moving_target", "on") %} on
+#          {% else %} off {% endif %}
+
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################

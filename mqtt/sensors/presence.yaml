@@ -1,0 +1,229 @@
+####################################################
+#                                                                                                    
+#            PRESENCE/RSSI - GENKAN                                                      
+#                                                                                                    
+####################################################
+
+# Duc
+  - name: 'iD Genkan'
+    state_topic: 'monitor/genkan/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - name: 'iE Genkan'
+    state_topic: 'monitor/genkan/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - name: 'iS Genkan'
+    state_topic: 'monitor/genkan/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - name: 'iSp Genkan'
+    state_topic: 'monitor/genkan/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - name: 'tms Genkan'
+    state_topic: 'monitor/genkan/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Sachiko
+  - name: 'Sachiko Genkan'
+    state_topic: 'monitor/genkan/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Tomokun
+  - name: 'Tomokun Genkan'
+    state_topic: 'monitor/genkan/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+####################################################
+#                                                                                                    
+#            PRESENCE/RSSI - SHION ROOM                                               
+#                                                                                                    
+####################################################
+
+# Duc
+  - name: 'iD Shionroom'
+    state_topic: 'monitor/shionroom/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - name: 'iE Shionroom'
+    state_topic: 'monitor/shionroom/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - name: 'iS Shionroom'
+    state_topic: 'monitor/shionroom/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - name: 'iSp Shionroom'
+    state_topic: 'monitor/shionroom/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - name: 'tms Shionroom'
+    state_topic: 'monitor/shionroom/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Sachiko
+  - name: 'Sachiko Shionroom'
+    state_topic: 'monitor/shionroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Tomokun
+  - name: 'Tomokun Shionroom'
+    state_topic: 'monitor/shionroom/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+
+####################################################
+#                                                                                                    
+#            PRESENCE/RSSI - MASTER ROOM                                               
+#                                                                                                    
+####################################################
+
+# Duc
+  - name: 'iD Masterroom'
+    state_topic: 'monitor/masterroom/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Eri
+  - name: 'iE Masterroom'
+    state_topic: 'monitor/masterroom/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - name: 'iS Masterroom'
+    state_topic: 'monitor/masterroom/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - name: 'iSp Masterroom'
+    state_topic: 'monitor/masterroom/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - name: 'tms Masterroom'
+    state_topic: 'monitor/masterroom/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Sachiko
+  - name: 'Sachiko Masterroom'
+    state_topic: 'monitor/masterroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Tomokun
+  - name: 'Tomokun Masterroom'
+    state_topic: 'monitor/masterroom/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+
+####################################################
+#                                                                                                    
+#            PRESENCE/RSSI - LIVINGROOM                                               
+#                                                                                                    
+####################################################
+
+# Duc
+  - name: 'iD Livingroom'
+    state_topic: 'monitor/livingroom/id'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+ 
+# Eri
+  - name: 'iE Livingroom'
+    state_topic: 'monitor/livingroom/ie'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6
+  - name: 'iS Livingroom'
+    state_topic: 'monitor/livingroom/is'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Shion 6+
+  - name: 'iSp Livingroom'
+    state_topic: 'monitor/livingroom/isp'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Tile Mate
+  - name: 'tms Livingroom'
+    state_topic: 'monitor/livingroom/tms'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Sachiko
+  - name: 'Sachiko Livingroom'
+    state_topic: 'monitor/livingroom/sachiko'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+# Guest Tomokun
+  - name: 'Tomokun Livingroom'
+    state_topic: 'monitor/livingroom/tomokun'
+    value_template: '{{ value_json.confidence }}'
+    unit_of_measurement: '%'
+    icon: mdi:account
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

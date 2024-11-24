@@ -1,0 +1,117 @@
+#########################################################
+#                                                                                                              #
+#             Curtains Node.js                                                                           #
+#                                                                                                              #
+#########################################################
+
+#  - platform: template
+#    covers:
+#      computer_room_curtains:
+#        device_class: curtain
+#        friendly_name: "Computer Room Curtains"
+#        value_template: >-
+#          {% if states('sensor.cr_curtain_left_position')|float(0) < 90 %}
+#            open
+#          {% else %}
+#            closed
+#          {% endif %}
+#        open_cover:
+#          service: script.enable_cr_curtain_tpl
+#          data:
+#            modus: "open"
+#        close_cover:
+#          service: script.enable_cr_curtain_tpl
+#          data:
+#            modus: "close"
+#        stop_cover:
+#          service: script.enable_cr_curtain_tpl
+#          data:
+#            modus: "stop"
+#        set_cover_position:
+#          service: script.enable_cr_curtain_tpl
+#          data_template:
+#            position: "{{ position }}"
+#            modus: "position"
+#        icon_template: >-
+#          {% if is_state('cover.computer_room_curtains', 'open') %}
+#            mdi:blinds-open
+#          {% else %}
+#             mdi:blinds
+#          {% endif %}
+#
+#  - platform: template
+#    covers:
+#      living_room_curtains:
+#        device_class: curtain
+#        friendly_name: "Living Room Curtains"
+#        value_template: >-
+#          {% if states('sensor.lr_curtain_left_position')|float(0) < 90 %}
+#            open
+#          {% else %}
+#            closed
+#          {% endif %}
+#        open_cover:
+#          service: script.enable_lr_curtain_tpl
+#          data:
+#            modus: "open"
+#        close_cover:
+#          service: script.enable_lr_curtain_tpl
+#          data:
+#            modus: "close"
+#        stop_cover:
+#          service: script.enable_lr_curtain_tpl
+#          data:
+#            modus: "stop"
+#        set_cover_position:
+#          service: script.enable_lr_curtain_tpl
+#          data_template:
+#            position: "{{ position }}"
+#            modus: "position"
+#        icon_template: >-
+#          {% if is_state('cover.living_room_curtains', 'open') %}
+#            mdi:blinds-open
+#          {% else %}
+#             mdi:blinds
+#          {% endif %}
+#########################################################
+#                                                                                                              
+#             Combined Curtains /MQTT                                                     
+#                                                                                                              
+#########################################################
+
+# CURRENTLY USING
+#  - platform: template
+#    covers:
+#      fr_curtains:
+#        friendly_name: "Front Room Curtains"
+#        open_cover:
+#          service: script.fr_curtains
+#          data:
+#            modus: "open"
+#        close_cover:
+#          service: script.fr_curtains
+#          data:
+#            modus: "close"
+#        stop_cover:
+#          service: script.fr_curtains
+#          data:
+#            modus: "stop"
+#        set_cover_position:
+#          service: script.fr_curtains_position
+#          data:
+#            position: "{{position}}"
+#        value_template: "{{is_state('sensor.fr_curtains', 'open')}}"
+#        icon_template: >-
+#          {% if is_state('sensor.fr_curtains', 'open') %}
+#            mdi:window-open
+#          {% else %}
+#            mdi:window-closed
+#          {% endif %}
+
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

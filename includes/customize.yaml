@@ -1,0 +1,260 @@
+sensor.hacs:
+  icon: mdi:alpha-c-box
+  hidden: true
+
+sensor.last_alexa:
+  icon: si:amazonalexa
+sensor.home_assistant_v2_db_size_gb:
+  icon: mdi:database
+
+sensor.lr_condensation_chance:
+  friendly_name: Living Room Condensation
+  icon: mdi:weather-rainy
+sensor.sr_condensation_chance:
+  friendly_name: Shion Room Condensation
+  icon: mdi:weather-rainy
+sensor.mr_condensation_chance:
+  friendly_name: Master Room Condensation
+  icon: mdi:weather-rainy
+sensor.mdf_condensation_chance:
+  friendly_name: MDF Condensation
+  icon: mdi:weather-rainy
+sensor.genkan_condensation_chance:
+  friendly_name: Genkan Condensation
+  icon: mdi:weather-rainy
+
+sensor.vj_ssl_cert_expiry:
+  icon: mdi:file-certificate
+sensor.mqtt_ssl_cert_expiry:
+  icon: mdi:file-certificate
+sensor.ha_ssl_cert_expiry:
+  icon: mdi:file-certificate
+
+sensor.lr_radar_illuminance:
+  friendly_name: Rear illuminance
+sensor.ikea_pm25:
+  friendly_name: Air Quality
+
+# Don't change these names. it's using name as light entity
+binary_sensor.master_clo_door_contact:
+  friendly_name: master_closet
+binary_sensor.storage_door_contact:
+  friendly_name: storage
+
+sensor.desktop_3l5pa48_cputemperature:
+  unit_of_measurement: '°C'
+
+group.wakeuplight:
+  name: Wakeup Light
+  control: hidden
+
+group.bed_sensors:
+  device_class: problem
+switch.ceiling_fan_summer:
+  friendly_name: Ceiling Fan Summer
+  assumed_state: false
+switch.ceiling_fan_winter:
+  friendly_name: Ceiling Fan Winter
+switch.ceiling_fanlight:
+  friendly_name: Ceiling Fan & Lights
+switch.ceiling_fan_lights_only:
+  friendly_name: Ceiling Fan Lights Only
+switch.ceiling_fan_only:
+  friendly_name: Ceiling Fan Only
+switch.yuasa_fan:
+  friendly_name: Fan
+switch.yuasa_fan_spd:
+  friendly_name: Fan Speed
+switch.yuasa_fan_mde:
+  friendly_name: Fan Mode
+switch.yuasa_fan_timer:
+  friendly_name: Fan Timer
+switch.ac_lr_unit:
+  friendly_name: AC Living Room
+switch.ac_ctrl_lr_unit:
+  friendly_name: AC Living Room Ctrl
+switch.heater_lr_unit:
+  friendly_name: Heater Living Room
+  icon: mdi:power
+  assumed_state: false
+switch.heater_ctrl_lr_unit:
+  friendly_name: Heater Living Room Ctrl
+switch.humidifier_lr_unit:
+  friendly_name: Humidifier Living Room
+  icon: mdi:power
+  assumed_state: false
+switch.humidifier_ctrl_lr_unit:
+  friendly_name: Humidifier Living Room Ctrl
+switch.ac_mr_unit:
+  friendly_name: AC Master Room
+  icon: mdi:power
+  assumed_state: false
+switch.heater_mr_unit:
+  friendly_name: Heater Master Room
+  icon: mdi:power
+  assumed_state: false
+switch.humidifier_mr_unit:
+  friendly_name: Humidifier Master Room
+  icon: mdi:power
+  assumed_state: false
+switch.ac_sr_unit:
+  friendly_name: AC Shion Room
+switch.heater_sr_unit:
+  friendly_name: Heater Shion Room
+switch.humidifier_sr_unit: # switch yaml in rm32 file which is fake.
+  friendly_name: Humidifier Shion Room
+switch.tv_power:
+  friendly_name: TV Power
+  assumed_state: false
+switch.tv_mute:
+  friendly_name: TV Mute
+switch.tv_volume:
+  friendly_name: TV Volume
+switch.flush_eco:
+  friendly_name: Flush ECO
+switch.flush_small:
+  friendly_name: Flush Small
+switch.flush_big:
+  friendly_name: Flush Big
+
+switch.heat_water:
+  friendly_name: Heat Toilet Water
+
+switch.momentary_presence_monitor:
+  icon: mdi:crosshairs-gps
+switch.momentary_activate_guest:
+  icon: mdi:account
+switch.momentary_activate_tv:
+  icon: mdi:monitor
+
+
+person.duc:
+  entity_picture: /local/img/people/avatar-duc.png
+person.eri:
+  entity_picture: /local/img/people/avatar-eri.png
+person.shion:
+  entity_picture: /local/img/people/avatar-shion.png
+
+cover.fr_curtains:
+  assumed_state: true
+device_tracker.shion:
+  friendly_name: Shion
+device_tracker.duc:
+  friendly_name: Duc
+device_tracker.eri:
+  friendly_name: Eri
+
+#########################################################
+#                                                                                                              
+#             Customize UI                                                                                
+#                                                                                                              
+#########################################################
+# https://github.com/Mariusthvdb/custom-ui
+
+switch.desktop:
+  templates:
+    icon: if ( state === 'on' ) return 'mdi:monitor-dashboard'; return 'mdi:monitor-off';
+
+switch.ser8:
+  templates:
+    icon: if ( state === 'on' ) return 'mdi:monitor-dashboard'; return 'mdi:monitor-off';
+
+input_select.home_mode:
+  templates:
+    icon: if ( state === 'Home' ) return 'mdi:home'; if ( state === 'Away' ) return
+      'mdi:home-export-outline'; if ( state === 'Returning' ) return 'mdi:home-import-outline';
+      return 'mdi:beach';
+sensor.n_people_home:
+  templates:
+    icon: if ( state ===  '0' ) return 'mdi:account-off'; if ( state ===  '1' ) return
+      'mdi:account'; if ( state === '2' ) return 'mdi:account-multiple'; if ( state
+      ===  '3' ) return 'mdi:account-group'; return 'mdi:account-multiple-plus';
+
+sensor.toilet:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.hallway:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.security_genkan:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.genkan:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.washroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.kitchen:
+  templates:
+    icon_color: if (state === 'Open') return 'rgb(255, 255, 0)';
+
+sensor.masterroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.shionroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.storageroom:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+sensor.closet:
+  templates:
+    icon_color: if (state === 'On') return 'rgb(255, 255, 0)';
+
+
+#sensor.pollen_tree:
+#  templates:
+#    icon_color: if ( state ===  '0' ) return 'rgb(178, 244, 187)';
+#     if ( state === '1' ) return 'rgb(115, 223, 130)';
+#     if ( state === '2' ) return 'rgb(72, 192, 89)';
+#     if ( state === '3' ) return 'rgb(55, 175, 72)';
+#     if ( state === '4' ) return 'rgb(44, 188, 65)';
+#     if ( state === '5' ) return 'rgb(27, 157, 44)';
+#
+#sensor.pollen_weed:
+#  templates:
+#    icon_color: if ( state ===  '0' ) return 'rgb(178, 244, 187)';
+#     if ( state === '1' ) return 'rgb(115, 223, 130)';
+#     if ( state === '2' ) return 'rgb(72, 192, 89)';
+#     if ( state === '3' ) return 'rgb(55, 175, 72)';
+#     if ( state === '4' ) return 'rgb(44, 188, 65)';
+#     if ( state === '5' ) return 'rgb(27, 157, 44)';
+#
+#sensor.pollen_grass:
+#  templates:
+#    icon_color: if ( state ===  '0' ) return 'rgb(178, 244, 187)';
+#     if ( state === '1' ) return 'rgb(115, 223, 130)';
+#     if ( state === '2' ) return 'rgb(72, 192, 89)';
+#     if ( state === '3' ) return 'rgb(55, 175, 72)';
+#     if ( state === '4' ) return 'rgb(44, 188, 65)';
+#     if ( state === '5' ) return 'rgb(27, 157, 44)';
+
+
+sensor.sniffer0_pm_2_5_aqi:
+  friendly_name: Kitchen
+  templates:
+    icon_color: >
+     if ( state <  51 ) return 'RGB(3, 169, 245)';
+     if ( state < 101 ) return 'RGB(16, 128, 8)';    
+     if ( state < 201 ) return 'RGB(240, 240, 10)';
+     if ( state < 351 ) return 'RGB(221, 156, 72)';
+     if ( state > 350 ) return 'RGB(252, 88, 18)';
+
+sensor.sniffer1_pm_2_5_aqi:
+  friendly_name: Master
+  templates:
+    icon_color: >
+     if ( state <  51 ) return 'RGB(3, 169, 245)';
+     if ( state < 101 ) return 'RGB(16, 128, 8)';    
+     if ( state < 201 ) return 'RGB(240, 240, 10)';
+     if ( state < 351 ) return 'RGB(221, 156, 72)';
+     if ( state > 350 ) return 'RGB(252, 88, 18)';

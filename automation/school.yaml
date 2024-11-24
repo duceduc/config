@@ -1,0 +1,119 @@
+#########################################################
+#
+#             School
+#
+#########################################################
+# Set time for pickup
+  - alias: School today
+    initial_state: true
+    triggers:
+      - trigger: time
+        at: '05:00:00'
+    conditions:
+      - condition: and
+        conditions:
+          - condition: template
+            value_template: >
+              {%- if as_timestamp(strptime(state_attr('calendar.shion_school', 'start_time'), '%Y-%m-%d %H:%M:%S')) | timestamp_custom("%Y-%m-%d") == now().strftime("%Y-%m-%d") %}
+                true
+              {%- endif -%}
+          - condition: template
+            value_template: "{{ states('sensor.holiday') == 'none' }}"
+    actions:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >
+                  {{ 'home school' in states('sensor.school_event') }}
+            sequence:
+              - action: input_boolean.turn_on
+                entity_id: input_boolen.school_early_release
+              - action: input_datetime.set_datetime
+                target:
+                  entity_id: input_datetime.school_day_end
+                data:
+                  time: "15:15:00"
+        default:
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.school_day_end
+            data:
+              time: "18:15:00"
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.school_today
+          - action: script.turn_on
+            entity_id: script.school_in_session
+
+
+
+#########################################################
+#
+#             Shion Bedtime Announcement
+#
+#########################################################
+
+  - alias: Shion Night Briefing
+    triggers:
+      - trigger: time
+        at: input_datetime.shion_school_bedtime
+        id: school_night
+      - trigger: time
+        at: input_datetime.shion_bedtime_holiday
+        id: no_school
+    conditions:
+      - condition: state
+        entity_id: input_boolean.shion_awake
+        state: 'on'
+    actions:
+      - choose:
+          - conditions:
+            - condition: state
+              entity_id: sensor.school_tomorrow
+              state: 'on'
+            - condition: trigger
+              id: school_night
+            sequence:
+              - action: script.turn_on
+                target:
+                  entity_id: script.shion_nightly_briefing
+          - conditions:
+            - condition: state
+              entity_id: sensor.school_tomorrow
+              state: 'off'
+            - condition: trigger
+              id: no_school
+            sequence:
+              - action: script.turn_on
+                target:
+                  entity_id: script.shion_nightly_briefing
+        default: []
+  - alias: set shion nightly bedtime time
+    triggers:
+      - trigger: time
+        at: '18:30:00'
+    actions:
+      - action: input_datetime.set_datetime
+        entity_id: input_datetime.shion_nightly_report
+        data:
+          time: >
+            {% if is_state('sensor.school_tomorrow', 'on') or
+            is_state('sensor.school_event', 'school off') %}
+              21:00
+            {% else %}
+              21:30
+            {% endif %}
+#      - action: >
+#          {% if is_state('sensor.school_tomorrow', 'on') or
+#          not is_state('sensor.holidaytomorrow', 'none') %}
+#            input_boolean.turn_on
+#          {% else %}
+#            input_boolean.turn_off
+#          {% endif %}
+#        entity_id: input_boolean.wakeup
+
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

@@ -1,0 +1,97 @@
+#########################################################
+#
+#             Washroom
+#
+#########################################################
+
+- alias: 'motion washroom auto-on'
+  mode: parallel
+  triggers:
+    - trigger: state
+      entity_id: group.motion_showerroom_occupancy
+      from: 'off'
+      to: 'on'
+#    - trigger: template # alt if false positive occurs above
+#      value_template: |
+#       {%- set trig = (now() - states.binary_sensor.motion_washroom_sensor_occupancy.last_changed).seconds -%}
+#       {% if is_state('group.motion_showerroom_occupancy', 'on') and trig <= 300 %} true
+#       {% else %} false {% endif %}
+    - trigger: state
+      entity_id: light.laundry
+      to: 'on'
+      id: 'laundry'
+    - trigger: state
+      entity_id: binary_sensor.washer_door_button
+      to: 'on'
+      id: 'shower'
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'laundry'
+          sequence:
+            - condition: template
+              value_template: "{{ not is_state('light.sink', 'on') }}"
+#            - action: script.tradfri_transition
+#              data:
+#                entity_id: light.sink
+#                color_temp: 153 # white color
+#                transition: 2
+#                brightness: 254
+#              entity_id: light.sink
+            - action: light.turn_on
+              entity_id: light.sink, light.vanity
+
+
+#            - action: script.tradfri_transition
+#              data:
+#                entity_id: light.w_4
+#                color_temp: 370 # beige color
+#                transition: 2
+#                brightness: 254
+#              entity_id: light.w_4
+
+        - conditions:
+            - condition: trigger
+              id: 'shower'
+          sequence:
+            - action: light.toggle
+              entity_id: light.shower
+      default:
+        - action: light.turn_on
+          entity_id: light.laundry
+
+
+- alias: 'motion washroom auto-off'
+  mode: parallel
+  triggers:
+    - trigger: state
+      entity_id: group.motion_showerroom_occupancy, binary_sensor.wr_has_target
+      to: 'off'
+      for: 25
+    - trigger: state
+      entity_id: light.laundry
+      to: 'off'
+      for: 15
+      id: laundry
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'laundry'
+          sequence:
+            - action: light.turn_off
+              entity_id: light.sink, light.vanity
+      default:
+        - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
+          entity_id: light.laundry
+
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################

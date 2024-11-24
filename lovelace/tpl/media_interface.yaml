@@ -1,0 +1,492 @@
+# lovelace_gen
+
+        type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: conditional
+                conditions:
+                  - entity: sensor.template_selected_audio_media_device_state
+                    state_not: playing
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      entity: input_select.audio_media_player_select
+                      show_state: false
+                      name: Local Music
+                      icon: mdi:music
+                      tap_action:
+                        action: call-service
+                        service: input_select.select_option
+                        service_data:
+                          option: Plex
+                          entity_id: input_select.audio_media_player_select
+                      styles:
+                        name:
+                          - justify-self: middle
+                          - font-weight: bold
+                          - font-size: 14px
+                          - color: |
+                              [[[
+                                if (entity.state == 'Plex')
+                                  return '#dddddd';
+                                else 
+                                  return '#56819F';
+                              ]]]
+                        card:
+                          - height: 70px
+                          - background-color: |
+                              [[[
+                                if (entity.state == 'Plex')
+                                  return '#56819F';
+                                else 
+                                  return '';
+                              ]]]
+                        icon:
+                          - color: |
+                              [[[
+                                if (entity.state == 'Plex')
+                                  return '#dddddd';
+                                else 
+                                  return '#56819F';
+                              ]]]
+                    - type: custom:button-card
+                      entity: input_select.audio_media_player_select
+                      show_state: false
+                      name: Online Radio
+                      icon: mdi:radio
+                      tap_action:
+                        action: call-service
+                        service: input_select.select_option
+                        service_data:
+                          option: Webradio
+                          entity_id: input_select.audio_media_player_select
+                      styles:
+                        name:
+                          - justify-self: middle
+                          - font-weight: bold
+                          - font-size: 14px
+                          - color: |
+                              [[[
+                                if (entity.state == 'Webradio')
+                                  return '#dddddd';
+                                else 
+                                  return '#56819F';
+                              ]]]
+                        card:
+                          - height: 70px
+                          - background-color: |
+                              [[[
+                                if (entity.state == 'Webradio')
+                                  return '#56819F';
+                                else 
+                                  return '';
+                              ]]]
+                        icon:
+                          - color: |
+                              [[[
+                                if (entity.state == 'Webradio')
+                                  return '#dddddd';
+                                else 
+                                  return '#56819F';
+                              ]]]
+                    - type: custom:button-card
+                      entity: input_select.audio_media_player_select
+                      show_state: false
+                      name: Spotify
+                      icon: mdi:spotify
+                      tap_action:
+                        action: call-service
+                        service: input_select.select_option
+                        service_data:
+                          option: Spotify
+                          entity_id: input_select.audio_media_player_select
+                      styles:
+                        name:
+                          - justify-self: middle
+                          - font-weight: bold
+                          - font-size: 14px
+                          - color: |
+                              [[[
+                                if (entity.state == 'Spotify')
+                                  return '#dddddd';
+                                else 
+                                  return '#56819F';
+                              ]]]
+                        card:
+                          - height: 70px
+                          - background-color: |
+                              [[[
+                                if (entity.state == 'Spotify')
+                                  return '#56819F';
+                                else 
+                                  return '';
+                              ]]]
+                        icon:
+                          - color: |
+                              [[[
+                                if (entity.state == 'Spotify')
+                                  return '#dddddd';
+                                else 
+                                  return '#56819F';
+                              ]]]
+
+          - type: conditional
+            conditions:
+              - entity: input_select.audio_media_player_select
+                state: Plex
+              - entity: sensor.template_selected_audio_media_device_state
+                state_not: playing
+            card:
+              type: entities
+              entities:
+                - entity: input_select.plex_playlist_select
+                  name: Choose Playlist
+          - type: conditional
+            conditions:
+              - entity: input_select.audio_media_player_select
+                state: Webradio
+              - entity: sensor.template_selected_audio_media_device_state
+                state_not: playing
+            card:
+              type: entities
+              entities:
+                - entity: input_select.webradio_select
+                  name: Choose Station
+          - type: conditional
+            conditions:
+              - entity: input_select.audio_media_player_select
+                state: Spotify
+              - entity: sensor.template_selected_audio_media_device_state
+                state_not: playing
+            card:
+              type: entities
+              entities:
+                - entity: input_select.spotify_playlist_select
+                  name: Choose Playlist
+          - type: conditional
+            conditions:
+              - entity: sensor.template_selected_audio_media_device_state
+                state_not: playing
+            card:
+              type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_select.audio_media_device_select
+                  show_state: false
+                  name: Kitchen
+                  icon: mdi:silverware
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    service_data:
+                      option: Kitchen
+                      entity_id: input_select.audio_media_device_select
+                  styles:
+                    name:
+                      - justify-self: middle
+                      - font-weight: bold
+                      - font-size: 14px
+                      - color: |
+                          [[[
+                            if (entity.state == 'Kitchen')
+                              return '#dddddd';
+                            else 
+                              return '#56819F';
+                          ]]]
+                    card:
+                      - height: 70px
+                      - background-color: |
+                          [[[
+                            if (entity.state == 'Kitchen')
+                              return '#56819F';
+                            else 
+                              return '';
+                          ]]]
+                    icon:
+                      - color: |
+                          [[[
+                            if (entity.state == 'Kitchen')
+                              return '#dddddd';
+                            else 
+                              return '#56819F';
+                          ]]]
+                - type: custom:button-card
+                  entity: input_select.audio_media_device_select
+                  show_state: false
+                  name: Computer
+                  icon: mdi:home-floor-0
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    service_data:
+                      option: Computer
+                      entity_id: input_select.audio_media_device_select
+                  styles:
+                    name:
+                      - justify-self: middle
+                      - font-weight: bold
+                      - font-size: 14px
+                      - color: |
+                          [[[
+                            if (entity.state == 'Computer')
+                              return '#dddddd';
+                            else 
+                              return '#56819F';
+                          ]]]
+                    card:
+                      - height: 70px
+                      - background-color: |
+                          [[[
+                            if (entity.state == 'Computer')
+                              return '#56819F';
+                            else 
+                              return '';
+                          ]]]
+                    icon:
+                      - color: |
+                          [[[
+                            if (entity.state == 'Computer')
+                              return '#dddddd';
+                            else 
+                              return '#56819F';
+                          ]]]
+                - type: custom:button-card
+                  entity: input_select.audio_media_device_select
+                  show_state: false
+                  name: Hallway
+                  icon: mdi:home
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    service_data:
+                      option: Hallway
+                      entity_id: input_select.audio_media_device_select
+                  styles:
+                    name:
+                      - justify-self: middle
+                      - font-weight: bold
+                      - font-size: 14px
+                      - color: |
+                          [[[
+                            if (entity.state == 'Hallway')
+                              return '#dddddd';
+                            else 
+                              return '#56819F';
+                          ]]]
+                    card:
+                      - height: 70px
+                      - background-color: |
+                          [[[
+                            if (entity.state == 'Hallway')
+                              return '#56819F';
+                            else 
+                              return '';
+                          ]]]
+                    icon:
+                      - color: |
+                          [[[
+                            if (entity.state == 'Hallway')
+                              return '#dddddd';
+                            else 
+                              return '#56819F';
+                          ]]]
+          - type: horizontal-stack
+            cards:
+              - type: custom:button-card
+                name: Volume Down
+                icon: mdi:volume-minus
+                color: '#56819F'
+                show_state: true
+                tap_action:
+                  action: call-service
+                  service: script.music_control_decrease_sound_level
+                styles:
+                  card:
+                    - height: 70px
+                  name:
+                    - justify-self: middle
+                    - font-size: 14px
+              - type: custom:button-card
+                entity: input_select.audio_media_device_select
+                show_state: false
+                name: |
+                  [[[
+                    if (states['sensor.template_selected_audio_media_device_state'].state == 'playing')
+                      return 'Stop';
+                    else 
+                      return 'Play';
+                  ]]]
+                icon: |
+                  [[[
+                    if (states['sensor.template_selected_audio_media_device_state'].state == 'playing')
+                      return 'mdi:stop';
+                    else 
+                      return 'mdi:play';
+                  ]]]
+                tap_action:
+                  action: call-service
+                  service: |
+                    [[[
+                      if (states['sensor.template_selected_audio_media_device_state'].state == 'playing')
+                        return 'script.music_control_stop_music';
+                      else 
+                        return 'script.music_control_play_music';
+                    ]]]
+                styles:
+                  name:
+                    - justify-self: middle
+                    - font-size: 14px
+                  card:
+                    - height: 70px
+                  icon:
+                    - color: |
+                        [[[
+                          if (entity.state == 'Plex')
+                            return '#dddddd';
+                          else 
+                            return '#56819F';
+                        ]]]
+              - type: custom:button-card
+                name: Volume Up
+                icon: mdi:volume-plus
+                color: '#56819F'
+                show_state: false
+                tap_action:
+                  action: call-service
+                  service: script.music_control_increase_sound_level
+                styles:
+                  card:
+                    - height: 70px
+                  name:
+                    - justify-self: middle
+                    - font-size: 14px
+              - type: custom:button-card
+                entity: sensor.template_sound_volume_selected_audio_device
+                show_name: false
+                show_state: true
+                icon: |
+                  [[[
+                    if (states['sensor.template_selected_audio_media_device_muted'].state == 'True')
+                      return 'mdi:volume-mute';
+                    if (states['sensor.template_sound_volume_selected_audio_device'].state > 37)
+                      return 'mdi:volume-high'
+                    if (states['sensor.template_sound_volume_selected_audio_device'].state > 17)
+                      return 'mdi:volume-medium'
+                    if (states['sensor.template_sound_volume_selected_audio_device'].state > 0)
+                      return 'mdi:volume-low'
+                    else 
+                      return 'mdi:speaker-off';
+                  ]]]
+                tap_action:
+                  action: call-service
+                  service: script.music_control_mute_unmute_music
+                styles:
+                  card:
+                    - height: 70px
+                    - background-color: '#56819F'
+                  state:
+                    - justify-self: middle
+                    - font-size: 14px
+                    - color: '#dddddd'
+                  icon:
+                    - color: '#dddddd'
+
+          - type: conditional
+            conditions:
+              - entity: input_select.audio_media_player_select
+                state: Spotify
+              - entity: sensor.template_selected_audio_media_device_state
+                state: playing
+            card:
+              type: entities
+              entities:
+                - entity: sensor.spotify_usage_monthy_convert_full
+                  name: Spotify Monthly Played
+                  icon: mdi:spotify
+    
+          - type: conditional
+            conditions:
+              - entity: sensor.template_selected_audio_media_device_state
+                state: playing
+            card:
+              type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  icon: mdi:speaker
+                  show_icon: false
+                  show_state: true
+                  custom_fields:
+                    device: |
+                      [[[
+                        return `${states['input_select.audio_media_device_select'].state}`
+                      ]]]
+                    player: |
+                      [[[
+                        return `${states['input_select.audio_media_player_select'].state}`
+                      ]]]
+                    artist: |
+                      [[[
+                        return `${states['sensor.template_artist_playing'].state}`
+                      ]]]
+                    title: |
+                      [[[
+                        return `${states['sensor.template_title_playing'].state}`
+                      ]]]
+                  styles:
+                    card:
+                      - border-radius: 5px
+                      - padding: 15px
+                      - height: 120px
+                      - color: ivory
+                      - font-size: 18px
+                      - text-shadow: 2px 0px 2px black
+                      - background-repeat: no-repeat
+                      - background-size: 150px
+                      - background-color: '#56819F'
+                      - background-image: |-
+                          [[[
+                            return `url('${states['sensor.template_selected_audio_media_device_picture'].state}')`
+                          ]]]
+                      - background-position: right
+                    grid:
+                      - grid-template-areas: '"player device ." "artist . ." "artist . ." "title . ."'
+                      - grid-template-columns: min-content 1fr 1fr
+                      - grid-template-rows: 1fr 1fr 1fr 1fr
+                    custom_fields:
+                      artist:
+                        - align-self: middle
+                        - justify-self: start
+                        - font-size: 22px
+                      title:
+                        - align-self: middle
+                        - justify-self: start
+                        - font-size: 18px
+                      player:
+                        - align-self: top
+                        - justify-self: start
+                        - font-size: 14px
+                      device:
+                        - align-self: top
+                        - justify-self: start
+                        - font-size: 14px
+                - type: custom:button-card
+                  icon: mdi:skip-next
+                  color: '#56819F'
+                  size: 40px
+                  show_state: false
+                  show_name: false
+                  tap_action:
+                    action: call-service
+                    service: |
+                      [[[
+                        if (states['input_select.audio_media_player_select'].state == 'Spotify')
+                          return 'script.music_control_next_track';
+                        else 
+                          return 'script.music_control_play_music';
+                      ]]]
+                  styles:
+                    card:
+                      - width: 60px
+                      - height: 120px

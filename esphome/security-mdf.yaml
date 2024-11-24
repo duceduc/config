@@ -1,0 +1,84 @@
+# [10:52:1C:62:EC:48]
+substitutions:
+  name: security-mdf
+#  ssid: !secret ssid2
+
+<<: !include .base.yaml #.249
+
+esphome:
+  name: $name
+  platform: esp32
+  board: nodemcu-32s
+
+esp32_camera:
+  name: $name
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+
+# Image settings
+  vertical_flip: false
+  max_framerate: 1 fps
+  resolution: SXGA
+  jpeg_quality: 20
+  contrast: 2
+  saturation: 2
+
+output:
+  - platform: gpio
+    pin:
+      number: GPIO3
+      allow_other_uses: true
+    id: gpio_3
+    
+light:
+  - platform: binary
+    name: $name light  
+    output: gpio_3
+
+
+sensor:
+  - platform: wifi_signal
+    name: '$name wifi signal'
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+
+  - platform: dht
+    model: AM2302
+    update_interval: 15s
+    pin: 
+      number: GPIO3
+      allow_other_uses: true
+
+    temperature:
+      name: "mdf Temperature"
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+    humidity:
+      name: "mdf Humidity"
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+
+binary_sensor:
+  - platform: status
+    name: "$name status"
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart

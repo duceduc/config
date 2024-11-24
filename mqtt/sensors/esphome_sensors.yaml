@@ -1,0 +1,42 @@
+####################################################
+#                                                                                                    
+#                      WIFI Signal                                                                                     
+#                                                                                                    
+####################################################
+
+#  - name: 'Hallway Sensor Wifi Signal'
+#    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+
+#  - name: 'MDF Sensor Wifi Signal'
+#    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+
+####################################################
+#                                                                                                    
+#                      Illuminance                                                                
+#                                                                                                    
+####################################################
+
+#  - name: 'Hallway Illuminance'
+#    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_illuminance/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'lux'
+#    icon: mdi:gamma
+
+#  - name: 'mdf Illuminance'
+#    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_illuminance/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'lux'
+#    icon: mdi:gamma
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

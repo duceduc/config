@@ -1,0 +1,10 @@
+
+sensor:
+  - platform: adc # LDR
+    pin: A0
+    name: '$name illuminance'
+    unit_of_measurement: lux
+    update_interval: 5s
+#    filters:
+#      - lambda: |-
+#          return (x / 10000.0) * 2000000.0;

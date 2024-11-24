@@ -1,0 +1,192 @@
+
+
+  jarvis_voice:
+    name: Jarvis voice
+    options:
+     - Brian
+     - Emma
+     - Raveena
+    initial: Brian
+
+  exercise_select:
+    name: Select a Room
+    icon: mdi:bed-empty
+    options:
+     - Master Room
+     - Computer Room
+     - Shion Room
+     - Living Room
+
+  wakeup_select:
+    name: Select a Room
+    icon: mdi:bed-empty
+    options:
+     - Shion Room
+     - Computer Room
+     - Master Room
+     - Living Room
+     - Hallway
+     - Kitchen
+
+# Alexa Parser..
+  entity_list:
+    name: Entity List
+    options:
+     - switch.ac_lr_unit # 0
+     - switch.ac_mr_unit
+     - switch.ac_sr_unit
+     - sensor.entrance_temperature
+     - sensor.livingroom_temperature
+     - group.bed_sensors #5
+     - sensor.entrance_humidity
+     - sensor.livingroom_humidity
+     - sensor.shionroom_temperature
+     - sensor.shionroom_humidity
+     - sensor.master_temperature #10
+     - sensor.master_humidity
+     - sensor.entry_temperature # need to remove and change order
+     - sensor.entry_humidity # need to remove and change order
+     - sensor.mdf_temperature
+     - sensor.mdf_humidity #15
+     - light.shion
+     - sensor.shion_birthday # need to remove and change order
+     - sensor.ikea_pm25
+     - sensor.carbon_dioxide
+     - sensor.carbon_monoxide #20
+     - sensor.alexa_last_msg
+      
+  speak_list:
+    icon: si:amazonalexa 
+    name: Speak List
+    options:
+     - do not use
+     - The current time is (tt)
+     - The current date is (td)
+     - (e16f) light is at (e16B) % brightness with brightness level set at (e16b)
+     - The (e01f) is turned (e01s)
+     - The (e02f) is turned (e02s)
+     - The current outside temperature is (e03$) degrees and the humidity is (e06$) percent # Outside Temp
+     - The current livingroom temperature is (e04S) and the humidity is (e07S) # Livingroom Temp
+     - The current master room temperature is (e10$) degrees and the humidity is (e11$) # Master Room Temp
+     - The current hallway temperature is (e12$) degrees the humidity is (e13$) percent # Hallway Temp
+     - The current she on room temperature is (e08$) degrees and the humidity is (e09$) percent # Shion Room Temp
+     - The current (e14f) is (e14$) degrees and the humidity is (e15$) percent # MDF Temp
+     - しおんの現在の部屋の温度は (e08$) 度、湿度は (e09$)%です
+     - The (e00f) is turned (e00s)
+     - She on is (e05s) sleeping in his bed
+     - She ons birthday is (e15s) from now
+     - The (e18f) is (e18$) micrograms per cubic meter
+     - The (e19f) is (e19$) parts per million
+     - The (e20f) is (e20$) parts per million
+     - (e21$)
+
+#       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
+
+
+#  sb_humidifier_mode:
+#    name: SB Humidifier Mode
+#    icon: mdi:air-humidifier
+#    options:
+#      - 'Off'
+#      - Auto
+#      -  Low
+#      - Med
+#      - High
+
+
+  lr_ac_mode:
+    name: Livingroom AC Mode
+    icon: mdi:air-conditioner
+    options:
+     - 'Off'
+     - Fan
+     - Ai Auto
+     - Man Auto
+     - Powerful Cool
+     - Normal Cool
+     - Silent Cool
+     - Manual Cool
+     - Powerful Heat
+     - Normal Heat
+     - Silent Heat
+     - Manual Heat
+     - Normal Humidifier
+
+  mr_ac_mode:
+    name: Masterroom AC Mode
+    icon: mdi:air-conditioner
+    options:
+     - 'Off'
+     - Fan
+     - Ai Auto
+     - Man Auto
+     - Powerful Cool
+     - Normal Cool
+     - Silent Cool
+     - Manual Cool
+     - Powerful Heat
+     - Normal Heat
+     - Silent Heat
+     - Manual Heat
+     - Normal Humidifier
+
+  sr_ac_mode:
+    name: Shionroom AC Mode
+    icon: mdi:air-conditioner
+    options:
+     - 'Off'
+     - Fan
+     - Ai Auto
+     - Man Auto
+     - Powerful Cool
+     - Normal Cool
+     - Silent Cool
+     - Manual Cool
+     - Powerful Heat
+     - Normal Heat
+     - Silent Heat
+     - Manual Heat
+     - Normal Humidifier
+  home_mode:
+    name: Home Mode
+    options:
+     - Home
+     - Away
+     - Returning
+     - Vacation
+
+  select_theme:
+    name: Select Theme
+    options:
+     - midnight
+     - default_ha
+
+  duc_destination_waze:
+    name: Duc Destination Waze
+    options: 
+     - home
+     - school
+     - jcb
+     - others
+    initial: jcb  
+
+  eri_destination_waze:
+    name: Eri Destination Waze
+    options: 
+     - home
+     - school
+     - costcokawa
+     - costcokisa
+     - others
+    initial: costcokisa  
+
+  shion_destination_waze:
+    name: Shion Destination Waze
+    options: 
+     - home
+     - school
+     - others
+    initial: school  
+
+
+

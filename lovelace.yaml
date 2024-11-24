@@ -1,0 +1,94 @@
+#########################################################
+#
+#             Resources
+#
+#########################################################
+
+    mode: yaml
+    resources:
+      - url: /local/lovelace/css/styles.css?v=1.0.0
+        type: css
+      - url: /local/lovelace/css/fontstyle.css
+        type: css
+      - url: /local/custom_ui/card-mod.js?v=3.2.2
+        type: module
+      - url: /local/custom_ui/fold-entity-row.js
+        type: module
+      - url: /local/custom_ui/custom-header.js
+        type: module
+      - url: /local/custom_ui/stack-in-card.js
+        type: module
+      - url: /local/custom_ui/bar-card.js
+        type: module
+      - url: /local/custom_ui/custom-ui.js?v=20240118
+        type: module
+      - url: /local/custom_ui/config-template-card.js?v=1.3.6
+        type: module
+      - url: /local/custom_ui/card-tools.js?v=2.1.2
+        type: module
+      - url: /local/custom_ui/ha-sankey-chart.js?v=1.13.0
+        type: module
+      - url: /local/custom_ui/hui-element.js?v=1.0
+        type: module
+      - url: /local/custom_ui/mini-graph-card-bundle.js?v=0.11
+        type: module
+      - url: /local/custom_ui/lunar-phase-card.js?v=1.0.0
+        type: module
+
+      - url: /local/custom_ui/streamline-card.js?v=2
+        type: module
+
+      - url: /local/custom_ui/button-card.js
+        type: module
+      - url: /local/custom_ui/layout-card.js
+        type: module
+      - url: /local/custom_ui/my-slider-v2.js
+        type: module
+      - url: /local/custom_ui/weather-card.js
+        type: module
+      - url: /local/custom_ui/honeycomb-menu.js?v=0.12.3
+        type: module
+      - url: /local/custom_ui/vertical-stack-in-card.js
+        type: js
+      - url: /local/custom_ui/floorplan.js
+        type: js
+      - url: /local/custom_ui/auto-entities.js?v=1.0.0
+        type: js
+
+      - url: https://fonts.googleapis.com/css2?family=Noto+Color+Emoji # for qlm
+        type: css
+      - url: https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap # for lcars
+        type: css
+      - url: /local/community/lcars.jsv=1
+        type: js
+
+#########################################################
+#
+#             Dashboards
+#
+#########################################################
+
+
+    dashboards:
+      lovelace-floorplan: # url slug need to contain a hyphen
+        mode: yaml
+        filename: lovelace/dashboards/floorplan/ui-floorplan.yaml
+        title: Floorplan
+        icon: mdi:view-dashboard
+        show_in_sidebar: true
+
+      ui-lcars: # url slug need to contain a hyphen
+        mode: yaml
+        filename: lovelace/dashboards/lcars/ui-lcars.yaml
+        title: Lcars
+        icon: mdi:view-dashboard
+        show_in_sidebar: false
+
+      quick-look-mobile-dashboard:
+        mode: yaml
+        title: Quick Look Mobile
+        icon: mdi:cellphone
+        show_in_sidebar: true
+        filename: lovelace/dashboards/quick_look_mobile/qlm.yaml
+
+

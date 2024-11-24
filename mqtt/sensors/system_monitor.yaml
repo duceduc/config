@@ -1,0 +1,129 @@
+####################################################
+#                                                                                                    
+#                      RPI MQTT Monitor                                                           
+#                                                                                                    
+####################################################
+# https://github.com/hjelev/rpi-mqtt-monitor
+
+  - name: ser cpu usage
+    unique_id: 48fa15af-f78f-4973-a885-976a6ac6f071
+    state_topic: "house/system_monitor/servers/ser/cpuload"
+    unit_of_measurement: '%'
+  - name: ser clock speed
+    unique_id: 437c9fd5-fab9-4de2-b5ec-aa21805ee75a
+    state_topic: "house/system_monitor/servers/ser/sys_clock_speed"
+    unit_of_measurement: "MHz"    
+  - name: ser disk use
+    unique_id: 84fbabe2-022b-4389-8a89-23299bbdd556
+    state_topic: "house/system_monitor/servers/ser/diskusage"
+    unit_of_measurement: '%'
+  - name: ser memory use
+    unique_id: da7b88d5-b0a4-4dd4-8b82-27a51ac2a5db
+    state_topic: "house/system_monitor/servers/ser/memory"
+    unit_of_measurement: '%'
+  - name: ser temperature
+    unique_id: 067b98c8-6e82-4ce4-bfea-c917969f676f
+    state_topic: "house/system_monitor/servers/ser/cputemp"
+    unit_of_measurement: "°C"
+
+  - name: ngx cpu usage
+    unique_id: 4be9dd99-0113-4a1b-a14e-f1445eb789cc
+    state_topic: "house/system_monitor/servers/ngx/cpuload"
+    unit_of_measurement: '%'
+  - name: ngx temperature
+    unique_id: fb9d8d2d-3e31-482d-8e7f-8cb82909b04e
+    state_topic: "house/system_monitor/servers/ngx/cputemp"
+    unit_of_measurement: "°C"
+  - name: ngx disk use
+    unique_id: f20cacea-2965-42c3-8f23-d0b6e0d11384
+    state_topic: "house/system_monitor/servers/ngx/diskusage"
+    unit_of_measurement: '%'
+  - name: ngx memory use
+    unique_id: f106e316-9577-4c59-8a27-505ab7e3b1b9
+    state_topic: "house/system_monitor/servers/ngx/memory"
+    unit_of_measurement: '%'
+
+  - name: mediaroomsatellite cpu usage
+    state_topic: "house/system_monitor/servers/mediaroomsatellite/cpuload"
+    unit_of_measurement: '%'
+  - name: mediaroomsatellite temperature
+    state_topic: "house/system_monitor/servers/mediaroomsatellite/cputemp"
+    unit_of_measurement: "°C" 
+  - name: mediaroomsatellite disk use
+    state_topic: "house/system_monitor/servers/mediaroomsatellite/diskusage"
+    unit_of_measurement: '%'
+  - name: mediaroomsatellite memory use
+    state_topic: "house/system_monitor/servers/mediaroomsatellite/memory"
+    unit_of_measurement: '%'
+
+###
+#  - name: rearsatellite cpu usage
+#    state_topic: "house/system_monitor/servers/rearsatellite/cpuload"
+#    unit_of_measurement: '%'
+    
+#  - name: rearsatellite temperature
+#    state_topic: "house/system_monitor/servers/rearsatellite/cputemp"
+#    unit_of_measurement: "°C"
+
+#  - name: rearsatellite disk use
+#    state_topic: "house/system_monitor/servers/rearsatellite/diskusage"
+#    unit_of_measurement: '%'
+    
+#  - name: rearsatellite memory use
+#    state_topic: "house/system_monitor/servers/rearsatellite/memory"
+#    unit_of_measurement: '%'
+
+# Monitor Presense
+  - name: ms1 cpu usage
+    state_topic: "house/system_monitor/servers/ms1/cpuload"
+    unit_of_measurement: '%'
+  - name: ms1 temperature
+    state_topic: "house/system_monitor/servers/ms1/cputemp"
+    unit_of_measurement: "°C"
+  - name: ms1 disk use
+    state_topic: "house/system_monitor/servers/ms1/diskusage"
+    unit_of_measurement: '%'
+  - name: ms1 memory use
+    state_topic: "house/system_monitor/servers/ms1/memory"
+    unit_of_measurement: '%'
+  - name: ms1 wifi strength
+    state_topic: "house/system_monitor/servers/ms1/wifi_signal_dbm"
+    unit_of_measurement: 'dBm'
+
+  - name: ms2 cpu usage
+    state_topic: "house/system_monitor/servers/ms2/cpuload"
+    unit_of_measurement: '%'
+  - name: ms2 temperature
+    state_topic: "house/system_monitor/servers/ms2/cputemp"
+    unit_of_measurement: "°C"
+  - name: ms2 disk use
+    state_topic: "house/system_monitor/servers/ms2/diskusage"
+    unit_of_measurement: '%'
+  - name: ms2 memory use
+    state_topic: "house/system_monitor/servers/ms2/memory"
+    unit_of_measurement: '%'
+  - name: ms2 wifi strength
+    state_topic: "house/system_monitor/servers/ms2/wifi_signal_dbm"
+    unit_of_measurement: 'dBm' 
+ 
+  - name: ms3 cpu usage
+    state_topic: "house/system_monitor/servers/ms3/cpuload"
+    unit_of_measurement: '%'
+  - name: ms3 temperature
+    state_topic: "house/system_monitor/servers/ms3/cputemp"
+    unit_of_measurement: "°C"
+  - name: ms3 disk use
+    state_topic: "house/system_monitor/servers/ms3/diskusage"
+    unit_of_measurement: '%'
+  - name: ms3 memory use
+    state_topic: "house/system_monitor/servers/ms3/memory"
+    unit_of_measurement: '%'
+  - name: ms3 wifi strength
+    state_topic: "house/system_monitor/servers/ms3/wifi_signal_dbm"
+    unit_of_measurement: 'dBm'
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

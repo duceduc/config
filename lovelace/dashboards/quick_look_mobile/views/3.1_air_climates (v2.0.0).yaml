@@ -1,0 +1,233 @@
+title: air_climates
+path: air_climates
+icon: mdi:thermometer
+theme: Quick Look Mobile
+background: 'var(--theme)'
+type: custom:grid-layout
+layout:
+  margin: -0.5vh 1vh 0vh
+  grid-template-columns: auto
+  grid-template-rows: 19.5vh 7.5vh 50vh 4vh 10vh 9vh
+  grid-template-areas: |
+    "header"
+    "subheader"
+    "main"
+    "footer_title"
+    "footer"
+    "menu"
+cards:
+  - type: custom:button-card # HEADER
+    view_layout:
+      grid-area: header
+    template: header
+    variables:
+      view: 'air'
+  - type: custom:button-card # SUBHEADER
+    view_layout:
+      grid-area: subheader
+    template: subheader_1
+    variables:
+      subheader_1_title: Climates #can be changed
+      subheader_1_path: air_climates
+      subheader_2_title: Fans #can be changed
+      subheader_2_path: air_fans
+  - type: custom:layout-card # MAIN
+    view_layout:
+      grid-area: main
+    layout_type: custom:vertical-layout
+    layout:
+      height: 50vh
+      margin: 0vh 0vh 0vh
+      padding: 0vh 0.4vh
+    cards:
+      # This is where you can customize this view to fit your system and devices.
+      - type: custom:button-card # TITLE 01
+        template: title_scrollable
+        variables:
+          title: Aircons
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card # ENTITY 01
+            template: climate
+            variables:
+              entity: climate.lr_ac_mode
+              temperature_unit:
+              input_select: input_select.lr_ac_mode
+              room_temp_target: sensor.livingroom_temperature
+              battery:
+              name: Living
+              expand_to: #required path if climate_expandable template is used
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: climate.mr_ac_mode
+              temperature_unit:
+              input_select: input_select.mr_ac_mode
+              room_temp_target: sensor.master_temperature
+              battery:
+              name: Master
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: climate.sr_ac_mode
+              temperature_unit:
+              input_select: input_select.sr_ac_mode
+              room_temp_target: sensor.shionroom_temperature
+              battery:
+              name: Shion
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity:
+              temperature_unit:
+              temperature:
+              battery:
+              name:
+              expand_to:
+      - type: custom:button-card
+        template: title_scrollable
+        variables:
+          title: Temperatures
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.entrance_temperature
+              temperature_unit:
+              temperature:
+              battery:
+              name: Outside
+              expand_to:
+
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.mdf_temperature
+              temperature_unit:
+              temperature:
+              battery: sensor.meter_battery
+              name: Mdf
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.meter_temperature
+              temperature_unit:
+              temperature:
+              battery: sensor.meter_battery
+              name: Genkan
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.wc_temperature
+              temperature_unit:
+              temperature:
+              battery:
+              name: Wc
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.computerroom_temperature
+              temperature_unit:
+              temperature:
+              battery:
+              name: Computer
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.kitchen_temperature
+              temperature_unit:
+              temperature:
+              battery:
+              name: Kitchen
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.livingroom_temperature
+              temperature_unit:
+              temperature:
+              battery:
+              name: Living
+              expand_to:
+          - type: custom:button-card
+            template: climate
+            variables:
+              entity: sensor.washer_device_temperature
+              temperature_unit:
+              temperature:
+              battery:
+              name: Wash
+              expand_to:
+      - type: custom:button-card
+        template: title_scrollable
+        variables:
+          title: RF Status
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: device
+            variables:
+              entity: remote.rm4_remote
+              temperature_unit:
+              temperature:
+              battery:
+              name: rm4
+              expand_to:
+          - type: custom:button-card
+            template: device
+            variables:
+              entity: remote.rm31_remote
+              temperature_unit:
+              temperature:
+              battery:
+              name: rm31
+              expand_to:
+          - type: custom:button-card
+            template: device
+            variables:
+              entity: remote.rm32_remote
+              temperature_unit:
+              temperature:
+              battery:
+              name: rm32
+              expand_to:
+          - type: custom:button-card
+            template: media
+            variables:
+              entity:
+              temperature_unit:
+              temperature:
+              battery:
+              name:
+              expand_to:
+  - type: custom:button-card # FOOTER TITLE
+    view_layout:
+      grid-area: footer_title
+    template: title_sticky
+    variables:
+      title: 'Weather' #can be changed
+  - type: custom:button-card # FOOTER
+    view_layout:
+      grid-area: footer
+    template: weather_footer
+    variables:
+      entity: weather.my_weather
+  - type: custom:button-card # MENU
+    view_layout:
+      grid-area: menu
+    template: menu
+
+

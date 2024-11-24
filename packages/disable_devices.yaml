@@ -1,0 +1,97 @@
+###############################################################################
+#   @author           :   Duc Su
+#   @date              :   08/14/2022
+#   @package        :   Disable Devices
+#   @description    :   Time sensitive chores arund the house.
+###############################################################################
+
+input_datetime:
+  weekday_disable_internet:
+    name: Weekday Disable Internet
+    has_time: true
+    initial: '21:30'
+
+  weekend_disable_internet:
+    name: Weekend Disable Interent
+    has_time: true
+    initial: '22:30'
+
+command_line:
+#ai3: .163; nes: .102 for laptop use .104  (.104 was .251 [70:66:55:D0:4E:C9])
+  - switch:
+      name: Ai 4
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.163"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.163"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.163"
+      value_template: '{{ value == "1" }}'
+
+  - switch: 
+      name: Desktop Internet
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.112"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.112"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.112"
+      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: iPhoneX
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.101"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.101"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.101"
+      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: iPad # combine portainer & pihole switch
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
+      value_template: '{{ value == "1" }}'
+
+#  - switch:
+#      name: iPad
+#      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
+#      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
+#      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
+#      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: iphone8 # combine portainer & pihole switch
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.220"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.220"
+      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.220"
+      value_template: '{{ value == "1" }}'
+
+
+# pihole testing
+  - switch:
+      name: Pihole Shion NoAccess
+      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'
+      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'
+      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess status'
+      value_template: '{{ value == "1" }}'
+
+  - switch:
+      name: Pihole Shion Novideos
+      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos enable'
+      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos disable'
+      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos status'
+      value_template: '{{ value == "1" }}'
+
+template:
+  - sensor:
+      - name: "Disable Internet"
+        unique_id: 11d5bdca-a931-40b5-8bc0-d68ab00d56e4
+        state: >
+          {% set wend = states('input_datetime.weekend_disable_internet') %}
+          {% set wday = states('input_datetime.weekday_disable_internet') %}
+          {% if states("sensor.date_dayoftheweek").lower() in ["friday", "saturday"] %} {{wend}} {% else %} {{wday}} {% endif %}
+        icon: mdi:clock
+
+
+automation:
+  - alias: disable device internet
+    triggers:
+      - trigger: template
+        value_template: "{{ states('sensor.time') == states('sensor.disable_internet')[0:5] }}"
+    actions:
+      - action: switch.turn_on
+        entity_id: switch.ipad

@@ -1,0 +1,194 @@
+#########################################################
+#                                                                                                              
+#             Telegram PC is on                                                    
+#                                                                                                              
+#########################################################
+
+- alias: Telegram - PC is on
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.duc_presence
+      to: 'off'
+      for: 60
+  conditions:
+    - condition: template # PC left on
+      value_template: "{{ is_state('binary_sensor.desktop_status', 'on') }}"
+  actions:
+    - action: notify.amberthebot
+      data:
+        message: "The PC was left {{ states('binary_sensor.desktop_status') }} and there are {{ states('sensor.n_people_home') }} person at home."
+        data:
+          inline_keyboard:
+          - 'Turn off pc:/turn_off_pc, Leave it:/donothing'
+
+- alias: Telegram - Turn off PC
+  triggers:
+    - trigger: event
+      event_type: telegram_callback
+      event_data:
+        data: '/turn_off_pc'
+  actions:
+    - action: telegram_bot.answer_callback_query
+      data:
+        callback_query_id: '{{ trigger.event.data.id }}'
+        message: 'OK, turning off pc now'
+    - action: telegram_bot.edit_replymarkup
+      data:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        inline_keyboard: []
+    - action: script.desktop_wol_off
+
+
+#########################################################
+#                                                                                                              
+#             Telegram You've got mail                                                   
+#                                                                                                              
+#########################################################
+
+- alias: Telegram - You got mail
+  triggers:
+    - trigger: state
+      entity_id: sensor.lora_mailbox
+      id: mail
+      to: '0xA2B2'
+      for: 3
+    - trigger: state
+      entity_id: sensor.lora_mailbox
+      id: bat
+      to: '0xLBAT'
+      for: 3
+  conditions:
+    - condition: []
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: mail
+          sequence:
+            - action: notify.amberthebot
+              data:
+                message: "You've got mail!"
+                data:
+                  inline_keyboard:
+                  - 'Received:/received, Mute:/donothing'
+        - conditions:
+            - condition: trigger
+              id: bat
+          sequence:
+            - action: script.text_notify
+              data:
+                who: amber
+                title: 'Mailbox'
+                message: "Mailbox battery is low!"
+            - action: python_script.set_state
+              data:
+                entity_id: sensor.lora_mailbox
+                state: received
+
+# sensor.lora_mailbox resets auto resets at midnight
+- alias: Telegram - You got mail received
+  triggers:
+    - trigger: event
+      event_type: telegram_callback
+      event_data:
+        data: '/received'
+  actions:
+    - action: telegram_bot.answer_callback_query
+      data:
+        callback_query_id: '{{ trigger.event.data.id }}'
+        message: 'OK, turning off notification'
+    - action: telegram_bot.edit_replymarkup
+      data:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        inline_keyboard: []
+    - action: python_script.set_state
+      data:
+        entity_id: sensor.lora_mailbox
+        state: received
+    - action: script.mailbox_reset # reset mqtt state or it will never retrigger
+
+
+
+#########################################################
+#                                                                                                              
+#             Global Callback                                                                             
+#                                                                                                              
+#########################################################
+
+# Do Nothing
+- alias: Telegram - Do Nothing
+  triggers:
+    - trigger: event
+      event_type: telegram_callback
+      event_data:
+        data: '/donothing'
+  actions:
+    - action: telegram_bot.answer_callback_query
+      data:
+        callback_query_id: '{{ trigger.event.data.id }}'
+        message: 'OK, no action taken'
+    - action: telegram_bot.edit_replymarkup
+      data:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        inline_keyboard: []
+
+
+#########################################################
+#                                                                                                              
+#             Controllable Devices                                                                       
+#                                                                                                              
+#########################################################
+
+- alias: Control Devices
+  initial_state: 'on'
+  triggers:
+    - trigger: event
+      event_type: telegram_text
+  conditions:
+    - condition: template
+      value_template: >-
+        {%- set text = trigger.event.data.text|lower -%}
+        {%- set text = text.split(' ') -%}
+        {%- if (text[0] == 'turn' or text[0] == 'switch') and (text[1] == 'on' or text[1] == 'off') -%}
+          true
+        {%- endif -%}
+  actions:
+    - action: telegram_bot.send_message
+      data:
+        message: >-
+          {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
+          {%- for entity in states.group.controllable_devices.attributes.entity_id if states[entity.split('.')[0]][entity.split('.')[1]].name|lower == device -%}
+          OK, {{ trigger.event.data.text|lower|replace('turn','turning')|replace('switch','switching') }}.
+          {%- else -%}
+          I'm sorry. I cannot find the device named {{device}} in the house.
+          {%- endfor -%}
+        title: ''
+        target: '{{ trigger.event.data.chat_id }}'
+    - condition: template
+      value_template: >-
+        {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
+        {%- for entity in states.group.controllable_devices.attributes.entity_id if states[entity.split('.')[0]][entity.split('.')[1]].name|lower == device -%}
+        true
+        {%- else -%}
+        false
+        {%- endfor -%}
+    - action: >-
+        {%- set text = trigger.event.data.text|lower -%}
+        {%- set text = text.split(' ') -%}
+        {%- set onoff = text[1] -%}
+        homeassistant.turn_{{onoff}}
+      data:
+        entity_id: >-
+          {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
+          {%- for entity in states.group.controllable_devices.attributes.entity_id if states[entity.split('.')[0]][entity.split('.')[1]].name|lower == device -%}
+          {{ entity }}
+          {%- endfor -%}
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

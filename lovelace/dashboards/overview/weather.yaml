@@ -1,0 +1,169 @@
+####################################################
+#                                                                                                    
+#                    WEATHER VIEW                                                           
+#                                                                                                    
+####################################################
+
+title: Weather
+path: weather
+icon: mdi:weather-partly-snowy-rainy
+# background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+panel: true
+cards:
+
+  - type: custom:layout-card
+    layout_type: horizontal-layout
+    layout:
+      max_cols: 3
+    cards:
+
+      - type: picture-entity
+        title: Camera MDF
+        show_header_toggle: false
+        aspect_ratio: 16x9
+        entity: camera.security_mdf
+        camera_view: live
+
+      - type: picture-entity
+        title: Camera Balcony
+        show_header_toggle: false
+        aspect_ratio: 16x9
+        entity: camera.security_balcony
+        camera_view: live
+
+      - type: custom:hui-element
+        card_type: weather-forecast
+        entity: weather.my_weather
+        forecast_type: daily
+        secondary_info_attribute: humidity
+#        style:
+#            top: 20%
+#            left: 50%
+      - type: custom:weather-card
+        entity: weather.my_weather
+#        style:
+#            top: 65%
+#            left: 50%
+
+
+
+
+
+      - type: entities
+        entities:
+          - sun.sun
+          - entity: sensor.nextsunrise
+            icon: mdi:weather-sunset-up
+          - entity: sensor.nextsunset
+            icon: mdi:weather-sunset-down
+          - entity: sensor.hoursdaylight
+            icon: mdi:clock
+            name: Hours of Daylight
+          - type: attribute
+            entity: sun.sun
+            attribute: elevation
+            name: Sun Elevation
+            icon: mdi:weather-sunset
+          - entity: sensor.rainfall_today
+            icon: mdi:weather-pouring
+            name: Rain today
+          - entity: sensor.earthquake_daily_count
+            icon: mdi:home-flood
+            name: Daily Earthquakes
+
+
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: School Activity Dates
+            state_color: true
+            entities:
+              - entity: sensor.school_start_days2go
+                name: School Starts in
+              - entity: sensor.school_end_days2go
+                name: School Ends in
+              - entities:
+                  - entity: input_datetime.school_first_day
+                    name: First Day of School
+                  - entity: input_datetime.school_last_day
+                    name: Last Day of School
+
+                  - entity: input_datetime.school_day_start
+                    name: School Day Start
+                  - entity: input_datetime.school_day_end
+                    name: School Day End
+
+                  - entity: input_datetime.school_day_start_reminder
+                    name: School Day Start Reminder
+                  - entity: input_datetime.school_day_end_reminder
+                    name: School Day End Reminder
+                head:
+                  label: School Dates
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+
+              - entities:
+                  - entity: input_datetime.spring_break_start
+                    name: Spring Break
+                  - entity: input_datetime.summer_break_start
+                    name: Summer Break
+                  - entity: input_datetime.christmas_break_start
+                    name: Christmas Break
+                head:
+                  label: Vacation Dates
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+
+              - entities:
+                  - entity: input_datetime.audible_notification_on
+                    name: Audible Notification On
+                  - entity: input_datetime.audible_notification_off
+                    name: Audible Notification Off
+                  - entity: input_datetime.morning_report
+                    name: Morning Reports
+                  - entity: input_datetime.daily_report
+                    name: Daily Report
+                  - entity: input_datetime.nightly_briefing
+                    name: Nightly Briefing
+                  - entity: input_datetime.event_briefing
+                    name: Event Briefing
+                head:
+                  label: Briefing Time
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+
+              - entities:
+                  - entity: input_datetime.shion_school_bedtime
+                    name: Shion School Bedtime
+                  - entity: input_datetime.shion_bedtime_holiday
+                    name: Shion Bedtime Holiday
+                  - entity: input_datetime.shion_nightly_report
+                    name: Auto Nightly Report
+                head:
+                  label: Shion Time
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+
+
+            show_header_toggle: false
+            style: |
+              ha-card {
+              }
+
+      - type: custom:lunar-phase-card
+        entity: sensor.tokyo_moon_phase
+        use_default: false
+        show_background: true
+        compact_view: false
+
+
+####################################################
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
+####################################################

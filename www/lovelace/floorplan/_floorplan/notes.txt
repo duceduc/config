@@ -1,0 +1,4 @@
+
+sims:
+photo cooling filter (82):10
+hue sat: -37

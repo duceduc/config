@@ -1,0 +1,142 @@
+####################################################
+#
+#                    CLIMATE
+#
+####################################################
+
+
+title: Climate
+path: climate
+icon: mdi:home-thermometer-outline
+# background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+cards:
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Outside
+      - icon: weather-windy
+      - entity_1: sensor.home_windspeed
+      - name_1: Wind Speed
+      - entity_2: sensor.entrance_humidity
+      - name_2: Outside Humidity
+      - entity_3: sensor.entrance_temperature
+      - name_3: Outside Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Master Room
+      - icon: weather-rainy
+      - entity_1: sensor.mr_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.master_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.master_temperature
+      - name_3: Room Temperature
+
+  #  - type: custom:streamline-card
+  #    template: climate_tpl
+  #    variables:
+  #      - title: Hallway
+  #      - icon: weather-rainy
+  #      - entity_1: sensor.hallway_condensation_chance
+  #      - name_1: Hallway Condensation
+  #      - entity_2: sensor.hr_sensor_humidity
+  #      - name_2: Hallway Humidity
+  #      - entity_3: sensor.hr_sensor_temperature
+  #      - name_3: Hallway Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Hallway
+      - icon: weather-rainy
+      - entity_1: sensor.hallway_condensation_chance
+      - name_1: Hallway Condensation
+      - entity_2: sensor.entry_humidity
+      - name_2: Hallway Humidity
+      - entity_3: sensor.entry_temperature
+      - name_3: Hallway Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: MDF
+      - icon: weather-rainy
+      - entity_1: sensor.mdf_condensation_chance
+      - name_1: MDF Condensation
+      - entity_2: sensor.mdf_humidity
+      - name_2: Shoe Closet Humidity
+      - entity_3: sensor.mdf_temperature
+      - name_3: Shoe Closet Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Shion Room
+      - icon: weather-rainy
+      - entity_1: sensor.sr_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.shionroom_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.shionroom_temperature
+      - name_3: Room Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Livingroom
+      - icon: weather-rainy
+      - entity_1: sensor.lr_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.livingroom_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.livingroom_temperature
+      - name_3: Room Temperature
+
+
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Kitchen
+      - icon: weather-rainy
+      - entity_1: sensor.kitchen_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.kitchen_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.kitchen_temperature
+      - name_3: Room Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: Computer Room
+      - icon: weather-rainy
+      - entity_1: sensor.computerroom_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.computerroom_humidity # sensor.espresense_computerroom_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.computerroom_temperature # sensor.espresense_computerroom_temperature
+      - name_3: Room Temperature
+
+  - type: custom:streamline-card
+    template: climate_tpl
+    variables:
+      - title: WC
+      - icon: weather-rainy
+      - entity_1: sensor.wc_condensation_chance
+      - name_1: Room Condensation
+      - entity_2: sensor.wc_humidity
+      - name_2: Room Humidity
+      - entity_3: sensor.wc_temperature
+      - name_3: Room Temperature
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

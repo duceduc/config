@@ -1,0 +1,52 @@
+
+sensor:
+  - platform: aht10
+    variant: AHT20
+    i2c_id: i2c_0
+    address: 0x38
+    update_interval: 50s
+    temperature:
+      name: "$hlk0 Temperature"
+      accuracy_decimals: 1
+      filters:
+        - offset: "$temp_offset0" 
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+            send_first_at: 1
+
+    humidity:
+      name: "$hlk0 Humidity"
+      accuracy_decimals: 1
+      filters:
+        - offset: "$hum_offset0"
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+            send_first_at: 1
+
+
+  - platform: aht10
+    variant: AHT20
+    i2c_id: i2c_1
+    address: 0x38
+    update_interval: 50s
+    temperature:
+      name: "$hlk1 Temperature"
+      accuracy_decimals: 1
+      filters:
+        - offset: "$temp_offset1"
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+            send_first_at: 1
+
+    humidity:
+      name: "$hlk1 Humidity"
+      accuracy_decimals: 1
+      filters:
+        - offset: "$hum_offset1"
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+            send_first_at: 1

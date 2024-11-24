@@ -1,0 +1,35 @@
+###############################################################################
+#   @author          :   Duc Su 
+#   @date              :   08/14/2022
+#   @package        :   Integrations
+#   @description    :   All 3rd Party Integrations 
+###############################################################################
+
+# Could be deleted. Using native integration
+#google:
+#  client_id: !secret google_calendarE_id
+#  client_secret: !secret google_calendarE_secret
+
+# Find Amazon dot name
+# https://alexa.amazon.com/api/devices-v2/device
+# reaunthenicate issue - enter random string and hit submit to refresh visable captacha.
+alexa_media:
+  accounts:
+    - email: !secret amazon_duc
+      password: !secret amazon_duc_pass
+      url: amazon.com
+      include_devices:
+        - Ai.1
+        - Ai.2
+        - Ai.3
+        - Ai.4
+#    - email: !secret amazon_eri
+#      password: !secret amazon_eri_pass
+#      url: amazon.co.jp
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_apikey
+    allowed_chat_ids:
+      - !secret telegram_chatid
+      - !secret telegram_userid

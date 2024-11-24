@@ -1,0 +1,21 @@
+# https://github.com/twrecked/hass-momentary
+
+version: 1
+switches:
+# automation in annoucement.yaml
+  - name: +Activate Guest
+    mode: 'on'
+    toggle_for: 15
+    cancellable: True
+
+# automation in annoucement.yaml
+  - name: +Activate Tv
+    mode: 'on'
+    toggle_for: 15
+    cancellable: True
+
+# automation in presence.yaml
+  - name: +Presence Monitor
+    mode: 'on'
+    toggle_for: 40
+    cancellable: True

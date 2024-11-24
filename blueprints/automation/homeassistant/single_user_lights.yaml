@@ -1,0 +1,29 @@
+blueprint:
+  name: Single user lights
+  description: >
+    When only one person is home,
+    when light goes on (for defined lights, e.g. bedrooms),
+    turn off all other lights!
+  domain: automation
+  source_url: https://github.com/bruxy70/blueprints/single_user_lights.yaml
+  input:
+    light_list:
+      name: Light list
+      description: List of lights that will trigger all other lights off
+      selector:
+        target:
+          entity:
+            domain: light
+triggers:
+  - trigger: state
+    entity_id: !input light_list
+    from: "off"
+    to: "on"
+conditions:
+  condition: template
+  value_template: "{{ states.person | map(attribute='state') | select('eq','home') | list | length == 1 }}"
+actions:
+  - action: light.turn_off
+    data:
+      entity_id: "{{ states.light | map(attribute='entity_id') | select('ne', trigger.entity_id) | join(', ') }}"
+mode: single

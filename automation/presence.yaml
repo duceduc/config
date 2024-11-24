@@ -1,0 +1,431 @@
+#########################################################
+#                                                                                                              
+#            Presence - Family                                                                          
+#                                                                                                             
+#########################################################
+
+# Duc combing both monitor and espresense detections
+- alias: Presence Duc On
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.id_presence
+      above: 10
+    - trigger: template
+      value_template: "{{ states('sensor.duc_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
+  actions:
+    - action: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.duc_presence
+- alias: Presence Duc Off
+  mode: restart
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.id_presence
+      below: 10
+    - trigger: state
+      entity_id: sensor.duc_espresense
+      to: 'not_home'
+      
+  conditions:
+    - condition: template
+      value_template: "{{ states('sensor.id_presence')| float(0) == 0.0 }}"   
+    - condition: template
+      value_template: "{{ is_state('sensor.duc_espresense', 'not_home') }}"   
+
+  actions:
+    - action: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.duc_presence
+
+
+# Eri combing both monitor and espresense detections
+- alias: Presence Eri On
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.ie_presence
+      above: 10
+    - trigger: template
+      value_template: "{{ states('sensor.eri_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
+  actions:
+    - action: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.eri_presence
+- alias: Presence Eri Off
+  mode: restart
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.ie_presence
+      below: 10
+    - trigger: state
+      entity_id: sensor.eri_espresense
+      to: 'not_home'
+
+  conditions:      
+    - condition: template
+      value_template: "{{ states('sensor.ie_presence')| float(0) == 0.0 }}"   
+    - condition: template
+      value_template: "{{ is_state('sensor.eri_espresense', 'not_home') }}"   
+      
+  actions:
+    - action: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.eri_presence
+
+# Shion combing both monitor and espresense detections
+- alias: Presence Shion On
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.tms_presence
+      above: 10
+    - trigger: template
+      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"    
+  actions:
+    - action: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.shion_presence
+
+- alias: Presence Shion Off
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.tms_presence
+      below: 10
+    - trigger: state
+      entity_id: sensor.shion_tms_espresense
+      to: 'not_home'
+  conditions:
+    - condition: template
+      value_template: "{{ is_state('sensor.shion_tms_espresense', 'not_home') }}"      
+  actions:
+    - action: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.shion_presence
+
+#########################################################
+#                                                                                                              
+#            Presence - Guests                                                                         
+#                                                                                                              
+#########################################################
+
+
+# Sachiko
+- alias: Presence Sachiko On
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.sachiko_presence
+      above: 10
+  actions:
+    - action: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.sachiko_presence, input_boolean.toggle_guest_presence
+- alias: Presence Sachiko Off
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.sachiko_presence
+      below: 10
+  actions:
+    - action: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.sachiko_presence
+
+# Tomokun
+- alias: Presence Tomokun On
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.tomokun_presence
+      above: 10
+  actions:
+    - action: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.tomokun_presence, input_boolean.toggle_guest_presence
+- alias: Presence Tomokun Off
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.tomokun_presence
+      below: 10
+  actions:
+    - action: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.tomokun_presence
+
+
+# Enable/Disable Guest Mode
+- alias: Enable Guest Mode
+  triggers:
+    - trigger: state
+      entity_id: group.guest_presence
+      to: 'on'
+  actions:
+    - action: homeassistant.turn_on
+      entity_id: input_boolean.guest_mode
+      
+    - action: notify.mobile_app_id
+      data:
+        message: "Guest Mode is turned {{ states('input_boolean.guest_mode') }}."
+        title: "*Guest Mode Status*"
+
+- alias: Disable Guest Mode
+  triggers:
+    - trigger: state
+      entity_id: group.guest_presence
+      to: 'off'
+  actions:
+    - action: homeassistant.turn_off
+      entity_id: input_boolean.guest_mode
+
+    - action: notify.mobile_app_id
+      data:
+        message: "Guest Mode is turned {{ states('input_boolean.guest_mode') }}."
+        title: "*Guest Mode Status*"
+
+#########################################################
+#                                                                                                              
+#            Arrival | Departure                                                                         
+#                                                                                                             
+#########################################################
+- alias: Monentary Presence Monitor Trigger
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.genkan_moving_target
+      to: 'on'
+  actions:
+    - delay: 4
+    - action: switch.turn_on
+      data:
+        entity_id: switch.momentary_presence_monitor
+###
+- alias: Presence Scan Arrival
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.entrance_moving_target
+      to: 'on'
+  conditions:
+    - condition: template
+      value_template: "{{ is_state('switch.momentary_presence_monitor', 'off') }}"
+  actions:
+    - action: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+
+- alias: Presence Scan Departure
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.genkan_door_contact
+      to: 'on'
+  conditions:
+    - condition: template
+      value_template: "{{ is_state('switch.momentary_presence_monitor', 'on') }}" # on for 40sec
+  actions:  
+    - delay: '00:01:25'
+    - action: script.monitor_depart
+
+
+#########################################################
+#                                                                                                              
+#            Restart Monitor                                                                              
+#                                                                                                              
+#########################################################
+
+- alias: Presence Restart Daily
+  initial_state: 'on'
+  triggers:
+    - trigger: time
+      at: '04:01:00'
+  actions:
+    - action: mqtt.publish
+      data:
+        topic: monitor/scan/restart
+        payload: ''
+
+
+#########################################################
+#                                                                                                              
+#            Away|Home|Returning|Vacation status                                              
+#                                                                                                              
+#########################################################
+
+# Home
+- alias: Home Mode - Arriving
+  triggers:
+    - trigger: state
+      entity_id: sensor.n_people_home
+  conditions:
+    - condition: template
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.state|int(0) > trigger.from_state.state|int(0) }}
+  actions:
+    - action: input_select.select_option
+      entity_id: input_select.home_mode
+      data:
+        option: 'Home'
+    - action: script.standby
+
+# Away
+- alias: Home Mode - Leaving
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.n_people_home
+      below: 1
+      for: 10
+  conditions:
+    - condition: template
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: state
+      entity_id: input_select.home_mode
+      state: 'Home'
+  actions:
+    - action: input_select.select_option
+      entity_id: input_select.home_mode
+      data:
+        option: 'Away'
+    - action: script.appliances_off # turn off any devices that were left on
+    - action: script.text_notify
+      data: 
+        who: duc
+        message: "There are {{ states('sensor.n_people_home') }} people at home now."
+        title: '*Home Status*'
+    - action: input_boolean.turn_on #### RE ENABLE THIS WHEN RETURN FROM USA
+      entity_id: input_boolean.sentry_mode
+
+        
+# Returning
+## [See announcements.yaml announcing whose coming home]
+##
+
+# Vacation
+- alias: Home Mode - Vacation
+  triggers:
+  - trigger: state
+    entity_id: input_boolean.vacation_mode
+  actions:
+    choose:
+      - conditions: >
+           {{ states.input_boolean.vacation_mode.state == 'on' }}
+        sequence:
+          - action: input_select.select_option
+            entity_id: input_select.home_mode
+            data:
+              option: 'Vacation'
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.sentry_mode
+              
+      - conditions: >
+           {{ states.input_boolean.vacation_mode.state == 'off' and
+              states.sensor.n_people_home.state | int(0)  < 1 }}
+        sequence:
+          - action: input_select.select_option
+            entity_id: input_select.home_mode
+            data:
+              option: 'Away'
+      - conditions: >
+           {{ states.input_boolean.vacation_mode.state == 'off' and
+              states.sensor.n_people_home.state | int(0)  >= 1 }}
+        sequence:
+          - action: input_select.select_option
+            entity_id: input_select.home_mode
+            data:
+              option: 'Home'
+          - action: script.standby
+
+
+#########################################################
+#                                                                                                              
+#            Set Custom Device Tracker Location                                                  
+#                                                                                                              
+#########################################################
+
+- alias: Set tms Tile Location
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.shion_presence
+  actions:
+#    - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
+    - service_template: script.set_device_tracker_shion
+
+- alias: Set Location Waze
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.duc_to_work_waze, sensor.eri_to_work_waze # sensor.shion_to_school_waze
+      below: 3
+  actions:
+    choose:
+      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'duc to work waze' }}"
+        sequence:
+          - action: device_tracker.see
+            data:
+              dev_id: duc
+              location_name: 'Duc Work'
+              
+      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'eri to work waze' }}"
+        sequence:
+          - action: device_tracker.see
+            data:
+              dev_id: eri
+              location_name: 'Eri Work'
+
+#      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'shion to school waze' }}"
+#        sequence:
+#          - action: device_tracker.see
+#            data:
+#              dev_id: shion
+#              location_name: "school"
+
+
+
+####################################################
+#                                                                                                    
+#            Turn off Travel Monitor Alerts                                            
+#                                                                                                    
+####################################################
+
+
+- id: family_has_arrived
+  alias: Family Has arrived
+  triggers:
+  - trigger: zone
+    entity_id: person.duc
+    zone: zone.home
+    event: enter
+    id: duc
+  - trigger: zone
+    entity_id: person.eri
+    zone: zone.home
+    event: enter
+    id: eri
+  conditions: []
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: duc
+          sequence:
+            - action: input_boolean.turn_off
+              data: {}
+              entity_id: input_boolean.duc_travel_monitor
+        - conditions:
+            - condition: trigger
+              id: eri
+          sequence:
+            - action: input_boolean.turn_off
+              data: {}
+              entity_id: input_boolean.eri_travel_monitor
+      default: []
+
+
+####################################################
+#                                                                                                    
+#            Monitor RPIw Devices                                         
+#                                                                                                    
+####################################################
+
+
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

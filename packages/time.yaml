@@ -1,0 +1,148 @@
+###############################################################################
+#   @author         :   Duc Su
+#   @date           :   11/13/2024
+#   @package        :   TIME
+#   @description    :   Various time sensors, automations
+###############################################################################
+
+sensor:
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+      - 'date_time_utc'
+      - 'date_time_iso'
+      - 'time_date'
+      - 'time_utc'
+
+template:
+  - sensor:
+      - name: 'Period of the day'
+        unique_id: 172e87d3-04fe-4792-a8cb-1e411241b5b6
+        state: >-
+          {% set elevation = state_attr('sun.sun', 'elevation') %}
+          {% set rising = state_attr('sun.sun', 'rising') %}
+          {%- if elevation <= -7 -%}
+            night
+          {%- elif -7 < elevation <= -1 -%}
+            {{ 'dawn' if rising else 'dusk' }}
+          {%- else -%}
+            day
+          {%- endif -%}light
+        icon: >-
+          {% set elevation = state_attr('sun.sun', 'elevation') %}
+          {% set rising = state_attr('sun.sun', 'rising') %}
+          {%- if elevation <= -7 -%}
+            mdi:weather-night
+          {%- elif -7 < elevation <= -1 -%}
+            mdi:weather-sunset-{{ 'up' if rising else 'down' }}
+          {% else %}
+            mdi:weather-sunny
+          {% endif %}
+
+      - name: 'Today is'
+        unique_id: aa24c0d6-c263-483c-93cd-c6aff1bb146a
+        state: "{{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}"
+      - name: 'Month is'
+        unique_id: 2f43d01a-6661-40f7-964b-2650204881cd
+        state: "{{ ['January','February','March','April','May','June','August','September','October','November','December'][now().month-2] }}" 
+
+      - name: 'Human Time'
+        unique_id: 7d5bc561-1fc6-4531-9194-5f12effb09c5
+        state: >-
+          {% if now().strftime('%-H') | float(0) >= 0 and now().strftime('%-H') | float(0) < 6 %}
+            {% set timeofday = "at night" %}
+          {% elif now().strftime('%-H') | float(0) >= 6 and now().strftime('%-H') | float(0) < 12 %}
+            {% set timeofday = "in the morning" %} 
+          {% elif now().strftime('%-H') | float(0) >= 12 and now().strftime('%-H') | float(0) < 18 %}
+            {% set timeofday = "in the afternoon" %}
+          {% elif now().strftime('%-H') | float(0) >= 18 and now().strftime('%-H') | float(0) < 25 %}
+            {% set timeofday = "in the evening" %}
+          {% endif %}
+
+          {% if (now().minute | float(0)) == 0 %}
+            {{ now().strftime('%-I') }} o'clock {{ timeofday }}
+
+          {% elif (now().minute | float(0)) == 1 %}
+            {{ now().minute }} minute past {{ now().strftime('%-I') }} {{ timeofday }}
+
+          {% elif (now().minute | float(0)) >= 2 and (now().minute | float(0)) <= 14 %}
+            {{ now().minute }}  minutes past {{ now().strftime('%-I') }} {{ timeofday }}
+
+          {% elif (now().minute | float(0)) == 15 %}
+            quarter past {{ now().strftime('%-I') }} {{ timeofday }}
+
+          {% elif (now().minute | float(0)) >= 16 and (now().minute | float(0)) <= 29 %}
+            {{ 30 - now().minute | int(0) }} minutes before half past {{ now().strftime('%-I') | int(0) }} {{ timeofday }}
+
+          {% elif (now().minute | float(0)) == 30 %}
+            {% if (now().strftime('%-I')) | float(0) < 12 %}
+              half past {{ now().strftime('%-I') | int(0)  }} {{ timeofday }}
+            {% elif (now().strftime('%-I')) | float(0) >= 12 %}
+              half past {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
+            {% endif %}
+
+          {% elif (now().minute | float(0)) == 31 %}
+            {% if (now().strftime('%-I')) | float(0) < 12 %}        
+              {{ now().minute | int(0) - 30 }} minute past half {{ now().strftime('%-I') | int(0) }} {{ timeofday }}       
+            {% elif (now().strftime('%-I')) | float(0) >= 12 %}
+              {{ now().minute | int(0) - 30 }} minute past half {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
+            {% endif %}
+
+          {% elif (now().minute | float(0)) >= 32 and (now().minute | float(0)) <= 44 %}
+            {% if (now().strftime('%-I'))  | float(0) < 12 %}        
+              {{ now().minute | int(0) - 30 }} minutes past half {{ now().strftime('%-I') | int(0) }} {{ timeofday }}       
+            {% elif (now().strftime('%-I')) | float(0) >= 12 %}
+              {{ now().minute | int(0) - 30 }} minutes past half {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
+            {% endif %}
+
+          {% elif (now().minute | float(0)) == 45 %}
+            {% if (now().strftime('%-I')) | float(0) < 12 %}        
+              quarter to {{ now().strftime('%-I') | int(0) + 1 }} {{ timeofday }}
+            {% elif (now().strftime('%-I')) | float(0) >= 12 %}
+              quarter to {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
+            {% endif %}
+
+          {% elif (now().minute | float(0)) >= 46 and (now().minute | float(0)) <=59 %}
+            {% if (now().strftime('%-I')) | float(0) < 12 %}        
+              {{ 60 - now().minute | int(0) }} minutes to {{ now().strftime('%-I') | int(0) + 1 }} {{ timeofday }}
+            {% elif (now().strftime('%-I')) | float(0) >= 12 %}
+            {{ 60 - now().minute | int(0) }} minutes to {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
+            {% endif %}
+          {% endif %}
+        icon: >-
+          {% if now().strftime('%-H') | float(0) >= 0 and now().strftime('%-H') | float(0) <= 6 %}
+            mdi:weather-night
+          {% elif now().strftime('%-H') | float(0) >= 6 and now().strftime('%-H') | float(0) <= 12 %}
+            mdi-weather-sunset
+          {% elif now().strftime('%-H') | float(0) >= 12 and now().strftime('%-H') | float(0) <= 18 %}
+            mdi:weather-sunny        
+          {% elif now().strftime('%-H') | float(0) >= 18 and now().strftime('%-H') | float(0) <= 25 %}
+            mdi:weather-sunset
+          {% else %}
+            mdi:clock
+          {% endif %}
+
+      - name: 'School Start Days2go'
+        unique_id: 9d1945c9-d043-4f59-9ea0-524bd1d306dc
+        unit_of_measurement: 'Days'
+        state: "{{ ((state_attr('input_datetime.school_first_day', 'timestamp')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}"
+      - name: 'School End Days2go'
+        unique_id: 3852ec14-b6a9-4c4b-bb09-37fefddf1cb8
+        unit_of_measurement: 'Days'
+        state: "{{ ((state_attr('input_datetime.school_last_day', 'timestamp')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}"
+      - name: 'Vacation Days2go' # No upcoming vacation will cause error in log.
+        unique_id: bd85ebff-50dc-4af5-addf-6b92a5ba71d1
+        unit_of_measurement: 'Days'
+        state:  "{{ ((as_timestamp(state_attr('calendar.vacation', 'start_time'), '%Y-%m-%d')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}"
+
+      - name: 'School Tomorrow'
+        unique_id: cace00f8-bf49-4206-85ea-2be58c98f178
+        state: >-
+          {%- set tt=(as_timestamp(now())+ (86400)) | timestamp_custom("%Y-%m-%d",true) %}
+          {% if states.calendar.shion_school.attributes.start_time == tt + " 08:15:00" %}
+            on
+          {% else %}
+            off
+          {% endif %}

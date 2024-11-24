@@ -1,0 +1,145 @@
+#########################################################
+#                                                                                                              
+#             EMULATED HUE                                                                             
+#                                                                                                              
+#########################################################
+# Flush
+# https://community.home-assistant.io/t/how-to-efficiently-flush-emulated-hue-solved/201480/25
+
+#  host_ip: 192.168.1.20
+#  listen_port: 80
+#  off_maps_to_on_domains:
+#    - automation
+#  expose_by_default: false
+#  exposed_domains:
+#    - light
+#  entities:
+#    input_boolean.lights_flash:
+#      name: 'Workout'
+#      hidden: false
+#    input_boolean.appletv_netflix:
+#      name: 'Appletv Netflix'
+#      hidden: false
+#    input_boolean.appletv_plex:
+#      name: 'Appletv Plex'
+#      hidden: false
+
+#####
+#    light.alexa_virtual:
+#      name: Dummy Light
+#      hidden: false
+#    light.kitchen:
+#      name: Kitchen
+#      hidden: false
+
+#####
+#    script.turn_on_all_fans:
+#      name: On All Fans
+#      hidden: false
+#    script.turn_off_all_fans:
+#      name: Off All Fans
+#      hidden: false
+
+
+#####
+#    switch.ceiling_fan_light:
+#      name: 'Ceiling Fan Lights'
+#      hidden: false
+     
+#    switch.ceiling_fan_summer:
+#      name: 'Ceiling Fan Summer'
+#      hidden: false
+
+#    switch.ceiling_fan_winter: # can delete
+#      name: 'Ceiling Fan Winter'
+#      hidden: false
+#    switch.ceiling_fanlight: # can delete
+#      name: 'Ceiling Fan and Lights'
+#      hidden: false
+#    switch.ceiling_fan_lights_only: # can delete
+#      name: 'Ceiling Fan Lights Running'
+#      hidden: false
+#    switch.ceiling_fan_only: # can delete
+#      name: 'Ceiling Fan Running'
+#      hidden: false
+
+#    switch.toilet_airfreshener: # toilet_airfreshener_spray
+#      name: Toilet Airfreshener
+#      hidden: false
+
+#    switch.jcom_tv:
+#    jcom_tv_box: # mqtt
+#      name: Tv
+#      hidden: false
+
+#    switch.floor_heat:
+#    floor_heater: # mqtt
+#      name: Floor Heater
+#      hidden: false
+
+#    switch.yuasa_fan: # CAN DELETE DURING FLUSH
+#      name: 'Fan'
+#      hidden: false
+
+#    switch.computer_room_curtain:
+#      name: 'Computer Room Curtains'
+#      hidden: false
+
+#    switch.living_room_curtain:
+#      name: 'Living Room Curtains'
+#      hidden: false
+
+
+#########################################################
+#                                                                                                              
+#             Aircons                                                                                       
+#                                                                                                              
+#########################################################
+
+#    switch.ac_lr_unit:
+#      name: AC Livingroom
+#      hidden: false      
+#    switch.heater_lr_unit:
+#      name: Heater Livingroom
+#      hidden: false    
+#    switch.humidifier_lr_unit:
+#      name: Humidifier Livingroom
+#      hidden: false
+
+#    switch.ac_mr_unit:
+#      name: AC Master Room
+#      hidden: false
+#    switch.heater_mr_unit:
+#      name: Heater Master Room
+#      hidden: false    
+#    switch.humidifier_mr_unit:
+#      name: Humidifier Master Room
+#      hidden: false
+
+#    switch.ac_sr_unit:
+#      name: AC She On Room
+#      hidden: false
+#    switch.heater_sr_unit:
+#      name: Heater She On Room
+#      hidden: false    
+#    switch.humidifier_sr_unit:
+#      name: Humidifier She On Room
+#      hidden: false
+
+
+#########################################################
+#                                                                                                              
+#             Humidifier                                                                                   
+#                                                                                                              
+#########################################################
+
+#    switch.sb_humidifier:
+#      name: Humidifier
+#      hidden: false  
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

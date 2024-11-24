@@ -1,0 +1,637 @@
+###############################################################################
+#   @author         :   Duc Su
+#   @date           :   03/07/2022
+#   @package        :   Security
+#   @description    :   Everything related to security functions.
+###############################################################################
+
+input_select: # QLM View
+  sentry_mode_status:
+    icon: mdi:security
+    options:
+      - disarmed
+      - arming
+      - armed_away
+      - armed_home
+      - armed_night
+      - armed_vacation
+      - armed_custom_bypass
+      - pending
+      - triggered
+
+input_boolean:
+  # Main security switch. If this is on, the security is armed.
+  sentry_mode:
+    name: Sentry Mode
+    icon: mdi:security
+
+  vacation_mode:
+    name: Vacation Mode
+    icon: mdi:airplane-takeoff
+
+  guest_mode:
+    name: Guest Mode
+    icon: mdi:account-multiple
+
+  # This switch powers the security alarm and gives an easy way to kill the alarm.
+  # When it is on, the alarm is going off
+  security_alarm:
+    name: Security Alarm
+    icon: mdi:speaker-wireless
+
+  lockdown_issue:
+    name: Lockdown Issue
+    icon: mdi:lock-reset
+
+  security_issue:
+    name: Security Issue
+    icon: mdi:alert-circle-outline
+
+mqtt:
+  sensor:
+    - name: front_door_motion_away_count
+      state_topic: "house/alerts/front_door_motion/away_count"
+
+binary_sensor:
+  - platform: template
+    sensors:
+      computerroom_window_triggered:
+        value_template: >
+          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+          {% if is_state("binary_sensor.computerroom_window", "on") and sentry_mode == "on" %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      livingroom_window_triggered:
+        value_template: >
+          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+          {% if is_state("binary_sensor.livingroom_window", "on") and sentry_mode == "on" %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      genkan_door_triggered:
+        value_template: >
+          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+          {% if is_state("binary_sensor.genkan_door_contact", "on") and sentry_mode == "on" %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+
+automation:
+  #############################################
+  # When sentry mode is enabled / security armed by any method, check the doors and notify everyone.
+  - id: sentry_mode_enabled
+    alias: Sentry Mode Enabled Annoucement
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.sentry_mode
+        from: "off"
+        to: "on"
+    actions:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.genkan_door_contact
+                state: "on"
+            sequence:
+              - action: input_boolean.turn_off
+                entity_id: input_boolean.sentry_mode
+              - action: input_boolean.turn_on
+                entity_id: input_boolean.lockdown_issue
+              - action: script.text_notify
+                data:
+                  who: "duc"
+                  message: >
+                    {{ [
+                    "I was unable to activate genkan door protocol due to an open door.",
+                    "You may want to check the external doors. I was unable to secure them all.",
+                    "My systems check has failed. Please check the external doors.",
+                    "Someone has left the front door open."
+                    ] | random }}
+              - action: script.sentry_mode_status
+                data:
+                  modus: 'pending'
+        default:
+          - action: script.speech_engine
+            data:
+              who: "{{ states('sensor.room_audio') }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
+              message: >
+                {{ [
+                "Lions door protocol has been activated.",
+                "Lions Home has been secured! ",
+                "Sentry Mode is active. ",
+                "I am now monitoring the doors and will let you know if anyone attempts to access.",
+                "Lions Home Shields are up."
+                ] | random }}
+          - action: script.text_notify
+            data:
+              who: "duc"
+              title: "Security Armed"
+              message: "Security System has been armed."
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.security_cameras
+          - action: script.turn_on
+            entity_id: script.reset_front_door_motion_count
+          - action: script.sentry_mode_status
+            data:
+              modus: |
+                {% set night = (now() - state_attr('automation.nightly_lockdown', 'last_triggered')).seconds %}
+                
+                {% if is_state('input_boolean.vacation_mode', 'on') %} armed_vacation
+                {%elif night <= 2 %} armed_night
+                {% else %} armed_away {% endif %}
+
+  # Secure the house every night if it has been set already, and everyone is home.
+  - id: nightly_lockdown # currently automation is disabled.
+    alias: Nightly Lockdown
+#    initial_state: true
+    triggers:
+      - trigger: time
+        at: "23:00:00"
+    conditions:
+      - condition: state
+        entity_id: person.duc
+        state: home
+      - condition: state
+        entity_id: person.eri
+        state: home
+      - condition: template
+        value_template: "{{ is_state('input_boolean.guest_mode', 'off') }}"
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "off"
+    actions:
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.sentry_mode
+
+  # If sentry mode is on / Security armed, notify when there is movement around doors.
+  - id: motion_detected_front_door
+    alias: Motion Detected Front Door
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.genkan_door_contact
+        from: "off"
+        to: "on"
+    conditions:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "on"
+    actions:
+      - delay: 2
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('binary_sensor.genkan_moving_target', 'on') }}"
+            sequence:
+              - action: mqtt.publish
+                data:
+                  topic: house/alerts/front_door_motion/away_count
+                  payload: "{{ states('sensor.front_door_motion_away_count') | int(0) + 1 }}"
+                  retain: true
+              - action: script.status_annc
+                data:
+                  who: "{{ states('sensor.room_presence') }}"
+                  call_interuption: 1
+                  call_snark_door_motion: 1
+                  speech_message: >
+                    {% set alias = {"Genkan Moving Target":"front door"} %}
+                    {% set l = trigger.to_state.attributes.friendly_name %}
+                    {% set location = alias.get(l) %}
+                    {{ [
+                    "I have detected someone at the ",
+                    "Someone appears to be at the ",
+                    "There is a person at the ",
+                    "My sensors are picking up presence at the ",
+                    "We appear to have a visitor at the ",
+                    "My sensors have detected a meat popsicle at the "
+                    ] | random }}
+                    {{ location }}.
+              - action: script.sentry_mode_status
+                data:
+                  modus: 'triggered'
+      - delay:
+          minutes: 2
+    initial_state: true
+
+  # Security Issues
+  # If doors are opened and sentry mode is on / security armed announce location of breach to house and turn on security issue.
+  # If its the back door and dog mode is on ignore
+  - id: security_breach
+    alias: Security Breach
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id:
+          - binary_sensor.genkan_door_contact
+          - binary_sensor.computerroom_window
+          - binary_sensor.livingroom_window
+        to: "on"
+    conditions:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "on"
+    actions:
+      - action: script.alexa_alert
+        data:
+          message: "My security protocols are being overidden, The {{ trigger.to_state.attributes.friendly_name }} has been opened."
+      - action: script.text_alert
+        data:
+          who: duc
+          title: "Security Alert!!"
+          message: "{{ trigger.to_state.attributes.friendly_name }} has been opened."
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.security_issue
+      - action: script.sentry_mode_status
+        data:
+          modus: 'triggered'
+
+
+
+  #############################################
+
+  #############################################
+  # When sentry mode is disabled / security disarmed by any method, notify everyone.
+  - id: sentry_mode_disabled
+    alias: Sentry Mode Disabled Annoucement
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.sentry_mode
+        from: "on"
+        to: "off"
+    actions:
+      - choose:
+          - conditions:
+              condition: or
+              conditions:
+                - condition: template
+                  value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+                - condition: template
+                  value_template: "{{ is_state('input_select.home_mode', 'Returning') }}"
+                - condition: template
+                  value_template: "{{ is_state('input_boolean.guest_mode', 'on') }}"
+            sequence:
+              - action: script.speech_engine
+                data:
+                  who: "{{ states('sensor.room_audio') }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
+                  message: >
+                    {{ [
+                    "Lions door protocol has been deactivated.",
+                    "I am no longer monitoring the access points. ",
+                    "Sentry Mode has been disabled. ",
+                    "Lions Home Shields are down."
+                    ] | random }}
+              - action: script.text_notify
+                data:
+                  who: "duc"
+                  title: "Welcome Home"
+                  message: "Security System has been disarmed."
+              - action: input_boolean.turn_off
+                entity_id: input_boolean.security_alarm
+              - action: script.sentry_mode_status
+                data:
+                  modus: 'disarmed'
+        default:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.sentry_mode
+          - action: script.text_notify
+            data:
+              who: "duc"
+              title: "Potential Security Issue"
+              message: "Security System has been disarmed, but I could not validate presence."
+          - action: script.sentry_mode_status
+            data:
+              modus: 'pending'
+
+  #############################################
+
+  #############################################
+  # Scheduled Arm / Disarm
+  # Disarm around the time people are up
+  - id: morning_standby
+    alias: Morning Standby
+    initial_state: true
+    triggers:
+      - trigger: time
+        at: 04:10:00
+    condition:
+      condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+        - condition: template
+          value_template: "{{ is_state('input_boolean.guest_mode', 'on') }}"
+    actions:
+      - action: script.standby
+
+  #############################################
+
+  #############################################
+  # Vacation Mode Enabled
+  # Enable when everyone is 3 hours away.
+  # Disbaled happens in family_is_home automation in presence.yaml
+  - id: enable_vacation_mode
+    alias: Enable Vacation Mode
+    initial_state: true
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.duc_ett_home
+        above: 180
+      - trigger: numeric_state
+        entity_id: sensor.eri_ett_home
+        above: 180
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.duc_ett_home
+        above: 180
+      - condition: numeric_state
+        entity_id: sensor.eri_ett_home
+        above: 180
+    actions:
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.vacation_mode
+
+  # If guest mode is enabled, notify the house [delete other guest notification automation]
+  - id: guest_mode_feedback
+    alias: Guest Mode Audio Feedback
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_boolean.guest_mode
+        from: "off"
+        to: "on"
+    actions:
+      - action: script.speech_engine
+        data:
+          who: "{{ states('sensor.room_audio') }}"
+          voice: "{{ states('input_select.jarvis_voice') }}"
+          message: >
+            {{ [
+            "Guest Mode has been enabled.",
+            "I have switched to the system to guest mode.",
+            "I have enabled guest mode. ",
+            "Guest Mode is on."
+            ] | random }}
+
+
+  #############################################
+
+  #############################################
+  # If security issue switch turns on, kick off security response script, and go red.
+  - id: security_response_on
+    alias: Security Response On
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.security_issue
+        from: "off"
+        to: "on"
+        for: '00:02:00'
+    actions:
+      - action: script.turn_on
+        entity_id: script.security_response
+      - action: script.alarm_light_flash
+
+
+script:
+  sentry_mode_status: # For QLM dashboard
+    sequence:
+      - action: input_select.set_options
+        data:
+          entity_id: input_select.sentry_mode_status
+          options: '{{ modus }}'
+
+  standby:
+    sequence:
+      - action: script.turn_on
+        entity_id: script.vacation_canceled
+      - action: script.turn_on
+        entity_id: script.disarm_security
+      - action: script.turn_on
+        entity_id: script.cancel_security_alarm
+      - action: script.turn_on
+        entity_id: script.cancel_security_camera
+      - action: script.turn_on
+        entity_id: script.cancel_lockdown_issue
+      - action: script.turn_on
+        entity_id: script.clear_security_issue
+      - action: script.sentry_mode_status
+        data:
+          modus: 'disarmed'
+
+  # If vacation mode is on, turn it off
+  vacation_canceled:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.vacation_mode
+        state: "on"
+      - action: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.vacation_mode
+
+  # If security is armed, disarm it
+  disarm_security:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "on"
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.sentry_mode
+
+  # If alarm is on, turn it off
+  cancel_security_alarm:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.security_alarm
+        state: "on"
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.security_alarm
+
+  # If  camera is on, turn it off
+  cancel_security_camera:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.security_cameras
+        state: "on"
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.security_cameras
+
+
+  # if there are lockdown issues, turn them off
+  cancel_lockdown_issue:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.lockdown_issue
+        state: "on"
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.lockdown_issue
+
+  clear_security_issue:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.security_issue
+        state: "on"
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.security_issue
+
+  reset_front_door_motion_count:
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/front_door_motion/away_count
+          payload: 0
+          retain: true
+
+  update_front_door_motion_count:
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/front_door_motion/away_count
+          payload: "{{ states('sensor.front_door_motion_away_count') | int(0) + 1 }}"
+          retain: true
+
+  # Called via Alexa routine...adds a little interaction
+  activate_barn_door_protocol:
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.sentry_mode
+                state: "on"
+            sequence:
+              - action: script.speech_engine
+                data:
+                  who: "{{ states('sensor.room_audio') }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
+                  message: !include ../tpl/speech/already_done.yaml
+        default:
+          - action: script.speech_engine
+            data:
+              who: "{{ states('sensor.room_audio') }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
+              message: !include ../tpl/speech/interjections.yaml
+          - delay: 5
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.sentry_mode
+
+  # Called via secret Alexa routine...adds a little interaction
+  deactivate_barn_door_protocol:
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.sentry_mode
+                state: "off"
+            sequence:
+              - action: script.speech_engine
+                data:
+                  who: "{{ states('sensor.room_audio') }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
+                  message: !include ../tpl/speech/already_done.yaml
+        default:
+          - action: script.speech_engine
+            data:
+              who: "{{ states('sensor.room_audio') }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
+              message: !include ../tpl/speech/interjections.yaml
+          - delay: 5
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.sentry_mode
+
+  were_home:
+    sequence:
+      - action: script.turn_on
+        entity_id: script.standby
+#      - action: script.turn_on
+#        entity_id: script.welcome_briefing # need to create this script. see slacker lab sample
+
+  # Called via Alexa routine...adds a little interaction
+  activate_guest_mode:
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: "on"
+            sequence:
+              - action: script.speech_engine
+                data:
+                  who: "{{ states('sensor.room_audio') }}"
+                  voice: "{{ states('input_select.jarvis_voice') }}"
+                  message: !include ../tpl/speech/already_done.yaml
+        default:
+          - action: script.speech_engine
+            data:
+              who: "{{ states('sensor.room_audio') }}"
+              voice: "{{ states('input_select.jarvis_voice') }}"
+              message: !include ../tpl/speech/interjections.yaml
+          - delay: 2
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.guest_mode
+
+  # When it hits the fan, time to respond.
+  security_response:
+    sequence:
+      - delay:
+          seconds: 15
+      - action: script.alexa_alert
+        data:
+          message: >
+            {{ [
+            ",Unathorized Access detected.",
+            ",Meat Popsicle detected. Attempting to verify."
+            ] | random }}
+            You now have 60 seconds to abandon Lions Home.
+      - delay: 15
+      - action: script.alexa_alert
+        data:
+          message: >
+            {{ [
+            ",Just what do you think you're doing, Dave?",
+            ",This is highly unusual.",
+            "I will not disable the security response without the presence of an authorized identity. Your efforts are futile."
+            ] | random }}
+            You have 45 seconds to find the nearest exit.
+      - delay: 15
+      - action: script.alexa_alert
+        data:
+          message: >
+            {{ [
+            ",I can't lie to you about your chances, but, you have my sympathies.",
+            ",I wouldn't do that if I was you."
+            ] | random }}
+            You have 30 seconds to leave.
+      - delay: 15
+      - action: script.alexa_alert
+        data:
+          message: >
+            {{ [
+            "Danger. The emergency destruct system is now activated.",
+            "Danger. Counter Measures are now armed."
+            ] | random }}
+            You have 15 seconds. I would run.
+      - delay: 15
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.security_alarm
+      - action: script.text_notify
+        data:
+          who: viber
+          message: >-
+            {{ [
+              "My security protocols have been overridden. I am sounding the alarm for the interloper. #itsloudinhere #securityalarm",
+              "To the unannounced guest that has entered Lions Home. I see you. Enjoy the concert of alarm sounds. #itsloudinhere #securityalarm",
+              "I am playing the most annoying sound in the world at full volume for the intruder in Lions Home. And the neighbors too. #itsloudinhere #securityalarm",
+              "Someone did not say the magic word. And now I have to get angry. Deploying countermeasures. #itsloudinhere #securityalarm",
+              "Initiating my security response, and sounding the alarm. Oh, and I dont charge a monthly monitoring fee. #itsloudinhere #securityalarm",
+              "Hey, wanna hear the most annoying sound in the world? The intruder inside Lions Home evidently did.  #itsloudinhere #securityalarm"
+            ] | random }}
+

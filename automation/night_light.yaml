@@ -1,0 +1,41 @@
+#########################################################
+#                                                                                                              
+#             Night Light                                                                                   
+#                                                                                                              
+#########################################################
+
+
+- alias: 'night light on'
+  triggers:
+    - trigger: time
+      at: '23:00:00'
+  conditions:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: light.turn_on
+      entity_id: light.ntl_1
+      data:
+        brightness: 40
+
+- alias: 'night light off'
+  triggers:
+    - trigger: state
+      entity_id: sensor.period_of_the_day
+      to: 'dawnlight'
+  conditions:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Light not turn off yet
+      value_template: "{{ not is_state('light.ntl_1', 'off') }}"
+  actions:
+    - action: script.returntonormal
+      data:
+        entity: light.ntl_1
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

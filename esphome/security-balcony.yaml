@@ -1,0 +1,39 @@
+# [C8:C9:A3:F9:24:4C]
+substitutions:
+  name: security-balcony
+  vertical_flip: 'false'
+
+packages:
+  cam: !include components/cam.yaml
+
+<<: !include .base.yaml #.226
+
+esphome:
+  name: $name
+  platform: esp32
+  board: nodemcu-32s #esp-wrover-kit  
+
+sensor:
+  - platform: wifi_signal
+    name: '$name wifi signal'
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO14 # D17 ??
+    name: motion balcony occupancy
+    device_class: motion    
+
+  - platform: status
+    name: "$name status"
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart    

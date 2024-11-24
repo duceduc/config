@@ -1,0 +1,98 @@
+preferences:
+  flash_write_interval: 1min
+
+output:
+  - platform: esp8266_pwm
+    id: motor_forward_pin
+    pin: GPIO13
+  - platform: esp8266_pwm
+    id: motor_reverse_pin
+    pin: GPIO12
+
+fan:
+  - platform: hbridge
+    id: spray_motor
+    name: ${name} Motor
+    pin_a: motor_forward_pin
+    pin_b: motor_reverse_pin
+    decay_mode: slow
+    internal: true
+
+number:
+  - platform: template
+    icon: mdi:counter
+    id: spray_counter
+    restore_value: true
+    update_interval: 30s
+    min_value: 0
+    max_value: 400
+    mode: box
+    step: 1
+    optimistic: true
+    internal: true
+
+sensor:
+  - platform: template
+    name: ${name} ${counter}
+    icon: mdi:counter
+    id: spray_counter_tpl
+    state_class: measurement
+    unit_of_measurement: ""
+    accuracy_decimals: 0
+    lambda: |-
+      return id(spray_counter).state;
+    update_interval: 60s
+
+switch:
+  - platform: template
+    name: ${name}
+    id: sw_spray
+    icon: mdi:spray
+    restore_mode: always_off
+    optimistic: true
+    on_turn_on:
+      then:
+        if:
+          condition:
+            not:
+              script.is_running: do_spray
+          then:
+            script.execute: do_spray
+
+button:
+  - platform: template
+    name: ${name} ${reset}
+    icon: mdi:restart
+    on_press:
+      then:
+        - number.set:
+            id: spray_counter
+            value: 0
+        - component.update: spray_counter
+        - component.update: spray_counter_tpl
+
+script:
+  - id: do_spray
+    then:
+      - number.increment: spray_counter
+      - component.update: spray_counter
+      - component.update: spray_counter_tpl
+      - fan.hbridge.brake: spray_motor
+      - fan.turn_on:
+          id: spray_motor
+          speed: 80 #80
+          direction: forward
+      - delay: 500ms
+      - fan.hbridge.brake: spray_motor
+      - fan.turn_on:
+          id: spray_motor
+          speed: 80 #80
+          direction: reverse
+      - delay: 330ms
+      - fan.hbridge.brake: spray_motor
+      - fan.turn_off:
+          id: spray_motor
+      - delay: 500ms
+      - switch.turn_off: sw_spray
+
+

@@ -1,0 +1,62 @@
+#########################################################
+#                                                                                                              
+#             Alexa Commands                                                                           
+#                                                                                                              
+#########################################################
+
+- alias: Item Select to speak
+  triggers:
+    - trigger: state
+      entity_id: input_select.speak_list
+  variables:
+    opt: >
+      {% set sp = states('input_select.speak_list') %}
+      {% set no = sp.find("(c")+2 %}
+      {{ sp[no:no+2]|int(0) }}
+  conditions:
+    - condition: template
+      value_template: '{{states.input_select.speak_list.state != "do not use"  }}'
+  actions:
+    - action: script.speech_engine
+      data: 
+        who: "{{ states('sensor.last_alexa') }}"
+        voice: "{{ states('input_select.jarvis_voice') }}"
+        message: !include ../tpl/speech/alexa_cmds.yaml
+
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.speak_list
+        option: 'do not use'
+    - delay: 2
+    - action: light.turn_on
+      data:
+        entity_id: light.alexa_virtual
+        brightness_pct: "{{opt}}"
+
+- alias: Dummy light to item select
+  triggers:
+    - trigger: state
+      entity_id: light.alexa_virtual
+      from: 'off'
+      to: 'on'
+  actions:
+    - action: input_select.select_option
+      data:  
+        entity_id: input_select.speak_list
+        option: >
+          {% set slist = state_attr('input_select.speak_list','options') %}
+          {% set opt = state_attr('light.alexa_virtual','brightness') %}
+          {% set opt = (opt | float(0) / 255  * 100+0.5)|int %}
+          {% if opt|int > slist|length %}
+            {% set opt = 0 %}
+          {% endif %}
+          {{slist[opt]}} 
+    - action: light.turn_off
+      entity_id: light.alexa_virtual
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

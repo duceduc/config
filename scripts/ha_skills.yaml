@@ -1,0 +1,34 @@
+#########################################################
+#                                                                                                              #
+#             Custom Skills                                                                                #
+#                                                                                                              #
+#########################################################
+
+  activate_alexa_actionable_notification:
+    description: 'Activates an actionable notification on a specific echo device'
+    fields:
+      text:
+        description: 'The text you would like alexa to speak.'
+        example: 'The Outside temperature is above 25 degree celsius. Would you like me to turn on the livingroom AC?'
+      event_id:
+        description: 'Correlation ID for event responses'
+        example: 'ask_to_turn_on_ac_temp_above_25'
+      who: 
+        description: 'Alexa device you want to trigger'
+        example: 'media_player.ai_1'
+    sequence:
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.alexa_actionable_notification
+          value: '{"text": "{{ text }}", "event": "{{ event_id }}"}'
+      - service: media_player.play_media
+        data:
+          entity_id: "{{ who }}"
+          media_content_type: skill
+          media_content_id: amzn1.ask.skill.2ccd013f-8afa-4939-ab9e-996e8466f88c # Enable AC Skill
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

@@ -1,0 +1,33 @@
+####################################################
+#                                                                                                    
+#                    LOVELACE FLOORPLAN CONFIG                                                        
+#                                                                                                    
+####################################################
+
+custom_header:
+  compact_mode: true
+  button_text:
+    options: '{{ hours12LZ }}:{{ minutesLZ }}'
+  hide_help: true
+  hide_config: true
+  shadow: on
+  chevrons: false
+background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+views:
+  - !include floorplan.yaml
+
+honeycomb_menu_templates:
+  base:
+    audio: /local/audio/pin-drop.ogg
+    styles:
+      icon:
+        - filter: "drop-shadow(rgba(0, 0, 0, 0.4) 1px 1px 0px)"
+
+
+
+
+####################################################
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
+####################################################

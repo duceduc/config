@@ -1,0 +1,53 @@
+###################################################################################################
+## Package - Phillps Hue Bridge Customize
+## Hack to toggle light to off if lights are turn off by switch
+###################################################################################################
+
+group:
+  light_status: # for status of lightbulbs phillps hue hub
+    - light.wc_1
+    - light.g_1
+    - light.h_1
+    - light.c_1
+    - light.s_1
+    - light.l_1 
+    - light.k_1
+    - light.k_4
+    - light.str_1
+    - light.ntl_1
+    - light.lr_1
+    - light.w_1
+    - light.v_1
+    - light.sr_1
+    - light.m_1
+    - light.m_2
+    - light.clr_1
+
+template:
+  - sensor:
+      - name: "light Status" # for status of lightbulbs phillps hue hub
+        unique_id: 0ce8991a-7599-4fef-9f7e-34896e665ae7
+        icon: mdi:lightbulb-outline
+        state: >
+          {% set alias = {"wc_1":"wc","g_1":"genkan","h_1":"hallway","c_1":"computer","s_1":"shion","l_1":"living","k_1":"cabinet","k_4":"counter","str_1":"storage","ntl_1":"night_light","lr_1":"laundry","w_1":"sink","v_1":"vanity","sr_1":"shower","m_1":"master","m_2":"master_lamp","clr_1":"master_closet"} %}
+          {% set list = state_attr(('group.light_status'), 'entity_id') %}
+          {% if states.light | selectattr('entity_id', 'in', list) | selectattr('state','eq','unavailable') | list | count >=1 %}
+          {% set light = states.light | selectattr('entity_id', 'in', list) | selectattr('state','eq','unavailable') | sort(attribute='last_changed') | last %}
+            {% if light.state == 'unavailable' %}
+              {% set e = light.name %}
+              {% set entity = alias.get(e) %}
+                {{ entity }}
+          {% else %}{% endif %}{% endif %}
+
+
+automation:
+# add light to group.light_status entity & alias below
+  - alias: Status light update (bulbs) # for status of lightbulbs phillps hue hub
+    triggers:
+      - trigger: state
+        entity_id: sensor.light_status
+    condition: []
+    actions:
+      - action: light.turn_off
+        target:
+          entity_id: "light.{{ states('sensor.light_status') }}"

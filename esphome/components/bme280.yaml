@@ -1,0 +1,51 @@
+
+i2c: # default values. can override in main yaml file
+  sda: GPIO4 # GPIO21 for ESP32 and GPIO4 (D2) for ESP8266
+  scl: GPIO5 # GPIO22 for ESP32 and GPIO5 (D1) for ESP8266
+  scan: true
+
+sensor:
+  - platform: bme280_i2c
+    update_interval: 50s
+    address: 0x76
+    temperature:
+      name: "$room Temperature"
+      id: bme280_temperature
+      oversampling: 16x
+
+    pressure:
+      name: "$room Pressure"
+      id: bme280_pressure
+      oversampling: 16x
+
+    humidity:
+      name: "$room Humidity"
+      id: bme280_humidity
+      oversampling: 16x
+
+  - platform: homeassistant
+    name: My Weather Pressure
+    entity_id: sensor.my_weather_pressure
+    id: my_weather_pressure
+
+#  - platform: template
+#    name: $room Altitude
+#    lambda: |-
+#      const float STANDARD_SEA_LEVEL_PRESSURE = 1011.85; //in hPa, see note
+#      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
+#        (powf((id(my_weather_pressure).state / id(bme280_pressure).state), 0.190234) - 1); // in meter
+#    update_interval: 15s
+#    icon: 'mdi:signal'
+#    unit_of_measurement: 'm'
+#  - platform: absolute_humidity
+#    name: $room Abs Humidity
+#    temperature: bme280_temperature
+#    humidity: bme280_humidity
+#  - platform: template
+#    name: $room Dew Point
+#    lambda: |-
+#      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
+#      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
+#      ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
+#    unit_of_measurement: °C
+#    icon: 'mdi:thermometer-alert'

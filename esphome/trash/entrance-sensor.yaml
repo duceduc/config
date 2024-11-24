@@ -1,0 +1,19 @@
+# [40:91:51:4F:89:61]
+substitutions:
+  name: "entrance-sensor"
+  room: Entrance   
+  temp_offset: '0'
+  hum_offset: '0'
+
+packages:
+  stats: !include components/stats.yaml
+  aht10: !include components/aht10.yaml
+  adc: !include components/adc.yaml
+
+<<: !include .base.yaml #.134
+
+esphome:
+  name: $name
+  platform: esp8266
+  board: d1_mini
+

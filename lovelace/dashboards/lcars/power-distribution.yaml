@@ -1,0 +1,96 @@
+####################################################
+#
+#                    Bridge
+#
+####################################################
+
+title: Power Distribution
+path: power-distribution
+#panel: false
+cards:
+
+
+  - type: markdown
+    content: '# POWER DISTRIBUTION'
+    card_mod:
+      class: bar-large
+
+
+
+  - type: picture
+    image: https://i.pinimg.com/originals/aa/2f/ba/aa2fba231f3c70034d0a122e9a1f5a75.gif
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    card_mod:
+      class: middle-blank
+  - type: picture
+    image: https://i.pinimg.com/originals/aa/2f/ba/aa2fba231f3c70034d0a122e9a1f5a75.gif
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    card_mod:
+      class: middle-blank
+  - type: picture
+    image: https://i.pinimg.com/originals/aa/2f/ba/aa2fba231f3c70034d0a122e9a1f5a75.gif
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    card_mod:
+      class: middle-blank
+
+
+    
+  - type: custom:hui-element
+    card_type: custom:sankey-chart
+#    title: Power
+    show_names: true
+    height: 300
+    round: 2
+    unit_prefix: k
+    wide: true
+    card_mod:
+      class: middle-blank
+    sections:
+      - entities:
+          - entity_id: sensor.energy_t31_light_and_power_monthly
+            color: var(--lcars-text-purple)
+            name: Total
+            remaining:
+              name: Entertainment
+            children:
+            - sensor.energy_tv_power_monthly
+            - sensor.energy_washer_power_monthly
+      - entities:
+          - entity_id: sensor.energy_washer_power_monthly
+            name: Washer
+          - entity_id: sensor.energy_tv_power_monthly
+            name: Television
+            children:
+            - sensor.energy_fridge_power_monthly
+            - sensor.energy_fridge_power_monthly
+            - sensor.energy_fridge_power_monthly
+            remaining:
+              name: Other
+      - entities:
+          - entity_id: sensor.energy_fridge_power_monthly
+            name: Host 1
+          - entity_id: sensor.energy_fridge_power_monthly
+            name: Host 2
+          - entity_id: sensor.energy_fridge_power_monthly
+            name: Host 3
+
+
+
+
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

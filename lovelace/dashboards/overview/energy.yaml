@@ -1,0 +1,270 @@
+####################################################
+#                                                                                                    
+#                    SHELLY EM                                                                 
+#                                                                                                    
+####################################################
+
+title: Energy
+path: energy
+icon: mdi:gauge-full
+# background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+cards:
+#  - type: entities
+#    title: Living Room Air Quality
+#    show_header_toggle: false
+#    footer:
+#      type: graph
+#      entity: sensor.ikea_pm25_temperature
+#      detail: 3
+#    entities:
+#      - entity: sensor.ikea_pm25
+#        name: Air Quality
+#      - entity: sensor.carbon_dioxide
+#        name: Carbon Dioxide
+#      - entity: sensor.carbon_monoxide
+#        name: Carbon Monoxide
+#      - type: divider
+#      - entity: sensor.ikea_pm25_temperature
+#        name: PM25 Temperature
+
+  - type: entities
+    title: Kitchen Air Quality
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.sniffer0_temperature
+      detail: 3
+    entities:
+      - entity: sensor.sniffer0_pm_2_5_aqi
+        name: Air Quality
+      - entity: sensor.sniffer0_pm_2_5_mm
+        name:  Pollutant Level
+      - entity: sensor.sniffer0_gas_resistance
+        name: Carbon Monoxide
+      - type: divider
+      - entity: sensor.sniffer0_temperature
+        name: Kitchen Temperature
+
+  - type: entities
+    title: Living Air Quality
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.sniffer1_temperature
+      detail: 3
+    entities:
+      - entity: sensor.sniffer1_pm_2_5_aqi
+        name: Air Quality
+      - entity: sensor.sniffer1_pm_2_5_mm
+        name:  Pollutant Level
+      - entity: sensor.sniffer1_gas_resistance
+        name: Carbon Monoxide
+      - type: divider
+      - entity: sensor.sniffer1_temperature
+        name: Livingroom Temperature
+
+
+  - type: entities
+    title: Power Monitor
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.tariff_31_power
+      detail: 3
+    entities:
+      - entity: sensor.mains_voltage
+        name: Current Voltage
+        icon: mdi:lightning-bolt
+      - entity: sensor.t31_amperage
+        name: Current Amperage
+        icon: mdi:atom
+      - entity: sensor.energy_t31_light_and_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.tariff_31_power
+        name: Lights and Power
+        icon: mdi:lightning-bolt
+
+
+  - type: entities
+    title: Television
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.gosund_tv_power
+      detail: 3
+    entities:
+      - entity: sensor.gosund_tv_voltage
+        name: Current Voltage
+        icon: mdi:lightning-bolt
+      - entity: sensor.gosund_tv_amperage
+        name: Current Amperage
+        icon: mdi:atom
+      - entity: sensor.energy_tv_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.gosund_tv_power
+        name: Power
+        icon: mdi:lightning-bolt
+
+
+  - type: entities
+    title: Washer Machine
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.gosund_washer_power
+      detail: 3
+    entities:
+#      - entity: sensor.gosund_washer_state
+#        icon: mdi:washing-machine-alert
+      - entity: sensor.gosund_washer_current_state
+        name: Washer State
+        icon: mdi:washing-machine
+      - entity: sensor.energy_washer_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - entity: sensor.gosund_washer_yesterday_energy
+        name: Yesterday Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.gosund_washer_power
+        name: Power
+        icon: mdi:lightning-bolt
+
+  - type: entities
+    title: Refrigerator
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.gosund_fridge_power # sensor.fridge_plug_apower
+      detail: 3
+    entities:
+      - entity: sensor.gosund_fridge_voltage # sensor.fridge_plug_voltage
+        name: Current Voltage
+        icon: mdi:lightning-bolt
+      - entity: sensor.gosund_fridge_amperage # sensor.fridge_plug_temperature
+        name: Current Amperage  # Temperature
+        icon: mdi:thermometer-lines
+      - entity: sensor.energy_fridge_power_monthly
+        name: Monthly Total Power
+        icon: mdi:gauge
+      - type: divider
+      - entity: sensor.gosund_fridge_power # sensor.fridge_plug_apower
+        name: Power
+        icon: mdi:lightning-bolt
+
+
+
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Energy Use
+        state_color: true
+        entities:
+          - entity: sensor.t31_cost_today
+            name: T31 Light and Power
+          - entity: sensor.t41_cost_today
+            name: T41 Heating and Hot Water
+          - entity: sensor.total_cost_today
+          - entity: sensor.cumulative_energy_cost
+          - entity: sensor.last_reset
+          - entities:
+              - entity: input_number.t31_daily_cost
+              - entity: input_number.t31_1_energy_cost
+              - entity: input_number.t31_2_energy_cost
+              - entity: input_number.t31_3_energy_cost
+              - entity: input_number.t41_daily_cost
+              - entity: input_number.t41_energy_cost
+              - entity: script.reset_cumulative_cost
+            head:
+              label: Tariff Prices
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: select.energy_t31_light_and_power #
+                name: Metering T31
+              - entity: sensor.energy_t31_light_and_power_day
+                name: Lights and Power (Day)
+              - entity: sensor.energy_t31_light_and_power_night
+                name: Lights and Power (Night)
+              - entity: sensor.energy_t31_light_and_power_total
+                name: Lights and Power (Total)
+              - type: divider
+              - entity: select.energy_t41_heating #
+                name: Metering T41
+              - entity: sensor.energy_t41_heating_day
+                name: Heating and Hot Water (Day)
+              - entity: sensor.energy_t41_heating_night
+                name: Heating and Hot Water (Night)
+              - entity: sensor.energy_t41_heating_total
+                name: Heating and Hot Water (Total)
+#              - type: divider
+#              - entity: sensor.total_energy_day
+#                name: Total Energy (Day)
+#              - entity: sensor.total_energy_night
+#                name: Total Energy (Night)
+#              - entity: sensor.total_energy
+            head:
+              label: Main Energy Meters
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+          - entities:
+              - entity: sensor.gosund_washer_daily_energy
+                name: Washing Machine
+              - entity: sensor.gosund_tv_daily_energy
+                name: Television
+              - entity: sensor.gosund_fridge_daily_energy
+                name: Refrigerator
+
+            head:
+              label: Monitored Devices
+              type: section
+            padding: 0
+            type: 'custom:fold-entity-row'
+        show_header_toggle: false
+        style: |
+          ha-card {
+          }
+
+
+
+
+
+
+  # Hide when turned off
+  - type: entities
+    title: Humidifier
+    show_header_toggle: false
+    footer:
+      type: graph
+      entity: sensor.sb_humidifier_temperature
+      detail: 2
+    entities:
+      - entity: sensor.sb_humidifier_nebulization_efficiency
+        name: Humidifier Efficiency
+        icon: mdi:molecule
+      - entity: sensor.sb_humidifier_humidity
+        name: Humidifier Humidity
+        icon: mdi:water-percent
+      - type: divider
+      - entity: sensor.sb_humidifier_temperature
+        name: Humidifier Temperature
+        icon: mdi:thermometer-lines
+    style: |
+      ha-card {
+        {% if is_state('switch.sb_humidifier','off') %}
+           display:none !important;
+        {% endif %}
+      }
+
+
+####################################################
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
+####################################################

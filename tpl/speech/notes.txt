@@ -1,0 +1,14 @@
+
+When pollen sensor is fix, paste this code back in morning_briefing(line 58) and daily briefing (line 60) file
+
+      <p>
+        {% if states('sensor.pollen_tree')| int > 1 %}
+        {{ [
+         'Todays pollen count is Level, CT.',
+         'The current pollen count is Level, CT',
+         'Make sure you have your mask today, the pollen level is at CT.',
+         'Pollen level CT is expected today in Japan.',
+         'Japans pollen count level is at CT today.'
+         ]| random | replace('CT', states('sensor.pollen_tree')) }}
+        {% endif %}   
+      </p>

@@ -1,0 +1,30 @@
+track_package:
+  name: Track Package
+  description: Track a new package
+  fields:
+    tracking_id:
+      name: Tracking ID
+      description: The tracking ID of the package
+      example: "ABC123456789"
+      required: true
+      selector:
+        text:
+    name:
+      name: Sensor Name
+      description: Optional name for the sensor (default is 'Parcel <TrackingID>')
+      example: "My Amazon Package"
+      required: false
+      selector:
+        text:
+
+remove_package:
+  name: Remove Package
+  description: Remove a tracked package
+  fields:
+    tracking_id:
+      name: Tracking ID
+      description: The tracking ID of the package to remove
+      example: "ABC123456789"
+      required: true
+      selector:
+        text:

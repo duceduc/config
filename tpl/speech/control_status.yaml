@@ -1,0 +1,38 @@
+>
+  {# Control Status #}
+  {%- macro getReport() -%}
+     <p>
+     {% set mode = 'automatic' if trigger.to_state.state == 'off' else 'manual' %}
+     {{ [
+      'The TT are now in ',
+      'TT are now in ',      
+      'The Lights are now in '
+      ]| random | replace('TT', state_attr(trigger.entity_id, 'friendly_name')) }}
+      
+      {{ mode }}
+      
+      {{ [
+      'mode',
+      'setting.',
+      'status',
+      'state'
+      ]| random }}
+     
+     </p>
+     
+  {%- endmacro -%}
+
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}
+  {%- macro cleanup(data) -%}
+    {%- for item in data.split("\n")  if item | trim != "" -%}
+      {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  {# a macro to call all macros :)  #}
+  {%- macro mother_of_all_macros() -%}
+    {{ getReport() }}
+  {%- endmacro -%}
+
+  {# Call the macro  #}
+  {{- cleanup(mother_of_all_macros()) -}}

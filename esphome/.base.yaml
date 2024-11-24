@@ -1,0 +1,19 @@
+  
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+
+logger:
+#  level: WARN
+  baud_rate: 0
+#  hardware_uart: uart0
+
+api:
+  encryption:
+    key: !secret esphome_apikey
+
+ota:
+  - platform: esphome
+    password: !secret ota_pass
+
+captive_portal:

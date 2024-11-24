@@ -1,0 +1,211 @@
+
+  lrh_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '05:00'
+  lrh_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '07:30'
+  lrh_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '18:30'
+  lrh_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '20:00'
+
+
+
+#####
+  lr_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '04:00'
+  lr_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '07:25'
+  lr_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '18:30'
+  lr_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '20:00'
+#####
+  mr_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '04:30'
+  mr_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '05:00'
+  mr_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '20:00'
+  mr_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '20:30'
+#####
+  sr_ac_am_on_time:
+    name: AM On Time
+    has_time: true
+    initial: '05:40'
+  sr_ac_am_off_time:
+    name: AM Off Time
+    has_time: true
+    initial: '09:00'
+  sr_ac_pm_on_time:
+    name: PM On Time
+    has_time: true
+    initial: '21:00'
+  sr_ac_pm_off_time:
+    name: PM Off Time
+    has_time: true
+    initial: '20:00'
+
+  last_reset:
+    name: Last Reset
+    has_date: true
+
+#########################################################
+#                                                                                                              
+#             Disable Device Time                                                                      
+#                                                                                                              
+#########################################################
+
+#  tv_lock_time:
+#    name: TV Lock Time
+#    has_time: true
+#    initial: '21:25'
+
+#  weekday_disable_device_time:
+#    name: Weekday Disable Device Time
+#    has_time: true
+#    initial: '21:15'
+
+#  weekend_disable_device_time:
+#    name: Weekend Disable Device Time
+#    has_time: true
+#    initial: '22:15'
+
+
+#########################################################
+#                                                                                                              
+#             School Dates                                                                    
+#                                                                                                              
+#########################################################
+
+
+  school_first_day:
+    name: School First Day
+    has_date: true
+    has_time: false
+  school_last_day:
+    name: School Last Day
+    has_date: true
+    has_time: false
+  school_day_start:
+    name: School Day Start
+    has_date: false
+    has_time: true
+  school_day_end:
+    name: School Day End
+    has_date: false
+    has_time: true
+    
+  school_day_start_reminder:
+    name: School Day Start Reminder
+    has_date: false
+    has_time: true
+  school_day_end_reminder:
+    name: School Day End Reminder
+    has_date: false
+    has_time: true 
+
+  christmas_break_start:
+    name: Christmas Break
+    has_date: true
+    has_time: false
+  summer_break_start:
+    name: Summer Break
+    has_date: true
+    has_time: false
+  spring_break_start:
+    name: Spring Break
+    has_date: true
+    has_time: false
+
+
+#########################################################
+#                                                                                                              
+#             Time Report Automations Fires                                                                    
+#                                                                                                              
+#########################################################
+
+
+  morning_report:
+    name: Morning Report
+    has_date: false
+    has_time: true
+  nightly_report:
+    name: Nightly Report
+    has_date: false
+    has_time: true
+  daily_report:
+    name: Daily Report
+    has_date: false
+    has_time: true
+  nightly_briefing:
+    name: Nightly Briefing
+    has_date: false
+    has_time: true
+
+  shion_nightly_report:
+    name: Shion Nightly Report
+    has_date: false
+    has_time: true
+  shion_school_bedtime:
+    name: Shion School Bedtime
+    has_date: false
+    has_time: true
+  shion_bedtime_holiday:
+    name: Shion Bedtime Holiday
+    has_date: false
+    has_time: true
+
+
+  event_briefing:
+    name: Event Briefing
+    has_date: false
+    has_time: true
+
+
+  audible_notification_on:
+    name: Audible Notifications On
+    has_date: false
+    has_time: true
+  audible_notification_off:
+    name: Audible Notifications Off
+    has_date: false
+    has_time: true
+    
+
+
+
+
+
+
+
+
+
+
+
+
+

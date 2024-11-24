@@ -1,0 +1,165 @@
+title: light_bulbs
+path: light_bulbs
+icon: mdi:lightbulb
+theme: Quick Look Mobile
+background: 'var(--theme)'
+type: custom:grid-layout
+layout:
+  margin: -0.5vh 1vh 0vh
+  grid-template-columns: auto
+  grid-template-rows: 19.5vh 7.5vh 50vh 4vh 10vh 9vh
+  grid-template-areas: |
+    "header"
+    "subheader"
+    "main"
+    "footer_title"
+    "footer"
+    "menu"
+cards:
+  - type: custom:button-card
+    view_layout:
+      grid-area: header
+    template: header
+    variables:
+      view: light
+  - type: custom:button-card
+    view_layout:
+      grid-area: subheader
+    template: subheader_1
+    variables:
+      subheader_1_title: Bulbs #can be changed
+      subheader_1_path: light_bulbs
+      subheader_2_title: Covers #can be changed
+      subheader_2_path: light_covers
+  - type: custom:layout-card
+    view_layout:
+      grid-area: main
+    layout_type: custom:vertical-layout
+    layout:
+      height: 50vh
+      margin: 0vh 0vh 0vh
+      padding: 0vh 0.4vh
+    cards:
+      - type: custom:button-card
+        template: title_scrollable
+        variables:
+          title: Front Area
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: light_expandable
+            variables:
+              entity: light.hallway
+              name:
+              expand_to: light_bulbs_hallway
+          - type: custom:button-card
+            template: light
+            variables:
+              entity: light.shion
+              name:
+              expand_to:
+          - type: custom:button-card
+            template: light_expandable
+            variables:
+              entity: light.master
+              name:
+              expand_to: light_bulbs_master
+          - type: custom:button-card
+            template: light
+            variables:
+              entity: light.master_closet
+              name: closet
+              expand_to:
+          - type: custom:button-card
+            template: light
+            variables:
+              entity: light.wc
+              name:
+              expand_to:
+          - type: custom:button-card
+            template: light
+            variables:
+              entity: light.night_light
+              name: Night
+              expand_to:
+      - type: custom:button-card
+        template: title_scrollable
+        variables:
+          title: Rear Area
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: light_expandable
+            variables:
+              entity: light.cabinet
+              name: Kitchen
+              expand_to: light_bulbs_kitchen
+          - type: custom:button-card
+            template: light
+            variables:
+              entity: light.storage
+              name:
+              expand_to:
+          - type: custom:button-card
+            template: light_expandable
+            variables:
+              entity: light.living
+              name:
+              expand_to: light_bulbs_living
+          - type: custom:button-card
+            template: light
+            variables:
+              entity:  light.computer
+              name:
+              expand_to:
+          - type: custom:button-card
+            template: light_expandable
+            variables:
+              entity: light.laundry
+              name:
+              expand_to: light_bulbs_laundry
+          - type: custom:button-card
+            template: light
+            variables:
+              entity: light.shower
+              name:
+              expand_to:
+  - type: custom:button-card # FOOTER TITLE
+    view_layout:
+      grid-area: footer_title
+    template: title_sticky
+    variables:
+      title: Scenes
+  - type: custom:button-card # FOOTER
+    view_layout:
+      grid-area: footer
+    template: routines_footer
+    variables:
+      routine1_entity: #optional scene, script or automation
+      routine1_name: #optional
+      routine1_background_color: #optional
+      routine1_icon_color: #optional
+      routine2_entity: scene.living_1_fix
+      routine2_name: LR Fix
+      routine2_background_color:
+      routine2_icon_color: 
+      routine3_entity:
+      routine3_name:
+      routine3_background_color:
+      routine3_icon_color:
+      routine4_entity:
+      routine4_name:
+      routine4_background_color:
+      routine4_icon_color:
+      routine5_entity:
+      routine5_name:
+      routine5_background_color:
+      routine5_icon_color:
+  - type: custom:button-card # MENU
+    view_layout:
+      grid-area: menu
+    template: menu

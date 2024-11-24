@@ -1,0 +1,74 @@
+#########################################################
+#                                                                                                              
+#             Dummy Climate Template for QLM Theme                                           
+#                                                                                                              
+#########################################################
+# Climate Template Integration via CComponent
+# https://github.com/jcwillox/hass-template-climate
+
+  - platform: climate_template # Dummy climate to run input_select setup
+    name: "LR AC Mode"
+    modes:
+      - 'off'
+      - 'auto'
+      - 'heat'
+      - 'cool'
+      - 'fan_only'
+      - 'dry'
+    min_temp: 15
+    max_temp: 35
+    temp_step: 0.5
+    current_temperature_template: "{{ states('sensor.livingroom_temperature') }}"
+    target_temperature_template: "{{ states('input_number.lr_target_temperature') }}"
+    set_temperature:
+      service: input_number.set_value
+      data:
+        entity_id: input_number.lr_target_temperature
+        value: "{{ temperature }}"
+
+  - platform: climate_template # Dummy climate to run input_select setup
+    name: "MR AC Mode"
+    modes:
+      - 'off'
+      - 'auto'
+      - 'heat'
+      - 'cool'
+      - 'fan_only'
+      - 'dry'
+    min_temp: 15
+    max_temp: 35
+    temp_step: 0.5
+    current_temperature_template: "{{ states('sensor.master_temperature') }}"
+    target_temperature_template: "{{ states('input_number.mr_target_temperature') }}"
+    set_temperature:
+      service: input_number.set_value
+      data:
+        entity_id: input_number.mr_target_temperature
+        value: "{{ temperature }}"
+
+  - platform: climate_template # Dummy climate to run input_select setup
+    name: "SR AC Mode"
+    modes:
+      - 'off'
+      - 'auto'
+      - 'heat'
+      - 'cool'
+      - 'fan_only'
+      - 'dry'
+    min_temp: 15
+    max_temp: 35
+    temp_step: 0.5
+    current_temperature_template: "{{ states('sensor.shionroom_temperature') }}"
+    target_temperature_template: "{{ states('input_number.sr_target_temperature') }}"
+    set_temperature:
+      service: input_number.set_value
+      data:
+        entity_id: input_number.sr_target_temperature
+        value: "{{ temperature }}"
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

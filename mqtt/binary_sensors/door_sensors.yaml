@@ -1,0 +1,70 @@
+#########################################################
+#                                                                                                              
+#            SHELLY DOOR SENSORS                                                                  
+#                                                                                                              
+#########################################################
+## upate firmware manually
+## http://archive.shelly-tools.de/ ##
+
+# Battery seems to last for 1 year. status of battery inaccurate
+# genkan door sensor [D8BFC01A8C6A] - 192.168.1.82 [batt installed on 1/10/2023]
+# hallway door sensor [D8BFC01A8C33] - 192.168.1.83 [batt installed on 3/3/2022. died 6 months first doc]
+# shion door sensor [483FDA81F69D] - 192.168.1.92  [batt installed on 11/8/2022]
+# master door sensor [483FDA81F97F] - 192.168.1.93 
+# shellyem sensor [8CAAB506209A] - 192.168.1.87
+# smart plug sensor [FCF5C4AAF6E1] - 192.168.1.91
+
+
+
+# Shelly Genkan Door  CONVERTING NOW
+#  - name: "Genkan Door"  
+#    state_topic: "shellies/D8BFC01A8C6A/sensor/state"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Shelly Hallway Door
+#  - name: "Hallway Door"
+#    state_topic: "shellies/D8BFC01A8C33/sensor/state"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+# Shelly Master Door
+#  - name: "Master Door"  
+#    state_topic: "shellies/483FDA81F97F/sensor/state"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+# Shelly Shion Door
+#  - name: "Shion Door"
+#    state_topic: "shellies/483FDA81F69D/sensor/state"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

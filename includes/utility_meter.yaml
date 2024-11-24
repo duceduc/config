@@ -1,0 +1,37 @@
+#########################################################
+#                                                                                                              
+#             Metering                                                   
+#                                                                                                              
+#########################################################
+
+  energy_t31_light_and_power_monthly:
+    source: sensor.shelly_t31_total_energy
+    cycle: monthly
+    offset:
+      days: 2
+  energy_t31_light_and_power:
+    source: sensor.shelly_t31_total_energy
+    cycle: daily
+    tariffs:
+      - day
+      - night
+  energy_t41_heating:
+    source: sensor.shelly_t41_total_energy
+    cycle: daily
+    tariffs:
+      - day
+      - night
+
+  hourly_frontdoor_count:
+    source: sensor.front_door_count
+    cycle: hourly
+  daily_frontdoor_count:
+    source: sensor.front_door_count
+    cycle: daily
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

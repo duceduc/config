@@ -1,0 +1,64 @@
+
+input_boolean:
+  zigbee_permit_join:
+    name: Allow devices to join
+    initial: off
+    icon: mdi:cellphone-wireless
+
+timer:
+  zigbee_permit_join:
+    name: Time remaining
+    duration: 600 # Updated this to the number of seconds you wish
+
+mqtt:
+  sensor:
+    - name: Bridge state
+      state_topic: "zigbee2mqtt/bridge/state"
+      icon: mdi:router-wireless
+
+automation:
+  - id: enable_zigbee_join
+    alias: Enable Zigbee joining
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.zigbee_permit_join
+        to: 'on'
+    actions:
+    - action: mqtt.publish
+      data:
+        topic: zigbee2mqtt/bridge/config/permit_join
+        payload: 'true'
+    - action: timer.start
+      data:
+        entity_id: timer.zigbee_permit_join
+
+  - id: disable_zigbee_join
+    alias: Disable Zigbee joining
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.zigbee_permit_join
+        to: 'off'
+    actions:
+      - action: mqtt.publish
+        data:
+          payload: 'false'
+          topic: zigbee2mqtt/bridge/config/permit_join
+      - action: timer.cancel
+        data:
+          entity_id: timer.zigbee_permit_join
+
+  - id: disable_zigbee_join_timer
+    alias: Disable Zigbee joining by timer
+    triggers:
+      - trigger: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.zigbee_permit_join
+    actions:
+    - action: mqtt.publish
+      data:
+        topic: zigbee2mqtt/bridge/config/permit_join
+        payload: 'false'
+    - action: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.zigbee_permit_join

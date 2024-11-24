@@ -1,0 +1,102 @@
+#########################################################
+#                                                                                                              
+#             Testing Script                                                                               
+#                                                                                                              
+#########################################################
+
+
+# Alexa chimes
+  door_bell_alexa:
+    sequence:
+      - service: media_player.play_media
+        data:
+          entity_id: media_player.ai_1
+          media_content_type: sound
+          media_content_id: amzn_sfx_doorbell_chime_01
+
+  play_debbie:
+    alias: Plex Play Debbie
+    sequence:
+      - service: media_player.play_media
+        data_template:
+          entity_id: media_player.plex_plex_for_ios_id
+          media_content_type: 'music'  
+          media_content_id: '{ "library_name": "Music", "artist_name": "Debbie Gibson", "album_name": "Electric Youth" }'
+
+
+#########################################################
+#                                                                                                              
+#             Shelly EM                                                                                    
+#                                                                                                              
+#########################################################
+
+  reset_cumulative_cost:
+    sequence:
+    - service: input_number.set_value
+      data:
+        entity_id: input_number.cumulative_energy_cost
+        value: 0
+    - service: input_datetime.set_datetime
+      entity_id: input_datetime.last_reset
+      data_template:
+        date: "{{ as_timestamp(now())|timestamp_custom('%Y-%m-%d') }}"
+
+#########################################################
+#                                                                                                              
+#            Earthquake Daily Count                                                  
+#                                                                                                              
+#########################################################
+
+  update_earthquake_daily_count:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/daily_count
+          payload: "{{ states.sensor.earthquake_daily_count.state | int + 1 }}"
+          retain: true
+
+  reset_earthquake_daily_count:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/daily_count
+          payload: 0
+          retain: true
+
+  seismom5p_reset:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/seismom5P/command
+          payload: '{"reset": true}'
+
+  seismom5_reset:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: house/earthquake/seismom5P/seismom5/command
+          payload: '{"reset": true}'
+
+#########################################################
+#                                                                                                              
+#             Mailbox                                                                                    
+#                                                                                                              
+#########################################################
+
+# automation in telegram_bot.yaml in automation
+  mailbox_reset:
+    sequence:
+      - service: mqtt.publish # reset mqtt state or it will never retrigger
+        data:
+          topic: house/alerts/lora_mailbox/state
+          payload: received
+          retain: true
+
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

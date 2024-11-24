@@ -1,0 +1,159 @@
+>
+  {# Morning Report #}
+  {%- macro getReport() -%}
+    <p>
+        {% if now().strftime('%H')|int < 12 %}
+          Good morning.
+        {% elif now().strftime('%H')|int >= 12 and now().strftime('%H')|int < 17 %}
+          Good afternoon.
+        {% else %}
+          Good evening.
+        {% endif %}
+      </p>
+      
+      <p>
+      {% if now().strftime('%H')|int < 12 %}
+        {% if now().strftime('%M')|int == 0 %}
+          It is {{ now().strftime('%H')|int }} AM.
+        {% else %}
+          It is {{ now().strftime('%H')|int }} {{ now().strftime('%M')|int }} a.m.
+        {% endif %}
+
+      {% elif now().strftime('%H')|int > 12 %}
+        {% if now().strftime('%M')|int == 0 %}
+          It is {{ now().strftime('%H')|int }} PM.
+        {% else %}
+          It is {{ now().strftime('%H')|int }} {{ now().strftime('%M')|int }} p.m.
+        {% endif %}
+      
+      {% else %}
+
+      {% endif %}
+      </p>
+      
+      <p>
+      {{ [
+          'Today is ',
+          'If you have not been keeping track today is ',
+          'Do you know what day of the week it is? Today is ',
+          'I hate to be the bearer of bad news, but today is '
+      ]|random }}
+      {{states('sensor.date_dayoftheweek') }}.
+      </p>
+      
+      <p>
+        It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.entrance_temperature')|round}} degrees in Kawagoodchi. 
+      </p>
+
+
+      
+      <p>
+        {{ [
+            'The rest of the day should be,',
+            'Todays forecast should be,'
+        ]|random }}
+          {{ states('sensor.wbio_current_condition') }}. 
+        </p>
+
+
+
+        <p>
+          {% if is_state('sensor.date_dayoftheweek', 'Sunday') %}
+            {% if now().strftime('%H')|int > 17 %}
+            {{ [ 'Do not forget tomorrow is Trash Day. ',
+              'I advise you collect all trash and carry down to the trash room. ',
+              'The trash should go out.'
+            ] | random }}
+            {% endif %}
+          {% endif %}
+        </p>
+        
+        <p>
+        {% if is_state('sensor.halloween_countdown', '0') %}
+          Happy Halloween!
+        {% endif %}
+        {% if is_state('sensor.christmas_countdown', '0') %}
+          Merry Christmas Everyone!
+        {% endif %}
+        {% if is_state('sensor.anniversary_our_wedding', '0') %}
+          Happy Anniversary! It been an amazing {{ state_attr('sensor.anniversary_our_wedding', 'years') }} years!          
+        {% endif %}
+        </p>
+
+        <p>
+          {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) %}
+            {% if is_state('sensor.school_start_days2go', '0') %}
+                Today is the first day of school! 
+              {% else %}
+                {{ [ 'Today is a school day.',
+                  'It is a school day. '
+                ] | random }}
+              {% endif %}
+            Pickup will be at {{(state_attr('input_datetime.school_day_end', 'timestamp') | int | timestamp_custom('%I:%M %p', False)) }}.
+            {% if 'After School Care' in states('sensor.school_event') %}
+              But will be at the After School Day Care.
+            {% endif %} 
+            {% if 'Walking Home' in states('sensor.school_event') %}
+              But Sheon will be walking home from school.
+            {% endif %}
+            {% if states('sensor.school_end_days2go')| int == 0 -%}
+              But today is the last day of School! 
+            {%- endif %}
+          {% endif %}
+          {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) and 'After School Care' not in states('sensor.school_event') %}
+            {% if is_state('sensor.school_lunch', 'Nothing') %}
+              I am not sure what the school menu is for today, so plan on She on taking his lunch 
+            {% else %}
+              School lunch is {{ states('sensor.school_lunch') }}, lets hope She on is not too picky on his plate.
+            {% endif %}
+          {% endif %}
+
+          {% if states('sensor.school_end_days2go')| int == -1 -%}
+            Today is the first day of Summer Break! 
+          {%- endif %}
+
+          {% if 'School Off' in states('sensor.school_event') and  is_state('input_boolean.school_today', 'off') %}
+            There is no school today.
+          {% endif %} 
+
+          {% if is_state('calendar.shion_events', 'on') %}
+            Shion has {{ state_attr('calendar.shion_events', 'message') }} today as well!
+          {% endif %}
+        </p>
+
+        <p>
+          {% if is_state('sensor.date_weekday', 'on') and is_state('calendar.holidays_in_japan', 'off') %}
+             {%- if states('sensor.duc_destinations')|round > 48 %}
+               Traffic to jcb office appears heavy than normnal.
+             {% else %}
+               Traffic to the jcb office is normal.
+             {% endif %}
+             Currently it will take {{states('sensor.duc_destinations')|round}} minutes to get to the office.
+
+             {%- if not is_state('device_tracker.ie', 'home') %}
+               Eddie appears to be enroute to work and
+             {%- elif states('sensor.eri_destinations')|round > 71 %}
+               Traffic to the costco headquarter appears heavy than normnal.
+             {% else %}
+               Traffic to the costco headquarter is normal.
+             {% endif %}
+             Currently it will take {{states('sensor.eri_destinations')|round}} minutes to get to costco.
+          {% endif %}
+      </p>
+      
+  {%- endmacro -%}
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}
+    {%- macro cleanup(data) -%}
+      {%- for item in data.split("\n")  if item | trim != "" -%}
+        {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  {# a macro to call all macros :)  #}
+    {%- macro mother_of_all_macros() -%}
+      {{ getReport() }}
+    {%- endmacro -%}
+    
+    {# Call the macro  #}
+    {{- cleanup(mother_of_all_macros()) -}}
+    

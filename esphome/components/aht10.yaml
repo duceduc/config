@@ -1,0 +1,31 @@
+
+i2c: # for aht10
+  sda: GPIO4 # GPIO4 (D2) for ESP8266 GPIO21 for ESP32 and 
+  scl: GPIO5 # GPIO5 (D1) for ESP8266 GPIO22 for ESP32 and 
+  scan: true
+
+sensor:
+  - platform: aht10
+    variant: AHT20
+    address: 0x38
+    update_interval: 50s
+
+    temperature:
+      name: "$room Temperature"
+      accuracy_decimals: 1
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+            send_first_at: 1
+        - offset: "$temp_offset"
+
+    humidity:
+      name: "$room Humidity"
+      accuracy_decimals: 1
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+            send_first_at: 1
+        - offset: "$hum_offset"

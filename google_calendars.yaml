@@ -1,0 +1,68 @@
+- cal_id: someyae1118@gmail.com
+  entities:
+  - device_id: eri_someya
+    ignore_availability: true
+    name: Eri Someya
+    track: true
+  - device_id: reminders
+    name: reminders
+    search: "#special"
+    track: true
+  - device_id: birthdays
+    name: birthdays
+    search: "#birthday"
+    track: true
+
+- cal_id: en.japanese#holiday@group.v.calendar.google.com
+  entities:
+  - device_id: holidays_in_japan
+    ignore_availability: true
+    name: Holidays in Japan
+    track: true
+
+- cal_id: s8fph1rap53q0ah28d3h3japno@group.calendar.google.com
+  entities:
+  - device_id: vacation
+    ignore_availability: true
+    name: Vacation
+    track: true
+
+- cal_id: md7nniejbhs8g5hf192dohs94s@group.calendar.google.com
+  entities:
+  - device_id: appointments
+    ignore_availability: true
+    name: Appointments
+    track: true
+
+- cal_id: 6p3a7etpfihlsrhk0cr6i79r28@group.calendar.google.com
+  entities:
+  - device_id: shion_school
+    ignore_availability: true
+    name: Shion School
+    track: true
+
+- cal_id: bs0nebd9g3ckb9fojooq12eh44@group.calendar.google.com
+  entities:
+  - device_id: school_events
+    ignore_availability: true
+    name: School Events
+    track: true
+
+- cal_id: sc6u5eiohphpjvja04j9hjr4rg@group.calendar.google.com
+  entities:
+  - device_id: shion_events
+    ignore_availability: true
+    name: Shion Events
+    track: true
+
+#- cal_id: duceduc@gmail.com
+#  entities:
+#  - device_id: duc_g
+#    ignore_availability: true
+#    name: Duc G
+
+- cal_id: duceduc@gmail.com
+  entities:
+  - device_id: duc_g
+    ignore_availability: true
+    name: Duc G

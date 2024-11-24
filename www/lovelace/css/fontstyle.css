@@ -1,0 +1,17 @@
+
+@font-face {
+  font-family: "Oswald-Light";
+  src: url(/local/lovelace/fonts/Oswald-Light.woff) format('woff');
+}
+
+@font-face {
+  font-family: "Roboto-Condensed-Light";
+  src: url(/local/lovelace/fonts/Roboto-Condensed-Light.woff) format('woff');
+}
+
+
+html, {
+	font-family: "Oswald-Light", sans-serif !important;
+	paper-font-common-base_-_font-family: "Oswald-Light", sans-serif !important;
+	
+}

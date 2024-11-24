@@ -1,0 +1,20 @@
+# [C4:5B:BE:70:E0:FF]
+
+substitutions:
+  name: washroom-sensor
+
+packages:
+  stats: !include components/stats.yaml
+
+<<: !include .base.yaml #.73
+
+esphome:
+  name: $name
+  platform: ESP8266
+  board: d1_mini
+
+binary_sensor:
+  - platform: gpio
+    pin: D1
+    name: 'motion $name occupancy'
+    device_class: motion

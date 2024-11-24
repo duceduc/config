@@ -1,0 +1,497 @@
+###############################################################################
+#   @author         :   Duc Su
+#   @date           :   10/23/2022
+#   @package        :   Music Interface
+#   @description    :   Music selection both locally and Internet
+###############################################################################
+
+###################################################################################################
+# Music Player - Audio Selection
+###################################################################################################
+# https://community.home-assistant.io/t/a-flexible-multi-player-multi-device-music-interface/379769
+# https://fluxradios.blogspot.com/
+
+input_select:
+  audio_media_player_select:
+    name: Choice of audio media
+    options:
+      - Plex
+      - Spotify
+      - Webradio
+    initial: Spotify
+    icon: mdi:music-box-multiple
+
+  audio_media_device_select:
+    name: Choice of speakers
+    options:
+      - Kitchen
+      - Computer
+      - Hallway
+    initial: Computer
+    icon: mdi:cast-audio
+
+  plex_playlist_select:
+    name: Playlist Plex to play
+    options:
+      - All Music
+      - Cinéma & Télévision
+      - Dinner Classics
+      - Français
+      - International
+      - Madeleine & Lucien
+      - Musique Classique
+      - Noël
+    initial: All Music
+    icon: mdi:music
+
+  spotify_playlist_select:
+    name: Playlist Spotify to play
+    options:
+      - Hits Français
+      - Culture Tubes
+      - Noël Top 100
+      - La Vie est Belle
+      - Life Sucks
+      - Dinner with Friends
+      - Soft Pop
+      - Classical Movie Music
+    initial: La Vie est Belle
+    icon: mdi:spotify
+
+  webradio_select:
+    name: Choice of Webradio
+    options:
+      - Sun Radio
+      - La Première
+      - Nostalgie 80
+      - Top Oldies
+      - London Radio
+      - Q Foute Radio
+      - RTL 2
+    initial: London Radio
+    icon: mdi:radio
+
+
+###################################################################################################
+# Spotify Statistic Usage
+###################################################################################################
+
+switch:
+  - platform: template
+    switches:
+      spotify_usage:
+        value_template: "{{ is_state('media_player.spotify_duc', 'playing')  }}"
+        turn_on:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.target
+        turn_off:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.target
+
+sensor:
+  #Spotify Daily
+  - platform: history_stats
+    name: spotify_usage_daily
+    entity_id: switch.spotify_usage
+    state: "on"
+    type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+  - platform: template
+    sensors:
+      spotify_usage_daily_convert:
+        value_template: "{{ (states('sensor.spotify_usage_daily') | float * 3600)| timestamp_custom('%-H.%-M', false) }}"
+  #Spotify Weekly
+  - platform: history_stats
+    name: spotify_usage_weekly
+    entity_id: switch.spotify_usage
+    state: "on"
+    type: time
+    start: "{{ as_timestamp( now().replace(hour=0, minute=0, second=0) ) - now().weekday() * 86400 }}"
+    end: "{{ now() }}"
+  #Spotify Monthly
+  - platform: history_stats
+    name: spotify_usage_monthly
+    entity_id: switch.spotify_usage
+    state: "on"
+    type: time
+    start: "{{ now().replace(day=1).replace(hour=0).replace(minute=0).replace(second=0) }}"
+    end: "{{ now() }}"
+
+
+###################################################################################################
+# Spotify Statistic Usage && Music Player - Selected Audio Transformation
+###################################################################################################
+
+template:
+  - sensor:
+  #Spotify Weekly
+      - name: "Spotify Usage Weekly Convert"
+        unique_id: 63d7a277-3dbb-447c-baec-d3c1b0d89109
+        state: "{{ (states('sensor.spotify_usage_weekly') | float * 3600)| timestamp_custom('%-H.%-M', false) }}"
+        icon: mdi:calendar-clock
+  #Spotify Monthly
+      - name: "Spotify Usage Monthly Convert"
+        unique_id: 81a6b302-ca21-4871-8151-e614b15c8aae
+        state: "{{ (states('sensor.spotify_usage_monthly') | float * 3600)| timestamp_custom('%-H.%-M', false) }}"
+        icon: mdi:calendar-clock
+      - name: "Spotify Usage Monthly Convert Full"
+        unique_id: b70c6054-1fa8-47f5-b200-8d78f0009c05
+        state: "{{ (states('sensor.spotify_usage_monthly') | float * 3600)| timestamp_custom('%-H hours %-M minutes', false) }}"
+        icon: mdi:calendar-clock
+
+
+      - unique_id: "selected_plex_playlist_url"
+        icon: "mdi:music"
+        state: >-
+          {% if is_state("input_select.plex_playlist_select", "All Music") %} plex://{ "library_name": "MUSIC", "playlist_name": "All Music", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "Cinéma & Télévision") %} plex://{ "library_name": "Musique", "playlist_name": "Cinéma & Télévision", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "Dinner Classics") %} plex://{ "library_name": "Musique", "playlist_name": "Dinner Classics", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "Français") %} plex://{ "library_name": "Musique", "playlist_name": "Français", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "International") %} plex://{ "library_name": "Musique", "playlist_name": "International", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "Madeleine & Lucien") %} plex://{ "library_name": "Musique", "playlist_name": "Madeleine & Lucien", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "Musique Classique") %} plex://{ "library_name": "Musique", "playlist_name": "Musique Classique", "shuffle":"1" }
+          {% elif is_state("input_select.plex_playlist_select", "Noël") %} plex://{ "library_name": "Musique", "playlist_name": "Noël", "shuffle":"1" }
+          {% endif %}
+        attributes:
+          friendly_name: "Selected Plex Playlist URL"
+          filter_key: "Music_Player"
+
+      - unique_id: "selected_webradio_url"
+        icon: "mdi:radio"
+        state: >-
+          {% if is_state("input_select.webradio_select", "London Radio") %}
+          http://ec5.yesstreaming.net:2400/stream
+          {% elif is_state("input_select.webradio_select", "Sun Radio") %}
+          http://radio2.vip-radios.fm:8071/stream-128kmp3-ClubSoulside_autodj
+          {% elif is_state("input_select.webradio_select", "Q Foute Radio") %}  http://playerservices.streamtheworld.com/api/livestream-redirect/QFOUTERADIO.mp3
+          {% elif is_state("input_select.webradio_select", "RTL 2") %} http://streaming.radio.rtl2.fr/rtl2-1-44-128?listen=webCwsBCggNCQgLDQUGBAcGBg
+          {% elif is_state("input_select.webradio_select", "Nostalgie 80") %} http://185.52.127.157/fr/30605/mp3_128.mp3?origine=fluxradios&adws_out_2&access_token=6cdadc56875346318f1f8f09e4d83aa0
+          {% elif is_state("input_select.webradio_select", "Top Oldies") %}
+          http://live.topfm.hu:8000/oldies.mp3
+          {% elif is_state("input_select.webradio_select", "La Première") %}
+          http://radios.rtbf.be/laprem1erebxl-128.mp3
+          {% endif %}
+        picture: >-
+          {% if is_state("input_select.webradio_select", "London Radio") %}
+          /local/radio-logo/qmusic.png
+          {% elif is_state("input_select.webradio_select", "Sun Radio") %}
+          /local/radio-logo/joefm.png
+          {% elif is_state("input_select.webradio_select", "Q Foute Radio") %}
+          /local/radio-logo/qfout.png
+          {% elif is_state("input_select.webradio_select", "RTL 2") %}
+          /local/radio-logo/rtl2.png
+          {% elif is_state("input_select.webradio_select", "Nostalgie 80") %}
+          /local/radio-logo/nostalgie80.png
+          {% elif is_state("input_select.webradio_select", "Top Oldies") %}
+          /local/radio-logo/nostalgie_cinema.png
+          {% elif is_state("input_select.webradio_select", "La Première") %}
+          /local/radio-logo/premiere.png
+          {% endif %}
+        attributes:
+          friendly_name: "Selected Webradio URL"
+          filter_key: "Music_Player"
+
+      - unique_id: "selected_spotify_playlist_uri"
+        state: >-
+          {% if is_state("input_select.spotify_playlist_select", "Hits Français") %}
+          spotify:playlist:6PdQUFfjOzTaiPUqtfDPCc
+          {% elif is_state("input_select.spotify_playlist_select", "Culture Tubes") %}
+          spotify:playlist:37i9dQZF1DXd0Y4aXXQXWv
+          {% elif is_state("input_select.spotify_playlist_select", "Noël Top 100") %}
+          spotify:playlist:2wlZ9OIdKnLrSLRqIpBPax
+          {% elif is_state("input_select.spotify_playlist_select", "Soft Pop") %}
+          spotify:playlist:37i9dQZF1DWTwnEm1IYyoj
+          {% elif is_state("input_select.spotify_playlist_select", "La Vie est Belle") %}
+          spotify:playlist:37i9dQZF1DXdrln2UyZD7F
+          {% elif is_state("input_select.spotify_playlist_select", "Life Sucks") %}
+          spotify:playlist:37i9dQZF1DX3YSRoSdA634
+          {% elif is_state("input_select.spotify_playlist_select", "Dinner with Friends") %}
+          spotify:playlist:37i9dQZF1DX4xuWVBs4FgJ
+          {% elif is_state("input_select.spotify_playlist_select", "Classical Movie Music") %}
+          spotify:playlist:1UdKFAMBjM3prK7hieeqjC
+          {% endif %}
+        icon: mdi:spotify
+        attributes:
+          friendly_name: "Selected Spotify Playlist URI"
+          filter_key: "Music_Player"
+
+      - unique_id: "selected_audio_media_type"
+        state: >-
+          {% if is_state("input_select.audio_media_player_select", "Plex") %} PLAYLIST
+          {% elif is_state("input_select.audio_media_player_select", "Webradio") %} audio/mp4
+          {% elif is_state("input_select.audio_media_player_select", "Spotify") %} playlist
+          {% endif %}
+        attributes:
+          friendly_name: "Selected Media Category"
+          filter_key: "Music_Player"
+
+      - unique_id: "selected_audio_media_device"
+        icon: "mdi:cast-audio"
+        state: >-
+          {% if is_state("input_select.audio_media_device_select", "Kitchen") %} media_player.razer_leviathan_player
+          {% elif is_state("input_select.audio_media_device_select", "Computer") %} media_player.ai_4
+          {% elif is_state("input_select.audio_media_device_select", "Hallway") %} media_player.ai_2
+          {% endif %}
+        attributes:
+          friendly_name: "Selected Speaker Group"
+          filter_key: "Music_Player"
+          nameid: >-
+            {% if is_state("input_select.audio_media_device_select", "Kitchen") %} Ai.1
+            {% elif is_state("input_select.audio_media_device_select", "Computer") %} Ai.4
+            {% elif is_state("input_select.audio_media_device_select", "Hallway") %} Ai.2
+            {% endif %}
+          plexid: >-
+            {% if is_state("input_select.audio_media_device_select", "Kitchen") %} media_player.plex_razer_leviathan_player
+            {% elif is_state("input_select.audio_media_device_select", "Computer") %} media_player.plex_ai_4
+            {% elif is_state("input_select.audio_media_device_select", "Hallway") %} media_player.plex_ai_2
+            {% endif %}
+
+      - unique_id: "selected_audio_media_device_state"
+        icon: "mdi:cast-audio-variant"
+        state: >-
+          {{ states(states("sensor.template_selected_audio_media_device")) }}
+        attributes:
+          friendly_name: "Selected Speaker Group - Status"
+          filter_key: "Music_Player"
+
+      - unique_id: "selected_audio_media_device_muted"
+        icon: "mdi:volume-mute"
+        state: >-
+          {{ (state_attr(states('sensor.template_selected_audio_media_device'), 'is_volume_muted')) }}
+        attributes:
+          friendly_name: "Selected Speaker Group - Mute/Unmute"
+          filter_key: "Music_Player"
+
+      - unique_id: "selected_audio_media_device_picture"
+        icon: "mdi:panorama-variant"
+        state: >-
+          {% if is_state('input_select.audio_media_player_select', 'Plex') %}
+          {{ (state_attr(state_attr('sensor.template_selected_audio_media_device', 'plexid'), 'entity_picture')) }}
+          {% elif is_state('input_select.audio_media_player_select', 'Webradio') %}
+          {{ (state_attr('sensor.template_selected_webradio_url', 'entity_picture')) }}
+          {% elif is_state('input_select.audio_media_player_select', 'Spotify') %}
+          {{ (state_attr(states('sensor.template_selected_audio_media_device'), 'entity_picture_local'))}}
+          {% endif %}
+        attributes:
+          friendly_name: "Selected Speaker Group - Image"
+          filter_key: "Music_Player"
+
+###################################################################################################
+# Music Player - Sound Volume Management
+###################################################################################################
+
+      - unique_id: "sound_volume_selected_audio_device"
+        state: >-
+          {% if is_state("input_select.audio_media_device_select", "Kitchen") %}
+          {{ (state_attr('media_player.razer_leviathan_player', 'volume_level') | float *100) |int }}
+          {% elif is_state("input_select.audio_media_device_select", "Computer") %}
+          {{ (state_attr('media_player.ai_4', 'volume_level') | float *100) |int }}
+          {% elif is_state("input_select.audio_media_device_select", "Hallway") %}
+          {{ (state_attr('media_player.ai_2', 'volume_level') | float *100) |int }}
+          {% endif %}
+        icon: >-
+          {% if states("sensor.template_sound_volume_selected_audio_device")|float(0) >37 %} mdi:volume-high
+          {% elif states("sensor.template_sound_volume_selected_audio_device")|float(0) >17 %} mdi:volume-medium
+          {% elif states("sensor.template_sound_volume_selected_audio_device")|float(0) >0 %} mdi:volume-low
+          {% else %} mdi:speaker-off
+          {% endif %}
+        attributes:
+          friendly_name: "Selected Speaker Group - Volume"
+          filter_key: "Music_Player"
+
+###################################################################################################
+# Music Player - Artist & Title Information Extract
+###################################################################################################
+
+      - unique_id: "artist_playing"
+        state: >-
+          {% if is_state("input_select.audio_media_player_select", "Webradio") %}
+          {{ states("input_select.webradio_select") }}
+          {% else %}
+          {{ (state_attr(states('sensor.template_selected_audio_media_device'), 'media_artist')) }}
+          {% endif %}
+        icon: mdi:account-music
+        attributes:
+          friendly_name: "Performer of the current song"
+          filter_key: "Music_Player"
+
+      - unique_id: "title_playing"
+        state: >-
+          {% if is_state("input_select.audio_media_player_select", "Webradio") %}
+          {{ states("input_select.webradio_select") }}
+          {% else %}
+          {{ (state_attr(states('sensor.template_selected_audio_media_device'), 'media_title')) }}
+          {% endif %}
+        icon: mdi:file-music
+        attributes:
+          friendly_name: "Current song title"
+          filter_key: "Music_Player"
+
+###################################################################################################
+# Music Player - Scripts
+###################################################################################################
+script:
+# Music Player - Scripts dynamiques
+  music_control_play_music:
+    alias: Dynamic Music - Play Music
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_select.audio_media_player_select
+                state: Spotify
+            sequence:
+              - action: media_player.select_source
+                data:
+                  entity_id: media_player.spotify_duc
+                  source: '{{ state_attr("sensor.template_selected_audio_media_device", "nameid") }}'
+              - action: media_player.shuffle_set
+                data:
+                  shuffle: true
+                  entity_id: media_player.spotify_duc
+              - action: media_player.play_media
+                data:
+                  entity_id: media_player.spotify_duc
+                  media_content_type: '{{ states("sensor.template_selected_audio_media_type") }}'
+                  media_content_id: '{{ (states(''sensor.template_selected_spotify_playlist_uri'')) }}'
+        default:
+          - action: media_player.play_media
+            data:
+              media_content_type: '{{ states("sensor.template_selected_audio_media_type") }}'
+              media_content_id: >-
+                {% if is_state("input_select.audio_media_player_select", "Plex") %}
+                  {{ states("sensor.template_selected_plex_playlist_url") }}
+                {% elif is_state("input_select.audio_media_player_select", "Webradio") %}
+                  {{ states("sensor.template_selected_webradio_url")}}
+                {% endif %}
+            target:
+              entity_id: '{{ states("sensor.template_selected_audio_media_device") }}'
+    mode: single
+    icon: mdi:folder-music-outline
+
+  music_control_stop_music:
+    alias: Dynamic Music - Stop Music
+    sequence:
+      - action: media_player.media_stop
+        target:
+          entity_id: '{{ states("sensor.template_selected_audio_media_device")}}'
+    mode: single
+    icon: mdi:volume-off
+
+  music_control_decrease_sound_level:
+    alias: Dynamic Music - Volume Up
+    sequence:
+      - action: media_player.volume_set
+        target:
+          entity_id: '{{ states("sensor.template_selected_audio_media_device") }}'
+        data:
+          volume_level: >-
+            {{ ((((states("sensor.template_sound_volume_selected_audio_device")|float(0))
+            / 500)|round(2) * 5) - 0.05) |round(2) |float(0.05) }}
+    mode: single
+    icon: mdi:volume-minus
+
+  music_control_increase_sound_level:
+    alias: Dynamic Music - Volume Up
+    sequence:
+      - action: media_player.volume_set
+        target:
+          entity_id: '{{ states("sensor.template_selected_audio_media_device") }}'
+        data:
+          volume_level: >-
+            {{ ((((states("sensor.template_sound_volume_selected_audio_device")|float(0))
+            / 500)|round(2) * 5) + 0.05) |round(2) |float(0.05) }}
+    mode: single
+    icon: mdi:volume-plus
+
+  music_control_mute_unmute_music:
+    alias: Dynamic Music - Mute/Unmute Speakers
+    sequence:
+      - action: media_player.volume_mute
+        target:
+          entity_id: '{{ states("sensor.template_selected_audio_media_device")}}'
+        data:
+          is_volume_muted: >-
+            {% if is_state_attr(states("sensor.template_selected_audio_media_device"),'is_volume_muted', true) %}
+              false
+            {% else %}
+              true
+            {% endif %}
+    mode: single
+    icon: mdi:volume-off
+
+  music_control_next_track:
+    alias: Dynamic Music - Next track if API allows
+    sequence:
+      - action: media_player.media_next_track
+        target:
+          entity_id: '{{ states("sensor.template_selected_audio_media_device")}}'
+    mode: single
+    icon: mdi:skip-next
+
+
+###################################################################################################
+# Razer Player
+###################################################################################################
+#    play_tracks:
+#      sequence:
+#        - repeat:
+#            while:
+#              - condition: template
+#                value_template: '{{ repeat.index <= states.sensor.music.attributes.number_of_files }}'
+#            sequence:
+#              - service: media_player.play_media
+#                data:
+#                  media_content_id: "{{ state_attr('sensor.music', 'file_list') [repeat.index][-1] }}"
+#                  media_content_id: >-
+#                    /media/local/{{
+#                    states.sensor.music.attributes.file_list[repeat.index
+#                    - 1]  }}
+#                  media_content_type: audio/mp4
+#                target:
+#                  entity_id: media_player.razer_leviathan_player
+#              - delay:
+#                  hours: 0
+#                  minutes: 0
+#                  seconds: 11
+#                  milliseconds: 0
+#              - wait_template: '{{ is_state("media_player.razer_leviathan_player", "idle") }}'
+
+
+  play_random_track:
+    alias: Play Random Music Track
+    sequence:
+      - action: media_player.play_media
+        data:
+          media_content_id: "{{ state_attr('sensor.music', 'file_list') | random | replace('media/','media/local/') }}"
+          media_content_type: audio/mp4
+        target:
+          entity_id: media_player.razer_leviathan_player
+
+
+input_boolean:
+  continuous_play:
+    name: Continous Play
+    initial: off
+
+automation:
+  triggers:
+    - trigger: state
+      entity_id: media_player.razer_leviathan_player
+      to: idle
+    - trigger: state
+      entity_id: input_boolean.continuous_play
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.continuous_play
+              state: 'on'
+          sequence:
+            - action: script.play_random_track
+      default:
+        - action: media_player.media_stop
+          entity_id: media_player.razer_leviathan_player

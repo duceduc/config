@@ -1,0 +1,51 @@
+###############################################################################
+#   @author         :   Duc Su 
+#   @date           :   03/20/2022
+#   @package        :   Sysmon
+#   @description    :   A collection of Home Assistant and Pi Sensors. Using ser server to perform test every 30mins.
+###############################################################################
+# Run by ser server
+mqtt:
+  sensor:
+    - name: "Speedtest Result"
+      state_topic: "house/system_monitor/speedtest/result"
+      json_attributes_topic: "house/system_monitor/speedtest/result"    
+      json_attributes_template: "{{ value_json.attributes | tojson }}"
+      value_template: "{{ value_json.state }}"
+
+sensor:
+  - platform: template
+    sensors:
+# Speedtest Results
+      speedtest_download:
+        value_template: "{{ state_attr('sensor.speedtest_result', 'download') }}"
+        unique_id: speeddown
+      speedtest_upload:
+        value_template: "{{ state_attr('sensor.speedtest_result', 'upload') }}"
+        unique_id: speedup
+      speedtest_ping:
+        value_template: "{{ state_attr('sensor.speedtest_result', 'ping') }}"
+        unique_id: speedping
+      speedtest_lastrun:
+        value_template: "{{ state_attr('sensor.speedtest_result', 'time_run') }}"
+        unique_id: speedtimerun
+
+# Speedtest Average custom component
+# {{ now().replace(hour=0).replace(minute=0).replace(second=0) }}
+  - platform: average
+    name: "Speedtest Download Average"
+    start: '{{ 0 }}'
+    end: '{{ now() }}'
+    entities:
+      - sensor.speedtest_download
+
+  - platform: average
+    name: "Speedtest Upload Average"
+    start: '{{ 0 }}'
+    end: '{{ now() }}'
+    entities:
+      - sensor.speedtest_upload
+
+
+    
+    

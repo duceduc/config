@@ -1,0 +1,506 @@
+####################################################
+#
+#                    Floorplan
+#
+####################################################
+
+title: Floorplan
+path: floorplan
+icon: mdi:floor-plan
+theme: midnight
+panel: true
+cards:
+  - type: horizontal-stack
+    cards:
+
+#################################################
+### Battery States
+#################################################
+
+      - type: custom:mod-card
+        card_mod:
+          style: |
+              :host {
+                position: absolute;
+                bottom: 6px;
+                right: 6px;
+                width: 265px;
+              }
+        card:
+          type: custom:auto-entities
+          show_empty: false
+          filter:
+            include:
+              - entity_id: '/sensor\..*battery/'
+                state: "< 15"
+            exclude:
+              - entity_id: '/sensor\..*phone/'
+              - entity_id: '/sensor\.device*/'
+              - entity_id: '/sensor\..*_watch*/'
+              - attributes:
+                  show_battery_alert: false
+          card:
+            type: entities
+            card_mod:
+              style: |
+                @keyframes alert {
+                  from {
+                    background: #ff000033;
+                    box-shadow: 0px 0px 0px 1px #f970709e;
+                  }
+                  to {
+                    background: #ff000011;
+                    box-shadow: 0px 0px 0px 1px #f9707055;
+                  }
+                }
+                ha-card {
+                  background: #ffffff14;
+                  height: auto !important;
+                  transform: translate( 0, 0 );
+                  
+                  animation: 1s alert linear infinite alternate;
+                  box-shadow: 0px 0px 0px 1px #f970709e;
+                  background: #ff000033;
+                }
+
+
+
+#################################################
+### Floorplan
+#################################################
+
+      - type: 'custom:floorplan-card'
+        style: >
+          ha-card {
+            max-width: 167vh;
+            margin: 0 auto;
+            background: none;
+            box-shadow: none;
+          }
+
+        config:
+          image: '/local/lovelace/floorplan/floorplan_optimized.svg?8'
+          stylesheet: '/local/lovelace/css/floorplan.css?8'
+          console_log_level: error
+          rules:
+
+            - entity: switch.jcom_tv
+              tap_action:
+                action: 'toggle'
+              hold_action:
+                action: call-service
+                service: honeycomb
+                service_data:
+                  template: base
+                  autoclose: false
+                  active: true
+                  buttons:                  
+                    - icon: mdi:information-variant
+                      tap_action:
+                        action: more-info
+
+    #                - icon: mdi:monitor
+                    - icon: mdi:volume-minus
+                      tap_action:
+                        action: call-service
+                        service: script.tv_volume_down
+
+                    - icon: mdi:volume-mute
+                      tap_action:
+                        action: call-service
+                        service: switch.toggle
+                        service_data:
+                          entity_id: switch.tv_mute
+
+
+                    - icon: mdi:volume-plus
+                      tap_action:
+                        action: call-service
+                        service: script.tv_volume_up
+
+
+#################################################
+### Motions and Sensors
+#################################################
+
+            - entities:
+              - binary_sensor.computerroom_window_triggered
+              - binary_sensor.livingroom_window_triggered
+              - binary_sensor.genkan_door_triggered
+              state_action:
+                service: floorplan.class_set
+                service_data: 'motion motion-${entity.state}'
+
+            - entity: sensor.gosund_washer_power
+              state_action:
+                service: floorplan.class_set
+                service_data:
+                  class: '${(entity.state > 700) ? "washer-drying" : (entity.state >= 5) ? "washer-running" : "washer-stop"}'
+
+            - entity: binary_sensor.desktop_status
+              state_action:
+                service: floorplan.class_set
+                service_data:
+                  class: '${(entity.state === "off") ? "power-off" : "power-on"}'
+
+            - entity: binary_sensor.washer_water_leak
+              state_action:
+                service: floorplan.class_set
+                service_data:
+                  class: '${(entity.state === "off") ? "detect-off" : "detect-on"}'
+
+            - entities:
+              - input_select.lr_ac_mode
+              - input_select.sr_ac_mode
+    #          - input_select.mr_ac_mode
+              hold_action: more-info          
+              state_action:
+                service: floorplan.class_set
+                service_data: |
+                  >
+                    var stat = (entity.state);
+                    if (stat === "Powerful Heat") return "aircon status-heat";
+                    else if (stat === "Normal Heat") return "aircon status-heat";
+                    else if (stat === "Silent Heat") return "aircon status-heat";
+                    else if (stat === "Powerful Cool") return "aircon status-cool";
+                    else if (stat === "Normal Cool") return "aircon status-cool";
+                    else if (stat === "Silent Cool") return "aircon status-cool";
+                    else if (stat === "Normal Humidifier") return "aircon status-fan";
+                    else if (stat === "Ai Auto") return "aircon status-fan";
+                    else if (stat === "Fan") return "aircon status-fan";
+                    else if (stat === "Off") return "aircon status-off";
+                    else return "unknown";
+
+            - entity: input_select.mr_ac_mode
+              tap_action: false
+              hover_action: false
+              state_action:     
+                service: floorplan.image_set
+                service_data: |
+                  >
+                   var imgName = ''; 
+                   switch (entity.state) { 
+                     case 'Powerful Heat': imgName = 'heat'; break;
+                     case 'Normal Heat': imgName = 'heat'; break;
+                     case 'Silent Heat': imgName = 'heat'; break;
+                     case 'Powerful Cool': imgName = 'cool'; break;
+                     case 'Normal Cool': imgName = 'cool'; break;
+                     case 'Silent Cool': imgName = 'cool'; break;
+                     case 'Normal Humidifier': imgName = 'air'; break;
+                     case 'Ai Auto': imgName = 'air'; break;
+                     case 'Fan': imgName = 'air'; break;
+                     case 'Off': imgName = 'off'; break;
+                   } 
+                   return '/local/lovelace/floorplan/img/fan-' + imgName + '.svg';
+
+
+#################################################
+### Texts and Labels
+#################################################
+
+            - entities:
+              - sensor.espresense_computerroom_temperature
+              - sensor.computerroom_temperature
+              - sensor.kitchen_temperature
+              - sensor.entrance_temperature
+              - sensor.entrance_humidity                    
+              - sensor.shionroom_temperature
+              - sensor.master_temperature
+              - sensor.wc_temperature
+              - sensor.livingroom_temperature
+              - sensor.mdf_temperature
+              - sensor.entry_temperature
+              - sensor.average_house_temperature
+              - sensor.washer_device_temperature
+              tap_action: false
+              state_action:
+                - service: floorplan.class_set
+                  service_data: 'static-temp'
+         
+            - entities:
+              - sensor.espresense_computerroom_temperature
+              - sensor.computerroom_temperature
+              - sensor.kitchen_temperature
+              - sensor.entrance_temperature
+              - sensor.shionroom_temperature
+              - sensor.master_temperature
+              - sensor.wc_temperature
+              - sensor.livingroom_temperature
+              - sensor.mdf_temperature
+              - sensor.entry_temperature
+              - sensor.average_house_temperature
+              - sensor.washer_device_temperature
+              tap_action: false
+              state_action:
+                action: call-service
+                service: floorplan.text_set
+                service_data:
+    #              element: ${entity.entity_id}.text
+                  text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : (entity.state)}°'
+
+            - entities:
+              - sensor.entrance_humidity
+              tap_action: false
+              state_action:
+                action: call-service
+                service: floorplan.text_set
+                service_data:
+    #              element: ${entity.entity_id}.text
+                  text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : (entity.state)}%'
+
+#################################################
+### Presence
+#################################################
+
+            - entities:
+              - sensor.eri_espresense
+              - sensor.duc_espresense
+              - sensor.shion_tms_espresense
+              tap_action: false
+              state_action:
+                action: call-service
+                service: floorplan.style_set
+                service_data:
+                  element: "${entity.entity_id}"
+                  style: |
+                    >
+                    if( entity.state == "not_home" )
+                         return "display: none;";
+                         return "display: block;"
+
+    #        - entities:
+    #          - person.duc
+    #          - person.eri
+    #          - person.shion          
+    #          tap_action: false
+    #          state_action:
+    #            action: call-service
+    #            service: floorplan.style_set
+    #            service_data:
+    #              element: "${entity.entity_id}"
+    #              style: |
+    #                >
+    #                if( entity.state == "home" )
+    #                     return "display: block;";
+    #                     return "display: none;"
+
+
+#################################################
+### Lights
+#################################################
+
+            - entities:
+              - light.cabinet
+              - light.genkan
+              - light.hallway
+              - light.counter
+              - light.master
+              - light.master_closet
+              - light.master_lamp
+              - light.ceiling_fan_light
+              - light.computer
+              - light.living
+              - light.night_light
+              - light.shion
+              - light.shower
+              - light.laundry
+              - light.sink
+              - light.storage
+              - light.wc
+              tap_action: false
+              state_action:
+                action: call-service
+                service: floorplan.class_set
+                service_data: 'light-${entity.state}'
+
+            - entities:
+              - light.cabinet
+              - light.genkan
+              - light.hallway
+              - light.counter
+              - light.master
+              - light.master_closet
+              - light.master_lamp
+              - light.ceiling_fan_light
+              - light.computer
+              - light.living
+              - light.night_light
+              - light.shion
+              - light.shower
+              - light.laundry
+              - light.sink
+              - light.storage
+              - light.wc
+              tap_action:
+                action: 'toggle'
+              double_tap_action: more-info
+              state_action:
+                action: call-service
+                service: floorplan.style_set
+                service_data:
+                  element: "${entity.entity_id.replace('light.', 'light_overlay.')}"
+                  style: |
+                      >
+                      if( entity.state !== "on" )
+                           return "display: none;";
+                      let hue = 0;
+                      let sat = 0;
+                      if( entity.attributes.hs_color )
+                      {
+                         hue = entity.attributes.hs_color[0];
+                         sat = entity.attributes.hs_color[1];
+                      }
+                      if( sat < 35 )
+                      {
+                         return `
+                           display: block;
+                           filter:
+                             brightness(calc( ${entity.attributes.brightness} / 255));`
+                      }
+                         return `
+                           display: block;
+                           filter:
+                             sepia(100%)
+                             hue-rotate(calc( ${hue}deg - 55deg ))
+                             saturate(calc( ${sat}% * 2 ))
+                             brightness(calc( ${entity.attributes.brightness} / 255));`
+  
+
+#################################################
+### Speakers
+#################################################
+
+
+      - type: custom:mod-card
+        card_mod:
+        style: |
+            :host {
+               --vertical-stack-card-margin: 5px;
+               transform: translate(0, 0);
+               top: var(--header-height);
+               right: 6px;              
+               position: absolute;
+               width: 265px;
+               height: auto !important;
+            }
+
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:auto-entities
+              card:
+                type: entities
+              filter:
+                include:
+                  - entity_id: '/media_player\..*plex_/'
+              sort:
+                method: entity_id
+                ignore_case: true
+
+            - type: custom:auto-entities
+              show_empty: false
+              card:
+                type: entities
+              filter:
+                include:
+                  - domain: media_player
+                    state: playing
+                    entity_id: '/^media_player\..*(ai|plex_)$'
+
+
+            - type: grid
+              square: false
+              columns: 2
+              cards:
+                - type: custom:button-card
+                  show_label: false
+                  show_icon: false
+                  entity: input_select.home_mode
+                  color: '#ffffff45'
+                  styles:
+                    card:
+                      - height: '100%'
+                    name:
+                      - color: '#ffffff45'
+                      - font-size: 1.5em
+                      - font-style: italic
+                  state:
+                    - operator: '=='
+                      value: 'Home'
+                      styles:
+                        card:
+                          - box-shadow: '0px 0px 5px #0072ffd9'
+                  tap_action:
+                    action: more-info
+
+                - type: custom:button-card
+                  icon: mdi:video
+                  label: All Cameras
+                  show_label: false
+                  color: '#ffffff45'
+
+
+
+  #################################################
+  # Weather
+  #################################################
+  
+  
+      - type: custom:weather-card
+        entity: weather.my_weather
+        current: true
+        details: false
+        forecast: false
+        card_mod:
+          style: |
+            :host {
+              transform: translate( 0, 0 );
+              position: absolute;
+              width: 240px;
+              left: 6px;
+              top: 22px;
+              opacity: 0.7;
+              mix-blend-mode: luminosity;
+            }
+            @media only screen and (max-width: 1280px)
+            {
+                :host {
+                    left: -22px;
+                    top: 12px;
+                }
+            }
+            ha-card {
+              background: none;
+              box-shadow: none;
+            }
+            :host .icon.bigger {
+              position: unset;
+              width: 8em;
+              height: 8em;
+              margin-top: -1em;
+            }
+            .temp, .tempc, .icon {
+                position: unset !important;
+            }
+            :host .temp {
+                font-size: 1.5em !important;
+                margin-left: -1em;
+            }
+            :host .current {
+              --primary-text-color: #606060; 
+            }
+            .tempc {
+                font-size: .9em !important;
+                vertical-align: super;
+            }
+ 
+ 
+ 
+ 
+ 
+ 
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

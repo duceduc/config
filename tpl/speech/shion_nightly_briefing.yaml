@@ -1,0 +1,83 @@
+>
+  {# Shion Nightly Report #}
+  {%- macro getReport() -%}
+    <p>
+      こんばんは シオン, 
+      {{ [ 'お風呂に入る時間です. ',
+          'ほぼ就寝時間です。それは、ベッドの準備を始める時が来たことを意味します。今夜お風呂に入っているなら、そのように向かう必要があります.',
+          '浴槽と通信できません。または私はあなたのためにすでに水を始めていただろう。だからあなたは自分でお風呂を始めなければならないでしょう.',
+          'センサーが異臭を検出しています。診断を実行しています。しかし、その間に、あなたはお風呂を始めるべきで. ',
+          '言いたくないのですが、一日が終わりに近づいています。あなたの仕事を終えて、あなたが持っているおもちゃを拾い上げて、そしてベッドの準備をする時間.',
+          'ギアを切り替えて寝る準備をしなければならない毎日の時間になりました。ストーリータイムを楽しみたい場合は、先に進んでください.',
+          '入浴したことのない子供について聞いたことがありますか <break time="2s"/> ええ、私も。だから私たちはそれをそのように保つべきです。ベッドの準備をする時が来ました.',
+          '就寝時刻が始まるまでのカウントダウン時計。片付けて、パジャマを着て、今夜読む物語を選んでください.'
+        ] | random }} 
+      {% if is_state('sensor.school_tomorrow', 'on') %} 
+        {{ [ '明日学校があるから. ',
+          '明日早く起きて学校に行かなければならないから.',
+          '明日学校の準備をしたいから.'
+        ] | random }}   
+      {% else %}
+        {% set month=states("sensor.date").split('-')[1] | int %}
+        {%- if is_state('input_boolean.school_in_session', 'off') -%}
+          {{ [ '明日は夏休みの別の日みたい. ',
+              '明日はまだ夏休みです. ',
+              '夏休みは永遠に続くわけではありませんが、まだ終わっていません. '
+            ] | random }} 
+        {% else %}
+          ああ、明日は学校がないようです.
+        {% endif %} 
+          {{ [ '遅く寝ることができます. ',
+               '少し後で寝ましょう. ',
+              '早起きする理由はありません. ',
+              '寝ることができます. '
+            ] | random }} 
+      {% endif %} 
+      {% if states('sensor.school_start_days2go')| int < 10 and states('sensor.school_start_days2go')| int > 1 -%}
+        {{ [ '私はそれを言うのは嫌いですが ',
+            '不運にも,',
+            'すべての良いことは終わらせなければなりません.'
+          ] | random }}
+        しかありません {{ states('sensor.school_start_days2go') }} 日々  
+        {{ [ '夏休みの左. ',
+            ' 夏休みの左.',
+            '学校が再開するまで.'
+          ] | random }}
+      {% elif states('sensor.school_start_days2go')| int == 1 -%}
+        明日は学校の初日です。準備はできたか 
+      {%- endif %}
+      {% if states('sensor.school_end_days2go')| int < 15 and states('sensor.school_end_days2go')| int > 0 -%}
+      {{ [ '学校はもうすぐ終わります.',
+          'あなたは学年の終わりに到達しました.',
+          'あなたはほとんど学校を終えています.'
+        ] | random }}
+      しかありません {{ states('sensor.school_end_days2go') }} 日々  
+      {{ [ '学年に残った ',
+          ' 学校の左.',
+          '学校の最終日まで.'
+        ] | random }}
+      {% elif states('sensor.school_end_days2go')| int == 0 -%}
+        明日は夏の初日です. 準備はできたか 
+      {%- endif %}
+        {{ [ '私はあなたがそれを好きなようにあなたの部屋を準備しました.',
+          '部屋の照明を調整しました.',
+          '寝室の照明をつけて、ベッドの下の照明を調整しました.',
+          '私はあなたの部屋のプレベッドルーチンを実行しました.'
+        ] | random }}
+    </p>
+  {%- endmacro -%}
+
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}
+    {%- macro cleanup(data) -%}
+      {%- for item in data.split("\n")  if item | trim != "" -%}
+        {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  {# a macro to call all macros :)  #}
+    {%- macro mother_of_all_macros() -%}
+      {{ getReport() }}
+    {%- endmacro -%}
+    
+    {# Call the macro  #}
+    {{- cleanup(mother_of_all_macros()) -}}

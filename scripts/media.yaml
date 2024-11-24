@@ -1,0 +1,149 @@
+#########################################################
+#                                                                                                              
+#             AppleTV                                                                                         
+#                                                                                                              
+#########################################################
+
+# Turn on Netflix via AppleTV
+  appletv_netflix:
+      alias: Appletv Netflix
+      sequence:
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:08
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - down
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - select
+
+# Turn on Plex via AppleTV
+  appletv_plex:
+      alias: Appletv Plex
+      sequence:
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:08
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - menu
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - down
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - down
+              - down
+        - delay: 00:00:02
+        - service: remote.send_command
+          data:
+            entity_id: remote.living_room
+            command:
+              - select
+
+
+#########################################################
+#                                                                                                              #
+#             TV                                                                                             #
+#                                                                                                              #
+#########################################################
+
+# Volume Up
+  tv_volume_up:
+    alias: Tv Volume Up
+    sequence:
+      - service: switch.turn_on
+        entity_id: switch.tv_volume
+      - service: switch.turn_on
+        entity_id: switch.tv_volume
+
+# Volume Up
+  tv_volume_down:
+    alias: Tv Volume Down
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.tv_volume
+      - service: switch.turn_off
+        entity_id: switch.tv_volume
+
+
+#########################################################
+#                                                                                                              #
+#             Wyoming Enhanced                                                                                           
+#                                                                                                              #
+#########################################################
+
+  play_music:
+      alias: Play Music
+      sequence:
+        - variables:
+            music_query: "{{ music_query | default('Queen') }}"
+            mass_media_player: "{{ mass_media_player | default('media_player.mediaroomsatellite') }}"
+            derived_mass_media_player: >
+              {% set assist_entities =
+              integration_entities('wyoming')|select('contains','_assist_in_progress')|list
+              %}
+
+              {% for entity in assist_entities %}
+                {% if states(entity) == 'on' %}
+                  {{ entity.replace('_', '').replace('binarysensor', 'media_player').replace('assistinprogress', '') }}
+                {% endif %}
+              {% endfor %}
+        - service: mass.search
+          data:
+            limit: 1
+            media_type:
+              - playlist
+            name: "{{music_query}}"
+          response_variable: query_response
+        - service: media_player.clear_playlist
+          target:
+            entity_id: "{{mass_media_player or derived_mass_media_player}}"
+          data: {}
+        - service: mass.play_media
+          data:
+            media_id: "{{query_response.playlists[0].uri}}"
+            entity_id: "{{mass_media_player or derived_mass_media_player}}"
+            enqueue: replace
+      mode: single
+
+
+
+
+
+
+
+
+
+
+#########################################################
+#                                                                                                              #
+#          END OF CONFIGURATION FILE                                                             #
+#                                                                                                              #
+#########################################################

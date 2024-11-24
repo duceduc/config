@@ -1,0 +1,125 @@
+###############################################################################
+#   @author           :   Duc Su
+#   @date              :   08/14/2022
+#   @package        :   Database
+#   @description    :   Recorder and Logger Configurations
+###############################################################################
+
+recorder:
+#  db_url: !secret MySQL_login
+  db_url: sqlite:////media/data/hassio_db/home-assistant_v2.db
+#  purge_keep_days: 10
+  exclude:
+    entity_globs:
+      - sensor.homeft24*
+      - sensor.jcbft24*
+    domains:
+      - group
+      - automation
+      - camera
+      - media_player
+      - scene
+      - script
+      - updater
+    entities:
+      - sun.sun
+      - sensor.date_time
+      - sensor.date
+      - sensor.time_online
+      - sensor.moon
+      - sensor.month_is
+      - sensor.time
+      - sensor.today_is
+      - sensor.time_utc
+      - sensor.last_boot # comes from 'systemmonitor' sensor platform
+      - sensor.devices_with_low_battery
+
+template:
+  - sensor:
+      - name: Home Assistant v2 db size gb
+        unique_id: f80d1532-fad5-45b5-9740-db9e91cd7ca4
+        unit_of_measurement: 'GB'
+        state: "{{ '{:.2f}'.format((states('sensor.home_assistant_v2_db_size') | float(0) * 0.001)) }}"
+        icon: mdi:harddisk
+
+logbook:
+  include:
+    domains:
+     - media_player
+     - automation
+     - script
+     - light
+     - switch
+     - device_tracker
+     - input_boolean
+     - person
+
+# Lets try to make the logs less chatty and more fine tuned.
+logger:
+  default: error
+  logs:
+    homeassistant.core: warning
+    homeassistant.loader: error
+    homeassistant.components.recorder: error # to spot db issues
+    homeassistant.config_entries: error
+    homeassistant.setup: error
+    homeassistant.helpers.entity: critical
+    homeassistant.components.automation: error
+    homeassistant.components.waze_travel_time: error
+    homeassistant.components.statistics.sensor: critical
+    homeassistant.helpers.event: critical
+
+history:
+  include:
+    domains:
+      - sensor
+      - switch
+      - media_player
+      - light
+      - scene
+      - automation
+
+influxdb:
+  api_version: 2
+  host: 192.168.1.55
+  port: 8015
+  ssl: false
+  verify_ssl: false
+  token: !secret influx_token
+  organization: ngx
+  bucket: homeassistant
+  include:
+    domains:
+      - person
+      - utility_meter
+    entity_globs:
+      - sensor.*temperature
+      - sensor.*humidity
+      - sensor.*illuminance
+      - sensor.ram_use_pct*
+      - sensor.*cpu_usage
+      - sensor.energy*
+      - sensor.rainfall*
+      - sensor.sniffer*
+    entities:
+      - sensor.sniffer0_pm_2_5_aqi
+      - sensor.speedtest_download
+      - sensor.speedtest_upload
+      - sensor.home_assistant_v2_db_size_gb
+      - light.counter
+      - light.cabinet
+      - light.computer
+      - light.pc_desktop_led
+      - light.genkan
+      - light.hallway
+      - light.living
+      - light.master
+      - light.master_closet
+      - light.storage
+      - light.shower
+      - light.sink
+      - light.laundry
+      - light.vanity
+      - light.laundry
+      - media_player.mediaroomsatellite
+      - media_player.spotify_duc

@@ -1,0 +1,593 @@
+#########################################################
+#
+#                   Windows Desktop Notification
+#
+#########################################################
+
+- alias: set school pickup time
+  triggers:
+    - trigger: state
+      entity_id: calendar.shion_school
+      from: 'off'
+      to: 'on'
+  actions:
+    - action: input_datetime.set_datetime
+      entity_id: input_datetime.school_day_end_reminder
+      data:
+        time: >
+          {% if state_attr('calendar.shion_school', 'description' ) == 'early-release' %}
+            12:45
+          {% else %}
+            16:30
+          {% endif %}
+
+- alias: school time notification
+  triggers:
+    - trigger: time
+      at: '07:19:00'
+  conditions:
+    - condition: template # pc is on
+      value_template: "{{ is_state('binary_sensor.desktop_status', 'on') }}"
+    - condition: template # there is school today
+      value_template: "{{ is_state('input_boolean.school_today', 'on') }}"
+  actions:
+    - action: script.text_notify_image
+      data:
+        who: 'desktop'
+        title: 'School Time'
+        message: "Time for Shion to go to school."
+        image: "http://homeassistant.local:8123/local/img/misc/school-bell.png"
+
+#- alias: bed time notification
+#  triggers:
+#    - trigger: time
+#      at: '21:15:00'
+#  conditions:
+#    - condition: template # is the weekday
+#      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+#  actions:
+#    - action: script.text_notify
+#      data:
+#        who: 'isp'
+#        title: '就寝時間'
+#        message: 'シオン、今寝てください.'
+
+
+#########################################################
+#
+#                   ISP Internet Status
+#
+#########################################################
+
+# Using intergation Uptime robot, but flaky atm.2/16/2024
+#- alias: ISP/HA Internet Status Notification
+#  variables:
+#    status_msg: "Internet/HA is {{ states('binary_sensor.home_assistant')| lower }}line."
+#  triggers:
+#    trigger: state
+#    entity_id: binary_sensor.home_assistant
+#    to: 'off'
+#    for: 10
+#  actions:
+#    - action: script.email_notify
+#      data:
+#        who: duc
+#        title: "Internet/HA {{ states('binary_sensor.home_assistant')| title }}line Notification"
+#        message: >
+#          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+#          <br>
+#          The Internet or Home-Assistant appears to be {{ states('binary_sensor.home_assistant') }}line.
+#          <br>
+#    - action: script.text_notify
+#      data:
+#        who: amber
+#        title: '*Internet Status*'
+#        message: '{{ status_msg }}'
+#    - action: script.text_notify
+#      data:
+#        who: desktop
+#        title: '*Internet Status*'
+#        message: '{{ status_msg }}'
+#    - action: script.text_notify
+#      data:
+#        who: 'duc'
+#        message: '{{ status_msg }}'
+#        title: '*Internet Status*'
+#    - action: logbook.log
+#      data:
+#        name: Internet Status
+#        message: "{{ states('binary_sensor.home_assistant')| lower }}line"
+
+
+#########################################################
+#
+#                   Vehicles Delivery Notifications
+#
+#########################################################
+
+# MAKE SURE IT IS NOT DISABLED IN HA
+- alias: "Vehicles Arriving Notification"
+  triggers:
+    - trigger: state
+      entity_id: sensor.units_arriving
+      to: 'on'
+  conditions:
+    - condition: template
+      value_template: "{{ states('sensor.units_arriving') != 'unknown' }}"
+#    - trigger: calendar # alternative use
+#      event: start
+#      entity_id: calendar.units_arriving
+#      offset: -288:00:00 #12days
+#  conditions:
+#    - "{{ trigger.calendar_event.summary == 'Units Arriving' }}"
+  actions:
+    - action: script.text_notify
+      data:
+        who: discord_eta
+        message: >
+          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+
+          **Today is {{ now().strftime( '%B %d, %Y') }}**
+
+          List of Containers | Roro Arriving on {{ today }}.
+
+          Please make arrangements to have BL docs send to customers.
+
+          ---
+
+          {{ state_attr('sensor.units_arriving', 'description') }}
+#          {{ states('sensor.units_arriving') }}
+#          {{ trigger.calendar_event.description }}
+
+
+## delete when testing for discord is ok or use for MACK
+- alias: "Vehicle Delivery Notifications"
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id:
+       - sensor.deliveryin2week
+  conditions:
+    - condition: template
+      value_template: "{{ states('sensor.deliveryin2week') != 'unknown' }}"
+    - condition: template
+      value_template: "{{ states('sensor.deliveryin2week')| trim != '' }}"
+  actions:
+# Email
+    - action: script.email_notify
+      data:
+        who: jcb
+        title: "Vehicle Delivery Notification: ETA {{ as_timestamp(now() + timedelta(days = 11))|timestamp_custom('%-m/%d/%Y', true ) }}"
+        message: >
+          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          <b> List of Containers / Roro Arriving on  {{ today }}.</b> <br>
+          {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %} The following units are arriving in about 10 days. Please make arrangements to have BL send to customers.<br><br> {{ states('sensor.deliveryin2week') }} {% endif %} <br>
+          <br>
+# Discord NOTE: In Json file, max character is 268 total.
+#    - action: script.text_notify
+#      data:
+#        who: discord_eta
+#        message: >
+#          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+
+#          **Today is {{ now().strftime( '%B %d, %Y') }}**
+
+#          List of Containers | Roro Arriving on  {{ today }}.
+
+#          {% if is_state('sensor.deliveryin2week', '') %} There are no vehicles. {% else %}The following units are arriving in about 10 days.
+
+#          Please make arrangements to have BL send to customers.
+
+#          ---
+
+#          {{ states('sensor.deliveryin2week') }}
+#          {% endif %}
+
+
+
+#########################################################
+#
+#      HOLIDAY / BIRTHDAY
+#
+#########################################################
+
+- alias: "Holiday Notification"
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: sensor.holiday
+  conditions:
+    - condition: template
+      value_template: "{{ states('sensor.holiday') != 'unknown' }}"
+    - condition: template
+      value_template: "{{ states('sensor.holiday')| trim != 'none' }}"
+  actions:
+    - action: script.text_notify
+      data:
+        who: duc
+        title: "{{ states('sensor.holiday') }}"
+        message: "Today is {{ states('sensor.holiday') }}."
+
+
+
+#########################################################
+#
+#      Payday
+#
+#########################################################
+
+- alias: "Payday Notification"
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.payday
+      to: 'on'
+  conditions: []
+  actions:
+    - action: script.text_notify
+      data:
+        who: viber
+        title: 'Payday'
+        message: >-
+          {{ [
+            "You've got paid.",
+            "Fund's in the bank.",
+            "A deposit has been issued.",
+            "It's payday."
+            ] | random }}
+
+
+#########################################################
+#
+#      Samba Snapshot Backup
+#
+#########################################################
+
+- alias: Backup HA Notifications
+  triggers:
+    - trigger: state
+      entity_id: sensor.samba_backup
+  conditions:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.samba_backup
+        state: IDLE
+  actions:
+    - action: script.text_notify
+      data:
+        who: duc
+        title: '*Information*'
+        message: "Samba backup {{ states('sensor.samba_backup')| lower }}."
+    - action: logbook.log
+      data:
+        name: Samba Backup
+        message: "{{ states('sensor.samba_backup')| lower }}"
+
+#########################################################
+#
+#      SSL Certificate Expiry Notification
+#
+#########################################################
+
+
+#  CAN DELETE
+- alias: "VJ SSL Certificate Expiry Notification"
+  initial_state: true
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.vj_ssl_cert_expiry
+      below: 3
+  actions:
+    - action: script.email_notify
+      data:
+        who: duc
+        title: "Certificate Expiring in {{ states('sensor.vj_ssl_cert_expiry') }} Days: {{ states.sensor.vj_cert_sslmate.attributes.dns_names[0] }}"
+        message: >-
+          {% set str = states.sensor.vj_cert_sslmate.attributes.issuer.name %}
+          {% set issuer = (str|regex_findall_index('[a-zA-Z]{8}')).replace('','') %}
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          This is to notify you that your certificate with the common name {{ states.sensor.vj_cert_sslmate.attributes.dns_names[0] }} will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
+          To renew your certificate, please visit <a href="https://my.{{ issuer|lower }}.com/en/user/">{{ issuer }}</a>.<br>
+          <br>
+
+
+- alias: "HA SSL Certificate Expiry Notification"
+  initial_state: true
+  variables:
+    cn: >-
+     {% set str=states('sensor.ha_ssl_cert_cn') %}
+     {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}?\.[a-zA-Z]{1,}',1)) %}
+     {{ cn }}
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.ha_ssl_cert_expiry
+      below: 3
+  actions:
+    - action: script.email_notify
+      data:
+        who: duc
+        title: "Certificate Expiring in {{ states('sensor.ha_ssl_cert_expiry') }} Days: {{cn}}"
+        message: >-
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states('sensor.ha_ssl_cert_expiry') }} days. <br>
+          <br>
+
+- alias: "Mqtt SSL Certificate Expiry Notification"
+  initial_state: true
+  variables:
+    cn: >-
+     {% set str=states('sensor.mqtt_ssl_cert_cn') %}
+     {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}',7)) %}
+     {{ cn }}
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.mqtt_ssl_cert_expiry
+      below: 3
+  actions:
+    - action: script.email_notify
+      data:
+        who: duc
+        title: "Certificate Expiring in {{ states('sensor.mqtt_ssl_cert_expiry') }} Days: {{ cn }}"
+        message: >-
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states('sensor.mqtt_ssl_cert_expiry') }} days. <br>
+          <br>
+
+
+#########################################################
+#
+#      Earthquake Alert Notification
+#
+#########################################################
+
+- alias: "Earthquake Alert"
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id:
+        - sensor.earthquake_alert
+  conditions:
+    - condition: template
+      value_template: "{{ states('sensor.earthquake_alert') != 'unknown' }}"
+    - condition: template
+      value_template: "{{ states('sensor.earthquake_alert')| trim != '' }}"
+  actions:
+    - action: notify.send_message
+      target:
+        entity_id: notify.earthquake_log
+      data:
+        message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
+
+# Depreciate in 2024.12 
+#    - action: notify.earthquake_log
+#      data:
+#        message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
+
+    - condition: template
+      value_template: "{{ state_attr('sensor.earthquake_alert', 'mag')| float(0) >= 4 }}"
+    - action: script.update_earthquake_daily_count
+    - action: script.text_notify
+      data:
+        who: duc
+        title: >-
+          {% set d=state_attr('sensor.earthquake_alert', 'at') %}
+          {% set date=(d|regex_findall_index('[0-9]{4}-[0-9]{2}-[0-9]{2}',0)).replace('','') %}
+          {% set time=(d|regex_findall_index('[0-9]{2}:[0-9]{2}',0)).replace('','') %}
+           Earthquake at {{ time }}
+        message: "Location: {{ state_attr('sensor.earthquake_alert', 'en_anm') }} M{{ state_attr('sensor.earthquake_alert', 'mag') }}"
+
+
+- alias: Earthquake Status Notification
+  triggers:
+    - trigger: state
+      entity_id: sensor.seismoM5p_state
+      from: "LISTENING"
+      to: "EARTHQUAKE"
+    - trigger: state
+      entity_id: sensor.seismoM5p_state
+      from: "unavailable"
+      to: "LISTENING"
+      id: "status"
+    - trigger: state
+      entity_id: sensor.seismoM5p_state
+      from: "CALIBRATION"
+      to: "LISTENING"
+      id: "status"
+    - trigger: state
+      entity_id: sensor.seismoM5p_state
+      to: "unavailable"
+      id: "status"
+    - trigger: numeric_state
+      entity_id: sensor.seismom5p_pga
+      below: 0.1
+      for: 60
+      id: "offline"
+
+  actions:
+    choose:
+      - conditions:
+          - condition: trigger
+            id: 'status'
+        sequence:
+          - action: script.text_notify
+            data:
+              who: duc
+              message: "SeismoM5P is {{ states('sensor.seismoM5p_state')| lower() }}..."
+      - conditions:
+          - condition: trigger
+            id: 'offline'
+        sequence:
+          - action: script.text_notify
+            data:
+              who: duc
+              message: "Seismom sensors are offline"
+    default:
+      - action: script.text_notify
+        data:
+          who: duc
+          message: "Earthquake Happening at Home !!!"
+
+
+#- alias: "Earthquake Notification"
+#  triggers:
+#    - trigger: state
+#      entity_id:
+#        - sensor.earthquake_alert
+#  actions:
+#    - action: script.email_notify
+#      data:
+#        who: duc
+#        title: "Earthquake Notification Alert"
+#        message: >-
+#          {% set d=state_attr('sensor.earthquake_alert', 'at') %}
+#          {% set date=(d|regex_findall_index('[0-9]{4}-[0-9]{2}-[0-9]{2}',0)).replace('','') %}
+#          {% set time=(d|regex_findall_index('[0-9]{2}:[0-9]{2}',0)).replace('','') %}
+#          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+#          <br>
+#          There is an earthquake.<br>
+#          <br>
+#          Place of eqicenter: {{ state_attr('sensor.earthquake_alert', 'en_anm') }}<br>
+#          Time: {{ time }}<br>
+#          Magnitude: {{ state_attr('sensor.earthquake_alert', 'mag') }}<br>
+#          Seismic Intensity: {{ state_attr('sensor.earthquake_alert', 'maxi') }}<br>
+#          <br>
+
+
+
+#########################################################
+#
+#                   Home Air Quality Notifications
+#
+#########################################################
+
+- alias: Home Air Quality Warnings
+  variables:
+    warn_msg: "The {{ trigger.to_state.attributes.friendly_name }} in the house is at {{ trigger.to_state.state }}{{ trigger.to_state.attributes.unit_of_measurement }}. Take precautionary action."
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.ikea_pm25
+      above: 999
+      for: 61
+    - trigger: numeric_state
+      entity_id: sensor.carbon_monoxide
+      above: 59
+      for: 61
+    - trigger: numeric_state
+      entity_id: sensor.carbon_dioxide
+      above: 2000
+      for: 61
+
+  actions:
+#    - action: notify.home_assistant
+#      data:
+#        title: "{{ trigger.to_state.attributes.friendly_name }} Warning"
+#        message: >
+#          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+#          <br>
+#          {{ warn_msg }}
+#          <br>
+#        data:
+#          images: []
+
+    - action: script.text_notify
+      data:
+        who: amber
+        title: Air Quality Warning
+        message: '{{ warn_msg }}'
+
+    - action: script.text_notify
+      data:
+        who: desktop
+        title: Air Quality Warning
+        message: '{{ warn_msg }}'
+
+#    - action: script.text_notify
+#      data:
+#        who: duc
+#        title: '*{{ trigger.to_state.attributes.friendly_name }} Warning*'
+#        message: '{{ warn_msg }}'
+
+    - action: logbook.log
+      data:
+        name: '{{ trigger.to_state.attributes.friendly_name }} Warning'
+        message: '{{ warn_msg }}'
+
+- alias: Central Night Cooling Notification
+  triggers:
+    - trigger: state
+      entity_id:
+       - binary_sensor.central_night_cooling
+      to: "on"
+  conditions:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: script.text_notify
+      data:
+        who: duc
+        title: Night Cooling possible
+        message: Open Windows to cool down the rooms
+  mode: single
+
+- alias: Washing Machine Water Detection Notification
+  triggers:
+    - trigger: state
+      entity_id:
+       - binary_sensor.washer_water_leak
+      to: "on"
+  actions:
+    - action: script.text_notify
+      data:
+        who: duc
+        title: Water Leak Detected
+        message: Water Detected around the washing machine area.
+    - action: script.text_notify
+      data:
+        who: viber
+        title: Water Leak Detected
+        message: Water Detected around the washing machine area.
+    - action: script.email_notify
+      data:
+        who: duc
+        title: "Water Leak Detected"
+        message: >-
+          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+          <br>
+          There may have been a water leak around the washing machine area. Action is require as soon as possible. <br>
+          <br>
+  mode: single
+
+
+
+#########################################################
+#
+#                   Security Report Announcement
+#
+#########################################################
+
+
+- alias: Security Report
+  initial_state: true
+  triggers:
+    - trigger: time
+      at: '21:01:00'
+  actions:
+    - action: script.speech_engine
+      data:
+        who: "{{ states('sensor.room_presence') }}"
+        message: !include ../tpl/speech/security_report.yaml
+        voice: "{{ states('input_select.jarvis_voice') }}"
+
+
+####################################################
+#
+#           END OF CONFIGURATION FILE
+#
+####################################################

@@ -1,0 +1,41 @@
+#########################################################
+#                                                                                                              
+#            Shion at school                                                                             
+#                                                                                                              
+#########################################################
+# https://www.home-assistant.io/integrations/bayesian
+
+  - platform: bayesian
+    prior: 0.2
+    name: Shion at School Baysn
+    probability_threshold: 0.9
+    observations:
+      - platform: template
+        value_template: "{{ states('sensor.period_of_the_day').lower() in ['daylight', 'dusklight'] }}"
+        prob_given_true: 0.95
+        prob_given_false: 0.05
+
+#      - platform: template
+#        value_template: "{{ states('sensor.school_event').lower() in ['shion school day'] }}"
+#        prob_given_true: 0.3
+#        prob_given_false: 0.05
+
+      - platform: state
+        entity_id: sensor.date_weekend
+        to_state: 'weekday'
+        prob_given_true: 0.95
+        prob_given_false: 0.05
+
+      - platform: state
+        entity_id: calendar.holidays_in_japan
+        to_state: 'on' 
+        prob_given_true: 0.05
+        prob_given_false: 0.95
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

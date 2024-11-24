@@ -1,0 +1,38 @@
+####################################################
+#                                                                                                    
+#            Earthquake                                                                                  
+#                                                                                                    
+####################################################
+
+
+# M5 Stick Plus
+#  - unique_id: seismom5p_reset_btn
+#    name: "SeismoM5P Restart"
+#    command_topic: "house/earthquake/seismom5P/state"
+#    payload_press: "RESET"
+#    availability:
+#      - topic: "house/earthquake/seismom5P/status"
+#    qos: 0
+#    retain: false
+#    entity_category: "config"
+#    device_class: "restart"
+
+# M5 Stick
+#  - unique_id: seismom5_reset_btn
+#    name: "SeismoM5 Restart"
+#    command_topic: "house/earthquake/seismom5P/seismom5/state"
+#    payload_press: "RESET"
+#    availability:
+#      - topic: "house/earthquake/seismom5P/seismom5/status"
+#    qos: 0
+#    retain: false
+#    entity_category: "config"
+#    device_class: "restart"
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

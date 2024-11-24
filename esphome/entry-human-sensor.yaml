@@ -1,0 +1,280 @@
+# This is a custom firmware for Human Presence Sensor 1U
+# https://screek.io/1u
+
+substitutions:
+  name: entry-human-sensor
+  room: Entry
+  hlk0: Hallway
+  hlk1: Genkan
+  temp_offset: '-4.3'
+  hum_offset: '18'
+
+packages:
+  aht10: !include components/aht10.yaml
+
+esphome:
+  name: $name
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.f_cpu: 80000000L
+
+  on_boot:
+    priority: 900
+    then:
+       lambda: |-
+        id(cpu_speed) = ESP.getCpuFreqMHz() ;
+  project: 
+    name: Screek.Human Presence Sensor
+    version: 1U
+  min_version: 2023.6.1
+
+globals:
+   - id: cpu_speed
+     type: int
+     restore_value: no
+     initial_value: '0'
+
+external_components:
+  # - source: github://screek-workshop/custom_components_support_for_screek_1u
+  - source:
+      type: git
+      url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
+      ref: master
+    # components: [ ld2410, uart ]
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+    version: 2.0.9
+    platform_version: 6.3.2
+
+improv_serial:
+
+logger:
+  hardware_uart: uart0
+
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+
+captive_portal:
+
+api:
+  encryption:
+    key: !secret esphome_apikey
+
+ota:
+  - platform: esphome
+    password: !secret ota_pass
+
+# By automatically importing to the console, 
+# subsequent adjustments can be easily made without having to manually fix a specific name.
+#dashboard_import:
+#  package_import_url: github://screekworkshop/screek-human-sensor/1u/yaml/Screek-Humen-Dectet-1u.yaml@2023.06
+#  import_full_config: False
+
+
+i2c: # for aht10
+  sda: GPIO23
+  scl: GPIO5
+  scan: true
+
+web_server:
+  port: 80
+
+binary_sensor:
+# Hallway HLK
+  - platform: ld2410 
+    ld2410_id: ld2410_0
+    has_target:
+      name: $hlk0 Presence
+    has_moving_target:
+      name: $hlk0 Moving Target
+    has_still_target:
+      name: $hlk0 Still Target
+# Genkan HLK
+  - platform: ld2410 
+    ld2410_id: ld2410_1
+    has_target:
+      name: $hlk1 Presence
+    has_moving_target:
+      name: $hlk1 Moving Target
+    has_still_target:
+      name: $hlk1 Still Target
+
+  - platform: status # consolidate
+    name: $name Online
+
+sensor:
+  - platform: template
+    name: $name ESP Cpu Speed
+    accuracy_decimals: 0
+    unit_of_measurement: Mhz
+    lambda: |-
+      return (id(cpu_speed));
+    entity_category: "diagnostic"
+
+  - platform: template
+    id: sys_esp_temperature
+    name: $name ESP Temperature
+    lambda: return temperatureRead();
+    unit_of_measurement: °C
+    device_class: TEMPERATURE
+    update_interval: 5s
+    entity_category: "diagnostic"
+
+  - platform: uptime
+    name: $name Uptime
+    id: sys_uptime
+    update_interval: 10s
+
+  - platform: wifi_signal # consolidate
+    name: $name RSSI
+    id: wifi_signal_db
+    update_interval: 5s
+    entity_category: "diagnostic"
+
+  - platform: template
+    id: esp_memory
+    icon: mdi:memory
+    name: $name ESP Free Memory
+    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+    unit_of_measurement: 'kB'
+    state_class: measurement
+    entity_category: "diagnostic"
+
+# Hallway HLK
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    moving_distance:
+      name: $hlk0 Moving Distance
+    still_distance:
+      name: $hlk0 Still Distance
+    moving_energy:
+      name: $hlk0 Move Energy
+    still_energy:
+      name: $hlk0 Still Energy
+    detection_distance:
+      name: $hlk0 Detection Distance
+    light:
+      name: $hlk0 Sun Light
+
+
+# Genkan HLK
+  - platform: ld2410
+    ld2410_id: ld2410_1
+    moving_distance:
+      name: $hlk1 Moving Distance
+    still_distance:
+      name: $hlk1 Still Distance
+    moving_energy:
+      name: $hlk1 Move Energy
+    still_energy:
+      name: $hlk1 Still Energy
+    detection_distance:
+      name: $hlk1 Detection Distance
+    light:
+      name: $hlk1 Sun Light
+
+
+light:
+  - platform: status_led
+    name: $name sys_status
+    pin: GPIO2
+    internal: True
+    restore_mode: ALWAYS_OFF
+
+time:
+  - platform: sntp
+    id: time_sntp
+
+uart:
+# Hallway HLK
+  - id: uart_0
+    tx_pin: GPIO17
+    rx_pin: GPIO21
+    baud_rate: 256000
+    parity: NONE
+    stop_bits: 1
+# Genkan HLK
+  - id: uart_1
+    tx_pin: GPIO25 #1
+    rx_pin: GPIO27 # 3
+    baud_rate: 256000
+    parity: NONE
+    stop_bits: 1
+
+ld2410:
+  - id: ld2410_0 # Hallway HLK
+    timeout: 150s
+    uart_id: uart_0
+
+  - id: ld2410_1 # Genkan HLK
+    timeout: 150s
+    uart_id: uart_1
+
+
+button:
+# Hallway HLK
+  - platform: template
+    name: "$hlk0 Enable LD2410 BLE"
+    # disabled_by_default: True
+    entity_category: "config"
+    icon: mdi:bluetooth
+    on_press:
+      lambda: |-
+        id(ld2410_0) -> ble_control(true);
+  - platform: template
+    name: "$hlk0 Disable LD2410 BLE"
+    # disabled_by_default: True
+    entity_category: "config"
+    icon: mdi:bluetooth-off
+    on_press:
+      lambda: |-
+        id(ld2410_0) -> ble_control(false);
+  - platform: template
+    name: "$hlk0 LD2410 Reboot"
+    icon: mdi:radar
+    entity_category: "config"
+    on_press:
+      lambda: |-
+        // auto* radar = LD2410Component::get(ld2410); 
+        // radar -> roboot();
+        id(ld2410_0) -> reboot();
+
+# Genkan HLK
+  - platform: template
+    name: "$hlk1 Enable LD2410 BLE"
+    # disabled_by_default: True
+    entity_category: "config"
+    icon: mdi:bluetooth
+    on_press:
+      lambda: |-
+        id(ld2410_1) -> ble_control(true);
+  - platform: template
+    name: "$hlk1 Disable LD2410 BLE"
+    # disabled_by_default: True
+    entity_category: "config"
+    icon: mdi:bluetooth-off
+    on_press:
+      lambda: |-
+        id(ld2410_1) -> ble_control(false);
+  - platform: template
+    name: "$hlk1 LD2410 Reboot"
+    icon: mdi:radar
+    entity_category: "config"
+    on_press:
+      lambda: |-
+        // auto* radar = LD2410Component::get(ld2410); 
+        // radar -> roboot();
+        id(ld2410_1) -> reboot();
+
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "$name ESP Reboot"
+
+  - platform: factory_reset
+    disabled_by_default: True
+    name: $name Factory Reset
+    id: factory_reset_all

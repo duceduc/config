@@ -1,0 +1,140 @@
+#########################################################
+#                                                                                                              
+#            AIRCONS                                                                                      
+#                                                                                                              
+#########################################################
+
+# Aircon Living Room Controls
+  - platform: template
+    sensors:
+      lr_ac_heat_required:
+        friendly_name: "LR AC Heat Required"
+        value_template: >-
+          {{ states('sensor.livingroom_temperature') | float(default=19) < states('input_number.lr_heater_heat_temp_set') | float(default=18) }}
+
+      lr_ac_cool_required:
+        friendly_name: "LR AC Cool Required"
+        value_template: >-
+          {{ states('sensor.livingroom_temperature') | float(default=24) > states('input_number.lr_ac_cool_temp_set') | float(default=25) }}
+
+      lr_ac_am_automation_time_active:
+        friendly_name: "LR AM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.lr_ac_am_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.lr_ac_am_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+      lr_ac_pm_automation_time_active:
+        friendly_name: "LR PM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set pm_start = as_timestamp(d ~ states('input_datetime.lr_ac_pm_on_time') ~ tz) %}
+          {% set pm_end = as_timestamp(d ~ states('input_datetime.lr_ac_pm_off_time') ~ tz) %}
+          {{ pm_start <= t <= pm_end }}
+
+# Aircon Master Room Controls
+  - platform: template
+    sensors:
+      mr_ac_heat_required:
+        friendly_name: "MR AC Heat Required"
+        value_template: >-
+          {{ states('sensor.master_temperature') | float(default=19) < states('input_number.mr_heater_heat_temp_set') | float(default=18) }}
+
+      mr_ac_cool_required:
+        friendly_name: "MR AC Cool Required"
+        value_template: >-
+          {{ states('sensor.master_temperature') | float(default=24) > states('input_number.mr_ac_cool_temp_set') | float(default=25) }}
+
+      mr_ac_am_automation_time_active:
+        friendly_name: "MR AM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.mr_ac_am_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.mr_ac_am_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+      mr_ac_pm_automation_time_active:
+        friendly_name: "MR PM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set pm_start = as_timestamp(d ~ states('input_datetime.mr_ac_pm_on_time') ~ tz) %}
+          {% set pm_end = as_timestamp(d ~ states('input_datetime.mr_ac_pm_off_time') ~ tz) %}
+          {{ pm_start <= t <= pm_end }}
+# Aircon Shion Room Controls
+  - platform: template
+    sensors:
+      sr_ac_heat_required:
+        friendly_name: "SR AC Heat Required"
+        value_template: >-
+          {{ states('sensor.shionroom_temperature') | float(default=19) < states('input_number.sr_heater_heat_temp_set') | float(default=18) }}
+
+      sr_ac_cool_required:
+        friendly_name: "SR AC Cool Required"
+        value_template: >-
+          {{ states('sensor.shionroom_temperature') | float(default=24) > states('input_number.sr_ac_cool_temp_set') | float(default=25) }}
+
+      sr_ac_am_automation_time_active:
+        friendly_name: "SR AM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.sr_ac_am_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.sr_ac_am_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+      sr_ac_pm_automation_time_active:
+        friendly_name: "SR PM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set pm_start = as_timestamp(d ~ states('input_datetime.sr_ac_pm_on_time') ~ tz) %}
+          {% set pm_end = as_timestamp(d ~ states('input_datetime.sr_ac_pm_off_time') ~ tz) %}
+          {{ pm_start <= t <= pm_end }}
+
+
+#########################################################
+#                                                                                                              
+#            HUMIDIFIER                                                                                    
+#                                                                                                              
+#########################################################
+
+
+      lrh_humidifier_am_automation_time_active:
+        friendly_name: "LRH Humidifier AM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.lrh_ac_am_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.lrh_ac_am_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+      lrh_humidifier_pm_automation_time_active:
+        friendly_name: "LRH Humidifier PM Automation Time Active"
+        value_template: >-
+          {% set d = now().strftime("%Y-%m-%dT") %}
+          {% set tz = as_timestamp(now()) | timestamp_custom('%z') %}
+          {% set t = now().timestamp() %}
+          {% set am_start = as_timestamp(d ~ states('input_datetime.lrh_ac_pm_on_time') ~ tz) %}
+          {% set am_end = as_timestamp(d ~ states('input_datetime.lrh_ac_pm_off_time') ~ tz) %}
+          {{ am_start <= t <= am_end }}
+
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

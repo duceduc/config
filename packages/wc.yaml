@@ -1,0 +1,223 @@
+###############################################################################
+#   @author          :   Duc Su
+#   @date              :   03/4/2023
+#   @package        :   Toilet Rroom
+#   @description    :   Controlling the toilet seat
+###############################################################################
+
+input_boolean:
+  engage_toilet_airfreshener:
+    icon: mdi:spray
+    initial: off
+
+template:
+  - binary_sensor:
+      - name: "Replace Toilet Airfreshener"
+        unique_id: 396877aa-8c09-4c36-a752-b5e923bd758f
+        state: >
+         {% if states('counter.toilet_airfreshener')| int(0) >= 350 %} on
+         {% else %} off {% endif %}
+        icon: mdi:calendar-multiple-check
+
+script:
+  toilet_seat_low_heat:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm32_remote
+          device: Toilet
+          command: heat seat low
+
+  toilet_seat_med_heat:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm32_remote
+          device: Toilet
+          command: heat seat med
+  toilet_seat_high_heat:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm32_remote
+          device: Toilet
+          command: heat seat high
+  toilet_seat_off_heat:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm32_remote
+          device: Toilet
+          command: heat seat off
+
+  toilet_nozzle_cleaning:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm32_remote
+          device: Toilet
+          command: nozzle cleaning
+
+
+automation:
+  - alias: "Replace Toilet Airfreshener Notification"
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.wc_airfreshener_spray_counter
+        above: 300
+    actions:
+      - action: script.email_notify
+        data:
+          title: "Replace WC Airfreshener"
+          who: duc
+          message: >-
+            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
+            <br>
+            The wc air freshener bottle needs to be replaced. It has sprayed {{ states('sensor.wc_airfreshener_spray_counter') }} times.<br>
+            <br>
+
+
+  - alias: 'motion wc room'
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.wc_moving_target
+        to: 'on'
+      - trigger: state
+        entity_id: binary_sensor.wc_still_target
+        to: 'off'
+        for: 30
+        id: 'off'
+      - trigger: state
+        entity_id: input_boolean.engage_toilet_airfreshener
+        to: 'on'
+        for: '00:03:00'
+        id: 'air'
+      - trigger: template
+        value_template: "{{ is_state('light.wc', ['unavailable','off']) }}"
+        id: 'reset'
+    conditions: []
+    actions:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: 'off'
+            sequence:
+              - action: homeassistant.turn_off
+                entity_id: input_boolean.engage_toilet_airfreshener
+              - condition: template
+                value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+              - condition: template # If guest is present, do not turn off
+                value_template: "{{not is_state('input_boolean.guest_mode', 'on') }}"
+              - action: light.turn_off
+                entity_id: light.wc
+          - conditions:
+              - condition: trigger
+                id: 'air'
+            sequence:
+              - action: switch.turn_on
+                entity_id: switch.wc_airfreshener
+          - conditions:
+              - condition: trigger
+                id: 'reset'
+            sequence:
+              - action: homeassistant.turn_off
+                entity_id: input_boolean.engage_toilet_airfreshener
+        default:
+          - action: light.turn_on
+            entity_id: light.wc
+          - action: homeassistant.turn_on
+            entity_id: input_boolean.engage_toilet_airfreshener
+
+
+# Automate Toilet Seat Heater Arrival
+  - alias: 'Enable Toilet Seat Heater Upon Arrival'
+    triggers:
+      - trigger: state
+        entity_id: input_select.home_mode
+    conditions:
+      - condition: template # Is not summer
+        value_template: "{{ not is_state('sensor.season', 'summer') }}"
+    actions:
+      choose:
+        - conditions: "{{ trigger.to_state.state == 'Away' or trigger.to_state.state == 'Vacation' }}"
+          sequence:
+            - action: script.toilet_seat_off_heat
+        - conditions: >
+            {{ trigger.to_state.state == 'Home' and
+               states('sensor.entrance_temperature')| int(0) >= 21 }}
+          sequence:
+            - action: script.toilet_seat_off_heat
+        - conditions: >
+            {{ trigger.to_state.state == 'Home' and
+               states('sensor.entrance_temperature')| int(0) <= 9}}
+          sequence:
+            - action: script.toilet_seat_high_heat
+        - conditions: >
+            {{ trigger.to_state.state == 'Home' and
+               states('sensor.entrance_temperature')| int(0) <= 14 }}
+          sequence:
+            - action: script.toilet_seat_med_heat
+        - conditions: >
+            {{ trigger.to_state.state == 'Home' and
+               states('sensor.entrance_temperature')| int(0) <= 20 }}
+          sequence:
+            - action: script.toilet_seat_low_heat
+        - conditions: >
+            {{ trigger.to_state.state == 'Returning' and
+               states('sensor.entrance_temperature')| int(0) <= 20 }}
+          sequence:
+            - action: script.toilet_seat_low_heat
+
+# Adjust Temperature Base on OST
+  - alias: 'Adjust Toilet Seat Heater Temperature'
+    triggers:
+      - trigger: state
+        entity_id: sensor.entrance_temperature
+    conditions:
+      - condition: template # is not summer
+        value_template: "{{ not is_state('sensor.season', 'summer') }}"
+      - condition: template # only run if sensor is on
+        value_template: "{{ not is_state('binary_sensor.aio_human_sensor_online', 'off') }}"
+      - condition: template # delay turning off too fast 10 mins
+        value_template: |
+          {%- set last_toilet_heat_off_seconds = (now() - as_local(states.script.toilet_seat_off_heat.last_updated )).seconds -%}
+          {%- if last_toilet_heat_off_seconds >= 600 %} true {% else %} false {% endif %}
+    actions:
+      choose:
+        - conditions: >
+            {{ states('sensor.entrance_temperature')| int(0) >= 21 and
+               is_state('input_select.home_mode', 'Home') }}
+          sequence:
+            - action: script.toilet_seat_off_heat
+        - conditions: >
+            {{ states('sensor.entrance_temperature')| int(0) <= 9 and
+               is_state('input_select.home_mode', 'Home') }}
+          sequence:
+            - action: script.toilet_seat_high_heat
+        - conditions: >
+            {{ states('sensor.entrance_temperature')| int(0) <= 16 and
+               is_state('input_select.home_mode', 'Home') }}
+          sequence:
+            - action: script.toilet_seat_med_heat
+        - conditions: >
+            {{ states('sensor.entrance_temperature')| int(0) <= 20 and
+               is_state('input_select.home_mode', 'Home') }}
+          sequence:
+            - action: script.toilet_seat_low_heat
+#      - conditions: > # default to low if sensor not on
+#           {{ not is_state('binary_sensor.aio_wemos_status', 'on') and
+#              states.input_select.home_mode.state == 'Home' }}
+#        sequence:
+#          - action: script.toilet_seat_low_heat
+
+# Hibernate Toilet Seat Heater
+  - alias: 'Hibernate Toilet Seat Heater'
+    triggers:
+      - trigger: state
+        entity_id: sensor.season
+        to: 'summer'
+    actions:
+      - delay: 1
+      - action: script.toilet_seat_off_heat
+
+

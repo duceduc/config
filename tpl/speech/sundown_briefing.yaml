@@ -1,0 +1,128 @@
+>
+  {# Nightly Report #}
+  {%- macro getReport() -%}
+    <p>
+      Good evening.
+    </p>
+
+    <p>
+      It is {{ now().strftime("%I:%M %p") }}
+    </p>
+
+    <p>
+      {% if is_state('sun.sun', 'below_horizon') %}
+        You have
+        {% set seconds = as_timestamp(state_attr('sun.sun', 'next_rising'))-now().timestamp() %}
+        {% set hours = seconds / 60 %}
+        {% if seconds / ( 60 * 60 ) > 1 %}
+          {{ (seconds //  ( 60 * 60 )) | int }} hours
+        {% else %}
+          {{ (seconds // 60) | int }} minutes
+        {% endif %}
+        {{ [
+          'until the sun rises.',
+          'until the sun is up.',
+          'before the sun officially rises. '
+        ]|random }}
+      {% else %}
+        You have
+        {% set seconds = as_timestamp(state_attr('sun.sun', 'next_setting'))-now().timestamp() %}
+        {% set hours = seconds / 60 %}
+        {% if seconds / ( 60 * 60 ) > 1 %}
+          {{ (seconds //  ( 60 * 60 )) | int }} hours
+        {% else %}
+          {{ (seconds // 60) | int }} minutes
+        {% endif %}
+        {{ [
+          'until the sun sets for the day.',
+          'until the sun slips below the horizon.',
+          'before the sun officially sets. ',
+          'before The sun has been ushered off the stage.'
+        ]|random }}
+      {% endif %}
+      
+    </p>
+
+    <p>
+      {{ [
+          'Exterior Cameras are now motion activated, and the front entrance lights has been turned on for you.',
+          'Lions Mansion have turned on the front entrance lights and I have armed the perimiter cameras.',
+          'You are running out of daylight. Time to wrap up any outside chores. The ouside lights have been turned on.',          
+          'Switching Lions Mansion to night mode!',
+          'Lions Mansion has been configured for night.',
+          'It is getting dark outside if you have not noticed by now.',
+          'The sun is setting so it is time to wrap things up if you are working outside.',
+          'If you have not looked outside lately, the light of the day is almost gone.'
+      ]|random }}
+      </p>
+      
+        {% if is_state('binary_sensor.computerroom_window', 'on') and is_state('binary_sensor.livingroom_window', 'on')%} 
+        <p>
+          {{ [ 'The front area windows are open. ',
+            'Somone forgot to close the front area windows.'
+          ] | random }}
+          Make sure someone close the windows before going to bed. 
+          </p>
+        {% elif is_state('binary_sensor.livingroom_window', 'on') %}
+        <p> 
+          {{ [ 'The LR is open. ',
+            'Somone forgot to close the LR.'
+          ] | random | replace('LR', state_attr('binary_sensor.livingroom_window', 'friendly_name')) }}
+          Make sure someone close the {{ state_attr('binary_sensor.livingroom_window', 'friendly_name') }} before going to bed. 
+          </p>
+        {% elif is_state('binary_sensor.computerroom_window', 'on') %}
+        <p> 
+          {{ [ 'The CR is open. ',
+            'Somone forgot to close the CR.'
+          ] | random | replace('CR', state_attr('binary_sensor.computerroom_window', 'friendly_name')) }}
+          Make sure someone close the {{ state_attr('binary_sensor.computerroom_window', 'friendly_name') }}s before going to bed. 
+          </p>          
+          {% else %}
+
+          {% endif %}
+  
+        {% if is_state('input_boolean.freeze_warning','on') %}
+        <p>
+        {{ [ 'The temperature is expected to be near or below freezing. Someone might want to bring the lemon tree in. ',
+            'It appears that it will be cold tonight. Like, the turn water solid kind of cold. Think of the poor plants.',
+            'I suggest bringing in the plants other wise, the temperature might kill them. And that will be on you.',
+            'I would say winter is coming. But, based on the weather forecast it appears to be here.',
+            'It will be freezing cold tonight. I would bring in the plants but I lack legs. And Arms. So I am forced to rely on you. Do not let me down.'
+          ] | random }}
+          </p>
+        {% endif %}
+
+        {% if is_state('sensor.today_is', 'Sunday') %}
+          {% if now().strftime('%H')|int > 17 %}
+          {{ [ 'Do not forget tomorrow is Trash Day. ',
+            'I advise you start collecting all trash in the house to be collected tomorrow. ',
+            ' The trash and recycle should go out'
+          ] | random }}
+          {% endif %}
+        {% endif %}
+      
+        {% if is_state('sensor.today_is', 'Wednesday') %}
+          {% if now().strftime('%H')|int > 17 %}
+          {{ [ 'Do not forget tomorrow is Trash Day. ',
+            'I advise you start collecting all trash in the house to be collected tomorrow. ',
+            ' The trash and recycle should go out'
+          ] | random }}
+          {% endif %}
+        {% endif %}
+      
+  {%- endmacro -%}
+
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}
+    {%- macro cleanup(data) -%}
+      {%- for item in data.split("\n")  if item | trim != "" -%}
+        {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  {# a macro to call all macros :)  #}
+    {%- macro mother_of_all_macros() -%}
+      {{ getReport() }}
+    {%- endmacro -%}
+    
+    {# Call the macro  #}
+    {{- cleanup(mother_of_all_macros()) -}}

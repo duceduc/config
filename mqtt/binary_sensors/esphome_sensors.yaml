@@ -1,0 +1,21 @@
+####################################################
+#                                                                                                    
+#            MQTT Motion Sensors                                                                                
+#                                                                                                    
+####################################################
+
+# From swithbot mqtt
+#  - name: "motion kitchen occupancy"
+#    state_topic: "switchbotmqtt/esp32/motion/motion_kitchen_occupancy"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    device_class: motion
+#    qos: 0
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                      
+#                                                                                                              
+#########################################################

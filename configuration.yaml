@@ -1,0 +1,293 @@
+#########################################################
+#
+#             Main Configuration Settings....
+#
+#########################################################
+
+# Custom Components
+default_config:
+python_script:
+wake_on_lan:
+lovelace_gen:
+momentary:
+  yaml_config: True
+
+
+homeassistant:
+  name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: 20
+  unit_system: metric
+  time_zone: Asia/Tokyo
+  country: JP
+  currency: USD
+  internal_url: !secret internal_url
+  external_url: !secret external_url
+  customize: !include includes/customize.yaml
+  packages: !include_dir_named packages
+  allowlist_external_dirs:
+    - '/config'
+    - '/media/music'
+
+tts:
+  - platform: google_translate
+    service_name: google_say
+    cache_dir: /config/www/tts
+    time_memory: 300
+    cache: true
+
+notify_events:
+  token: !secret notify_token
+
+alert: !include includes/alerts.yaml
+zone: !include includes/zones.yaml
+group: !include includes/groups.yaml
+scene: !include includes/scenes.yaml
+timer: !include includes/timers.yaml
+light: !include includes/lights.yaml
+cover: !include includes/cover.yaml
+pyscript: !include includes/pyscript.yaml
+climate: !include includes/climate.yaml
+input_number: !include includes/input_number.yaml
+input_datetime: !include includes/input_datetime.yaml
+input_select: !include includes/input_select.yaml
+input_boolean: !include includes/input_boolean.yaml
+emulated_hue: !include includes/emulated_hue.yaml
+shell_command: !include includes/shell_commands.yaml
+utility_meter: !include includes/utility_meter.yaml
+#template: !include includes/template.yaml
+command_line: !include includes/command_line.yaml
+automation blueprint: !include includes/automations.yaml
+
+frontend: !include frontend.yaml
+lovelace: !include lovelace.yaml
+
+binary_sensor: !include_dir_merge_list binary_sensors/
+automation: !include_dir_merge_list automation/
+sensor: !include_dir_merge_list sensors/
+template: !include_dir_merge_list templates/
+switch: !include_dir_merge_list switches/
+notify: !include_dir_merge_list notify/
+script: !include_dir_merge_named scripts/
+
+mqtt:
+ sensor: !include_dir_merge_list mqtt/sensors/
+ binary_sensor: !include_dir_merge_list mqtt/binary_sensors/
+ button: !include_dir_merge_list mqtt/buttons/
+
+# https://community.home-assistant.io/t/reverse-proxy-error/312936
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.5 #ser    
+    - 172.30.33.0/24 # Docker network
+
+#########################################################
+#
+#             Device Tracker
+#
+#########################################################
+
+person:
+  - name: Shion
+    id: shion0614
+    device_trackers:
+     - device_tracker.shion
+  - name: Eri
+    id: eri1118
+    device_trackers:
+     - device_tracker.ie
+
+#########################################################
+#
+#             Sensor Integrations
+#
+#########################################################
+
+rest:
+  - resource: !secret switchbot_wohumi_url
+    scan_interval: 900
+    method: GET
+    headers:
+      Authorization: !secret switchbot_api
+      Content-Type: 'application/json'
+    sensor:
+      - name: SB Humidifier Power
+        value_template: "{{ value_json.body.power }}"
+      - name: SB Humidifier Lack Water
+        value_template: "{{ value_json.body.lackWater }}"
+      - name: SB Humidifier Nebulization Efficiency
+        value_template: "{{ value_json.body.nebulizationEfficiency }}"
+        unit_of_measurement: '%'
+        device_class: ozone
+      - name: SB Humidifier Temperature
+        value_template: "{{ value_json.body.temperature }}"
+        unit_of_measurement: '°C'
+        device_class: temperature
+      - name: SB Humidifier Humidity
+        value_template: "{{ value_json.body.humidity }}"
+        unit_of_measurement: '%'
+        device_class: humidity
+
+
+# Tomorrowio Pollen Count
+#  - resource: !secret tomorrowio_pollen_api
+#    scan_interval: 1800
+#    sensor:
+    ### Pollen - Tree Index
+#      - name: "Pollen - Tree Index - Day 0"
+#        value_template: "{{ value_json.data.timelines[0].intervals[0]['values']['treeIndex'] }}"
+#        json_attributes_path: "$.data.timelines[0].intervals[0].values"
+#        json_attributes:
+#          - grassIndex
+#          - weedIndex
+#          - temperature
+#      - name: "Pollen - Tree Index - Day 1"
+#        value_template: "{{ value_json.data.timelines[0].intervals[1]['values']['treeIndex'] }}"
+#        json_attributes_path: "$.data.timelines[0].intervals[1].values"
+#        json_attributes:
+#          - grassIndex
+#          - weedIndex
+#          - temperature
+#      - name: "Pollen - Tree Index - Day 2"
+#        value_template: "{{ value_json.data.timelines[0].intervals[2]['values']['treeIndex'] }}"
+#        json_attributes_path: "$.data.timelines[0].intervals[2].values"
+#        json_attributes:
+#          - grassIndex
+#          - weedIndex
+#          - temperature
+#      - name: "Pollen - Tree Index - Day 3"
+#        value_template: "{{ value_json.data.timelines[0].intervals[3]['values']['treeIndex'] }}"
+#        json_attributes_path: "$.data.timelines[0].intervals[3].values"
+#        json_attributes:
+#          - grassIndex
+#          - weedIndex
+#          - temperature
+#      - name: "Pollen - Tree Index - Day 4"
+#        value_template: "{{ value_json.data.timelines[0].intervals[4]['values']['treeIndex'] }}"
+#        json_attributes_path: "$.data.timelines[0].intervals[4].values"
+#        json_attributes:
+#          - grassIndex
+#          - weedIndex
+#          - temperature
+
+
+
+#########################################################
+#
+#             Integration
+#
+#########################################################
+
+#influxdb:
+#  host: a0d7b954-influxdb
+#  port: 8086
+#  database: homeassistant
+#  username: !secret influx_user
+#  password: !secret influx_pass
+#  max_retries: 3
+#  default_measurement: state
+
+
+spotcast:  
+  sp_dc: !secret duc_sp_dc
+  sp_key: !secret duc_sp_key
+#  country: US #optional, added in 3.6.24
+
+#media_player:
+#  name: "agent mediaplayer"
+#  platform: hass_agent_mediaplayer
+#  host: 192.168.1.111
+#  port: 5115
+
+
+counter:
+#Glade
+  toilet_airfreshener:
+    initial: 1
+    step: 1
+    restore: true
+    icon: mdi:spray
+# humidifier
+#  humidifier_toggle:
+#    initial: 0
+#    step: 1
+
+input_text:
+  slack_app_verification_token:
+    initial: !secret slack_app_verification_token
+    mode: password
+
+  room_presence:
+    name: Room Presence
+
+  alexa_actionable_notification:
+    name: Alexa Actionable Notification Holder
+    max: 255
+    initial: '{"text": "This is a test of the alexa actions custom skill. Did it work?", "event": "actionable.skill.test"}'
+
+#################
+
+rest_command:
+  slack_api:
+    url: https://slack.com/api/{{ api }}
+    content_type: 'application/json; charset=utf-8'
+    verify_ssl: true
+    method: 'post'
+    timeout: 20
+    headers:
+      Authorization: !secret slackbot_token
+    payload: '{{ payload }}'
+
+# Slack URL '***-ga64322.slack.com'
+  slack_response:
+    url: '{{ response_url }}'
+    content_type: 'application/json; charset-utf-8'
+    verify_ssl: true
+    method: 'post'
+    timeout: 20
+    payload: >
+      {
+         "replace_original": '{{ replace_original if (replace_original is defined) else 'true' }}',
+        "text": "{{ message | default('') }}",
+        "attachments": {{ attachments if (attachments is defined) else '[]' }}
+      }
+
+#########################################################
+#
+#             Panel Redirect
+#
+#########################################################
+
+panel_custom:
+  - name: panel-redirect
+    url_path: redirect-Zigbee2mqtt-controls
+    sidebar_title: Z2M Controls
+    sidebar_icon: mdi:graphql
+    module_url: /local/custom_ui/panel-redirect.js
+    config:
+      target: /hassio/ingress/45df7312_zigbee2mqtt
+
+#  - name: panel-redirect
+#    url_path: redirect-server-controls
+#    sidebar_title: Server Controls
+#    sidebar_icon: mdi:server
+#    module_url: /local/custom_ui/panel-redirect.js
+#    config:
+#      target: /developer-tools/yaml
+
+  - name: panel-redirect
+    url_path: redirect-system
+    sidebar_title: System
+    sidebar_icon: mdi:home-assistant
+    module_url: /local/custom_ui/panel-redirect.js
+    config:
+      target: /config/system
+
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################

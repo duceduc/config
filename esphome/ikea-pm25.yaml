@@ -1,0 +1,28 @@
+# ESP8266 NodeMCU.... 98:CD:AC:30:E9:4F
+substitutions:
+  name: ikea-pm25
+#  ssid: !secret ssid3
+
+packages:
+  pm1006k: !include components/pm1006k.yaml
+
+<<: !include .base.yaml
+
+esphome:
+  name: $name
+  platform: esp8266
+  board: d1_mini
+
+sensor:
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+binary_sensor:
+  - platform: status
+    name: "$name status"

@@ -1,0 +1,23 @@
+
+i2c: # for bme280
+  sda: GPIO4 # GPIO21 for ESP32 and GPIO4 (D2) for ESP8266
+  scl: GPIO5 # GPIO22 for ESP32 and GPIO5 (D1) for ESP8266
+  scan: true
+
+sensor:
+  - platform: bmp280_i2c
+    update_interval: 10s
+    address: 0x76
+    temperature:
+      name: "$room Temperature"
+      oversampling: 16x
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
+    pressure:
+      name: "$room Pressure"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15

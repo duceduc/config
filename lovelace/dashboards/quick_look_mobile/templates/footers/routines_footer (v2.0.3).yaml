@@ -1,0 +1,350 @@
+routines_footer:
+  variables:
+    routine1_entity: #scene, script or automation
+    routine1_name:
+    routine1_background_color:
+    routine1_icon_color:
+    routine2_entity:
+    routine2_name: 
+    routine2_background_color: 
+    routine2_icon_color: 
+    routine3_entity: #scene, script or automation
+    routine3_name:
+    routine3_background_color:
+    routine3_icon_color:
+    routine4_entity: #scene, script or automation
+    routine4_name:
+    routine4_background_color:
+    routine4_icon_color:
+    routine5_entity: #scene, script or automation
+    routine5_name:
+    routine5_background_color:
+    routine5_icon_color:
+  triggers_update: all
+  styles:
+      card:
+        - height: 9vh
+        - width: 92vw
+        - margin: -0.3vh 0vh 0vh 1vw
+        - background-color: 'transparent'
+        - padding: 0px
+        - border-radius: 0px
+        - box-shadow: none
+        - cursor: none
+      grid:
+        - grid-template-rows: auto
+        - grid-template-columns: auto
+        - grid-template-areas: |
+            "menu"
+  custom_fields:
+    menu:
+      card:
+        type: grid
+        columns: 5
+        square: false
+        cards:
+          - type: custom:button-card # Routine 1
+            entity: '[[[return variables.routine1_entity ]]]'
+            size: '50%'
+            show_name: |
+              [[[
+                if (variables.routine1_name) return true;
+                return false;
+              ]]]
+            name: |
+              [[[
+                if (variables.routine1_name) return variables.routine1_name;
+                return '';
+              ]]]
+            show_icon: |
+              [[[
+                if (variables.routine1_name) return false;
+                return true;
+              ]]]
+            show_state: false
+            show_label: false
+            styles:
+              card:
+                - height: 7.9vh
+                - width: 7.5vh
+                - margin: 0vh 0.2vh 0vh 0.5vh
+                - border-radius: 50%
+                - box-shadow: none
+                - background: |
+                    [[[
+                      if (variables.routine1_background_color) { 
+                        return variables.routine1_background_color;
+                      } else {
+                        return "var(--routine-background-color)";
+                      }
+                    ]]]
+                - cursor: none
+                - --mdc-ripple-press-opacity: 0
+              name: 
+                - font-size: 12px
+              icon:
+                - color: |
+                    [[[
+                      if (variables.routine1_icon_color) { 
+                        return variables.routine1_icon_color;
+                      } else {
+                        return "var(--routine-icon-color)";
+                      }
+                    ]]]
+            tap_action: 
+              action: call-service
+              service: >
+                [[[ 
+                  const routine = variables['routine1_entity'];
+                  if (!routine) return 'none';
+                  return routine.startsWith('script.') ? 'script.turn_on' : 
+                        routine.startsWith('scene.') ? 'scene.turn_on' : 
+                        routine.startsWith('automation.') ? 'automation.trigger' :
+                        'none';
+                ]]]
+              service_data:
+                entity_id: '[[[return variables.routine1_entity ]]]'
+          - type: custom:button-card # Routine 2
+            entity: '[[[return variables.routine2_entity ]]]'
+            size: '50%'
+            show_name: |
+              [[[
+                if (variables.routine2_name) return true;
+                return false;
+              ]]]
+            name: |
+              [[[
+                if (variables.routine2_name) return variables.routine2_name;
+                return '';
+              ]]]
+            show_icon: |
+              [[[
+                if (variables.routine2_name) return false;
+                return true;
+              ]]]
+            show_state: false
+            show_label: false
+            styles:
+              card:
+                - height: 7.9vh
+                - width: 7.5vh
+                - margin: 0vh 0.2vh
+                - border-radius: 50%
+                - box-shadow: none
+                - background: |
+                    [[[
+                      if (variables.routine2_background_color) { 
+                        return variables.routine2_background_color;
+                      } else {
+                        return "var(--routine-background-color)";
+                      }
+                    ]]]
+                - cursor: none
+                - --mdc-ripple-press-opacity: 0
+              name: 
+                - font-size: 12px
+              icon:
+                - color: |
+                    [[[
+                      if (variables.routine2_icon_color) { 
+                        return variables.routine2_icon_color;
+                      } else {
+                        return "var(--routine-icon-color)";
+                      }
+                    ]]]
+            tap_action: 
+              action: call-service
+              service: >
+                [[[ 
+                  const routine = variables['routine2_entity'];
+                  if (!routine) return 'none';
+                  return routine.startsWith('script.') ? 'script.turn_on' : 
+                        routine.startsWith('scene.') ? 'scene.turn_on' : 
+                        routine.startsWith('automation.') ? 'automation.trigger' :
+                        'none';
+                ]]]
+              service_data:
+                entity_id: '[[[return variables.routine2_entity ]]]'
+          - type: custom:button-card # Routine 3
+            entity: '[[[return variables.routine3_entity ]]]'
+            size: '50%'
+            show_name: |
+              [[[
+                if (variables.routine3_name) return true;
+                return false;
+              ]]]
+            name: |
+              [[[
+                if (variables.routine3_name) return variables.routine3_name;
+                return '';
+              ]]]
+            show_icon: |
+              [[[
+                if (variables.routine3_name) return false;
+                return true;
+              ]]]
+            show_state: false
+            show_label: false
+            styles:
+              card:
+                - height: 7.9vh
+                - width: 7.5vh
+                - margin: 0vh 0.2vh
+                - border-radius: 50%
+                - box-shadow: none
+                - background: |
+                    [[[
+                      if (variables.routine3_background_color) { 
+                        return variables.routine3_background_color;
+                      } else {
+                        return "var(--routine-background-color)";
+                      }
+                    ]]]
+                - cursor: none
+                - --mdc-ripple-press-opacity: 0
+              name: 
+                - font-size: 12px
+              icon:
+                - color: |
+                    [[[
+                      if (variables.routine3_icon_color) { 
+                        return variables.routine3_icon_color;
+                      } else {
+                        return "var(--routine-icon-color)";
+                      }
+                    ]]]
+            tap_action: 
+              action: call-service
+              service: >
+                [[[ 
+                  const routine = variables['routine3_entity'];
+                  if (!routine) return 'none';
+                  return routine.startsWith('script.') ? 'script.turn_on' : 
+                        routine.startsWith('scene.') ? 'scene.turn_on' : 
+                        routine.startsWith('automation.') ? 'automation.trigger' :
+                        'none';
+                ]]]
+              service_data:
+                entity_id: '[[[return variables.routine3_entity ]]]'
+          - type: custom:button-card # Routine 4
+            entity: '[[[return variables.routine4_entity ]]]'
+            size: '50%'
+            show_name: |
+              [[[
+                if (variables.routine4_name) return true;
+                return false;
+              ]]]
+            name: |
+              [[[
+                if (variables.routine4_name) return variables.routine4_name;
+                return '';
+              ]]]
+            show_icon: |
+              [[[
+                if (variables.routine4_name) return false;
+                return true;
+              ]]]
+            show_state: false
+            show_label: false
+            styles:
+              card:
+                - height: 7.9vh
+                - width: 7.5vh
+                - margin: 0vh 0.2vh
+                - border-radius: 50%
+                - box-shadow: none
+                - background: |
+                    [[[
+                      if (variables.routine4_background_color) { 
+                        return variables.routine4_background_color;
+                      } else {
+                        return "var(--routine-background-color)";
+                      }
+                    ]]]
+                - cursor: none
+                - --mdc-ripple-press-opacity: 0
+              name: 
+                - font-size: 12px
+              icon:
+                - color: |
+                    [[[
+                      if (variables.routine4_icon_color) { 
+                        return variables.routine4_icon_color;
+                      } else {
+                        return "var(--routine-icon-color)";
+                      }
+                    ]]]
+            tap_action: 
+              action: call-service
+              service: >
+                [[[ 
+                  const routine = variables['routine4_entity'];
+                  if (!routine) return 'none';
+                  return routine.startsWith('script.') ? 'script.turn_on' : 
+                        routine.startsWith('scene.') ? 'scene.turn_on' : 
+                        routine.startsWith('automation.') ? 'automation.trigger' :
+                        'none';
+                ]]]
+              service_data:
+                entity_id: '[[[return variables.routine4_entity ]]]'
+          - type: custom:button-card # Routine 5
+            entity: '[[[return variables.routine5_entity ]]]'
+            size: '50%'
+            show_name: |
+              [[[
+                if (variables.routine5_name) return true;
+                return false;
+              ]]]
+            name: |
+              [[[
+                if (variables.routine5_name) return variables.routine5_name;
+                return '';
+              ]]]
+            show_icon: |
+              [[[
+                if (variables.routine5_name) return false;
+                return true;
+              ]]]
+            show_state: false
+            show_label: false
+            styles:
+              card:
+                - height: 7.9vh
+                - width: 7.5vh
+                - margin: 0vh 0.2vh 0vh 0.2vh
+                - border-radius: 50%
+                - box-shadow: none
+                - background: |
+                    [[[
+                      if (variables.routine5_background_color) { 
+                        return variables.routine5_background_color;
+                      } else {
+                        return "var(--routine-background-color)";
+                      }
+                    ]]]
+                - cursor: none
+                - --mdc-ripple-press-opacity: 0
+              name: 
+                - font-size: 12px
+              icon:
+                - color: |
+                    [[[
+                      if (variables.routine5_icon_color) { 
+                        return variables.routine5_icon_color;
+                      } else {
+                        return "var(--routine-icon-color)";
+                      }
+                    ]]]
+            tap_action: 
+              action: call-service
+              service: >
+                [[[ 
+                  const routine = variables['routine5_entity'];
+                  if (!routine) return 'none';
+                  return routine.startsWith('script.') ? 'script.turn_on' : 
+                        routine.startsWith('scene.') ? 'scene.turn_on' : 
+                        routine.startsWith('automation.') ? 'automation.trigger' :
+                        'none';
+                ]]]
+              service_data:
+                entity_id: '[[[return variables.routine5_entity ]]]'

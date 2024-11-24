@@ -1,0 +1,117 @@
+ #########################################################
+#
+#             School
+#
+#########################################################
+
+  school_in_session:
+    sequence:
+    - condition: state
+      entity_id: input_boolean.school_in_session
+      state: 'off'
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.school_in_session
+
+  school_year_over:
+    sequence:
+    - condition: state
+      entity_id: input_boolean.school_in_session
+      state: 'on'
+    - condition: template
+      value_template: >
+        {{ states('input_datetime.school_last_day') == now().strftime("%Y-%m-%d") }}
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.school_in_session
+
+
+
+#########################################################
+#
+#            Set Custom Device Tracker Location
+#
+#########################################################
+
+#  set_device_tracker_shion_home:
+#    sequence:
+#      - service: device_tracker.see
+#        data:
+#          dev_id: shion
+#          location_name: "home"
+#          gps:
+#          - '35.8182373046875'
+#          - '139.70377148641893'
+
+#  set_device_tracker_shion_not_home:
+#    sequence:
+#      - service: device_tracker.see # Set to away
+#        data:
+#          dev_id: shion
+#          location_name: "not_home"
+#          gps:
+#          - '00.0'
+#          - '000.0'
+#      - condition: template
+#        value_template: "{{ is_state('binary_sensor.shion_at_school_baysn', 'on') }}"
+#      - delay: 40
+#      - service: device_tracker.see # Set to at school
+#        data:
+#          dev_id: shion
+#          location_name: "school"
+#          gps:
+#          - '35.81214930237013'
+#          - '139.71171706362946'
+
+
+######################
+# TEST TEST 
+  set_device_tracker_shion:
+    sequence:
+      - choose:
+          - conditions:
+              - condition: template # 1
+                value_template: "{{ is_state('input_boolean.shion_presence', 'off') }}"
+            sequence:
+              - service: device_tracker.see 
+                data:
+                  dev_id: shion
+                  location_name: "not_home"  #set to away
+                  gps:
+                  - '00.0'
+                  - '000.0'
+              - condition: template
+                value_template: "{{ is_state('binary_sensor.shion_at_school_baysn', 'on') }}"
+              - delay: 45
+              - service: device_tracker.see 
+                data:
+                  dev_id: shion
+                  location_name: "school"  #set to school
+                  gps:
+                  - '35.81214930237013'
+                  - '139.71171706362946'
+          - conditions:
+              - condition: template # 2
+                value_template: "{{ is_state('input_boolean.shion_presence', 'on') }}"
+            sequence:
+              - service: device_tracker.see 
+                data:
+                  dev_id: shion
+                  location_name: "home"  #set to home
+                  gps:
+                  - '35.8182373046875'
+                  - '139.70377148641893'                  
+        default:
+          - service: device_tracker.see
+            data:
+              dev_id: shion
+              location_name: "home"  #set to home
+              gps:
+              - '35.8182373046875'
+              - '139.70377148641893'
+  
+
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

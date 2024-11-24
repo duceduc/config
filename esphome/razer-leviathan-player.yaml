@@ -1,0 +1,36 @@
+# ESP32 NodeMCU [08:3A:F2:B5:80:0C]
+
+substitutions:
+  name: razer-leviathan-player
+
+packages:
+  stats: !include components/stats.yaml
+
+<<: !include .base.yaml 
+
+esphome:
+  name: $name
+  platform: esp32
+  board: nodemcu-32s
+
+i2s_audio:
+  i2s_lrclk_pin: GPIO25
+  i2s_bclk_pin: GPIO26
+
+media_player:
+  - platform: i2s_audio
+    name: $name
+    dac_type: external
+    i2s_dout_pin: GPIO22
+    mode: mono
+    on_play:
+      - logger.log: "Playback started!"
+    on_pause:
+      - logger.log: "Playback paused!"
+    on_idle:
+      - logger.log: "Playback finished!"
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart

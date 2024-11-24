@@ -1,0 +1,185 @@
+#########################################################
+#
+#             Template Binary Sensors
+#
+#########################################################
+
+  - binary_sensor:
+      - name: "Central Night Cooling"
+        delay_on: 00:30:00 # to avoid toggling
+        delay_off: 01:00:00 # to avoid toggling
+        state: >
+          {{ (states('sensor.average_house_temperature') | float(0) > 22) and (states('sensor.entrance_temperature') | float(0) < (states('sensor.average_house_temperature') | float(0) - 1)) }}
+
+
+#########################################################
+#
+#             Template Sensors
+#
+#########################################################
+
+
+  - sensor:
+      - name: "Security Genkan"
+        unique_id: 396877aa-8c09-4c36-a752-b5e923bd758f
+        state: >
+          {% if is_state("binary_sensor.genkan_door_contact", "off") %}Off{% else %}On{% endif %}
+        icon: >
+          {% if is_state("binary_sensor.genkan_door_contact", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+
+
+
+#########################################################
+#
+#             Template Misc 
+#
+#########################################################
+
+
+  - trigger:
+      - platform: event
+        event_type: cube_living_room_last_action
+    sensor:
+      - name: "Cube Living Room Last Action"
+        unique_id: d7169ac1-a255-45ee-b19b-ad0a8ef5f95f
+        icon: mdi:eye-refresh-outline
+        attributes:
+          friendly_name: "Cube Action"
+        state: >
+          {{ trigger.event.data.friendly_name }} -
+          {{ trigger.event.data.action }} -
+          {{ trigger.event.data.side }} frm
+          {{ trigger.event.data.last_side }}
+
+
+#########################################################
+#
+#             Calendar JCB
+#
+#########################################################
+
+  - trigger:
+      - platform: calendar
+        event: start
+        entity_id: calendar.units_arriving
+        offset: "-288:00:00" # 12 days is 288 hours
+      - platform: time
+        at: '23:59:58'
+    sensor:
+      - name: "Units Arriving"
+        state: |
+          {% if 'calendar_event' in trigger and trigger.calendar_event.summary|default('off') == 'Units Arriving' %}
+            on {% else %} off {% endif %}
+        attributes:
+          description: |
+            {% if 'calendar_event' in trigger and trigger.calendar_event.summary|default('none') == 'Units Arriving' %}
+              {{ trigger.calendar_event.description }}
+            {% else %} none {% endif %}
+
+
+#########################################################
+#
+#             Calendar Holidays
+#
+#########################################################
+
+
+  - trigger:
+      - platform: calendar
+        event: start
+        entity_id: calendar.holidays_in_japan
+      - platform: time
+        at: '23:59:58' # resets to none
+    sensor:
+      - name: "Holiday"
+        state: |
+          {% if 'calendar_event' in trigger and  trigger.calendar_event.description|default('none') == 'Public holiday' %}
+            {{ trigger.calendar_event.summary }}
+          {% else %} none {% endif %}
+
+  - trigger:
+      - platform: calendar
+        event: start
+        entity_id: calendar.holidays_in_japan
+        offset: "-24:00:00"
+      - platform: time
+        at: '23:59:58' # resets to none
+    sensor:
+      - name: "Holidaytomorrow"
+        state: |
+          {% if 'calendar_event' in trigger and  trigger.calendar_event.description|default('none') == 'Public holiday' %}
+            {{ trigger.calendar_event.summary }}
+          {% else %} none {% endif %}
+
+  - trigger:
+      - platform: calendar
+        event: start
+        entity_id: calendar.holidays_in_japan
+        offset: "-168:00:00" #168 7 days
+      - platform: time # resets to none
+        at: '23:59:58'
+    sensor:
+      - name: "Holidayinaweek"
+        state: |
+          {% if 'calendar_event' in trigger and  trigger.calendar_event.description|default('none') == 'Public holiday' %}
+            {{ trigger.calendar_event.summary }}
+          {% else %} none {% endif %}
+
+
+#########################################################
+#
+#             Calendar Appointments
+#
+#########################################################
+
+####TESTING#########
+  - trigger:
+      - platform: calendar
+        event: start
+        entity_id: calendar.appointments
+        offset: "-24:00:00"
+        id: "tomorrow"
+      - platform: time
+        at: '23:59:59' # resets to none
+    sensor:
+      - name: "Appointmenttomorrow"
+        icon: mdi:calendar-check
+        state: |
+          {% if 'calendar_event' in trigger and trigger.calendar_event.description|default('none') | lower | regex_search('@doctor|@dentist') %}
+            {{ trigger.calendar_event.summary }}
+          {% else %} none {% endif %}
+        attributes:
+          start_time: |
+            {% if trigger.id == 'tomorrow' and trigger.calendar_event.description|default('none') | lower | regex_search('@doctor|@dentist') %}
+              {% set at = trigger.calendar_event.start %}
+              {% set at = as_timestamp(strptime(at,'%Y-%m-%dT%H:%M:%S+09:00')) %}
+              {{ at | timestamp_custom("%H:%M") }}
+            {% else %}{% endif %}
+          event_id: "tomorrow"
+
+
+
+# https://community.home-assistant.io/t/syntax-for-multiple-search-criteria-for-imap-search/568471/7
+# https://community.home-assistant.io/t/syntax-for-multiple-search-criteria-for-imap-search/568471/10
+  - trigger:
+      - platform: event
+        event_type: 'imap_content'
+        id: 'custom_event'
+    binary_sensor:
+      - name: Payday
+        auto_off: "00:05:00" # turns to off 5 mins after it is on
+        state: >
+          {% set sender_list = ['cibadmin@sbishinseibank.co.jp', 'info@snailmsg.com'] %}
+          {% set current = this.state|default('off', 1) %}
+          
+          {% if trigger.event.data['sender'] in sender_list and
+          "Information from Transfer" in
+          trigger.event.data['subject'] %} on
+          {% else %} {{ current }} {% endif %}
+
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

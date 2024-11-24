@@ -1,0 +1,61 @@
+#########################################################
+#                                                                                                              
+#            Times of Day                                                                                           
+#                                                                                                              
+#########################################################
+
+
+  - platform: tod
+    name: Night
+    after: sunset
+    before: sunrise
+
+  - platform: tod
+    name: Day
+    after: sunrise
+    before: sunset
+
+  - platform: tod
+    name: Morning
+    after: '05:00'
+    before: '08:30'
+
+  - platform: tod
+    name: Midday
+    after: '08:30'
+    before: '17:00'
+
+  - platform: tod
+    name: Evening
+    after: '17:00'
+    before: '22:00'
+
+  - platform: tod
+    name: Overnight
+    after: '18:00'
+    before: '06:00'
+
+  - platform: tod
+    name: Quiet time
+    after: '22:00'
+    before: '06:00'
+
+  - platform: tod
+    name: Morning Cooking
+    after: '07:00' #5:30
+    before: '09:00'
+  - platform: tod
+    name: Afternoon Cooking
+    after: '12:00'
+    before: '14:00'    
+  - platform: tod
+    name: Evening Cooking
+    after: '16:00'
+    before: '20:00'
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

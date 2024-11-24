@@ -1,0 +1,331 @@
+###############################################################################
+#   @author         :   Duc Su
+#   @date           :   06/25/2023
+#   @package        :   HVAC
+#   @description    :   Aircon and fan devices.
+###############################################################################
+# Use this guide to setup 3 speed fan
+# https://community.home-assistant.io/t/fan-template-for-4-speed-fan/306117/7
+
+input_number:
+  cool_fan_speed_status:
+    min: 0
+    max: 100
+
+  warm_fan_speed_status:
+    min: 0
+    max: 100
+
+  status_yfan_speed:
+    min: 0
+    max: 100
+
+input_boolean:
+  cool_fan_power_status:
+
+  warm_fan_power_status:
+
+  status_yfan_power:
+
+script:
+# Broadlink Cmd -> Emulated Hue
+  turn_on_all_fans:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Yuasa Fan
+          command:
+          - power
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          num_repeats: 2
+          command:
+          - toggle summer fan
+
+  turn_off_all_fans:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Yuasa Fan
+          command:
+          - power
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - turn off fan
+
+  ceiling_fan_lights:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - lights
+
+# Warm fan speeds
+  warm_fan_1:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command: warm 1
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.warm_fan_power_status
+  warm_fan_2:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command: warm 2
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.warm_fan_power_status
+  warm_fan_3:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command: warm 3
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.warm_fan_power_status
+
+  toggle_warm_fan:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - toggle winter fan
+
+  warm_fan_speed_set:
+    mode: single
+    sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.warm_fan_speed_status
+        data:
+          value: '{{ percentage }}'
+      - action: script.warm_fan_speed_action
+        data: {}
+
+  warm_fan_speed_action:
+    mode: single
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_number.warm_fan_speed_status
+                state: '0.0'
+            sequence:
+              - choose:
+                  - conditions:
+                      - condition: state
+                        entity_id: input_boolean.warm_fan_power_status
+                        state: 'on'
+                    sequence:
+                      - action: script.turn_off_all_fans
+                default: []
+              - action: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.warm_fan_power_status
+          - conditions:
+              - condition: state
+                entity_id: input_number.warm_fan_speed_status
+                state: '33.0'
+            sequence:
+              - action: script.warm_fan_1
+          - conditions:
+              - condition: state
+                entity_id: input_number.warm_fan_speed_status
+                state: '66.0'
+            sequence:
+              - action: script.warm_fan_2
+          - conditions:
+              - condition: state
+                entity_id: input_number.warm_fan_speed_status
+                state: '100.0'
+            sequence:
+              - action: script.warm_fan_3
+        default: []
+
+# Cool fan speeds
+  cool_fan_1:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command: cool 1
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.cool_fan_power_status
+  cool_fan_2:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command: cool 2
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.cool_fan_power_status
+  cool_fan_3:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command: cool 3
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.cool_fan_power_status
+
+  toggle_cool_fan:
+    sequence:
+      - action: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Ceiling Fan
+          command:
+          - toggle summer fan
+
+
+  cool_fan_speed_set:
+    mode: single
+    sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.cool_fan_speed_status
+        data:
+          value: '{{ percentage }}'
+      - action: script.cool_fan_speed_action
+        data: {}
+
+  cool_fan_speed_action:
+    mode: single
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_number.cool_fan_speed_status
+                state: '0.0'
+            sequence:
+              - choose:
+                  - conditions:
+                      - condition: state
+                        entity_id: input_boolean.cool_fan_power_status
+                        state: 'on'
+                    sequence:
+                      - action: script.turn_off_all_fans
+                default: []
+              - action: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.cool_fan_power_status
+          - conditions:
+              - condition: state
+                entity_id: input_number.cool_fan_speed_status
+                state: '33.0'
+            sequence:
+              - action: script.cool_fan_1
+          - conditions:
+              - condition: state
+                entity_id: input_number.cool_fan_speed_status
+                state: '66.0'
+            sequence:
+              - action: script.cool_fan_2
+          - conditions:
+              - condition: state
+                entity_id: input_number.cool_fan_speed_status
+                state: '100.0'
+            sequence:
+              - action: script.cool_fan_3
+        default: []
+
+fan:
+  - platform: template
+    fans:
+      ceiling_fan_summer:
+        friendly_name: Summer Fan
+        speed_count: 3
+        value_template: "{{ states('input_boolean.cool_fan_power_status') }}"
+        percentage_template: "{{ states('input_number.cool_fan_speed_status') }}"
+        turn_on:
+          - action: script.cool_fan_speed_set
+            data:
+              percentage: "{{ (33,66,100) | random }}"
+        turn_off:
+          - action: script.cool_fan_speed_set
+            data:
+              percentage: "{{ 0 }}"
+        set_percentage:
+          - action: script.cool_fan_speed_set
+            data:
+              percentage: "{{ percentage }}"
+
+  - platform: template
+    fans:
+      ceiling_fan_winter:
+        friendly_name: Winter Fan
+        speed_count: 3
+        value_template: "{{ states('input_boolean.warm_fan_power_status') }}"
+        percentage_template: "{{ states('input_number.warm_fan_speed_status') }}"
+        turn_on:
+          - action: script.warm_fan_speed_set
+            data:
+              percentage: "{{ 33 }}"
+        turn_off:
+          - action: script.warm_fan_speed_set
+            data:
+              percentage: "{{ 0 }}"
+        set_percentage:
+          - action: script.warm_fan_speed_set
+            data:
+              percentage: "{{ percentage }}"
+
+  - platform: template
+    fans:
+      yuasa_fan:
+        speed_count: 3
+        value_template: "{{ states('input_boolean.status_yfan_power') }}"
+        turn_on:
+          - condition: state
+            entity_id: input_boolean.status_yfan_power
+            state: 'off'
+          - action: remote.send_command
+            data:
+              entity_id: remote.rm4_remote
+              device: Yuasa Fan
+              command: power
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.status_yfan_power
+        turn_off:
+          - action: remote.send_command
+            data:
+              entity_id: remote.rm4_remote
+              device: Yuasa Fan
+              command: power
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.status_yfan_power
+        percentage_template: >
+          {{ states('input_number.status_yfan_speed') if is_state('input_boolean.status_yfan_power', 'on') else 0 }}
+        set_percentage:
+          - action: input_boolean.turn_{{ 'on' if percentage > 0 else 'off' }}
+            target:
+              entity_id: input_boolean.status_yfan_power
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.status_yfan_speed
+            data:
+              value: "{{ percentage }}"
+          - action: remote.send_command
+            data:
+              entity_id: remote.rm4_remote
+              device: Yuasa Fan
+              command: speed

@@ -1,0 +1,171 @@
+>
+  {# Family Greetings #}
+  {%- macro getReport() -%}
+    <p>
+      {% set alias = {"Duc":"Duck", "Shion":"She-on", "Eri":"Eddie"} %}
+      {% set family = state_attr(('group.family_presence'), 'entity_id') %}
+      {% set t_family = states.binary_sensor | selectattr('entity_id', 'in', family) | list | count %}
+      {% set n_home = states.binary_sensor | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | list | count %}
+      {% set people_home = states.binary_sensor | selectattr('entity_id', 'in', family) | selectattr('state','eq','on') | map(attribute='name') | list %}
+      {% set ns = namespace(occupants = '') %}
+      {% for i in people_home %}
+        {% set ns.occupants = ns.occupants ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
+      {% endfor %}
+     
+      {% macro p1(person) %}
+      {% set p1 = [
+         "Welcome home " ~ns.occupants~" ",
+          "Guess who's home? It's " ~ns.occupants~" ",
+          ns.occupants~ "is now home.",
+          ns.occupants~ "It was pretty quiet while you were gone.",
+          "Welcome back home " ~ns.occupants~" ",
+          "Hopefully noting too crazy happened out there " ~ns.occupants~ " ",
+          "Hey " ~ns.occupants~"! High Five! Glad you are finally home.",
+          "Welcome home " ~ns.occupants~". I missed you. ",
+          "Our house is now complete, rest and relax !. Welcome back " ~ns.occupants~" ",
+          "Hey there! " ~ns.occupants~ "Welcome home! ",
+          "Knock knock. Who's here? It's " ~ns.occupants~" ",
+          ns.occupants~ "!. You are home!",
+          "I know a secret! " ~ns.occupants~ " is home!",
+          "I am feeling a disturbance in the strength.. " ~ns.occupants~ " must be home! ",
+          "And the house becomes a home. Welcome back " ~ns.occupants~" ",
+          ns.occupants~ " is here now. Welcome home.",
+          ns.occupants~ " is now here.",
+          "I would love to hear about your adventures " ~ns.occupants~ ".On second thought I do not care.",
+          "Just a little announcement. " ~ns.occupants~ " is here!",
+          "Forgive the interruption, but " ~ns.occupants~ " is home! ",
+          "My systems are detecting the presence of more humans. " ~ns.occupants~ " is in the house. ",
+          "Welcome back "~ns.occupants~"!. The house is activating! ",
+          "Welcome home "~ns.occupants~"!. It's nice to see you again !. Let me turn the house on. ",
+          "Well, it looks like "~ns.occupants~" is finally home! I will prepare the house for you. ",
+          "It's nice to see you're back safe and sound, "~ns.occupants~". Do you want me to prepare the house? ",
+          "Great, "~ns.occupants~" is back! Let me get the house ready for you. "
+      ] %}
+      {{ p1 | random }}
+      {% endmacro %}
+
+      {% macro p2(persons) %}
+      {% set p2 = [
+         "Welcome home " ~ns.occupants~" ",
+          ns.occupants~ " You guys are home now. ",
+          "Welcome back home " ~ns.occupants~" ",          
+          "Welcome home " ~ns.occupants~". I missed you guys. ",
+          "Hey " ~ns.occupants~"! High Five! Glad you are finally home.",          
+          "Our house is now complete, rest and relax !. Welcome back " ~ns.occupants~" ",
+          "Hey there! " ~ns.occupants~ " Welcome home! ",
+          "Knock knock. Who's here? It's " ~ns.occupants~" ",
+          ns.occupants~ "!. You guys are home!",
+          "I know a secret! " ~ns.occupants~ " are home! ",
+          "And the house becomes a home. Welcome back guys. " ~ns.occupants~" ",
+          ns.occupants~ " are guys are here now. ",
+          "Just a little announcement. " ~ns.occupants~ " have arrived! ",
+          "My systems are detecting the presence of additional humans. " ~ns.occupants~ " are home.",
+          ns.occupants~ " have been identified in the house. ",
+          "Welcome back "~ns.occupants~"!. The house is activating! ",
+          "Welcome home "~ns.occupants~"!. It's good to see you guys again !. Let me turn the house on. ",
+          "Well, it looks like "~ns.occupants~" are finally home! Shall I prepare the house for you guys?"
+      ] %}
+      {{ p2 | random }}
+      {% endmacro %}
+
+      {% if n_home == 0 %}
+       Attention!!!
+       No family members are home at the moment!!
+       
+      {% elif n_home == 1 %}
+       {{ p1(person) }}
+      {% elif  n_home > 1 and n_home < t_family %}
+       {{ p2(persons) }}   
+       
+      {% elif  n_home == t_family  %}
+      {% set p = trigger.to_state.attributes.friendly_name %}
+      {% set user = alias.get(p) %}
+        {{ user }}. {{ ('Wow!,','Tickle me pink!,','Tickle me blue!,') | random }} What an event! The whole {{ ('family,','gang,','crew,') | random }} is at home!
+      {% endif %}
+  
+    </p>
+
+    <p>
+      {{ [
+       'The livingroom temperature is TT degrees ',
+       'The current livingroom temperature is TT degrees ',
+       'The temperature in the livingroom is TT degrees ',
+       'TT degrees is what my system is detecting in the livingroom currently'
+       ]| random | replace('TT', states('sensor.livingroom_temperature')) }}
+
+      {{ [
+       '.The humidity is TT %.',
+       '.Humidity is TT %.',
+       'And the humidity is TT %.',
+       '.TT % humidity is what my console is detecting in the livingroom.'
+       ]| random | replace('TT', states('sensor.livingroom_humidity')) }}
+
+    </p>
+
+    <p>
+       {%- if is_state('sensor.washer_status_m', 'complete') %}
+         The washing machine completed its cycle 
+         {% set seconds = (now() - states.sensor.washer_status_m.last_changed).seconds %}
+         {% if (seconds / ( 60 * 60 )) | int == 1 %}
+           over an hour ago.
+           {{ [
+           'Do not forget to rotate the clothes.', 
+           'Was someone going to rotate the laundry?',
+           'Once you rotate the laundry I will stop reminding you to do it. So if you want me to stop. Its up to you.'
+           ] | random }}
+         {% elif (seconds / ( 60 * 60 )) | int > 1 and (seconds / ( 60 * 60 )) | int < 6 %}
+           over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
+           {{ [
+           'Much longer and you are going to need to wash them again.', 
+           'Someone needs to rotate the laundry.',
+           'Do not forget about the clothes in the washing machine.',
+           'Surely you did not mean to forget about the clothes. Mistakes happen. But you can still fix it.',
+           'Do you like your clothes smelling like mildew? Becasue that is what is happening right now.'
+           ] | random }}
+         {% elif (seconds / ( 60 * 60 )) | int > 6 %}
+           over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
+           {{ [
+           'That is a crazy amount of time.', 
+           'Did you decide you want those clothes to suffer?',
+           'You might as well just rewash those clothes.',
+           'I can smell the mildew. Virtually that is.',
+           'Surely you did not mean to forget about the clothes.'
+           ] | random }}
+         {% else %}
+           {{ (seconds // 60) | int }} minutes ago.
+           {{ [
+           'Do not forget to rotate the clothes.', 
+           'Someone forgot to move the clothes to the dryer. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
+           'You might want to move them to the dryer.'
+           ] | random }}
+         {% endif %}
+       {% endif %}
+       </p>
+
+    <p>
+    {% if is_state('sensor.front_door_motion_away_count','0') %}
+      While you were gone there was no motion detected at the front door.
+    {% elif is_state('sensor.front_door_motion_away_count','1') %}
+      While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} time.      
+    {% else %}
+      While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} times.
+    {% endif %}
+    </p>
+
+       
+  {%- endmacro -%}
+
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}
+  {%- macro cleanup(data) -%}
+    {%- for item in data.split("\n")  if item | trim != "" -%}
+      {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  {# a macro to call all macros :)  #}
+  {%- macro mother_of_all_macros() -%}
+    {{ getReport() }}
+  {%- endmacro -%}
+
+  {# Call the macro  #}
+  {{- cleanup(mother_of_all_macros()) -}}

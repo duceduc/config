@@ -1,0 +1,115 @@
+# ESP8266 Uno... 8C-AA-B5-79-83-92
+# Change ip via ota
+# https://community.home-assistant.io/t/can-i-change-ip-address-over-the-air/168870/6
+substitutions:
+  name: aio-wemos
+  upper: Mr
+  lower: mr  
+  oa: oa
+
+packages:
+  ld2410: !include components/ld2410.yaml
+
+########
+esphome:
+  name: $name
+  platform: esp8266
+  board: d1_mini
+  includes:
+    - /config/esphome/components/ld2410_uart.h
+  on_boot:
+    priority: 600
+    # ...
+    then:
+      - lambda: |-
+          auto uart_component = static_cast<LD2410 *>(ld2410);
+          uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);  
+
+########
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+  power_save_mode: none
+  reboot_timeout: 0s
+  fast_connect : true
+  manual_ip:
+    static_ip: 192.168.1.96
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
+
+logger:
+  baud_rate: 0
+
+api:
+  encryption:
+    key: !secret esphome_apikey
+
+ota:
+  - platform: esphome
+    password: !secret ota_pass
+########
+
+# Sensors
+sensor:
+  - platform: dht
+    model: AM2302
+    pin: D6
+    update_interval: 15s
+    temperature:
+      name: '$lower temperature'
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+           send_first_at: 1           
+    humidity:
+      name: '$lower humidity'
+      filters:
+        - sliding_window_moving_average:
+           window_size: 15
+           send_every: 15
+           send_first_at: 1           
+
+#  - platform: dht
+#    model: AM2302
+#    pin: D7
+#    update_interval: 60s
+#    temperature:
+#      name: '$oa temperature'
+#      filters:
+#        - sliding_window_moving_average:
+#           window_size: 15
+#           send_every: 15
+#           send_first_at: 1           
+#    humidity:
+#      name: '$oa humidity'
+#      filters:
+#        - sliding_window_moving_average:
+#           window_size: 15
+#           send_every: 15
+#           send_first_at: 1
+
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+  - platform: adc
+    pin: A0
+    name: 'front illuminance'
+    unit_of_measurement: lux
+    update_interval: 10s
+
+binary_sensor:
+  - platform: status
+    name: $name status
+
+  - platform: gpio
+    pin: GPIO4 #D2
+    name: 'motion g2 occupancy'
+    device_class: motion
+

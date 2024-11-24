@@ -1,0 +1,132 @@
+#########################################################
+#
+#             Hallway Light
+#
+#########################################################
+
+- alias: 'motion hallway auto-on'
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.hallway_moving_target
+      to: 'on'
+  conditions:
+    - condition: template # Not on vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+  actions:
+    - choose:
+      - conditions:
+          - condition: state
+            entity_id: input_boolean.guest_mode
+            state: "on"
+        sequence:
+          - action: script.tradfri_transition
+            data:
+              entity_id: light.h_1
+              color_temp: 400
+              transition: 2
+              brightness: 200
+            entity_id: light.h_1
+      - conditions:
+          - condition: template
+            value_template: '{{ now().hour > 19 or now().hour < 7 }}'
+        sequence:
+          - action: script.tradfri_transition
+            data:
+              entity_id: light.h_1
+              color_temp: 400
+              transition: 2
+              brightness: 50
+            entity_id: light.h_1
+      default:
+        - action: script.tradfri_transition
+          data:
+            entity_id: light.h_1
+            color_temp: 400
+            transition: 2
+            brightness: 200
+          entity_id: light.h_1
+
+- alias: 'motion hallway auto-off'
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.hallway_presence
+      to: 'off'
+      for: 15
+#  conditions:
+#    - condition: template # disable motion light
+#      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+  actions:
+    - action: light.turn_off
+      entity_id: light.h_1
+
+
+#########################################################
+#
+#             Genkan Light
+#
+#########################################################
+
+- alias: 'motion genkan area'
+  triggers:
+    - trigger: state
+      entity_id: group.motion_genkan_occupancy, binary_sensor.genkan_door_contact
+      to: 'on'
+    - trigger: template
+      value_template: "{{ is_state('binary_sensor.genkan_presence', 'off') }}"
+      for: 15
+      id: 'off'
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'off'
+          sequence: 
+            - action: light.turn_off
+              entity_id: light.g_1
+      default:
+        - action: script.tradfri_transition
+          entity_id: light.g_1
+          data:
+            entity_id: light.g_1
+            color_temp: 400
+            transition: 2
+            brightness: 200
+
+
+#########################################################
+#
+#             Turn on Genkan For Eri During Workdays
+#
+#########################################################
+
+#- alias: 'turn on genkan for eri'
+#  triggers:
+#    trigger: time
+#    at: '05:25:00'
+#  conditions:
+#  - condition: and
+#    conditions:
+#    - condition: template # Is weekday
+#      value_template: "{{ is_state('sensor.date_weekday', 'on') }}"
+#    - condition: template # Don't run if holiday
+#      value_template: "{{ states('sensor.holiday')| trim == 'none' }}"
+#
+#    - condition: state
+#      entity_id: binary_sensor.eri_presence
+#      state: 'on'
+#  actions:
+#    - action: script.tradfri_transition
+#      data:
+#        entity_id: light.g_1
+#        color_temp: 400
+#        transition: 2
+#        brightness: 200
+#      entity_id: light.g_1
+
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################

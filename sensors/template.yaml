@@ -1,0 +1,50 @@
+####################################################
+#                                                                                                    
+#                    TEMPLATE                                                                  
+#                                                                                                    
+####################################################
+
+
+#  - platform: command_line
+#    name: "Number of Lines of Code"
+#    command: " find /config/ -name '*.yaml' | xargs cat | wc -l"
+
+  - platform: template
+    sensors:
+      sensor_count:
+        friendly_name: 'Number of Sensors'
+        value_template: '{{ states.sensor | count }}'
+      automation_count:
+        friendly_name: 'Number of Automations'
+        value_template: '{{ states.automation | count }}'
+      script_count:
+        friendly_name: 'Number of Scripts'
+        value_template: '{{ states.script | count }}'
+      switch_count:
+        friendly_name: 'Number of Switches'
+        value_template: '{{ states.switch | count }}'
+      binary_sensor_count:
+        friendly_name: 'Number of Binary Sensors'
+        value_template: '{{ states.binary_sensor | count }}'
+      light_count:
+        friendly_name: 'Number of Lights'
+        value_template: '{{ states.light | count }}'
+      tracker_count:
+        friendly_name: 'Number of Devices'
+        value_template: '{{ states.device_tracker | count }}'
+      nextsunrise:
+        friendly_name: 'Next Sunrise'
+        value_template: >
+          {{ as_timestamp(states.sun.sun.attributes.next_rising) | timestamp_custom(' %I:%M%p') | replace(" 0", "") }}
+      nextsunset:
+        friendly_name: 'Next Sunset'
+        value_template: >
+          {{ as_timestamp(states.sun.sun.attributes.next_setting) | timestamp_custom(' %I:%M%p') | replace(" 0", "") }}
+      hoursdaylight:
+        value_template: "{% set nr = as_timestamp(state_attr('sun.sun','next_rising')) %} {% set ns = as_timestamp(state_attr('sun.sun','next_setting')) %} {% if nr > ns %} {% set nr = nr - 60*60*24 %} {% endif %} {{ (ns - nr)|timestamp_custom('%H:%M',false) }}"
+
+####################################################
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
+####################################################

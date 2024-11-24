@@ -1,0 +1,150 @@
+  wakeuplight:
+    - sensor.wakeup_alarm_time
+    - sensor.wakeup_start_time_lights
+    - sensor.wakeup_fadein_duration
+    - input_number.wakeup_hour
+    - input_number.wakeup_minutes
+    - input_number.wakeup_duration
+    - input_boolean.wakeup
+    - input_boolean.wakeup_weekends
+    - input_select.wakeup_select
+
+#########################################################
+#
+#             Presence
+#
+#########################################################
+
+  family:
+    - person.duc
+    - person.eri
+    - person.shion
+
+  all_home:
+    name: Whose Home
+    icon: mdi:home
+    entities:
+      - binary_sensor.duc_presence
+      - binary_sensor.eri_presence
+
+  family_presence:
+    name: Family Presence
+    icon: mdi:home
+    entities:
+      - binary_sensor.duc_presence
+      - binary_sensor.eri_presence
+      - binary_sensor.shion_presence
+
+  guest_presence:
+    - binary_sensor.sachiko_presence
+    - binary_sensor.tomokun_presence
+
+  cooking_time:
+    - binary_sensor.morning_cooking
+    - binary_sensor.afternoon_cooking
+    - binary_sensor.evening_cooking
+
+  external_doors:
+    - binary_sensor.genkan_door_contact
+    - binary_sensor.genkan_doorlock
+    - binary_sensor.computerroom_window
+    - binary_sensor.livingroom_window
+
+  vacation_lights:
+    - light.cabinet
+    - light.counter
+    - light.computer
+    - light.living
+    - light.shion
+    - light.master
+
+  bed_sensors:
+#    - binary_sensor.top
+    - binary_sensor.bed_sensor_middle
+
+  echos:
+    - media_player.ai_1
+    - media_player.ai_2
+    - media_player.ai_3
+    - media_player.ai_4
+
+  clean_aircon_filter:
+    name: Clean Aircon Filter
+    icon: mdi:air-filter
+    entities:
+      - switch.clean_lr_unit
+      - switch.clean_mr_unit
+      - switch.bed_sensor_sr_clean
+
+  christmas_lights:
+    name: Christmas Lights
+    icon: mdi:string-lights
+    entities:
+      - switch.sp1_0
+      - switch.sp2_0
+      - switch.sp3_0
+
+  trigger_camera:
+    name: Trigger Camera
+    icon: mdi:camera
+    all: true
+    entities:
+      - light.h_1
+      - binary_sensor.genkan_door_contact
+
+  motion_kitchen_occupancy:
+    name: Motion Kitchen Occupancy
+    entities:
+      - binary_sensor.kitchen_moving_target
+#      - binary_sensor.motion_kitchen_occupancy
+#      - binary_sensor.cabinet_has_moving_target
+
+  motion_showerroom_occupancy:
+    name: Motion Shower Room Occupancy
+    entities:
+      - binary_sensor.wr_has_moving_target
+#      - binary_sensor.motion_washroom_sensor_occupancy
+#      - binary_sensor.motion_sink_sensor_occupancy
+
+# CAN DELETE???
+#  hallway_motion:
+#    - binary_sensor.genkan_moving_target
+#    - binary_sensor.motion_g1_occupancy
+
+  motion_genkan_occupancy:
+    - binary_sensor.genkan_moving_target
+
+  occupancy:
+    - binary_sensor.kitchen_moving_target
+    - binary_sensor.lr_moving_target
+    - binary_sensor.mr_moving_target
+    - binary_sensor.sr_has_moving_target
+    - binary_sensor.hallway_moving_target
+    - binary_sensor.genkan_moving_target
+    - binary_sensor.motion_cr_sensor_occupancy
+    - binary_sensor.wr_has_moving_target
+
+  home_alarm_motion_sensors:
+    - binary_sensor.lr_moving_target
+    - binary_sensor.mr_moving_target
+    - binary_sensor.sr_moving_target
+
+#########################################################
+#
+#             Telegram Bot Controllable Devices
+#
+#########################################################
+
+  controllable_devices:
+    - light.computer # Computer Room
+    - switch.desktop # Desktop
+    - switch.yuasa_fan # Fan
+    - switch.ceiling_fan_summer # Ceiling Fan Summer
+    - switch.jcom_tv # Jcom tv
+
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

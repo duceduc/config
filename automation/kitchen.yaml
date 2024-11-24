@@ -1,0 +1,148 @@
+#########################################################
+#
+#            Kitchen Motion
+#
+#########################################################
+
+- alias: Kitchen Occupancy
+  description: 'Defines occupancy state for room'
+  mode: single
+  triggers:
+    - trigger: time_pattern
+      id: time
+      seconds: '10'
+    - trigger: state
+      entity_id:  group.motion_kitchen_occupancy # binary_sensor.motion_kitchen_occupancy 
+      id: motion
+      to: 'on'
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+#    - condition: template # disable motion light
+#      value_template: >- # can remove when human sensor is working
+#        {%- set trig = (now() - states.binary_sensor.motion_kitchen_occupancy.last_changed).seconds -%}
+#          {{ trig <= 300 }}      
+    - condition: template # mcl is off
+      value_template: "{{ is_state('input_boolean.kitchen_mcl', 'off') }}"
+  actions:
+    - action: python_script.room_occupancy
+      data:
+        roomname: kitchen
+        timeout: "{{ 3 if is_state('group.cooking_time', 'on') else 2 }}"
+        entities_toggle:
+          - group.motion_kitchen_occupancy
+        entities_keep:
+          - binary_sensor.kitchen_still_target
+          - binary_sensor.cabinet_has_target
+
+- alias: Kitchen Light
+  description: 'toggle light depending on timer state'
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: timer.kitchen_timer
+      id: 'pre'
+      from: idle
+      to: active
+
+    - trigger: state
+      entity_id: light.cabinet
+      id: 'on'
+      from: 'off'
+      to: 'on'
+      for: '00:01:00'
+    - trigger: state
+      entity_id: sensor.kt_illuminance
+      id: 'on'
+      from: 'off'
+      to: 'on'
+
+    - trigger: state
+      entity_id: timer.kitchen_timer
+      id: 'off'
+      from: active
+      to: idle
+    - trigger: state # manual finish timer
+      entity_id: light.cabinet
+      id: 'off'
+      from: 'on'
+      to: 'off'
+    - trigger: template ## quick turn off if no presence
+      value_template: >-
+        {%- set trig = (now() - states.group.motion_kitchen_occupancy.last_changed).seconds -%}
+          {{ is_state('binary_sensor.kitchen_presence', 'off') and trig > 5 }}
+      id: 'off'
+      for: 40         
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+  
+  actions:
+    - choose:
+      - conditions:
+          - condition: trigger
+            id: 'pre'
+        sequence:
+          - action: light.turn_on
+            data:
+              entity_id: |
+               {% if is_state('binary_sensor.lr_radar_status', 'off') %}
+                  light.k_1, light.k_3
+               {% elif states.sensor.lr_radar_illuminance.state | float <= 0.09 %}
+                  light.k_1
+               {% else %}
+                  light.k_1, light.k_3
+               {% endif %}
+      - conditions:
+          - condition: trigger
+            id: 'on'
+        sequence:
+          - condition: template
+            value_template: "{{ is_state('light.cabinet', 'on') }}"
+          - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('binary_sensor.lr_radar_status', 'off') else 'online' }}
+
+      - conditions:
+          - condition: trigger
+            id: 'off'
+        sequence:
+          - action: light.turn_off
+            entity_id: light.cabinet, light.counter
+          - action: timer.finish
+            entity_id: timer.kitchen_timer
+      default: []
+
+#########################################################
+#
+#             Override Auto Mode Lights On/Off
+#
+#########################################################
+
+- alias: 'Kitchen MCL Announce State'
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.kitchen_mcl
+  conditions:
+    - condition: template
+      value_template: "{{ is_state('input_boolean.audible_notifications', 'on') }}"
+  actions:
+    - action: script.speech_engine
+      data:
+        who: ai_1
+        message: !include ../tpl/speech/control_status.yaml
+        voice: "{{ states('input_select.jarvis_voice') }}"
+
+- alias: 'Kitchen MCL Re-Enable'
+  triggers:
+    -  trigger: state
+       entity_id: input_boolean.kitchen_mcl
+       to: 'on'
+       for: '01:00:00'
+  actions:
+    - action: input_boolean.turn_off
+      entity_id: input_boolean.kitchen_mcl
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

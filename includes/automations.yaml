@@ -1,0 +1,36 @@
+- id: '1666493337050'
+  alias: Cube Livingroom On
+  description: ''
+  use_blueprint:
+    path: homeassistant/xiaomi_cube_controller.yaml
+    input:
+      remote: sensor.cube_living_room_action
+      flipped90_face_0:
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id: light.living
+- id: '1666495014498'
+  alias: Cube Livingroom Bright Toggle
+  description: ''
+  use_blueprint:
+    path: homeassistant/xiaomi_cube_controller.yaml
+    input:
+      remote: sensor.cube_living_room_action
+      rotate_cw_face_0:
+      - service: script.cube_dimmer_control
+        data:
+          angle: "{{ trigger.to_state.attributes.action_angle }}"
+          light: light.living
+- id: '1666495028593'
+  alias: Cube Livingroom Dim Toggle
+  description: ''
+  use_blueprint:
+    path: homeassistant/xiaomi_cube_controller.yaml
+    input:
+      remote: sensor.cube_living_room_action
+      rotate_ccw_face_0:
+      - service: script.cube_dimmer_control
+        data:
+          angle: "{{ trigger.to_state.attributes.action_angle }}"
+          light: light.living

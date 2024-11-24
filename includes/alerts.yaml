@@ -1,0 +1,174 @@
+#########################################################
+#                                                                                                              
+#             Traval Time Monitor Alerts                                                 
+#                                                                                                              
+#########################################################
+
+
+  eri_heading_home:
+    name: Eri is headed home
+    message: "Eddie will be home in {{state_attr('sensor.eri_ett_home','duration') | round}} minutes."
+    entity_id: input_boolean.eri_travel_monitor
+    state: "on"
+    repeat: 20
+    can_acknowledge: true
+    skip_first: false
+    data:
+      type: tts
+    notifiers:
+     - amberthebot
+     - alexa_media_ai_4
+
+  duc_heading_home:
+    name: Duc is headed home
+    message: "Duck will be home in {{state_attr('sensor.duc_ett_home','duration') | round}} minutes."
+    entity_id: input_boolean.duc_travel_monitor
+    state: "on"
+    repeat: 20
+    can_acknowledge: true
+    skip_first: false
+    data:
+      type: tts
+    notifiers:
+     - amberthebot
+     - alexa_media_ai_4
+
+
+#########################################################
+#                                                                                                              
+#             Monitor Devices                           
+#                                                                                                              
+#########################################################
+
+  monitor_rpi_zero:
+    name: Monitor rpi zero devices
+    entity_id: binary_sensor.monitor_rpi_zero
+    state: "on"
+    can_acknowledge: true
+    skip_first: true    
+    message: >-
+      Rpi zero devices possibly offline.
+      ms1: {{ states('sensor.ms1_wifi_strength') }}.
+      ms2: {{ states('sensor.ms2_wifi_strength') }}.
+      ms3: {{ states('sensor.ms3_wifi_strength') }}.
+    repeat:
+     - 20
+     - 45
+    notifiers:
+     - 'amberthebot'
+
+  monitor_broadlink:
+    name: Monitor Broadlink Devices
+    entity_id: binary_sensor.monitor_broadlink
+    state: "on"
+    can_acknowledge: true
+    skip_first: true    
+    message: >-
+      Broadlink devices possibly offline.
+      rm31: {{ states('remote.rm31_remote') }}.
+      rm32: {{ states('remote.rm32_remote') }}.
+      rm4: {{ states('remote.rm4_remote') }}.
+    repeat:
+     - 20
+     - 45
+    notifiers:
+     - 'amberthebot'
+
+#########################################################
+#                                                                                                              
+#             Security Alerts                           
+#                                                                                                              
+#########################################################
+
+#  rpi_updates:
+#    name: Raspberry Pi Updates Alert
+#    entity_id: binary_sensor.ms2_updates
+#    title: "{{ states('sensor.ms2_updates') }} Raspberry Pi Updates Available"
+#    message: "There are {{ states('sensor.ms2_updates') }} updates available for the Raspberry Pi servers"
+#    state: 'on'
+#    can_acknowledge: true
+#    repeat: 720
+#    notifiers:
+#      - 'amberthebot'
+
+
+  replace_toilet_airfreshener:
+    name: Replace Toilet Airfreshener Alert
+    entity_id: binary_sensor.replace_toilet_airfreshener
+    title: "Replace Toilet Air Freshener"
+    message: "The toilet air freshener bottle needs to be replaced. It has sprayed over {{ states('counter.toilet_airfreshener') }} times."
+    state: 'on'
+    can_acknowledge: true
+    repeat: 720
+    notifiers:
+      - 'notify_events'
+
+
+  lockdown_issue:
+    name: Issue Preventing Lockdown...Please Check
+    done_message: Issue Resolved...House Ready to Arm
+    entity_id: input_boolean.lockdown_issue
+    state: 'on'
+    repeat: 2
+    can_acknowledge: false
+    skip_first: false
+    notifiers:
+      - notify_events
+
+
+#########################################################
+#                                                                                                              
+#             Low Battery Alert                                    
+#                                                                                                              
+#########################################################
+
+  low_battery_alert:
+    name: Replace Battery Alert
+    entity_id: binary_sensor.devices_with_low_battery
+    title: "Replace Battery"
+    message: "There are {{ states('sensor.devices_with_low_battery') }} {% if is_state('sensor.devices_with_low_battery', '1') %}device{% else %}devices{% endif %} need battery replacement."
+    state: 'on'
+    can_acknowledge: true
+    repeat: 720
+    notifiers:
+      - 'notify_events'
+
+#########################################################
+#                                                                                                              
+#             Washer Finished Alert                                    
+#                                                                                                              
+#########################################################
+
+
+  washing_machine_finished:
+    name: Washing Machine Finished
+    message: >
+      The washing machine has completed its cycle 
+        {%- set seconds = (now() - states.sensor.washer_status_m.last_changed).seconds -%}
+        {%- set hours = seconds / 3600 -%}
+        {%- if hours == 1 -%}
+          over an hour ago.
+        {% elif hours | int > 1 %}
+          over {{ hours | int }} hours ago.
+        {% elif seconds == 0 %} seconds ago.
+        {% else %}
+          {{ (seconds // 60) | int }} minutes ago.
+        {% endif %}
+    entity_id: input_boolean.washer_finished
+    state: "on"
+    repeat:
+      - 15
+      - 30
+      - 45
+    can_acknowledge: false
+    skip_first: false
+    notifiers:
+      - notify_events
+#     - amberthebot
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

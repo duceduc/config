@@ -1,0 +1,167 @@
+####################################################
+#
+#                    SWITCHES VIEW
+#
+####################################################
+
+title: Switches
+path: switches
+icon: mdi:light-switch
+#background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+panel: true
+cards:
+
+  - type: custom:layout-card
+    layout_type: masonry-layout
+    layout:
+      max_cols: 3
+    cards:
+
+      - type: entities
+        title: Main Area Lights
+        show_header_toggle: false
+        entities:
+          - entity: light.living
+            name: Living Room
+          - entity: light.computer
+            name: Computer Room
+          - entity: light.pc_desktop_led
+            name: Desk Led
+          - entity: light.ceiling_fan_light
+            name: Dining Room            
+          - type: divider
+          - entity: fan.ceiling_fan_summer
+            icon: mdi:pinwheel
+            name: Ceiling Fan
+          - entity: fan.yuasa_fan
+            name: Yuasa Fan
+          - entity: switch.lr_airfreshener
+            name: Livingroom Airfreshener
+#          - entity: switch.kt_airfreshener
+#            name: Kitchen Airfreshener
+          - entity: switch.wc_airfreshener
+            name: Toilet Airfreshener
+          - entity: switch.floor_heat
+            name: Floor Heater
+          - entity: switch.sb_humidifier
+            name: Humidifier
+          - entity: switch.sb_humidifier_mode
+            name: Humidifier Mode
+          - entity: switch.jcom_tv
+            name: Jcom Tv
+          - entity: switch.hdmi_selector
+            name: Hdmi Selector
+          - entity: switch.ser8
+            name: Ser8
+          - entity: switch.desktop
+            name: Desktop
+
+#          - entity: switch.christmas_lights
+#            name: Christmas Lights
+          - type: divider
+          - entity: cover.cr_curtain_lt_curtain
+            name: Computer Room Curtains
+          - entity: cover.lr_curtain_lt_curtain
+            name: Living Room Curtains
+          - entity: cover.fr_curtains
+            name: Front Room Curtains
+    #      - entity: cover.computer_room_curtain
+    #        name: Computer Room Curtain Mqtt
+    #      - entity: cover.living_room_curtain
+    #        name: Living Room Curtain Mqtt
+
+
+      - type: entities
+        title: Kitchen Island
+        show_header_toggle: false
+        entities:
+          - entity: light.cabinet
+            name: Cabinet
+          - entity: light.counter
+            name: Counter
+          - entity: light.storage
+            name: Storage
+          - entity: light.night_light
+            name: Night Light
+
+      - type: entities
+        title: Wash Area Lights
+        show_header_toggle: false
+        entities:
+          - entity: light.laundry
+            name: Laundry Room
+          - entity: light.sink
+            name: Sink
+          - entity: light.vanity
+            name: Vanity
+          - entity: light.shower
+            name: Shower Room
+          - entity: light.wc
+            name: WC
+          - type: divider
+          - entity: switch.24hr_fan
+            name: 24hr Fan
+    #      - entity: switch.24h_fan
+    #        name: 24h Fan Mqtt
+
+      - type: entities
+        title: Front Area Lights
+        show_header_toggle: true
+        entities:
+          - entity: light.genkan
+            name: Genkan
+          - entity: light.hallway
+            name: Hallway
+
+      - type: entities
+        title: Bedroom Lights
+        show_header_toggle: false
+        entities:
+          - entity: light.m_1
+            name: Master Room
+          - entity: light.master_closet
+            name: Master Closet
+          - entity: light.shion
+            name: Shion Room
+
+      - type: entities
+        title: Disable Devices
+        show_header_toggle: false
+        entities:
+          - entity: switch.desktop_internet
+            name: Desktop
+          - entity: switch.iphonex
+            name: iX
+          - entity: switch.ai_4
+            name: Ai4        
+          - entity: switch.iphone8
+            name: iPhone8
+          - entity: switch.ipad
+            name: iPad
+          - entity: input_boolean.disable_motion_lights
+            name: Disable Motion Lights
+
+#          - entity: switch.is_internet
+#            name: iPhone 6
+#            icon: mdi:wifi
+#          - entity: switch.switch_internet
+#            name: Nintendo Switch
+#            icon: mdi:wifi
+
+      - type: custom:streamline-card
+        template: humidifier_tpl
+        variables:
+          - title: Humidifier Controls
+          - room: lrh
+          - entity_1: input_select.sb_humidifier_mode
+          - entity_2: sensor.sb_humidifier_temperature
+          - entity_3: sensor.sb_humidifier_humidity
+          - entity_4: sensor.sb_humidifier_nebulization_efficiency
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

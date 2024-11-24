@@ -1,0 +1,9 @@
+switchbotmqtt/esp32/bot/24hr_fan/state,ON
+switchbotmqtt/esp32/bot/24hr_fan/attributes,{"mode":"PressOnOff","state":"ON","batt":73,"rssi":-68}
+switchbotmqtt/esp32/bot/24hr_fan/settings,{"firmware":4.9,"timers":0,"inverted":false,"hold":0}
+switchbotmqtt/esp32/bot/24hr_fan/assumedstate,ON
+switchbotmqtt/esp32/bot/24hr_fan/battery,73
+switchbotmqtt/esp32/bot/24hr_fan/rssi,-68
+switchbotmqtt/esp32/bot/24hr_fan/akitchen_occupancy,OFF
+switchbotmqtt/esp32/bot/24hr_fan/assumedstate,ON
+switchbotmqtt/esp32/bot/24hr_fan/assumedstate,ON

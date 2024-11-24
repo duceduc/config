@@ -1,0 +1,61 @@
+#########################################################
+#                                                                                                              
+#            Miscs                                                                                           
+#                                                                                                              
+#########################################################
+
+  - platform: threshold
+    name: Devices with low battery
+    entity_id: sensor.devices_with_low_battery
+    upper: 0.5
+
+#  - platform: threshold
+#    name: ms2 updates
+#    entity_id: sensor.ms2_updates
+#    upper: 0.5
+
+
+####################################################
+#                                                                                                    
+#            Motion Sensors
+#                                                                                                    
+####################################################
+
+# {% set s = states('calendar.shion_school') %}
+  - platform: template
+    sensors:
+      motion_sr_auto_on:
+        value_template: >
+          {% set w = states('sensor.date_weekday') %}
+          {% set h = states('calendar.holidays_in_japan') %}
+          {% set end = '19:59:00' %}
+          {% if w == 'on' and h == 'off' %} 
+            {{ '06:59:00' < states('sensor.time') < end }}
+          {% else %}
+            {{ '09:29:00' < states('sensor.time') < end }}
+          {% endif %}
+
+  - platform: template
+    sensors:
+      monitor_rpi_zero:
+        value_template: >
+          {% if is_state("sensor.ms1_wifi_strength", "unavailable") or
+                     is_state("sensor.ms2_wifi_strength", "unavailable") or
+                     is_state("sensor.ms3_wifi_strength", "unavailable") %} on
+          {% else %} off {% endif %}
+
+  - platform: template
+    sensors:
+      monitor_broadlink:
+        value_template: >
+          {% if is_state("remote.rm31_remote", "unavailable") or
+                     is_state("remote.rm32_remote", "unavailable") or
+                     is_state("remote.rm4_remote", "unavailable") %} on
+          {% else %} off {% endif %}
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

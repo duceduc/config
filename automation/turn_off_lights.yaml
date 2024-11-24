@@ -1,0 +1,54 @@
+#########################################################
+#                                                                                                              
+#             Turn Off Lights if Left On                                                                
+#                                                                                                              
+#########################################################
+
+
+- alias: 'turn off light after timeout'
+  triggers:
+    - trigger: state
+      entity_id: light.g_1
+      to: 'on'
+      for:
+        minutes: 15
+  actions:
+    - action: light.turn_off
+      data:
+        entity_id: "{{ trigger.entity_id }}"
+
+
+- alias: 'closet storage room auto-off'
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.master_clo_door_contact
+        - binary_sensor.storage_door_contact
+      to: 'off'
+      for: 30
+  actions:
+    - action: light.turn_off
+      target:
+        entity_id: "light.{{ trigger.to_state.name }}"
+
+
+#########################################################
+#                                                                                                              
+#             Lights out before leaving                                                             
+#                                                                                                              
+#########################################################
+# Using the switchbot genkan doorlock physical button
+- alias: 'Lights out Before leaving'
+  triggers:
+    - entity_id: binary_sensor.genkan_doorlock_button 
+      trigger: state
+      to: 'on' 
+  actions:
+    - action: script.lights_out
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

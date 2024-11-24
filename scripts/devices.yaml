@@ -1,0 +1,178 @@
+#########################################################
+#
+#             Ceiling Fan
+#
+#########################################################
+
+
+
+
+#########################################################
+#
+#             Turn Off Devices If Left On: No One Home
+#
+#########################################################
+
+  appliances_off:
+    sequence:
+      - condition: template
+        value_template: "{{ states('input_select.home_mode') != 'Home' }}"
+      - service: script.aclr_off
+        data_template:
+          room: 'lr'
+      - condition: template
+        value_template: "{{ states('switch.sb_humidifier') != 'off' }}"
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sb_humidifier
+
+  aclr_off:
+    sequence:
+      - service: script.acmr_off
+        data_template:
+          room: 'mr'
+      - condition: template
+        value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.{{ room }}_ac_mode
+          option: 'Off'
+
+  acmr_off:
+    sequence:
+      - service: script.acsr_off
+        data_template:
+          room: 'sr'
+      - condition: template
+        value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.{{ room }}_ac_mode
+          option: 'Off'
+
+  acsr_off:
+    sequence:
+      - service: script.cr_off
+      - condition: template
+        value_template: '{{ states("input_select.{{ room }}_ac_mode") != "Off" }}'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.{{ room }}_ac_mode
+          option: 'Off'
+
+  cr_off:
+    sequence:
+#      - service: script.xmas_off
+      - condition: template
+        value_template: '{{ states("sensor.lr_radar_illuminance")| float(0) >= 0.29 }}'
+      - service: light.turn_off
+        data:
+          entity_id: light.computer, light.living
+      - service: script.turn_off
+        data_template:
+          entity_id:  script.lr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}, script.cr_lights_fadein_{{ 'day' if now().hour > 7 and now().hour < 16 else 'night' }}
+
+
+  xmas_off:
+    sequence:
+      - condition: template
+        value_template: "{{ states('switch.christmas_lights') != 'off' }}"
+      - service: switch.turn_off
+        data:
+          entity_id: switch.christmas_lights
+
+
+
+
+#########################################################
+#
+#             Enable Devices at midnight
+#
+#########################################################
+
+# automation at homeassistant.yaml
+  enable_devices:
+    sequence:
+      - service: script.enable_dev1
+
+  enable_dev1:
+    sequence:
+      - condition: template
+        value_template: "{{ is_state('switch.ipad', 'on') }}"
+      - service: switch.turn_off
+        data:
+          entity_id: switch.ipad, switch.iphonex, switch.ai_4, switch.iphone8
+
+
+#########################################################
+#
+#             Toilet Seat Heater/Cleaning
+#
+#########################################################
+
+
+
+#########################################################
+#
+#             Tv Source
+#
+#########################################################
+
+  tv_source:
+    sequence:
+      - service: remote.send_command
+        data:
+          entity_id: remote.rm4_remote
+          device: Tv
+#         num_repeats: 2
+          command: source
+
+
+#########################################################
+#
+#             Desktop WOL
+#
+#########################################################
+
+##CAN DELETE
+#  desktop_wol_on:
+#    alias: "Desktop WOL On"
+#    sequence:
+#      - service: wake_on_lan.send_magic_packet
+#        data:
+#          mac: "9C:6B:00:59:D2:6D"
+
+  desktop_wol_off:
+    alias: "Desktop WOL Off"
+    sequence:
+      - parallel:
+        - service: switch.turn_on
+          data:
+            entity_id: switch.desktop_3l5pa48_shutdown
+#Led
+        - service: script.ashley_fadeout
+          data:
+            entity_id: light.pc_desktop_led
+            sec: 70
+#pc room lights
+        - condition: template
+          value_template: "{{ states('light.computer') == 'on' }}"
+        - service: script.ashley_fadeout
+          data:
+            entity_id: light.computer
+            sec: 70
+
+  ser8_wol_off:
+    alias: "SER8 WOL Off"
+    sequence:
+      - parallel:
+        - service: switch.turn_on
+          data:
+            entity_id: switch.desktop_g8i0hbj_shutdown
+
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

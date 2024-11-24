@@ -1,0 +1,27 @@
+####################################################
+#                                                                                                    #
+#                      EXERCISE                                                                 #
+#                                                                                                    #
+####################################################
+
+
+# https://community.home-assistant.io/t/map-values-for-an-input-select/94354/5
+  - platform: template
+    sensors:
+      exercise_map:
+        value_template: >
+          {% set mapper =
+            { 'Master Room':'light.master',
+              'Computer Room':'light.computer',
+              'Shion Room':'light.shion',
+              'Living Room':'light.living' } %}
+          {% set state = states('input_select.exercise_select') %}
+          {% set id = mapper[state] if state in mapper %}
+          {{ id }}
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

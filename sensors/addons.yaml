@@ -1,0 +1,130 @@
+####################################################
+#                                                                                                    #
+#                      REST                                                                       #
+#                                                                                                    #
+####################################################
+
+# Deleted after 4/30/2023 Now as supervisor integration
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/15d21743_samba_backup/info
+#    name: sambabackup
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+#
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/db21ed7f_portainer/info
+#    name: portainer
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/core_mosquitto/info
+#    name: mosquitto
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/core_samba/info
+#    name: samba
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 5
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/1a32f091_sambanas/info
+#    name: sambanas
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 5
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_ssh/info
+#    name: ssh
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json    
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/45df7312_zigbee2mqtt/info
+#    name: zigbee2mqtt
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/a0d7b954_appdaemon/info
+#    name: appdaemon
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+#  - platform: rest
+#    resource: http://192.168.1.20:8123/api/hassio/addons/5c53de3b_esphome/info
+#    name: esphome
+#    value_template: '{{ value_json.data.state }}'
+#    scan_interval: 60
+#    headers:
+#      Authorization: !secret llt
+#      Content-Type: application/json
+#    json_attributes_path: "$.data"
+#    json_attributes:
+#     - version
+#     - version_latest
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

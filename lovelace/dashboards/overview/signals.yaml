@@ -1,0 +1,242 @@
+####################################################
+#
+#                    Link Signals
+#
+####################################################
+
+title: Signals
+path: signals
+icon: mdi:wifi
+# background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+panel: true
+cards:
+
+  - type: custom:layout-card
+    layout_type: masonry-layout
+    layout:
+      max_cols: 3
+    cards:
+
+
+      - type: custom:bar-card
+        title: Wifi Motion Signals
+        show_header_toggle: false
+        max: -100
+        min: 0
+        positions:
+          icon: 'off'
+          indicator: 'off'
+          value: inside
+        entities:
+          - entity: sensor.aio_human_sensor_rssi
+            name: Master room Sensors
+          - entity: sensor.sr_radar_wifi_signal
+            name: Shion Room Sensors
+          - entity: sensor.entry_human_sensor_rssi
+            name: Entry Human
+          - entity: sensor.kt_human_sensor_wifi_signal
+            name: Kitchen Human
+          - entity: sensor.cr_sensor_wifi_signal
+            name: Computerroom Sensor
+
+        severity:
+          - color: var(--label-badge-green)
+            from: -67
+            to: ''
+          - color: orange
+            from: -80
+            to: -67
+          - color: var(--label-badge-red)
+            from: -90
+            to: -80
+
+# lora signal strength. -30 strong -- -120 weak
+      - type: custom:bar-card
+        title: Wifi Device Signals
+        show_header_toggle: false
+        max: -110
+        min: 0
+        positions:
+          icon: 'off'
+          indicator: 'off'
+          value: inside
+        entities:
+          - entity: sensor.wc_airfreshener_wifi_signal
+            name: Restroom Air Freshner
+          - entity: sensor.bed_sensor_wifi_signal
+            name: Bed Sensor
+          - entity: sensor.lr_radar_wifi_signal
+            name: Livingroom Sensors
+          - entity: sensor.security_balcony_wifi_signal
+            name: Balcony Camera
+          - entity: sensor.security_mdf_wifi_signal
+            name: MDF Camera
+        severity:
+          - color: var(--label-badge-green)
+            from: -67
+            to: ''
+          - color: orange
+            from: -80
+            to: -67
+          - color: var(--label-badge-red)
+            from: -90
+            to: -80
+
+      - type: custom:bar-card
+        title: Wifi Server Signals
+        show_header_toggle: false
+        max: -100
+        min: 0
+        positions:
+          icon: 'off'
+          indicator: 'off'
+          value: inside
+        entities:
+          - entity: sensor.esp32_linkquality
+            name: Switchbot Master
+          - entity: sensor.esp32mesh1_linkquality
+            name: Switchbot Mesh 1
+          - entity: sensor.ms1_wifi_strength
+            name: MS1 Server
+          - entity: sensor.ms2_wifi_strength
+            name: MS2 Server
+          - entity: sensor.ms3_wifi_strength
+            name: MS3 Server
+
+        severity:
+          - color: var(--label-badge-green)
+            from: -67
+            to: ''
+          - color: orange
+            from: -80
+            to: -67
+          - color: var(--label-badge-red)
+            from: -90
+            to: -80
+
+
+      - type: entities
+        title: ESP Devices Status
+        show_header_toggle: false
+        entities:
+          - entity: binary_sensor.aio_human_sensor_online
+            name: Master Room
+          - entity: binary_sensor.wc_airfreshener_status
+            name: Restroom
+          - entity: binary_sensor.washroom_radar_status
+            name: Wash Room
+
+          - type: divider
+          - entity: binary_sensor.security_mdf_status
+            name: MDF Security
+          - entity: binary_sensor.entry_human_sensor_online
+            name: Entry
+
+          - type: divider
+          - entity: binary_sensor.lr_radar_status
+            name: Livingroom
+          - entity: binary_sensor.sr_radar_status
+            name: Shion Room
+          - entity: binary_sensor.cr_sensor_status
+            name: Computer Room
+
+
+#      - type: custom:bar-card
+#        title: Zigbee Dimmer Signals
+#        show_header_toggle: false
+#        max: 190
+#        min: 0
+#        positions:
+#          icon: 'off'
+#          indicator: 'off'
+#          value: inside
+#        entities:
+#          - entity: sensor.shower_room_linkquality
+#            name: Shower Room Dimmer
+#          - entity: sensor.cr_curtains_linkquality
+#            name: Computer Room Curtain Dimmer
+#          - entity: sensor.lr_curtains_linkquality
+#            name: Living Room Curtain Dimmer
+#          - entity: sensor.shion_dimmer_linkquality
+#            name: Shion Room Dimmer
+#          - entity: sensor.master_dimmer_linkquality
+#            name: Master Room Dimmer
+#          - entity: sensor.0x00124b001938c31b_linkquality
+#            name: CC2531 Router
+#        severity:
+#          - color: var(--label-badge-red)
+#            from: 0
+#            to: 25
+#          - color: orange
+#            from: 26
+#            to: 50
+#          - color: var(--label-badge-green)
+#            from: 51
+#            to: 190
+
+
+#      - type: custom:bar-card
+#        title: Zigbee Controller Signals
+#        show_header_toggle: false
+#        max: 180
+#        min: 0
+#        positions:
+#          icon: 'off'
+#          indicator: 'off'
+#          value: inside
+#        entities:
+#          - entity: sensor.aio_controller_linkquality
+#            name: Aio Controller
+#          - entity: sensor.computer_room_linkquality
+#            name: Computer Room Controller
+#          - entity: sensor.living_room_linkquality
+#            name: Living Room Controller
+#          - entity: sensor.shion_room_linkquality
+#            name: Shion Room Controller
+#        severity:
+#          - color: var(--label-badge-red)
+#            from: 0
+#            to: 25
+#          - color: orange
+#            from: 26
+#            to: 50
+#          - color: var(--label-badge-green)
+#            from: 51
+#            to: 180
+
+
+#      - type: custom:bar-card
+#        title: Zigbee Motion Signals
+#        show_header_toggle: false
+#        max: 190
+#        min: 0
+#        positions:
+#          icon: 'off'
+#          indicator: 'off'
+#          value: inside
+#        entities:
+#          - entity: sensor.motion_security_linkquality
+#            name: Front Door Motion Monitor
+#          - entity: sensor.motion_c1_linkquality
+#            name: Closet Motion Sensorr
+#          - entity: sensor.motion_s1_linkquality
+#            name: Pantry Motion Sensor
+#        severity:
+#          - color: var(--label-badge-red)
+#            from: 0
+#            to: 25
+#          - color: orange
+#            from: 26
+#            to: 50
+#          - color: var(--label-badge-green)
+#            from: 51
+#            to: 190
+
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

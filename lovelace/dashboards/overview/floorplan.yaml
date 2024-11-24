@@ -1,0 +1,728 @@
+####################################################
+#
+#                    FLOOR PLAN VIEW
+#
+####################################################
+
+title: Floor Plan
+path: floorplan
+icon: mdi:floor-plan
+panel: true
+cards:
+
+  - type: picture-elements
+    image: /local/lovelace/floorplan/img/floorplan.svg
+    aspect_ratio: 61%
+    card_mod:
+    style: |
+      ha-card {
+        font-size: 20px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 2.5rem;
+        --divider-color: rgba(0, 0, 0, 0);
+         {% if is_state('person.duc', 'not_home')%}
+        --duc-state-opacity: 0.6;
+        {% endif %}
+        {% if is_state('person.eri', 'not_home')%}
+        --eri-state-opacity: 0.6;
+        {% endif %}
+         {% if is_state('person.shion', 'not_home')%}
+        --shion-state-opacity: 0.6;
+        {% endif %}
+
+      }
+
+    elements:
+      # Presence Away
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'not_home'
+        elements:
+          - type: state-badge
+            entity: person.duc
+            style:
+              top: 5%
+              left: 18.2%
+              font-size: 14px
+              color: transparent
+              opacity: var(--duc-state-opacity)
+              #'--ha-label-badge-size': 50px
+
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'not_home'
+        elements:
+          - type: state-badge
+            entity: person.eri
+            style:
+              top: 5%
+              left: 22.2%
+              font-size: 14px
+              color: transparent
+              opacity: var(--eri-state-opacity)
+
+
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'not_home'
+        elements:
+          - type: state-badge
+            entity: person.shion
+            style:
+              top: 5%
+              left: 26.2%
+              font-size: 14px
+              color: transparent
+              opacity: var(--shion-state-opacity)
+
+      # Presence GK
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'genkan'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 45%
+              left: 24%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'genkan'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 45%
+              left: 21%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'genkan'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 45%
+              left: 18%
+              width: 2.5%
+
+      # Presence MR
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'masterroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 28% #20
+              left: 29% #24
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'masterroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 28%
+              left: 32%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'masterroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 28%
+              left: 35%
+              width: 2.5%
+
+      # Presence SR
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'shionroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              left: 24%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'shionroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              left: 27%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'shionroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              left: 30%
+              width: 2.5%
+
+      # Presence KT
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'kitchen'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              right: 54%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'kitchen'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              right: 51%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'kitchen'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              right: 48%
+              width: 2.5%
+
+      # Presence LR
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'livingroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              right: 30%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'livingroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              right: 27%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'livingroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              bottom: 38%
+              right: 24%
+              width: 2.5%
+
+      # Presence CR
+      - type: conditional
+        conditions:
+          - entity: sensor.duc_espresense
+            state: 'computerroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-duc.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 28% #20
+              right: 30%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.eri_espresense
+            state: 'computerroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-eri.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 28%
+              right: 27%
+              width: 2.5%
+      - type: conditional
+        conditions:
+          - entity: sensor.shion_tms_espresense
+            state: 'computerroom'
+        elements:
+          - type: image
+            image: /local/img/people/avatar-shion.png
+            style:
+              border-radius: 50%
+              border: 2px solid green
+              top: 28%
+              right: 24%
+              width: 2.5%
+
+
+####################################################
+#
+#                    TEMPERATURE STATS
+#
+####################################################
+
+
+      - type: state-label
+        entity: sensor.livingroom_temperature
+        style:
+          bottom: 42.5%
+          right: 33.2%
+      - type: state-label
+        entity: sensor.computerroom_temperature
+        style:
+          top: 24%
+          right: 25%
+      - type: state-label
+        entity: sensor.kitchen_temperature
+        style:
+          bottom: 42.5%
+          right: 48%
+      - type: state-label
+        entity: sensor.shionroom_temperature
+        style:
+          bottom: 42.5%
+          left: 31%
+      - type: state-label
+        entity: sensor.master_temperature
+        style:
+          top: 24%
+          left: 31%
+      - type: state-label
+        entity: sensor.entry_temperature
+        style:
+          bottom: 51.2%
+          left: 31%
+      - type: state-label
+        entity: sensor.wc_temperature
+        style:
+          bottom: 42.5%
+          left: 38.5%
+      - type: state-label
+        entity: sensor.entrance_temperature
+        style:
+          top: 24%
+          left: 7.2%
+      - type: state-label
+        entity: sensor.mdf_temperature
+        style:
+          bottom: 42.6%
+          left: 15.1%
+          font-size: 14px
+
+
+#      - type: state-label
+#        entity: sensor.ikea_pm25
+#        attribute: friendly_name
+#        style:
+#          bottom: 25%
+#          left: 42%
+#          font-size: 16px
+#      - type: state-label
+#        entity: sensor.ikea_pm25
+#        prefix: '{ '
+#        suffix: ' }'
+#        style:
+#          bottom: 23%
+#          left: 42%
+#          font-size: 14px
+
+
+      - type: state-label
+        entity: sensor.lr_radar_illuminance
+        attribute: friendly_name
+        style:
+          top: 4%
+          right: 1.2%
+          font-size: 16px
+      - type: state-label
+        entity: sensor.lr_radar_illuminance
+        prefix: '{ '
+        suffix: ' }'
+        style:
+          top: 6%
+          right: 2.4%
+          font-size: 14px
+
+      - type: state-label
+        entity: sensor.aio_human_sensor_illuminance
+        attribute: friendly_name
+        style:
+          top: 4%
+          left: 8.3%
+          font-size: 16px
+      - type: state-label
+        entity: sensor.aio_human_sensor_illuminance
+        prefix: '{ '
+        suffix: ' }'
+        style:
+          top: 6%
+          left: 7.2%
+          font-size: 14px
+
+      - type: state-label
+        entity: sensor.rainfall_today
+        attribute: friendly_name
+        style:
+          bottom: 32%
+          right: 1.7%
+          font-size: 16px
+      - type: state-label
+        entity: sensor.rainfall_today
+        prefix: '{ '
+        suffix: ' }'
+        style:
+          bottom: 30%
+          right: 2.6%
+          font-size: 14px
+
+
+####################################################
+#
+#                    APPLIANCE
+#
+####################################################
+
+      - type: image
+        hold_action:
+          action: more-info
+          entity_id: input_select.mr_ac_mode
+        entity: input_select.mr_ac_mode
+        state_image:
+          "Off": /local/lovelace/floorplan/img/aircon-off.svg
+          Fan: /local/lovelace/floorplan/img/aircon-fan-on.svg
+          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Man Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Normal Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Silent Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Normal Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Silent Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Normal Humidifier: /local/lovelace/floorplan/img/aircon-humidifier--on.svg
+        style:
+          top: 26.2%
+          left: 12.4%
+          width: 6.5%
+          transform: translate(-50%,-50%) rotate(-0.33turn)
+
+      - type: image
+        hold_action:
+          action: more-info
+          entity_id: input_select.sr_ac_mode
+        entity: input_select.sr_ac_mode
+        state_image:
+          "Off": /local/lovelace/floorplan/img/aircon-off.svg
+          Fan: /local/lovelace/floorplan/img/aircon-fan-on.svg
+          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Man Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Normal Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Silent Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Normal Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Silent Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Normal Humidifier: /local/lovelace/floorplan/img/aircon-humidifier--on.svg
+        style:
+          bottom: 23.5%
+          left: 14.5%
+          width: 6.5%
+          transform: translate(-50%,-50%) rotate(-0.25turn)
+
+      - type: image
+        hold_action:
+          action: more-info
+          entity_id: input_select.lr_ac_mode
+        tap_action:
+          action: call-service
+          service: script.turn_on
+          service_data:
+            entity_id: script.lr_ac_cool_toggle
+        entity: input_select.lr_ac_mode
+        state_image:
+          "Off": /local/lovelace/floorplan/img/aircon-off.svg
+          Fan: /local/lovelace/floorplan/img/aircon-fan-on.svg
+          Ai Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Man Auto: /local/lovelace/floorplan/img/aircon-ai-on.svg
+          Powerful Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Normal Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Silent Cool: /local/lovelace/floorplan/img/aircon-ac-on.svg
+          Powerful Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Normal Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Silent Heat: /local/lovelace/floorplan/img/aircon-heat-on.svg
+          Normal Humidifier: /local/lovelace/floorplan/img/aircon-humidifier--on.svg
+        style:
+          bottom: 21.6%
+          right: 11.9%
+          width: 6.5%
+          transform: translate(-50%,-50%) rotate(0.25turn)
+
+      - type: image
+        tap_action:
+          action: toggle
+          service: switch.turn_on
+          service_data:
+            entity_id: fan.ceiling_fan_summer
+        entity: fan.ceiling_fan_summer
+        state_image:
+          "off": /local/lovelace/floorplan/img/ceiling-fan-off.svg
+          "on": /local/lovelace/floorplan/img/ceiling-fan-on.gif
+        style:
+          bottom: 23%
+          right: 29%
+          width: 8.5%
+
+
+      - type: image
+        hold_action:
+          action: more-info
+          entity_id: input_select.sb_humidifier_mode
+        entity: input_select.sb_humidifier_mode
+        state_image:
+          "Off": /local/lovelace/floorplan/img/humidifier-off.svg
+          "auto": /local/lovelace/floorplan/img/humidifier-on.svg
+          "Low": /local/lovelace/floorplan/img/humidifier-on.svg
+          "Med": /local/lovelace/floorplan/img/humidifier-on.svg
+          "High": /local/lovelace/floorplan/img/humidifier-on.svg
+        style:
+          bottom: 20%
+          right: 34.2%
+          width: 3%
+
+      - type: image
+        tap_action:
+          action: toggle
+          service: switch.turn_on
+          service_data:
+            entity_id: switch.jcom_tv
+        entity: switch.jcom_tv
+        state_image:
+          "off": /local/lovelace/floorplan/img/television-off.svg
+          "on": /local/lovelace/floorplan/img/television-on.svg
+        style:
+          bottom: 14.1%
+          right: 19%
+          width: 8%
+
+      - type: image
+        tap_action:
+          action: toggle
+          service: switch.turn_on
+          service_data:
+            entity_id: switch.desktop
+        entity: switch.desktop
+        state_image:
+          "off": /local/lovelace/floorplan/img/pc-desktop-off.svg
+          "on": /local/lovelace/floorplan/img/pc-desktop-on.svg
+        style:
+          top: 12.2%
+          right: 22%
+          width: 2.7%
+
+
+
+####################################################
+#
+#                    CONTACT SENSORS
+#
+####################################################
+
+      - type: image
+        entity: sensor.washer_status_m
+        state_image:
+          running: /local/lovelace/floorplan/img/washing-machine-on.gif
+          complete: /local/lovelace/floorplan/img/washing-machine-off.svg
+          idle: /local/lovelace/floorplan/img/washing-machine-off.svg
+        style:
+          top: 34.5%
+          right: 34%
+          width: 4.9%
+          transform: translate(-50%,-50%) rotate(-0.25turn)
+
+      - type: image
+        entity: binary_sensor.computerroom_window
+        state_image:
+          "off": /local/lovelace/floorplan/img/window-cr-close.svg
+          "on": /local/lovelace/floorplan/img/window-cr-open.svg
+        style:
+          top: 30.5%
+          right: 7.3%
+          width: 9%
+
+      - type: image
+        entity: binary_sensor.livingroom_window
+        state_image:
+          "off": /local/lovelace/floorplan/img/window-lr-close.svg
+          "on": /local/lovelace/floorplan/img/window-lr-open.svg
+        style:
+          bottom: 19.8%
+          right: 7.3%
+          width: 9%
+
+      - type: image
+        entity: binary_sensor.master_door_contact
+        state_image:
+          "off": /local/lovelace/floorplan/img/window-mr-close.svg
+          "on": /local/lovelace/floorplan/img/window-mr-open.svg
+        style:
+          bottom: 49%
+          left: 28.6%
+          width: 15%
+
+      - type: image
+        entity: binary_sensor.shion_door_contact
+        state_image:
+          "off": /local/lovelace/floorplan/img/window-mr-close.svg
+          "on": /local/lovelace/floorplan/img/window-mr-open.svg
+        style:
+          bottom: 36.7%
+          left: 27.7%
+          width: 15%
+
+
+####################################################
+#
+#                    CAMERAS
+#
+####################################################
+
+      - type: conditional
+        conditions:
+          - entity: input_boolean.security_cameras
+            state: 'on'
+        elements:
+          - type: image
+            image: /local/lovelace/floorplan/img/security-camera-blinking.gif
+            style:
+              bottom: 37.5%
+              left: 17.5%
+              width: 5.5%
+              opacity: 80%
+      - type: image
+        entity: camera.security_mdf
+        image: /local/lovelace/floorplan/img/security-camera-off.svg
+        style:
+          bottom: 37.5%
+          left: 17.5%
+          width: 5.5%
+
+
+      - type: conditional
+        conditions:
+          - entity: input_boolean.security_cameras
+            state: 'on'
+        elements:
+          - type: image
+            image: /local/lovelace/floorplan/img/security-camera-blinking.gif
+            style:
+              bottom: 26.5%
+              right: 11.2%
+              width: 5.5%
+              opacity: 80%
+              transform: rotate(0.06turn)
+      - type: image
+        entity: camera.security_balcony
+        image: /local/lovelace/floorplan/img/security-camera-off.svg
+        style:
+          bottom: 26.5%
+          right: 11.2%
+          width: 5.5%
+          transform: rotate(0.06turn)
+
+
+
+####################################################
+#
+#                    MISC
+#
+####################################################
+
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.central_night_cooling
+            state: 'on'
+        elements:
+          - type: icon
+            icon: mdi:weather-windy
+            style:
+              top: 11%
+              right: 6%
+              color: green
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

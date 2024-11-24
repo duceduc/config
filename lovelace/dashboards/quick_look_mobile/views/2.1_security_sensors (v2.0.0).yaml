@@ -1,0 +1,186 @@
+title: security_sensors
+path: security_sensors
+icon: mdi:cctv
+theme: Quick Look Mobile
+background: 'var(--theme)'
+type: custom:grid-layout
+layout:
+  margin: -0.5vh 1vh 0vh
+  grid-template-columns: auto
+  grid-template-rows: 19.5vh 7.5vh 50vh 4vh 10vh 9vh
+  grid-template-areas: |
+    "header"
+    "subheader"
+    "main"
+    "footer_title"
+    "footer"
+    "menu"
+cards:
+  - type: custom:button-card # HEADER
+    view_layout:
+      grid-area: header
+    template: header
+    variables:
+      view: 'security'
+  - type: custom:button-card # SUBHEADER
+    view_layout:
+      grid-area: subheader
+    template: subheader_1
+    variables:
+      subheader_1_title: Sensors #can be changed
+      subheader_1_path: security_sensors
+      subheader_2_title: Cameras #can be changed
+      subheader_2_path: security_cameras
+  - type: custom:layout-card # MAIN
+    view_layout:
+      grid-area: main
+    layout_type: custom:vertical-layout
+    layout:
+      height: 50vh
+      margin: 0vh 0vh 0vh
+      padding: 0vh 0.4vh
+    cards:
+      # This is where you can customize this view to fit your system and devices.
+      - type: custom:button-card # TITLE 01
+        template: title_scrollable
+        variables:
+          title: Front Area
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card # ENTITY 01
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Patio
+              contact:
+              occupancy: binary_sensor.entrance_moving_target
+              lock:
+              contact_battery:
+              occupancy_battery:
+              lock_battery:
+              expand_to:
+          - type: custom:button-card # ENTITY 02
+            template: security
+            variables:
+              name: Genkan
+              contact: 
+              occupancy: group.motion_genkan_occupancy
+              lock: binary_sensor.genkan_door_contact
+              contact_battery: 
+              occupancy_battery:
+              lock_battery: sensor.genkan_door_battery
+              expand_to:
+          - type: custom:button-card # ENTITY 03
+            template: security
+            variables:
+              name: Master
+              contact:
+              occupancy: binary_sensor.mr_moving_target
+              lock:
+              contact_battery:
+              occupancy_battery:
+              lock_battery:
+              expand_to:
+          - type: custom:button-card # ENTITY 04
+            template: security
+            variables:
+              name: Shion
+              contact:
+              occupancy:  binary_sensor.sr_moving_target
+              lock:
+              contact_battery:
+              occupancy_battery:
+              lock_battery:
+              expand_to:
+
+      - type: custom:button-card # TITLE 02
+        template: title_scrollable
+        variables:
+          title: Rear Area
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card # ENTITY 09
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Hallway
+              contact:
+              occupancy: group.motion_genkan_occupancy
+              lock:
+              contact_battery:
+              occupancy_battery:
+              lock_battery:
+              expand_to:
+          - type: custom:button-card # ENTITY 10
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Toilet
+              contact:
+              occupancy: binary_sensor.wc_moving_target
+              lock:
+              contact_battery:
+              occupancy_battery:
+              lock_battery:
+              expand_to:
+          - type: custom:button-card # ENTITY 11
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Kitchen
+              contact:
+              occupancy: group.motion_kitchen_occupancy
+              lock:
+              contact_battery:
+              occupancy_battery:
+              lock_battery:
+              expand_to:
+          - type: custom:button-card # ENTITY 12
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Washer
+              contact: 
+              occupancy: group.motion_showerroom_occupancy
+              lock: #  binary_sensor.washer_door
+              contact_battery: 
+              occupancy_battery:
+              lock_battery: sensor.washer_battery
+              expand_to:
+          - type: custom:button-card # ENTITY 13
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Computer
+              contact: 
+              occupancy: binary_sensor.motion_cr_sensor_occupancy
+              lock: binary_sensor.computerroom_window
+              contact_battery: 
+              occupancy_battery: sensor.cr_window_battery
+              lock_battery:
+              expand_to:
+          - type: custom:button-card # ENTITY 14
+            template: security # or choose 'security_expandable'
+            variables:
+              name: Living
+              contact:
+              occupancy: binary_sensor.lr_moving_target
+              lock:  binary_sensor.livingroom_window
+              contact_battery: 
+              occupancy_battery:
+              lock_battery: sensor.lr_window_battery
+              expand_to:
+  - type: custom:button-card # FOOTER TITLE
+    view_layout:
+      grid-area: footer_title
+    template: title_sticky
+    variables:
+      title: 'Sentry'
+  - type: custom:button-card # FOOTER
+    view_layout:
+      grid-area: footer
+    template: alarm_footer
+    variables:
+      entity: input_select.sentry_mode_status
+  - type: custom:button-card # MENU
+    view_layout:
+      grid-area: menu
+    template: menu

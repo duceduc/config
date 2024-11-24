@@ -1,0 +1,32 @@
+#########################################################
+#                                                                                                              
+#             Exerecise                                                                                     
+#                                                                                                              
+#########################################################
+
+
+- alias: 'turn on light flash'
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.lights_flash
+      from: 'off'
+      to: 'on'
+  actions:
+    - action: script.light_loop
+
+- alias: 'turn off light flash'
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.lights_flash
+      from: 'on'
+      to: 'off'
+  actions:
+    - action: homeassistant.turn_off
+      entity_id: script.light_loop, script.light_flash
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

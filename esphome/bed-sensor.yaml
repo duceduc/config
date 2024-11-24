@@ -1,0 +1,83 @@
+# ESP32 NodeMCU [30:83:98:00:A5:B8]
+substitutions:
+  name: bed-sensor
+
+packages:
+  stats: !include components/stats.yaml
+  aircon: !include components/zw5620s.yaml
+
+esphome:
+  name: $name
+  platform: esp32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+  fast_connect : true
+  manual_ip:
+    static_ip: 192.168.1.90
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
+
+captive_portal:
+logger:
+
+mqtt:
+  topic_prefix: esphome/$name
+#  discovery: false
+  broker: 192.168.1.20
+  username: !secret mqtt_user
+  password: !secret mqtt_pass
+
+ota:
+  - platform: esphome
+    password: !secret ota_pass
+
+esp32_touch:
+  setup_mode: false
+
+binary_sensor:
+  - platform: esp32_touch
+    name: 'Top'
+    pin: GPIO14
+    threshold: 31 #30
+    id: top
+    filters:
+      - delayed_off: 1s
+  - platform: esp32_touch
+    name: 'Middle'
+    pin: GPIO33
+    threshold: 21 #was 21
+    id: middle
+    filters:
+      - delayed_off: 1s
+  - platform: esp32_touch
+    name: 'Bottom'
+    pin: GPIO27
+    threshold: 31
+    id: bottom
+    filters:
+      - delayed_off: 1s
+  - platform: template
+    name: $name
+    lambda: |-
+      if (id(top).state ||
+          id(middle).state ||
+          id(bottom).state) {
+        return true;
+      } else {
+        return false;
+      }
+
+# Remote Control
+remote_receiver:
+  pin:
+    number: GPIO15 # Pin is adjacent to GPIO2
+    inverted: true
+    mode: INPUT_PULLUP
+  dump: raw
+
+remote_transmitter:
+  pin: GPIO2 # Pin is adjacent to GPIO15
+  carrier_duty_percent: 66%

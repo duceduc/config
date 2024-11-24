@@ -1,0 +1,597 @@
+###############################################################################
+#   @author         :   Duc Su
+#   @date           :   03/02/2022
+#   @package        :   Appliances
+#   @description    :   Package for handling Smart Appliances and or automation to make dumb appliances seem smart.
+###############################################################################
+# https://community.home-assistant.io/t/trigger-on-washing-machine-finish/251990/9
+# Washer Door -  [batt installed on 3/6/2022]
+# Washer Water Leak - [1st use. batt paired on 9/23/2022]
+
+input_select:
+  gosund_washer_state:
+    name: Washer State
+    icon: mdi:washing-machine
+    options:
+      - 'stop'
+      - 'wash fill'
+      - 'wash'
+      - 'wash spin'
+      - 'wash drain'
+      - 'rinse fill'
+      - 'rinse wait'
+      - 'rinse'
+      - 'rinse spin'
+      - 'rinse drain'
+      - 'unknown'
+      - 'soak'
+      - 'dryer'
+      - 'cool down'
+      - '--'
+
+timer:
+# washer load filter checks
+  washer_monitor:
+    duration: '00:30:00'
+
+#  dish_cabinet:
+#    duration: '00:02:00'
+
+mqtt:
+  sensor:
+    - name: washer_load_count
+      state_topic: "house/alerts/washer/load_count"
+  # MQTT Sensor for Washing Machine Status.
+    - name: "washer_status_m"
+      state_topic: "house/alerts/washer/status"
+
+#Gosund Tv plug -  192.168.1.77
+    - name: "Gosund Tv Voltage"
+      state_topic: "tasmota/tv_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Voltage }}"
+      qos: 1
+      unit_of_measurement: "V"
+      icon: mdi:lightning-bolt
+
+    - name: "Gosund Tv Amperage"
+      state_topic: "tasmota/tv_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Current }}"
+      qos: 1
+      unit_of_measurement: "A"
+      icon: mdi:atom
+
+    - name: "Gosund Tv Power"
+      state_topic: "tasmota/tv_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Power }}"
+      qos: 1
+      unit_of_measurement: "W"
+      icon: mdi:lightning-bolt
+
+    - name: "Gosund Tv Total Energy"
+      state_topic: "tasmota/tv_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Total }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+    - name: "Gosund Tv Daily Energy"
+      state_topic: "tasmota/tv_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Today }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+    - name: "Gosund Tv Yesterday Energy"
+      state_topic: "tasmota/tv_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Yesterday }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+#Gosund washer plug - 192.168.1.78
+    - name: "Gosund Washer Voltage"
+      state_topic: "tasmota/washer_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Voltage }}"
+      qos: 1
+      unit_of_measurement: "V"
+      icon: mdi:lightning-bolt
+
+    - name: "Gosund Washer Power"
+      state_topic: "tasmota/washer_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Power }}"
+      qos: 1
+      unit_of_measurement: "W"
+      icon: mdi:gauge
+
+    - name: "Gosund Washer Total Energy"
+      state_topic: "tasmota/washer_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Total }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+    - name: "Gosund Washer Daily Energy"
+      state_topic: "tasmota/washer_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Today }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+    - name: "Gosund Washer Yesterday Energy"
+      state_topic: "tasmota/washer_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Yesterday }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+
+#Gosund fridge plug - 192.168.1.69
+    - name: "Gosund Fridge Voltage"
+      state_topic: "tasmota/fridge_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Voltage }}"
+      qos: 1
+      unit_of_measurement: "V"
+      icon: mdi:lightning-bolt
+
+    - name: "Gosund Fridge Amperage"
+      state_topic: "tasmota/fridge_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Current }}"
+      qos: 1
+      unit_of_measurement: "A"
+      icon: mdi:atom
+
+    - name: "Gosund Fridge Power"
+      state_topic: "tasmota/fridge_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Power }}"
+      qos: 1
+      unit_of_measurement: "W"
+      icon: mdi:lightning-bolt
+
+    - name: "Gosund Fridge Total Energy"
+      state_topic: "tasmota/fridge_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Total }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+    - name: "Gosund Fridge Daily Energy"
+      state_topic: "tasmota/fridge_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Today }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+    - name: "Gosund Fridge Yesterday Energy"
+      state_topic: "tasmota/fridge_plug/SENSOR"
+      value_template: "{{ value_json['ENERGY'].Yesterday }}"
+      qos: 1
+      unit_of_measurement: kWh
+      icon: mdi:gauge
+
+template:
+  - sensor:
+      - name: Gosund Washer State
+        unique_id: 6f668a03-5ae8-4252-a9d4-772620f0f97c
+        state: >
+          {% set s = states('sensor.gosund_washer_state') %}
+          {% set p = states('sensor.gosund_washer_power') %}
+          {% if p == 'unavailable' %} unavailable
+          {% else %}
+            {% set p = p | int(0) %}
+            {% if p == 0 %} stop
+            {% elif p < 7 %} wait
+            {% elif 7 <= p <= 15 %}
+              {{ 'fill' if s in ['wait', 'run'] else s }}
+            {% elif 40 < p < 400 %} run
+            {% elif p > 400 %} pulse
+            {% else %} {{s}}
+            {% endif %}
+          {% endif %}
+        icon: mdi:gauge-full
+
+### Same as input_select.gosund_washer_state
+      - name: Gosund Washer Current State
+        unique_id: aa532aaa-401a-4164-a65f-6e1ffc03b61e
+        state: "{{ states('input_select.gosund_washer_state') }}"
+        icon: mdi:gauge-full
+
+sensor:
+# Fridge Plug Shelly ****
+  - platform: rest
+    name: Fridge Plug Status
+    json_attributes_path: "$.switch:0" # uptime in days
+    json_attributes:
+      - apower
+      - voltage
+      - current
+      - aenergy
+      - temperature
+    resource: http://192.168.1.76/rpc/shelly.getstatus
+    value_template: "{{ '{:.1f}'.format(value_json.sys.uptime | int(0) / 86400) }}"
+#    value_template: "{{ value_json.sys.uptime | int(0) | timestamp_custom('%-Hh %-Mmin %-Ssec', false) }}"
+    scan_interval: 50
+
+#  For the above. Not in use now.
+
+#  - platform: template
+#    sensors:
+#      fridge_plug_apower:
+#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'apower') }}"
+#        unit_of_measurement: "W"
+#      fridge_plug_voltage:
+#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'voltage') }}"
+#        unit_of_measurement: "V"
+#      fridge_plug_current:
+#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'current') }}"
+#        unit_of_measurement: "A"
+#      fridge_plug_tenergy:
+#        value_template: "{{ '{:.1f}'.format(state_attr('sensor.fridge_plug_status', 'aenergy').total | float /10 | round(3)) }}"
+#        unit_of_measurement: "kWh"
+#      fridge_plug_temperature:
+#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'temperature').tC }}"
+#        unit_of_measurement: "C"
+###################
+
+
+# Calibrate meter back to zero
+# https://community.home-assistant.io/t/cant-get-service-utility-meter-reset-working/582492/2
+# Start Date Aug 02, 2022
+utility_meter:
+  energy_washer_power_monthly:
+    source: sensor.gosund_washer_total_energy
+    cycle: monthly
+#    offset:
+#      days: 2
+  energy_washer_power_yearly:
+    source: sensor.gosund_washer_total_energy
+    cycle: yearly
+
+# Start Date Aug 20, 2022
+  energy_tv_power_monthly:
+    source: sensor.gosund_tv_total_energy
+    cycle: monthly
+#    offset:
+#      days: 2
+  energy_tv_power_yearly:
+    source: sensor.gosund_tv_total_energy
+    cycle: yearly
+
+# Start Date Jun 20 2023
+  energy_fridge_power_monthly:
+    source: sensor.gosund_fridge_total_energy 
+    cycle: monthly
+  energy_fridge_power_yearly:
+    source: sensor.gosund_fridge_total_energy 
+    cycle: yearly
+
+automation:
+  # Washer State
+  - alias: Washer Operation
+    triggers:
+      - trigger: state
+        entity_id: sensor.gosund_washer_state
+    actions:
+      - action: input_select.select_option
+        data:
+          entity_id: input_select.gosund_washer_state
+          option: >
+            {% set s = states('input_select.gosund_washer_state') %}
+            {% set fr = trigger.from_state.state %}
+            {% set to = trigger.to_state.state %}
+            {% if fr == 'stop' and to == 'fill' %} wash fill
+            {% elif fr == 'fill' and to == 'run' %} wash
+            {% elif fr in ['fill', 'stop'] and to == 'run' %} wash
+            {% elif fr in ['run', 'fill'] and to == 'pulse' %} dryer
+            {% elif fr == 'run' and to == 'pulse' and s == 'wash' %} wash spin
+            {% elif fr == 'pulse' and to == 'run' and s == 'wash spin' %} wash drain
+            {% elif fr == 'pulse' and to == 'run' and s == 'unknown' %} cool down
+            {% elif fr == 'run' and to == 'fill' %} rinse fill
+            {% elif fr in ['fill', 'run'] and to == 'wait' %} rinse wait
+            {% elif fr == 'wait' and to == 'run' %} rinse
+            {% elif fr == 'run' and to == 'pulse' and s == 'rinse' %} rinse spin
+            {% elif fr == 'pulse' and to == 'run' and s == 'rinse spin' %} rinse drain
+            {% elif fr in ['run', 'fill', 'wait', 'unknown'] and to == 'stop' %} stop
+            {% else %} --
+            {% endif %}
+
+  - alias: Washer Running
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: sensor.gosund_washer_state
+        from: 'wait'
+        to: 'fill'
+      - trigger: state # dryer
+        entity_id: sensor.gosund_washer_state
+        from:
+          - 'fill'
+          - 'rinse'
+        to: 'pulse'
+
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.gosund_washer_power
+        above: 10
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: sensor.washer_status_m
+            state: idle
+          - condition: state
+            entity_id: sensor.washer_status_m
+            state: complete
+    actions:
+      - action: script.washer_running
+      - action: script.washer_monitor
+
+  - alias: Washer Complete
+    initial_state: true
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.gosund_washer_power
+        below: 8
+        for: 36
+        id: 'done'
+      - trigger: template
+        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"      
+#        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 or states('sensor.gosund_washer_power')| int(0) == 5 }}"
+        for: 18 #16 - 40
+        id: 'filter'
+    conditions: []
+    actions:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: 'done'
+            sequence:
+              - condition: template
+                value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 0 }}"
+              - condition: template
+                value_template: "{{ is_state('sensor.washer_status_m', 'running') }}"
+              - action: script.washer_complete
+
+          - conditions:
+              - condition: trigger
+                id: 'filter'
+            sequence:
+              - condition: template
+                value_template: "{{ is_state('sensor.washer_status_m', 'running') and is_state('timer.washer_monitor', 'idle') }}"
+              - action: script.speech_engine
+                data:
+                  who: '{{ states(''sensor.room_audio'') }}'
+                  voice: "{{ states('input_select.jarvis_voice') }}"
+                  message: 'It appears the washing machine check filter warning lamp is on.'
+              - action: script.washer_complete
+
+          - conditions:
+              - condition: trigger
+                id: 'err'
+            sequence:
+              - condition: template
+                value_template: "{{ is_state('sensor.washer_status_m', 'running') and is_state('timer.washer_monitor', 'active') }}"
+              - action: script.speech_engine
+                data:
+                  who: '{{ states(''sensor.room_audio'') }}'
+                  message: 'It seems the washing machine ended with an error. Please verify.'
+                  voice: "{{ states('input_select.jarvis_voice') }}"
+        default: []
+
+  - alias: Washer Notification
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: sensor.washer_status_m
+        from: running
+        to: complete
+    actions:
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.washer_finished # For alerts notifications via viber at interval mins
+      - action: script.speech_engine
+        data:
+          who: '{{ states(''sensor.room_audio'') }}'
+          voice: "{{ states('input_select.jarvis_voice') }}"
+          message: 'Just a quick heads up, It appears the washing machine has completed its cycle.'
+      - action: script.turn_on
+        entity_id: script.washer_finished_notification_audible
+
+  #    - condition: template
+  #      value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
+  #    - action: cover.open_cover
+  #      entity_id:
+  #       - cover.lr_curtain_lt_curtain
+
+  - alias: Washer Emptied
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.washer_door
+        from: 'off'
+        to: 'on'
+    actions:
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.washer_finished # For alert repeat notifications
+      - action: script.washer_emptied
+      - action: script.washer_monitor
+
+  - alias: Dish Cabinet Alert
+    mode: restart
+    triggers:
+      - trigger: template
+        value_template: "{{ is_state('binary_sensor.dish_cabinet_contact', 'on') }}"
+        for: 120
+    actions:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('binary_sensor.dish_cabinet_contact', 'on') }}"
+            sequence:
+              - action: script.status_annc
+                data:
+                  who: '{{ states(''sensor.room_audio'') }}'
+                  call_interuption: 1
+                  call_secure_dish: 1
+        default: []
+
+#  - alias: Dish Cabinet Notification
+#    mode: restart
+#    triggers:
+#      - trigger: state
+#        entity_id: binary_sensor.dish_cabinet_contact
+#      - trigger: event
+#        event_type: timer.finished
+#        event_data:
+#          entity_id: timer.dish_cabinet
+#        id: 'notify'
+#    actions:
+#      - choose:
+#          - conditions:
+#              - condition: trigger
+#                id: 'notify'
+#            sequence:
+#              - condition: template
+#                value_template: "{{ is_state('binary_sensor.dish_cabinet_contact', 'on') }}"
+#              - action: script.status_annc
+#                data:
+#                  who: '{{ states(''sensor.room_audio'') }}'
+#                  call_interuption: 1
+#                  call_secure_dish: 1
+#        default:
+#          - action: >
+#               {% if trigger.to_state.state == 'on' %}
+#                  timer.start
+#               {% else %}
+#                  timer.cancel
+#               {% endif %}
+#            entity_id: timer.dish_cabinet
+
+script:
+  washer_monitor:
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.washer_door
+                state: "on"
+            sequence:
+              - action: timer.cancel
+                target:
+                 entity_id: timer.washer_monitor
+        default:
+          - action: timer.start
+            target:
+              entity_id: timer.washer_monitor
+
+  washer_running:
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/washer/status
+          payload: running
+          retain: true
+
+  washer_complete:
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/washer/status
+          payload: complete
+          retain: true
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/washer/time_complete
+          payload: '{{ now().timestamp() }}'
+          retain: true
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/washer/load_count
+          payload: "{{ states('sensor.washer_load_count')| int + 1 }}"
+          retain: true
+
+  washer_finished_notification_audible:
+    sequence:
+      - repeat:
+          while:
+            - condition: state
+              entity_id: sensor.washer_status_m
+              state: 'complete'
+          sequence:
+            - delay:
+                minutes: 45
+            - action: script.simplified_washer_audible
+
+  washer_emptied:
+    sequence:
+      - condition: template
+        value_template: "{{ is_state('sensor.washer_status_m', 'complete') }}"
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/washer/status
+          payload: idle
+          retain: true
+      - action: script.turn_off
+        entity_id: script.washer_finished_notification_audible
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/washer/time_emptied
+          payload: '{{ now().timestamp() }}'
+          retain: true
+
+  simplified_washer_audible:
+    sequence:
+      - condition: template
+        value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+      - condition: state
+        entity_id: sensor.washer_status_m
+        state: 'complete'
+      - action: script.speech_engine
+        data:
+          who: "{{ states('sensor.room_presence') }}"
+          voice: "{{ states('input_select.jarvis_voice') }}"
+          message: >
+            {{ [
+              'Pardon me, ',
+              'Excuse me, ',
+              'I do not mean to interrupt, but, ',
+              'I hate to interrupt, but,',
+              'I beg your pardon, ',
+              'I do not mean to intrude, but, ',
+              'I am sorry to interrupt, but, ',
+              'Just a quick heads up, '
+              ] | random }}
+            <p>
+              The washing machine completed its cycle
+              {%- set seconds = (now() - states.sensor.washer_status_m.last_changed).seconds -%}
+              {% if (seconds / ( 60 * 60 )) | int == 1 %}
+                over an hour ago.
+                {{ [
+                'Do not forget to rotate the clothes.',
+                'Was someone going to rotate the laundry?',
+                'Once you rotate the laundry I will stop reminding you to do it. So if you want me to stop. Its up to you.'
+                ] | random }}
+              {% elif (seconds / ( 60 * 60 )) | int > 1 and (seconds / ( 60 * 60 )) | int < 6 %}
+                over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
+                {{ [
+                'Much longer and you are going to need to wash them again.',
+                'Someone needs to rotate the laundry.',
+                'Do not forget about the clothes in the washing machine.',
+                'Surely you did not mean to forget about the clothes. Mistakes happen. But you can still fix it.',
+                'Do you like your clothes smelling like mildew? Becasue that is what is happening right now.'
+                ] | random }}
+              {% elif (seconds / ( 60 * 60 )) | int > 6 %}
+                over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
+                {{ [
+                'That is a crazy amount of time.',
+                'Did you decide you want those clothes to suffer?',
+                'You might as well just rewash those clothes.',
+                'I can smell the mildew. Virtually that is.',
+                'Surely you did not mean to forget about the clothes.'
+                ] | random }}
+              {% else %}
+                {{ (seconds // 60) | int }} minutes ago.
+                {{ [
+                'Do not forget to rotate the clothes.',
+                'Someone forgot to move the clothes to the dryer. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
+                'You might want to move them to the dryer.'
+                ] | random }}
+              {% endif %}
+            </p>

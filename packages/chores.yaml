@@ -1,0 +1,43 @@
+###############################################################################
+#   @author         :   Duc Su 
+#   @date           :   08/05/2022
+#   @package        :   Chores
+#   @description    :   Time sensitive chores arund the house.
+###############################################################################
+
+group:
+  chore_tasks:
+    entities:
+      - sensor.change_bed_sheets
+      - sensor.clean_air_filters
+      
+automation:
+  - alias: Notify Chore Task Due
+    variables:
+      entities: "group.chore_tasks"
+    triggers:
+      - trigger: time
+        at: "16:57:00"
+    actions:
+      - repeat:
+          count: "{{ expand(entities) | list | count }}"
+          sequence:
+            - variables:
+                entity_id: >
+                  {% set tasks = expand(entities) | map(attribute='entity_id') | list %}
+                  {{ tasks[repeat.index - 1] }}
+                task_id: "{{ entity_id.split('.')[1] }}"
+                last_done_days: "{{ ((as_timestamp(now()) - (as_timestamp(states(entity_id))) | float) / 60 / 60 / 24) | int }}"
+                cycle_days: "{{ state_attr(entity_id, 'cycle_days') | int }}"
+                warn_before_days: "{{ state_attr(entity_id, 'warning_before') | int }}"
+            - condition: template
+              value_template: "{{ last_done_days|int >= (cycle_days|int - warn_before_days|int) }}"
+            - action: script.text_notify
+              data:
+                who: duc
+                title: "🧹 {{ state_attr(entity_id, 'friendly_name') }}"
+                message: >
+                  Chore last done {{ last_done_days }} days ago.
+   
+   
+   

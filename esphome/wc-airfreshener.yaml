@@ -1,0 +1,74 @@
+# C4:5B:BE:60:96:28
+# https://github.com/CDaxi/esphome-projects/tree/master/airfreshener
+substitutions:
+  name: wc-airfreshener
+  room: Wc
+  counter: Spray counter
+  reset: Reset spray counter
+
+packages:
+  airfresh: !include components/airfresh.yaml
+  bme280: !include components/bme280.yaml
+
+<<: !include .base.yaml 
+
+esphome:
+  name: $name
+  platform: esp8266
+  board: d1_mini
+
+uart:
+  id: uart_1
+  tx_pin: TX
+  rx_pin: RX
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
+
+i2c:
+  sda: D2
+  scl: D3
+  scan: true
+
+ld2410:
+  id: ld2410_radar
+
+status_led:
+  pin:
+    number: GPIO2 #ESP8266 OnBroad LED
+    inverted: false
+
+sensor:
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+  - platform: ld2410
+    moving_distance:
+      name : $room Moving Distance
+    still_distance:
+      name: $room Still Distance
+    moving_energy:
+      name: Move Energy
+    still_energy:
+      name: $room Still Energy
+    detection_distance:
+      name: $room Detection Distance
+
+
+binary_sensor:
+  - platform: status
+    name: $name status
+
+  - platform: ld2410
+    has_target:
+      name: $room Presence
+    has_moving_target:
+      name: $room Moving Target
+    has_still_target:
+      name: $room Still Target

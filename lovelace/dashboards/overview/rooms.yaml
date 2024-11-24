@@ -1,0 +1,231 @@
+####################################################
+#                                                                                                    
+#                    ROOMS VIEW                                                              
+#                                                                                                    
+####################################################
+
+title: Rooms
+path: rooms
+icon: mdi:bed-empty
+# background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+panel: true
+cards:
+
+  - type: custom:layout-card
+    layout_type: horizontal-layout
+    layout:
+      max_cols: 3
+    cards:
+
+      - type: custom:streamline-card
+        template: aircon_tpl
+        variables:
+          - title: Livingroom Aircon Controls
+          - room: lr
+          - entity_1: input_select.lr_ac_mode
+          - entity_2: sensor.lr_aircon_target
+          - entity_3: sensor.livingroom_temperature
+          - entity_4: sensor.livingroom_humidity
+#          - entity_5: sensor.lr_condensation_chance
+
+      - type: custom:streamline-card
+        template: aircon_tpl
+        variables:
+          - title: Shion Room Aircon Controls
+          - room: sr
+          - entity_1: input_select.sr_ac_mode
+          - entity_2: sensor.sr_aircon_target
+          - entity_3: sensor.shionroom_temperature
+          - entity_4: sensor.shionroom_humidity
+#          - entity_5: sensor.sr_condensation_chance
+
+      - type: custom:streamline-card
+        template: aircon_tpl
+        variables:
+          - title: Master Room Aircon Controls
+          - room: mr
+          - entity_1: input_select.mr_ac_mode
+          - entity_2: sensor.mr_aircon_target
+          - entity_3: sensor.master_temperature
+          - entity_4: sensor.master_humidity
+#          - entity_5: sensor.mr_condensation_chance
+
+      - type: 'custom:vertical-stack-in-card'
+        cards:
+          - type: glance
+            title: Fade Lights
+            state_color: true
+            show_name: true
+            entities:
+              - entity: sensor.sleeping
+                name: Shion
+              - entity: sensor.wakeup_alarm_time
+                name: Alarm
+                icon: mdi:clock
+              - entity: sensor.wakeup_start_time_lights
+                name: Start Fade
+                icon: mdi:clock
+              - entity: sensor.wakeup_fadein_duration
+                name: Fade Duration
+                icon: mdi:timer
+          - entities:
+              - head:
+                  label: Settings
+                  type: section
+                items:
+                  - input_number.wakeup_hour
+                  - input_number.wakeup_minutes
+                  - input_number.wakeup_duration
+                  - input_number.brightness_start
+                  - input_number.brightness_end
+                  - input_boolean.wakeup
+                  - input_boolean.wakeup_weekends
+                  - input_select.wakeup_select
+                type: 'custom:fold-entity-row'
+            show_header_toggle: false
+            type: entities
+
+      - type: entities
+        title: Workout
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.lights_flash
+            icon: mdi:weight-lifter
+            name: 30 Seconds Timer
+          - entity: input_select.exercise_select
+            icon: mdi:bed-empty
+
+# Media Player
+      - type: vertical-stack
+        cards:
+        - !include /config/lovelace/tpl/media_interface.yaml
+
+      - type: vertical-stack
+        cards:
+          - type: custom:stack-in-card
+            mode: horizontal
+            title: Master Bedroom Lights
+            cards:
+              - type: light
+                entity: light.m_1
+                icon: mdi:lightbulb-outline
+                name: Ceiling
+              - type: light
+                entity: light.master
+                icon: mdi:lightbulb-outline
+                name: Happy Hour
+              - type: light
+                entity: light.m_2
+                icon: mdi:lightbulb-outline
+                name: Floor Lamp
+
+          - type: custom:stack-in-card
+            mode: horizontal
+            title: Shion Room Lights
+            cards:
+              - type: light
+                entity: light.shion
+                icon: mdi:lightbulb-outline
+                name: Bedtime Mode
+              - type: light
+                entity: light.shion
+                icon: mdi:lightbulb-outline
+                name: Happy Hours
+              - type: light
+                entity: light.shion
+                name: Study
+                icon: mdi:lightbulb-outline
+
+      - type: vertical-stack
+        cards:
+          - type: custom:stack-in-card
+            mode: horizontal
+            title: Living Room Lights
+            cards:
+              - type: light
+                entity: light.living
+                icon: mdi:lightbulb-outline
+                name: Sofa
+              - type: light
+                entity: light.living
+                icon: mdi:lightbulb-outline
+                name: Movie Mode
+              - type: light
+                entity: light.ceiling_fan_light
+                icon: mdi:lightbulb-outline
+                name: Dining Table
+          - type: custom:stack-in-card
+            mode: horizontal
+            title: Computer Room
+            cards:
+              - type: light
+                entity: light.computer
+                name: Work
+                icon: mdi:lightbulb-outline
+              - type: light
+                entity: light.c_1
+                name: Movie
+                icon: mdi:lightbulb-outline
+              - type: light
+                entity: light.computer
+                name: Nap
+                icon: mdi:lightbulb-outline
+          - type: custom:stack-in-card
+            mode: horizontal
+            title: Kitchen Island
+            cards:
+              - type: light
+                entity: light.kitchen
+                name: Island
+                icon: mdi:lightbulb-outline
+              - type: light
+                entity: light.counter
+                name: Counter Lights
+                icon: mdi:lightbulb-outline
+              - type: light
+                entity: light.cabinet
+                name: Cabinet
+                icon: mdi:lightbulb-outline
+
+
+# TV and Stereo
+      - type: entities
+        title: TV and Stereo Controls
+        show_header_toggle: false
+        footer:
+          type: buttons
+          entities:
+            - entity: script.tv_volume_down
+              icon: mdi:volume-minus
+            - entity: script.appletv_netflix
+              icon: si:netflix
+            - entity: switch.tv_mute
+              icon: mdi:volume-mute
+            - entity: script.tv_volume_up
+              icon: mdi:volume-plus
+        entities:
+          - type: section
+            label: Living Room
+          - entity: media_player.living_room
+            icon: mdi:cast-variant
+            name: Apple Tv
+          - type: section
+            label: Basement
+          - entity: switch.tv_power
+            name: TV
+            icon: mdi:television-shimmer
+          - type: section
+            label: Jarvis Voice
+          - entity: input_select.jarvis_voice
+            name: Select a Voice
+            icon: si:amazonalexa
+
+
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

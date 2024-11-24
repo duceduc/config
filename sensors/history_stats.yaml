@@ -1,0 +1,82 @@
+####################################################
+#
+#                      Devices
+#
+####################################################
+
+  - platform: history_stats
+    name: Front Door Count
+    entity_id: binary_sensor.genkan_door
+    state: 'on'
+    type: count
+    end: '{{ now() }}'
+    duration:
+      days: 7
+
+  - platform: history_stats
+    name: Front Door Motion Night Count
+    entity_id: binary_sensor.genkan_moving_target
+    state: 'on'
+    type: count
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    duration:
+      hours: 5
+
+####################################################
+#
+#                      Temperature
+#
+####################################################
+
+
+  - platform: statistics
+    name: Outside Temp Stats
+    entity_id: sensor.entrance_temperature
+    state_characteristic: mean
+    sampling_size: 500
+
+  - platform: statistics
+    name: "Shion Room Temp Sats"
+    entity_id: sensor.shionroom_temperature
+    state_characteristic: mean
+    sampling_size: 20
+
+  - platform: statistics
+    name: "Master Room Temp Sats"
+    entity_id: sensor.master_temperature
+    state_characteristic: mean
+    sampling_size: 20
+
+  - platform: statistics
+    name: "Toilet Room Temp Sats"
+    entity_id: sensor.wc_temperature
+    state_characteristic: mean
+    sampling_size: 20
+
+  - platform: statistics
+    name: "Living Room Temp Sats"
+    entity_id: sensor.livingroom_temperature
+    state_characteristic: mean
+    sampling_size: 20
+
+  - platform: statistics
+    name: "Hallway Temp Sats"
+    entity_id: sensor.entry_temperature
+    state_characteristic: mean
+    sampling_size: 20
+
+  - platform: min_max
+    name: Inside Temp Stats
+    entity_ids:
+      - sensor.shionroom_temperature
+      - sensor.master_temperature
+      - sensor.wc_temperature
+      - sensor.livingroom_temperature
+      - sensor.entry_temperature
+
+
+####################################################
+#
+#            END OF CONFIGURATION FILE
+#
+####################################################

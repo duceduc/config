@@ -1,0 +1,55 @@
+#########################################################
+#                                                                                                              
+#             Depart                                                                                        
+#                                                                                                              
+#########################################################
+
+
+  monitor_depart:
+    sequence:
+      - delay: 10
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+      - delay: 20
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+      - delay: 30
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+      - delay: 40
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+      - delay: 20 # Testing only. can delete this combo entry
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+
+      - delay: 50
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/restart
+          payload: ''
+
+
+
+#########################################################
+#                                                                                                              
+#             Arrive                                                                                         
+#                                                                                                              
+#########################################################
+
+
+
+
+
+
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

@@ -1,0 +1,99 @@
+####################################################
+#                                                                                                    
+#                      WIFI Signal                                                                                     
+#                                                                                                    
+####################################################
+
+#  - platform: mqtt
+#    name: 'Computerroom Sensor Wifi Signal'
+#    state_topic: "esphome/computerroom-sensor/sensor/computerroom_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+
+#  - platform: mqtt
+#    name: 'Kitchen Sensor Wifi Signal'
+#    state_topic: "esphome/kitchen-sensor/sensor/kitchen2_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+
+
+
+# latest update ###
+#  - platform: mqtt
+#    name: 'Hallway Sensor Wifi Signal'
+#    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+#
+#  - platform: mqtt
+#    name: 'MDF Sensor Wifi Signal'
+#    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_wifi_signal/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'dBm'
+#    icon: mdi:signal
+
+####################################################
+#                                                                                                    
+#                      Illuminance                                                                
+#                                                                                                    
+####################################################
+
+# latest update ##
+#  - platform: mqtt
+#    name: 'Hallway Illuminance'
+#    state_topic: "esphome/hallway-sensor/sensor/hallway-sensor_illuminance/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'lux'
+#    icon: mdi:gamma
+#
+#  - platform: mqtt
+#    name: 'mdf Illuminance'
+#    state_topic: "esphome/mdf-sensor/sensor/mdf-sensor_illuminance/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'lux'
+#    icon: mdi:gamma
+
+
+
+####################################################
+#                                                                                                    
+#                      Climate Sensors                                                                               
+#                                                                                                    
+####################################################
+
+# DELETE
+#  - platform: mqtt
+#    name: 'HR Sensor Temperature'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_temperature/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: '°C'
+#    device_class: temperature
+
+#  - platform: mqtt
+#    name: 'HR Sensor Humidity'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_humidity/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: '%'
+#    device_class: humidity
+
+#  - platform: mqtt
+#    name: 'HR Sensor Pressure'
+#    state_topic: "esphome/hr-sensor/sensor/hr-sensor_pressure/state"
+#    value_template: '{{ value }}'
+#    unit_of_measurement: 'mb'
+#    device_class: pressure
+
+
+
+
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

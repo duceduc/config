@@ -1,0 +1,77 @@
+####################################################
+#                                                                                                    
+#                      CONDENSATION                                                         
+#                                                                                                    
+####################################################
+
+# LR Mold Chance
+  - platform: mold_indicator
+    name: Lr Condensation Chance
+    indoor_temp_sensor: sensor.livingroom_temperature
+    indoor_humidity_sensor: sensor.livingroom_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 1.4
+
+# MR Mold Chance
+  - platform: mold_indicator
+    name: Mr Condensation Chance
+    indoor_temp_sensor: sensor.master_temperature
+    indoor_humidity_sensor: sensor.master_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 2.4
+    
+# SR Mold Chance
+  - platform: mold_indicator
+    name: Sr Condensation Chance
+    indoor_temp_sensor: sensor.shionroom_temperature
+    indoor_humidity_sensor: sensor.shionroom_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 1.4
+
+# MDF Mold Chance
+  - platform: mold_indicator
+    name: MDF Condensation Chance
+    indoor_temp_sensor: sensor.mdf_temperature
+    indoor_humidity_sensor: sensor.mdf_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 2.8
+
+# Hallway Mold Chance
+  - platform: mold_indicator
+    name: Hallway Condensation Chance
+    indoor_temp_sensor: sensor.entry_temperature
+    indoor_humidity_sensor: sensor.entry_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 1.1
+
+# Toilet Mold Chance
+  - platform: mold_indicator
+    name: Wc Condensation Chance
+    indoor_temp_sensor: sensor.wc_temperature
+    indoor_humidity_sensor: sensor.wc_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 1.1
+
+# Kitchen Mold Chance
+  - platform: mold_indicator
+    name: Kitchen Condensation Chance
+    indoor_temp_sensor: sensor.kitchen_temperature
+    indoor_humidity_sensor: sensor.kitchen_humidity
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 1.3
+
+# Computer Room Mold Chance
+  - platform: mold_indicator
+    name: Computerroom Condensation Chance
+    indoor_temp_sensor: sensor.computerroom_temperature 
+    indoor_humidity_sensor: sensor.computerroom_humidity 
+    outdoor_temp_sensor: sensor.entrance_temperature
+    calibration_factor: 0.6
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

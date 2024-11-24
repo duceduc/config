@@ -1,0 +1,74 @@
+####################################################
+#
+#                    Bridge
+#
+####################################################
+
+title: Bridge
+path: bridge
+#icon: mdi:floor-plan
+panel: false
+cards:
+
+  - type: vertical-stack
+    cards:
+      - type: markdown
+        content: '# BRIDGE CONTROLS'
+        card_mod:
+          class: bar-large
+
+      - type: markdown
+        card_mod:
+          class: header
+        content: '# Planetary Data'
+      - type: weather-forecast
+        name: ' '
+        entity: weather.my_weather
+        card_mod:
+          class: middle
+
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: sensor.home_windspeed
+            name: Wind Speed
+            icon: mdi:weather-windy
+          - entity: sensor.entrance_temperature
+            name: Outside Temperature
+            icon: mdi:thermometer-lines
+          - entity: sensor.entrance_humidity
+            name: Outside Humidity
+            icon: mdi:water-percent
+        card_mod:
+          class: middle
+            
+      - type: thermostat
+        entity: climate.sr_ac_mode
+            
+        card_mod:
+          class: footer
+
+  - type: picture
+    image: https://i.pinimg.com/originals/aa/2f/ba/aa2fba231f3c70034d0a122e9a1f5a75.gif
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    card_mod:
+      class: middle-blank
+  - type: picture
+    image: https://i.pinimg.com/originals/aa/2f/ba/aa2fba231f3c70034d0a122e9a1f5a75.gif
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    card_mod:
+      class: middle-blank
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

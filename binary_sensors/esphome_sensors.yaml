@@ -1,0 +1,52 @@
+####################################################
+#                                                                                                    
+#            MQTT Motion Sensors                                                                                
+#                                                                                                    
+####################################################
+
+#  - platform: mqtt
+#    name: "motion kitchen occupancy"
+#    state_topic: "switchbotmqtt/esp32/motion/motion_kitchen_occupancy"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 0
+#    device_class: motion
+#
+#  - platform: mqtt
+#    name: "motion g1 occupancy"
+#    state_topic: "esphome/hallway-sensor/binary_sensor/motion_g1_occupancy/state"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 0
+#    device_class: motion
+#
+#  - platform: mqtt
+#    name: "motion hallway occupancy"
+#    state_topic: "esphome/hallway-sensor/binary_sensor/motion_hallway_occupancy/state"
+#    value_template: '{{ value }}'
+#    payload_on: "ON"
+#    qos: 0
+#    device_class: motion
+
+
+####################################################
+#                                                                                                    
+#            MQTT ESP Device Connectivities                                                                            
+#                                                                                                    
+####################################################
+
+
+#  - platform: mqtt
+#    name: "hallway sensor status"
+#    state_topic: "esphome/hallway-sensor/status"
+#    value_template: '{{ value }}'
+#    payload_on: "online"
+#    qos: 0
+#    device_class: connectivity
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                      
+#                                                                                                              
+#########################################################

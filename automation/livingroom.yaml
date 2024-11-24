@@ -1,0 +1,184 @@
+#########################################################
+#
+#             Automate Front Area Lights via LDR Sensor
+#
+#########################################################
+
+- alias: 'computer room lights auto-on'
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.lr_radar_illuminance
+      above: 0.29
+      below: 0.41
+  conditions:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.eri_home_location
+          state: 'not_home'
+        - condition: time
+          after: '07:59'
+          before: '20:00'
+#    - condition: time
+#      after: '07:59'
+#      before: '20:00'
+
+    - condition: template # duc is home
+      value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
+    - condition: template # Not on Vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+  actions:
+#    - action: script.tradfri_transition
+#      data:
+#        entity_id: light.computer
+#        color_temp: 143 # 350
+#        transition: "{{ (( states.input_number.wakeup_duration.state | float(0) * 60 * 2 )| round ) | int(0) }}"
+#        brightness: '{{ 151 if now().hour >= 5 and now().hour < 16 else 255 }}'
+
+    - action: script.ashley_fadein
+      data:
+        entity_id: light.computer
+        sec: 150
+  mode: restart
+
+- alias: 'livingroom lights auto-on'
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.lr_radar_illuminance
+      id: 'pre'
+      above: 0.29
+      below: 0.41
+    - trigger: state
+      entity_id: sensor.period_of_the_day
+      to: 'dusklight'
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+
+
+    - condition: time
+      after: '07:59'
+      before: '20:00'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Not in Vacation
+      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+    - condition: or # don't turn on weekdays
+      conditions:
+        - condition: template
+          value_template: "{{ is_state('sensor.date_weekday', 'off') or  is_state('binary_sensor.shion_presence', 'on') }}"
+        - condition: template
+          value_template: "{{ states('sensor.holiday')| trim != 'none' }}"  
+  actions:
+    - choose:
+      - conditions:
+          - condition: trigger
+            id: 'pre'
+        sequence:
+          - action: script.ashley_fadein
+            data:
+              entity_id: light.living
+              sec: 150
+
+#          - action: script.tradfri_transition
+#            data:
+#              entity_id: light.living
+#              color_temp: 350
+#              transition: "{{ (( states.input_number.wakeup_duration.state | float(0) * 60 * 2 )| round ) | int(0) }}"
+#              brightness: 255
+
+      default:
+        - action: light.turn_on
+          data:
+            brightness_pct: 100
+          target:
+            entity_id: light.living
+#        - action: scene.turn_on
+#          target:
+#            entity_id: scene.living_1_fix
+  mode: restart
+
+
+#- alias: 'livingroom lights auto-on'
+#  triggers:
+#    - trigger: numeric_state
+#      entity_id: sensor.lr_radar_illuminance
+#      above: 0.29
+#      below: 0.41
+#    - entity_id: sensor.period_of_the_day
+#      trigger: state
+#      to: 'dusklight'
+#  condition:
+#    - condition: template # Someone is home
+#      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+#    - condition: template # Not in Vacation
+#      value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+#    - condition: or # don't turn on weekdays
+#      conditions:
+#        - condition: template
+#          value_template: "{{ is_state('sensor.date_weekday', 'off') or  is_state('binary_sensor.shion_presence', 'on') }}"
+#        - condition: template
+#          value_template: "{{ states('sensor.holiday')| trim != 'none' }}"
+#  actions:
+#    - action: script.tradfri_transition
+#      data:
+#        entity_id: light.living
+#        color_temp: 350
+#        transition: "{{ (( states.input_number.wakeup_duration.state | float(0) * 60 * 2 )| round ) | int(0) }}"
+#        brightness: 255
+#  mode: restart
+
+
+
+- alias: 'front area lights auto-off'
+  triggers:
+    - trigger: template # after Nov light shines brightest at < 25 in the early mornings. All other < 21
+      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.25 and
+                                       states('sensor.lr_radar_illuminance') != 'unavailable' and
+                                       states('sensor.time') >= '05:00' }}"
+    - trigger: template
+      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.25 and
+                                       states('sensor.lr_radar_illuminance') != 'unavailable' }}"
+  conditions:
+    - condition: template  # If guest is present, do not turn off
+      value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
+  actions:
+    - choose:
+        - conditions:
+            - condition: template # disable motion light
+              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+            - condition: template
+              value_template: "{{ states('sensor.time') > '05:00' }}"
+          sequence:
+            - action: light.turn_off
+              entity_id: light.computer, light.living
+            - action: script.turn_off
+              data:
+                entity_id: script.ashley_fadein
+        - conditions:
+            - condition: template # disable motion light
+              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+            - condition: template
+              value_template: "{{ states('sensor.date_weekday') == 'off' }}"
+          sequence:
+            - action: light.turn_off
+              entity_id: light.computer, light.living
+            - action: script.turn_off
+              data:
+                entity_id: script.ashley_fadein
+      default:
+#        - condition: template # disable motion light
+#          value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+
+        - action: light.turn_off
+          entity_id: light.computer
+        - action: script.turn_off
+          data:
+            entity_id: script.ashley_fadein
+
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################

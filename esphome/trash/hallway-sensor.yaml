@@ -1,0 +1,78 @@
+# ESP8266 192.168.1.74 [C4:5B:BE:70:C4:A1]
+# https://github.com/trombik/esphome-component-ping
+substitutions:
+  name: hallway-sensor
+
+packages:
+  stats: !include components/stats.yaml
+
+esphome:
+  name: $name
+  platform: esp8266
+  board: d1_mini
+  libraries: # esphome-ping
+    - ESP8266WiFi
+    - https://github.com/akaJes/AsyncPing#95ac7e4
+
+external_components: # esphome-ping
+  - source:
+      type: git
+      url: https://github.com/trombik/esphome-component-ping
+      ref: main
+
+wifi:
+  ssid: !secret ssid1
+  password: !secret ssid_pwd
+  fast_connect : true
+  reboot_timeout: 0s
+  manual_ip:
+    static_ip: 192.168.1.74
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
+  
+logger:
+
+api:
+  encryption:
+    key: !secret esphome_apikey
+
+ota:
+  - platform: esphome
+    password: !secret ota_pass
+
+sensor:
+  - platform: ping # esphome-ping
+    ip_address: 8.8.8.8
+    num_attempts: 17
+    timeout: 1sec
+    loss:
+      name: $name Packet loss
+    latency:
+      name: $name Latency
+      accuracy_decimals: 3
+    update_interval: 10s
+
+  - platform: adc
+    pin: A0
+    name: '$name illuminance'
+    unit_of_measurement: lux
+    update_interval: 60s
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
+          
+binary_sensor:
+  - platform: gpio
+    pin: D1
+    name: 'motion hallway occupancy'
+    device_class: motion
+    
+  - platform: gpio
+    pin: D7
+    name: 'motion g1 occupancy'
+    device_class: motion
+
+switch:
+  - platform: restart
+    name: "$name Restart"
+    icon: mdi:restart

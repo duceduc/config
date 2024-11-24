@@ -1,0 +1,73 @@
+####################################################
+#
+#                    Chores
+#
+####################################################
+
+title: Chores
+path: chores
+icon: mdi:bookmark-check
+background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+panel: true
+cards:
+
+  - type: custom:layout-card
+    layout_type: horizontal-layout
+    layout:
+      max_cols: 4
+    cards:
+
+      - type: vertical-stack
+        title: Home
+        cards:
+         - !include
+           - /config/lovelace/tpl/chores_tpl.yaml
+           - name: Change Bed Sheets
+             sensor_name: change_bed_sheets
+             icon: mdi:bed
+             warning_before: 2
+             cycle_days: 24
+
+      - type: vertical-stack
+        title: Appliances
+        cards:
+         - !include
+           - /config/lovelace/tpl/chores_tpl.yaml
+           - name: Clean Air Filters
+             sensor_name: clean_air_filters
+             icon: mdi:air-filter
+             warning_before: 2
+             cycle_days: 60
+
+      - type: vertical-stack
+        title: Bathroom
+        cards:
+         - !include
+           - /config/lovelace/tpl/chores_tpl.yaml
+           - name: Clean Toilet
+             sensor_name: clean_toilet
+             icon: mdi:toilet
+             warning_before: 1
+             cycle_days: 7
+
+      - type: vertical-stack
+        title: Outdoor
+        cards:
+         - !include
+           - /config/lovelace/tpl/chores_tpl.yaml
+           - name: Clean Balcony
+             sensor_name: clean_balcony
+             icon: mdi:broom
+             warning_before: 1
+             cycle_days: 60
+
+
+
+
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

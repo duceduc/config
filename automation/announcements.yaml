@@ -1,0 +1,338 @@
+#########################################################
+#
+#             Announcements
+#
+#########################################################
+
+# Alexa Remind Shion to Go to Bed Starting at 9pm
+- alias: Bedtime Start Announcements
+  triggers:
+    - trigger: time
+      at: input_datetime.shion_nightly_report
+  conditions:
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: timer.start
+      entity_id: timer.looper
+###
+- alias: Bedtime Stop Announcements
+  triggers:
+    - trigger: state
+#      entity_id: entity_id: group.bed_sensors
+      entity_id: binary_sensor.middle
+      for: 30
+      from: 'off'
+
+      to: 'on'
+  conditions:
+    - condition: time
+      after: '21:00:00'
+      before: '22:30:00'
+  actions:
+    - action: timer.finish
+      entity_id: timer.looper
+
+- alias: 'Looper timer started'
+  triggers:
+    - trigger: event
+      event_type: timer.started
+      event_data:
+        entity_id: timer.looper
+  actions:
+    - action: >
+        {% if now().hour > 21 %}
+          timer.cancel
+        {% else %}
+          script.turn_on
+        {% endif %}
+      data:
+        entity_id: >
+          {% if now().hour > 21 %}
+             timer.looper
+          {% else %}
+             script.bedtime_notify
+          {% endif %}
+
+- alias: 'Looper timer finished'
+  triggers:
+    - trigger: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.looper
+  conditions:
+    - condition: state
+#      entity_id: group.bed_sensors
+      entity_id: binary_sensor.middle
+      state: 'off'
+  actions:
+    - action: timer.start
+      entity_id: timer.looper
+
+
+#########################################################
+#
+#             Audio on Notification
+#
+#########################################################
+
+
+- alias: Turn On Audible Notifications
+  initial_state: true
+  triggers:
+    - trigger: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.audible_notification_on', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  actions:
+    - action: input_boolean.turn_on
+      entity_id: input_boolean.audible_notifications
+
+# Turn off audible notifications if they have't been turned off yet.
+- alias: Turn Off Audible Notifications
+  initial_state: true
+  triggers:
+    - trigger: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.audible_notification_off', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  conditions:
+    - condition: state
+      entity_id: input_boolean.audible_notifications
+      state: 'on'
+  actions:
+    - action: input_boolean.turn_off
+      entity_id: input_boolean.audible_notifications
+
+#########################################################
+#
+#             Shion Calendar Events
+#
+#########################################################
+
+- alias: Shion Event Starting Soon
+  triggers:
+    - trigger: calendar
+      event: start
+      offset: "-0:45:0"
+      entity_id: calendar.shion_events
+  actions:
+    - action: script.status_annc
+      data:
+        who: ai_1
+        call_interuption: 1
+        call_shion_events: 1
+
+
+#- alias: School Pickup Reminder
+#  triggers:
+#    - trigger: time
+#      at: input_datetime.school_day_end_reminder
+#  conditions:
+#    - condition: state
+#      entity_id: calendar.shion_school
+#      attribute: offset_reached
+#      state: True
+#  actions:
+#    - action: script.status_annc
+#      data:
+#        who: "{{ states('sensor.room_audio') }}"
+#        call_interuption: 1
+#        call_school_pickup_reminder: 1
+#    - action: script.text_notify
+#      data:
+#        who: duc
+#        message: It's almost time to head for school.
+
+
+#########################################################
+#
+#             Calendar Appointments
+#
+#########################################################
+
+- alias: Appointment Reminder Today
+  triggers:
+    - trigger: calendar
+      event: start
+      offset: '-1:00:00'
+      entity_id: calendar.appointments
+  actions:
+    - action: script.status_annc
+      data:
+        who: ai_1
+        call_interuption: 1
+        call_appointments: 1
+
+
+
+
+
+- alias: Appointment Reminder Tomorrow
+  triggers:
+    - trigger: state
+      entity_id: sensor.appointmenttomorrow
+  conditions:
+    - condition: template
+      value_template: "{{ not is_state('sensor.appointmenttomorrow', ['unknown','none','unavailable']) }}"
+  actions:
+    - action: script.email_notify
+      data:
+        who: duc
+        title: "Appointment Tomorrow: {{ states('sensor.appointmenttomorrow') }}"
+        message: "There is {{ states('sensor.appointmenttomorrow') }} appointment tomorrow at {{ state_attr('sensor.appointmenttomorrow', 'start_time') }}."
+
+    - action: script.text_notify
+      data:
+        who: duc
+        title: "Appointment Tomorrow"
+        message: "There is {{ states('sensor.appointmenttomorrow') }} appointment tomorrow at {{ state_attr('sensor.appointmenttomorrow', 'start_time') }}."
+
+
+
+#########################################################
+#
+#             Alexa Announce Who is Coming Home
+#
+#########################################################
+
+- alias: announce who is arriving
+  triggers:
+    - trigger: state
+      entity_id:
+        - device_tracker.id #duc
+        - device_tracker.ie #eri
+#        - device_tracker.shion
+      to: 'home'
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ is_state('input_select.home_mode', 'Away') or is_state('input_select.home_mode', 'Vacation') }}"
+          sequence:
+            - action: input_select.select_option
+              entity_id: input_select.home_mode
+              data:
+                option: 'Returning'
+            - action: script.standby # turn off alarm
+            - action: input_boolean.turn_off
+              data:
+                entity_id: |
+                 {% if trigger.to_state.attributes.friendly_name == 'iE' %}
+                    input_boolean.eri_travel_monitor
+                 {% elif trigger.to_state.attributes.friendly_name == 'id' %}
+                    input_boolean.duc_travel_monitor
+                 {% else %}
+                 {% endif %}
+      default:
+        - action: script.speech_engine
+          data:
+            who: "{{ states('sensor.room_audio') }}"
+            voice: "{{ states('input_select.jarvis_voice') }}"
+            message: >
+              {% set alias = {"iE":"mommy", "id":"daddy", "Shion":"she-on"} %}
+              {% set p = trigger.to_state.attributes.friendly_name %}
+              {% set person = alias.get(p) %}
+                {{ person }}, will be home in about 5 minutes.
+        - action: light.turn_on
+          data:
+            entity_id: light.h_1
+            brightness: 200
+        - action: input_boolean.turn_off
+          data:
+            entity_id: |
+             {% if trigger.to_state.attributes.friendly_name == 'iE' %}
+                input_boolean.eri_travel_monitor
+             {% elif trigger.to_state.attributes.friendly_name == 'id' %}
+                input_boolean.duc_travel_monitor
+             {% else %}
+             {% endif %}
+
+#########################################################
+#
+#             Momentary Switch Trigger
+#
+#########################################################
+
+
+- alias: Momentary Switch Trigger
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_boolean.toggle_guest_presence
+        - binary_sensor.duc_presence
+      to: 'on'
+  actions:
+    - action: switch.turn_on
+      data:
+        entity_id: |
+          {% if is_state('input_boolean.toggle_guest_presence', 'on') %}
+             switch.momentary_activate_guest
+          {% elif is_state('binary_sensor.duc_presence', 'on') %}
+             switch.momentary_activate_tv
+          {% endif %}
+    - delay: 2
+    - condition: template
+      value_template: "{{ is_state('input_boolean.toggle_guest_presence', 'off') }}"
+    - action: homeassistant.turn_off
+      data:
+        entity_id: input_boolean.toggle_guest_presence
+
+
+#########################################################
+#
+#             Alexa Greets Person at Genkan
+#
+#########################################################
+
+- alias: welcome family announcement
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.duc_presence
+        - binary_sensor.eri_presence
+        - binary_sensor.shion_presence
+      to: 'on'
+  actions:
+    - wait_template: "{{ is_state('group.motion_genkan_occupancy', 'on') }}"
+      continue_on_timeout: false
+      timeout: 20
+    - action: script.speech_engine
+      data:
+        who: ai_2
+        message: !include ../tpl/speech/family_greetings.yaml
+        voice: "{{ states('input_select.jarvis_voice') }}"
+
+    - condition: template
+      value_template: "{{ not is_state('switch.momentary_activate_guest', 'on') }}"
+    - condition: template
+      value_template: "{{ states.sensor.lr_radar_illuminance.state | float(0) > 0.39 }}"
+    - action: script.turn_on_lr_lights
+
+
+#########################################################
+#
+#             Alexa Greets Guest at Genkan
+#
+#########################################################
+
+- alias: welcome guest announcement
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.sachiko_presence
+        - binary_sensor.tomokun_presence
+      to: 'on'
+  actions:
+    - delay: 1
+    - wait_template: "{{ is_state('binary_sensor.genkan_moving_target', 'on') }}"
+      continue_on_timeout: false
+      timeout: 10
+    - action: script.speech_engine
+      data:
+        who: ai_2
+        message: !include ../tpl/speech/guest_greetings.yaml
+        voice: "{{ states('input_select.jarvis_voice') }}"
+
+
+#########################################################
+#
+#             END OF CONFIGURATION FILE
+#
+#########################################################

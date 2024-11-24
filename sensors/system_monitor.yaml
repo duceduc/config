@@ -1,0 +1,43 @@
+####################################################
+#                                                                                                    
+#                      SYSTEM MONITOR                                                      
+#                                                                                                    
+####################################################
+
+#  - platform: command_line
+#    name: HA CPU Temperature
+#    command: "cat /sys/class/thermal/thermal_zone2/temp"
+#    unit_of_measurement: "°C"
+#    value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+# HA Servers CAN REMOVE. NOW IN UI  
+#  - platform: systemmonitor
+#    resources:
+#      - type: memory_free
+#      - type: memory_use_percent
+#      - type: processor_use
+#      - type: last_boot
+#      - type: load_1m
+#      - type: load_5m
+#      - type: load_15m
+#      - type: disk_use_percent
+#        arg: /
+
+# Converted to GB using HASS.Agent Integration
+  - platform: template
+    sensors:
+      desktop_3l5pa48_storage_c_gb:
+        value_template: >-
+          {% if state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')| int(0) < 1024 %}
+            {{state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB') }}
+          {% else %}
+            {{ '%.1f'|format(state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')|float / 1024) }}
+          {% endif %}
+        unit_of_measurement: "GB"
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

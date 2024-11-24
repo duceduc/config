@@ -1,0 +1,134 @@
+####################################################
+#                                                                                                    
+#                     ESPresense                                                
+#                                                                                                    
+####################################################
+#apple:1007:11-12 apple:iphone10-1 apple:1005:9 apple:1005:9-24 apple:1006:10-12 apple:1005:9-26 apple:iphone7-1 apple:iphone7-2 tile:ed5cc31a97c6 exp:20
+
+# id iphone old- irk:8179f6bccb43f921ce60a480f1d8f28c OR  b3cbe1bc5e6db13e19bd326d60072d77
+# ie iphone old - irk:fde3aef775146c642f726e1494431aa8
+
+# id iphone - irk:8bcf809f09f2919c1094ba36979ae5d5
+# ie iphone - irk:753cc977a5339bf6074a99949a2f1267
+# id watch: 051e96f65fdb83de199d30070ef37f7e 
+# ie watch: fc5505f5ea6bb804e3f1febb43d1cce3
+
+
+# Duc
+  - platform: mqtt_room
+    name: 'Duc ESPresense'
+    device_id: 'irk:8bcf809f09f2919c1094ba36979ae5d5'
+    state_topic: 'espresense/devices/irk:8bcf809f09f2919c1094ba36979ae5d5'
+    timeout: 5
+    away_timeout: 45
+
+  - platform: mqtt_room
+    name: 'Duc iWatch ESPresense'
+    device_id: irk:051e96f65fdb83de199d30070ef37f7e # apple:1005:9-24
+    state_topic: espresense/devices/irk:051e96f65fdb83de199d30070ef37f7e
+    timeout: 5
+    away_timeout: 45
+
+# Eri
+  - platform: mqtt_room
+    name: 'Eri ESPresense'
+    device_id: 'irk:753cc977a5339bf6074a99949a2f1267'
+    state_topic: 'espresense/devices/irk:753cc977a5339bf6074a99949a2f1267'
+    timeout: 5
+    away_timeout: 45
+
+  - platform: mqtt_room
+    name: 'Eri iWatch ESPresense'
+    device_id: irk:fc5505f5ea6bb804e3f1febb43d1cce3 # apple:1005:9-26
+    state_topic: espresense/devices/irk:fc5505f5ea6bb804e3f1febb43d1cce3
+    timeout: 5
+    away_timeout: 45
+
+# Shion Tile
+  - platform: mqtt_room
+    name: 'Shion tms ESPresense'
+    device_id: 'tile:ed5cc31a97c6'
+    state_topic: 'espresense/devices/tile:ed5cc31a97c6'
+    timeout: 5
+    away_timeout: 60
+
+
+
+
+
+
+#  DELETE 3 BELOW
+#  - platform: mqtt_room
+#    name: 'Eri ESPresense 101'
+#    device_id: 'apple:iphone10-1'
+#    state_topic: 'espresense/devices/apple:iphone10-1'
+#    timeout: 5
+#    away_timeout: 60
+# Eri Not Reliable node
+#  - platform: mqtt_room
+#    name: 'Eri ESPresense 1006'
+#    device_id: 'apple:1006:10-12' 
+#    state_topic: 'espresense/devices/apple:1006:10-12'
+#    timeout: 5
+#    away_timeout: 60
+# Eri Not Reliable node
+#  - platform: mqtt_room
+#    name: 'Eri ESPresense Exp20'
+#    device_id: 'exp:20' 
+#    state_topic: 'espresense/devices/exp:20'
+#    timeout: 5
+#    away_timeout: 60
+
+#          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+#            {{ states("sensor.eri_espresense_101") }}
+#  - platform: template
+#    sensors:
+#      eri_espresense:
+#        friendly_name: Eri ESPresense
+#        value_template: >-      
+#          {% if states("sensor.eri_espresense_1006") != "not_home" and states("sensor.eri_espresense_101") == "not_home" %}
+#            {{ states("sensor.eri_espresense_1006") }}
+#          {% elif states("sensor.eri_espresense_101") != "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+#            {{ states("sensor.eri_espresense_101") }}            
+#          {% elif states("sensor.eri_espresense_exp20") != "not_home" %}
+#            {{ states("sensor.eri_espresense_exp20") }}                
+#          {% elif states("sensor.eri_espresense_1006") == "not_home"  and states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_exp20") == "not_home" %} 
+#            not_home
+#          {% else %}
+#            unknown          
+#          {% endif %}
+
+
+
+#          {% if states("sensor.eri_espresense_101") != "not_home" %}
+#            {{ states("sensor.eri_espresense_101") }}
+#          {% elif states("sensor.eri_espresense_1006") != "not_home" %}
+#            {{ states("sensor.eri_espresense_1006") }}
+#          {% elif states("sensor.eri_espresense_101") == "not_home" and states("sensor.eri_espresense_1006") == "not_home" %}
+#            not_home
+#          {% else %}
+#            unknown
+#          {% endif %}
+
+
+# Shion ISP
+#  - platform: mqtt_room
+#    name: 'Shion isp ESPresense'
+#    device_id: 'apple:iphone7-1'
+#    state_topic: 'espresense/devices/apple:iphone7-1'
+#    timeout: 5
+#    away_timeout: 60
+
+#  - platform: mqtt_room
+#    name: 'Shion is ESPresense'
+#    device_id: 'apple:iphone7-2' # apple:1005:9-12
+#    state_topic: 'espresense/devices/apple:iphone7-2'
+#    timeout: 5
+#    away_timeout: 60
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

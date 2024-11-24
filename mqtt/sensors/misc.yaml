@@ -1,0 +1,80 @@
+####################################################
+#
+#            Earthquake
+#
+####################################################
+
+# M5 Stick Plus
+#  - name: "seismoM5p_pga"
+#    availability:
+#      - topic: "house/earthquake/seismom5P/status"
+#        payload_available: "online"
+#        payload_not_available: "offline"
+#    state_topic: "house/earthquake/seismom5P/event"
+#    value_template: "{{ value_json.pga }}"
+#    unit_of_measurement: "g"
+#    icon: mdi:pulse
+
+#  - name: "seismoM5p_state"
+#    availability:
+#      - topic: "house/earthquake/seismom5P/status"
+#        payload_available: "online"
+#        payload_not_available: "offline"
+#    state_topic: "house/earthquake/seismom5P/state"
+#    icon: mdi:pulse
+
+# M5 Stick C
+#  - name: "seismoM5_pga"
+#    availability:
+#      - topic: "house/earthquake/seismom5P/seismom5/status"
+#        payload_available: "online"
+#        payload_not_available: "offline"
+#    state_topic: "house/earthquake/seismom5P/seismom5/event"
+#    value_template: "{{ value_json.pga }}"
+#    unit_of_measurement: "g"
+#    icon: mdi:pulse
+
+#  - name: "seismoM5_state"
+#    availability:
+#      - topic: "house/earthquake/seismom5P/seismom5/status"
+#        payload_available: "online"
+#        payload_not_available: "offline"
+#    state_topic: "house/earthquake/seismom5P/seismom5/state"
+#    icon: mdi:pulse
+
+  - name: earthquake_daily_count
+    state_topic: "house/earthquake/daily_count"
+
+
+####################################################
+#
+#            Mailbox by PricelessToolkit
+#
+####################################################
+
+  - name: "lora mailbox"
+    state_topic: "house/alerts/lora_mailbox/state"
+
+  - name: "lora mailbox rssi"
+    state_topic: "house/alerts/lora_mailbox/rssi"
+
+
+####################################################
+#
+#            Notifications
+#
+####################################################
+
+  - name: "Alexa Last Msg"
+    state_topic: "house/alerts/alexa/lastmsg"
+  - name: "Alexa Last Location"
+    state_topic: "house/alerts/alexa/lastloc"
+  - name: "Alexa Last Msg Time"
+    state_topic: "house/alerts/alexa/msgtime"
+
+
+####################################################
+#
+#            END OF CONFIGURATION FILE
+#
+####################################################

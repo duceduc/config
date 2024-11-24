@@ -1,0 +1,119 @@
+# ESP32 With Battery Holder [C8:F0:9E:9C:41:10]
+substitutions:
+  name: livingroom-ldr-sensor
+
+#packages:
+#  stats: !include components/stats.yaml
+
+esphome:
+  name: $name
+  platform: esp32
+  board: esp32dev # nodemcu-32s  
+
+
+
+
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+logger:
+  level: NONE
+api:
+  encryption:
+    key: !secret esphome_apikey
+ota:
+  - platform: esphome
+    password: !secret ota_pass
+
+deep_sleep:
+  id: deep_sleep_1
+  run_duration: 10s
+  sleep_duration: 86400s
+  esp32_ext1_wakeup:
+    pins:
+      number: GPIO33
+      allow_other_uses: true
+    mode: ANY_HIGH
+
+
+
+switch:
+  - platform: gpio
+    id: light_status
+    name: $name Light Status
+    pin:
+      number: GPIO33
+      allow_other_uses: true
+#      mode: INPUT_PULLUP
+#      inverted: True
+#    on_turn_off:
+#      then:
+#        - logger.log: "press light_status"
+#        - deep_sleep.prevent: deep_sleep_1
+
+
+sensor:
+  - platform: adc # LDR
+    pin: GPIO35
+    name: $name illuminance
+    update_interval: 2s
+    accuracy_decimals: 1
+    unit_of_measurement: lux
+    on_value_range:
+      - above: 0.5
+        then:
+          - switch.turn_on: light_status
+      - below: 0.5
+        then:
+          - switch.turn_off: light_status
+
+
+#Notes:
+#Voltage divider: Used 2 x 300K Ohm resistors
+  - platform: adc
+    id: batt_voltage
+    name: $name Battery Voltage
+    internal: true
+    pin: GPIO32
+    update_interval: 60s
+    accuracy_decimals: 2
+    attenuation: auto
+    filters:
+      # #Scale it back up from voltage divided value 2 x 300K > 2.1. 4.2/2.1 = 2.
+      - multiply: 2
+      
+#Intermediate sensor. Might consolidate them later.
+  - platform: copy
+    source_id: batt_voltage
+    id: batt_voltage_filtered
+    icon: mdi:battery
+    internal: false
+    name: $name Battery Voltage
+    unit_of_measurement: V
+    accuracy_decimals: 2
+    filters:
+      - median: #Use moving median to smooth noise.
+          window_size: 10
+          send_every: 10
+          send_first_at: 1
+       
+#Convert the Voltage to a battery  level (%)
+  - platform: copy
+    source_id: batt_voltage_filtered
+    id: batt_level
+    internal: false 
+    icon: mdi:battery
+    name: $name Battery Percent
+    unit_of_measurement: '%'
+    accuracy_decimals: 0
+    filters:
+      # Map from voltage to Battery level
+      - calibrate_linear:
+          - 3.1 -> 0 #Set 3.0 to 0% even though it can go lower (2.4V), for life extention. There's not much capacity below this anyway.
+          - 4.1 -> 100 #Set 4.05 to 100% even though it can go higher (~4.2V), for life extention.
+       
+      #Overide values less than 0% and more than 100%
+      - lambda: |
+          if (x < 0) return 0; 
+          else if (x > 100) return 100;
+          else return ceil(x / 5) * 5;

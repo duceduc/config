@@ -1,0 +1,118 @@
+####################################################
+#                                                                                                    #
+#                      Local SSL Certs                                                         #
+#                                                                                                    #
+####################################################
+
+#  - platform: command_line
+#    name: mqtt ssl cert issued
+#    scan_interval: 14400
+#    command: "python3 /ssl/pem2json.py mqtt-server.crt"
+#    value_template: '{{ value_json.notBefore }}'
+
+#  - platform: command_line
+#    name: mqtt ssl cert cn
+#    scan_interval: 14400
+#    command: "python3 /ssl/pem2json.py mqtt-server.crt"
+#    value_template: '{{ value_json.subject }}'
+
+####################################################
+#                                                                                                    
+#                      ws1/External SSL Certs                                               
+#                                                                                                    
+####################################################
+
+# File location at ws1 bin folder
+#  - platform: command_line
+#    name: ha ssl cert issued
+#    scan_interval: 21600
+#    command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ws1@192.168.1.15 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+#    value_template: '{{ value_json.notBefore }}'
+
+#  - platform: command_line
+#    name: ha ssl cert cn
+#    scan_interval: 21600
+#    command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ws1@192.168.1.15 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+#    value_template: '{{ value_json.subjectAltName }}'
+
+####################################################
+#                                                                                                    
+#                      SSL Cert Expiry                                                          
+#                                                                                                    
+####################################################
+
+  - platform: rest
+    resource: !secret sm_sslmate_url
+    name: sm cert sslmate
+    value_template: "{{ value_json[0].not_after }}"
+    scan_interval: 14400
+    headers:
+      Authorization: !secret sslmate
+      Content-Type: application/json
+    json_attributes_path: "$[0]"
+    json_attributes:
+      - not_before    
+      - dns_names
+      - issuer
+
+# long ver: {{ 90 - ((now() - states("sensor.vj_ssl_cert_issued")|as_datetime|as_local) / timedelta(days=1)) | round(0) }}
+# shorter ver old ways: {{ 90 - (now() - states("sensor.vj_ssl_cert_issued")|as_datetime|as_local).days }}
+  - platform: template
+    sensors:
+      sm_ssl_cert_expiry:
+        value_template: '{{ (states("sensor.sm_cert_sslmate")|as_datetime|as_local - now()).days }}'
+        unit_of_measurement: Days
+
+
+
+  - platform: template
+    sensors:
+      mqtt_ssl_cert_expiry:
+        value_template: >-
+         {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
+         {% set str=states('sensor.mqtt_ssl_cert_issued') %}
+         
+         {% set Y=(str|regex_findall_index('[0-9]{4}')).replace('','') %}
+         {% set mt=(str|regex_findall_index('[a-zA-Z]{3}')).replace('','') %}
+         {% set m=alias.get(mt) %}
+         {% set d=(str|regex_findall_index('[0-9]{1,2}')).replace('','') %}
+         
+         {% set date=Y + '-' + m + '-' + d %}
+         {{ 10950 - (( as_timestamp(now()) - as_timestamp(strptime(date, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}
+        unit_of_measurement: Days
+
+  - platform: template
+    sensors:
+      ha_ssl_cert_expiry:
+        value_template: >-
+         {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
+         {% set str=states('sensor.ha_ssl_cert_issued') %}
+         
+         {% set Y=(str|regex_findall_index('[0-9]{4}',0)) %}
+         {% set mt=(str|regex_findall_index('[a-zA-Z]{3}',0)) %}
+         {% set m=alias.get(mt) %}
+         {% set d=(str|regex_findall_index('[0-9]{1,2}',0)) %}
+         
+         {% set date=Y + '-' + m + '-' + d %}
+         {{ 10950 - (( as_timestamp(now()) - as_timestamp(strptime(date, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}
+        unit_of_measurement: Days
+
+
+####################################################
+#                                                                                                    
+#                      IG Token Expiry Resets                                          
+#                                                                                                    
+####################################################
+
+#  - platform: command_line
+#    name: ig token expiry
+#    scan_interval: 43200
+#    command: !secret ig_token
+#    value_template: '{{ (value_json.expires_in / 86400) |  round(0) }}'
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

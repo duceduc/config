@@ -1,0 +1,569 @@
+#########################################################
+#
+#             Living Room Air Conditioning
+#
+#########################################################
+# binary_sensor.lr_ac_flaps battery start 6/28
+# AC temperature. Above 29 is hot inside LR. Below 25 is cold
+# Heater ???
+# LR anker: start farest from wall
+#1 - esp32mesh1
+# 2 - monitor
+# 3 - Lr radar ?
+# 4 - rm4
+
+
+- alias: 'LR Aircon'
+  triggers:
+    - trigger: template
+      value_template: "{{ (now() - states.binary_sensor.lr_ac_flaps_contact.last_changed).seconds < 4 }}"
+      id: flaps
+    - trigger: state
+      entity_id: input_select.lr_ac_mode
+      id: mode
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: mode
+          sequence:
+            - action: | # lr_man_auto is dummy script
+                {% if is_state('input_select.lr_ac_mode', 'Powerful Heat') %} script.lr_ac_powerful_heat
+                {% elif is_state('input_select.lr_ac_mode', 'Normal Heat') %} script.lr_ac_normal_heat
+                {% elif is_state('input_select.lr_ac_mode', 'Silent Heat') %} script.lr_ac_silent_heat
+                {% elif is_state('input_select.lr_ac_mode', 'Manual Heat') %} script.lr_heat_man
+                {% elif is_state('input_select.lr_ac_mode', 'Powerful Cool') %} script.lr_ac_powerful_cool
+                {% elif is_state('input_select.lr_ac_mode', 'Normal Cool') %} script.lr_ac_normal_cool
+                {% elif is_state('input_select.lr_ac_mode', 'Silent Cool') %} script.lr_ac_silent_cool
+                {% elif is_state('input_select.lr_ac_mode', 'Manual Cool') %} script.lr_cool_man
+                {% elif is_state('input_select.lr_ac_mode', 'Normal Humidifier') %} script.lr_ac_normal_humidifier
+                {% elif is_state('input_select.lr_ac_mode', 'Ai Auto') %} script.lr_ac_ai
+                {% elif is_state('input_select.lr_ac_mode', 'Man Auto') %} script.lr_man_auto
+                {% elif is_state('input_select.lr_ac_mode', 'Fan') %} script.lr_ac_fan
+                {% elif is_state('input_select.lr_ac_mode', 'Off') %} script.lr_ac_off
+                {% endif %}
+        - conditions:
+            - condition: trigger
+              id: flaps
+          sequence:
+            - condition: template
+              value_template: "{{ not states('binary_sensor.lr_ac_flaps_contact').lower() in ['unknown','unavailable','none'] }}"
+            - action: input_select.select_option
+              data:
+                entity_id: input_select.lr_ac_mode
+                option: |
+                  {% if (now() - states.input_select.lr_ac_mode.last_changed).seconds < 10 %}
+                    {{ states('input_select.lr_ac_mode') }}
+                  {% elif is_state('binary_sensor.lr_ac_flaps_contact', 'off') %} Off
+                  {% elif is_state('binary_sensor.lr_ac_flaps_contact', 'on') %} Man Auto
+                  {% else %}
+                  {% endif %}
+      default: []
+
+
+#########################################################
+#
+#             AM Schedule Auto Timer
+#
+#########################################################
+
+- alias: 'LR Aircon AM Schedule'
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.lr_ac_am_automation_time_active # AM on time trigger (only if temperature condition below is met)
+        - binary_sensor.lr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
+        - binary_sensor.lr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
+      to: 'on'
+      for: 10
+    - trigger: state
+      entity_id: binary_sensor.hallway_door # ac turns off when door is open
+      to: 'off'
+  conditions:
+    - condition: template # Vacation mode is not On
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
+      entity_id: input_select.lr_ac_mode
+      state: 'Off'
+    - condition: state # only if hallway door is closed
+      entity_id: binary_sensor.hallway_door
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.lr_radar_status # only if temperature sensor is available - prevents glitching when unavailable
+      state: 'on'
+    - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.lr_ac_heat_required
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.lr_ac_cool_required
+        state: 'on'
+    - condition: state # And only if current time is within AM automation time range (for the case of a temperature trigger)
+      entity_id: binary_sensor.lr_ac_am_automation_time_active
+      state: 'on'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: >
+          {% if is_state('binary_sensor.lr_ac_heat_required', 'on') %}
+            Normal Heat
+          {% elif is_state('binary_sensor.lr_ac_cool_required', 'on') %}
+            Normal Cool
+          {% else %}
+            'Off'
+          {% endif %}
+
+#########################################################
+#
+#             PM Schedule Auto Timer
+#
+#########################################################
+
+- alias: 'LR Aircon PM Schedule'
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.lr_ac_pm_automation_time_active # PM on time trigger (only if temperature condition below is met)
+        - binary_sensor.lr_ac_heat_required # also trigger if heating becomes required (only during time condition below)
+        - binary_sensor.lr_ac_cool_required # also trigger if cooling becomes required (only during time condition below)
+      to: 'on'
+      for: 10
+    - trigger: state
+      entity_id: binary_sensor.hallway_door # if door is closed
+      to: 'off'
+  conditions:
+    - condition: template # Vacation mode is not On
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: state # Only if AC is off (prevents oscillation between heat and cool mode if temperature over/undershoots set point)
+      entity_id: input_select.lr_ac_mode
+      state: 'Off'
+    - condition: state # only if hallway door is closed
+      entity_id: binary_sensor.hallway_door
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.lr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+      state: 'on'
+    - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.lr_ac_heat_required
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.lr_ac_cool_required
+          state: 'on'
+    - condition: state # And only if current time is within PM automation time range (for the case of a temperature trigger)
+      entity_id: binary_sensor.lr_ac_pm_automation_time_active
+      state: 'on'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: >
+          {% if is_state('binary_sensor.lr_ac_heat_required', 'on') %}
+            Normal Heat
+          {% elif is_state('binary_sensor.lr_ac_cool_required', 'on') %}
+            Normal Cool
+          {% else %}
+            'Off'
+          {% endif %}
+
+#########################################################
+#
+#             Turn Aircon Off At Time
+#
+#########################################################
+
+- alias: 'LR Aircon AM Off'
+  initial_state: true
+  triggers:
+    - trigger: state # AM off time trigger
+      entity_id:
+        - binary_sensor.lr_ac_am_automation_time_active
+      to: 'off'
+  conditions:
+    - condition: state # Only if AM Automation is enabled
+      entity_id: automation.lr_aircon_am_schedule
+      state: 'on'
+    - condition: template # And only if AC is on
+      value_template: '{{ states("input_select.lr_ac_mode") != "Off" }}'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Someone is not in LR
+      value_template: "{{ states('sensor.lr_still_target_energy')| int(0) < 40 }}"      
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: 'Off'
+
+- alias: 'LR Aircon PM Off'
+  initial_state: true
+  triggers:
+    - trigger: state # PM off time trigger
+      entity_id: binary_sensor.lr_ac_pm_automation_time_active
+      to: 'off'
+  conditions:
+    - condition: state # Only if PM Automation is enabled
+      entity_id: automation.lr_aircon_pm_schedule
+      state: 'on'
+    - condition: template # And only if AC is on
+      value_template: '{{ states("input_select.lr_ac_mode") != "Off" }}'
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # Someone is not in LR
+      value_template: "{{ is_state('binary_sensor.lr_has_still_target', 'off') }}"
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: 'Off'
+
+#########################################################
+#
+#             Manual Adjust Temperature / Humidity
+#
+#########################################################
+
+- alias: 'LR Room Aircon Cool Temperature Adjust'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_number.lr_ac_temp_set_cool
+  conditions:
+    - condition: template # If currently running a cool mode
+      value_template: "{{ 'Cool' in states.input_select.lr_ac_mode.state }}"
+  actions:
+    - action: >
+        {% if states('input_number.lr_ac_temp_set_cool')| int != 0 %} script.lr_cool_man
+        {% endif %}
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: 'Manual Cool'
+
+- alias: 'LR Room Aircon Heat Temperature Adjust'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_number.lr_ac_temp_set_heat
+  conditions:
+    - condition: template # If currently running a heat mode
+      value_template: "{{ 'Heat' in states.input_select.lr_ac_mode.state }}"
+  actions:
+    - action: >
+        {% if states('input_number.lr_ac_temp_set_heat')| int != 0 %} script.lr_heat_man
+        {% endif %}
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: 'Manual Heat'
+
+- alias: 'LR Room Aircon Humidity Set'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_number.lr_humidity_set
+  conditions:
+    - condition: template
+      value_template: "{{ 'Cool' in states.input_select.lr_ac_mode.state }}"
+  actions:
+    - action: |
+        {% if states('input_number.lr_humidity_set')| int != 0  %} script.lr_humidity_set
+        {% endif %}
+
+
+#########################################################
+#
+#             Powerful Cool On
+#
+#########################################################
+
+
+- alias: 'LR Powerful Cool On'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_select.lr_ac_mode
+      to: 'Normal Cool'
+      for:
+        minutes: 30
+    - trigger: state
+      entity_id: binary_sensor.lr_ac_cool_required
+      to: 'on'
+      for:
+        minutes: 5
+  conditions:
+    - condition: state
+      entity_id: binary_sensor.lr_ac_cool_required
+      state: 'on'
+    - condition: state
+      entity_id: input_select.lr_ac_mode
+      state: 'Normal Cool'
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: "Powerful Cool"
+
+- alias: 'LR Powerful Cool Off'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_select.lr_ac_mode
+      to: 'Powerful Cool'
+      for:
+        minutes: 30
+    - trigger: state
+      entity_id: binary_sensor.lr_ac_cool_required
+      to: 'off'
+      for:
+        minutes: 5
+  conditions:
+    - condition: state
+      entity_id: input_select.lr_ac_mode
+      state: 'Powerful Cool'
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: "Normal Cool"
+
+
+#########################################################
+#
+#             Powerful Heat On
+#
+#########################################################
+
+- alias: 'LR Powerful Heat Off'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_select.lr_ac_mode
+      to: 'Powerful Heat'
+      for: '00:30:00'
+    - trigger: state
+      entity_id: binary_sensor.lr_ac_heat_required
+      to: 'off'
+      for: '00:05:00'
+  conditions:
+    - condition: state
+      entity_id: input_select.lr_ac_mode
+      state: 'Powerful Heat'
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: "Normal Heat"
+
+- alias: 'LR Powerful Heat On'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_select.lr_ac_mode
+      to: 'Normal Heat'
+      for: '00:30:00'
+    - trigger: state
+      entity_id: binary_sensor.lr_ac_heat_required
+      to: 'on'
+      for: '00:05:00'
+  conditions:
+    - condition: state
+      entity_id: binary_sensor.lr_ac_heat_required
+      state: 'on'
+    - condition: state
+      entity_id: input_select.lr_ac_mode
+      state: 'Normal Heat'
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.lr_ac_mode
+        option: "Powerful Heat"
+
+#########################################################
+#
+#             Auto Set AM Living Room Heating Set Point
+#
+#########################################################
+
+- alias: 'LR Heating Seasonal Adjustment AM'
+  initial_state: true
+  triggers:
+    - trigger: time
+      at: '04:00:00'
+  actions:
+    - action: input_number.set_value
+      data:
+        entity_id: input_number.lr_heater_heat_temp_set
+        value: >
+          {% if is_state('sensor.season', 'summer') %}
+            18
+          {% elif is_state('sensor.season', 'autumn') %}
+            19
+          {% elif is_state('sensor.season', 'winter') %}
+            17
+          {% elif is_state('sensor.season', 'spring') %}
+            17
+          {% endif %}
+    - condition: template
+      value_template: "{{ states('sensor.entrance_temperature')|float(0) > 22 }}"
+    - action: input_number.set_value
+      data:
+        entity_id: input_number.lr_heater_heat_temp_set
+        value: 16
+
+#########################################################
+#
+#             Auto Set PM Living Room Heating Set Point
+#
+#########################################################
+
+
+- alias: 'LR Heating Seasonal Adjustment PM'
+  initial_state: true
+  triggers:
+    - trigger: time
+      at: '13:00:00'
+  actions:
+    - action: input_number.set_value
+      data:
+        entity_id: input_number.lr_heater_heat_temp_set
+        value: >
+          {% if is_state('sensor.season', 'summer') %}
+            18
+          {% elif is_state('sensor.season', 'autumn') %}
+            19
+          {% elif is_state('sensor.season', 'winter') %}
+            18
+          {% elif is_state('sensor.season', 'spring') %}
+            17
+          {% endif %}
+
+
+#########################################################
+#
+#             Switchbot Humidifier
+#
+#########################################################
+
+- alias: 'SB Humidifier'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_select.sb_humidifier_mode
+  actions:
+    - action: |
+        {% if is_state('input_select.sb_humidifier_mode', 'Low') %} script.humidifier_low
+        {% elif is_state('input_select.sb_humidifier_mode', 'Med') %} script.humidifier_med
+        {% elif is_state('input_select.sb_humidifier_mode', 'High') %} script.humidifier_high
+        {% elif is_state('input_select.sb_humidifier_mode', 'Auto') %} script.humidifier_auto
+        {% elif is_state('input_select.sb_humidifier_mode', 'Off') %} script.humidifier_off
+        {% endif %}
+
+- alias: 'SB Humidifier Intensity'
+  initial_state: true
+  triggers:
+    - trigger: state
+      entity_id: input_number.lrh_humidity_intensity_set
+  conditions:
+    - condition: template # Only if currently On
+      value_template: "{{ is_state('input_boolean.sb_humidifier', 'on') }}"
+  actions:
+    - action: script.lrh_humidity_intensity_set
+
+- alias: 'SB Humidifier AM Schedule'
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.lrh_humidifier_am_automation_time_active
+      to: 'on'
+      for: 10
+  condition:
+    - condition: template # Only if automation is enabled
+      value_template: "{{ is_state('input_boolean.lrh_humidifier_automation_enable', 'on') }}"
+    - condition: template # Only if currently Off
+      value_template: "{{ is_state('input_select.sb_humidifier_mode', 'Off') }}"
+    - condition: numeric_state
+      entity_id: sensor.livingroom_humidity # sb_humidifier_humidity
+      above: input_number.lrh_humidity_low_set
+      below: input_number.lrh_humidity_high_set
+    - condition: template # Water tank not empty
+      value_template: "{{ is_state('sensor.sb_humidifier_lack_water', 'False') }}"
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.sb_humidifier_mode
+        option: High
+
+- alias: 'SB Humidifier PM Schedule'
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.lrh_humidifier_pm_automation_time_active
+      to: 'on'
+      for: 10
+  conditions:
+    - condition: template # Only if automation is enabled
+      value_template: "{{ is_state('input_boolean.lrh_humidifier_automation_enable', 'on') }}"
+    - condition: template # Only if currently Off
+      value_template: "{{ is_state('input_select.sb_humidifier_mode', 'Off') }}"
+    - condition: numeric_state
+      entity_id: sensor.sb_humidifier_humidity
+      above: input_number.lrh_humidity_low_set
+      below: input_number.lrh_humidity_high_set
+    - condition: template # Water tank not empty
+      value_template: "{{ is_state('sensor.sb_humidifier_lack_water', 'False') }}"
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.sb_humidifier_mode
+        option: High
+
+- alias: 'SB Humidifier AM Off'
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.lrh_humidifier_am_automation_time_active
+      to: 'off'
+  conditions:
+    - condition: state # Only if AM automation is enabled
+      entity_id: automation.sb_humidifier_am_schedule
+      state: 'on'
+    - condition: template # And only if humidifier is on
+      value_template: '{{ states("input_select.sb_humidifier_mode") != "Off" }}'
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.sb_humidifier_mode
+        option: 'Off'
+
+- alias: 'SB Humidifier PM Off'
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.lrh_humidifier_pm_automation_time_active
+      to: 'off'
+  conditions:
+    - condition: state # Only if PM automation is enabled
+      entity_id: automation.sb_humidifier_pm_schedule
+      state: 'on'
+    - condition: template # And only if humidifier is on
+      value_template: '{{ states("input_select.sb_humidifier_mode") != "Off" }}'
+  actions:
+    - action: input_select.select_option
+      data:
+        entity_id: input_select.sb_humidifier_mode
+        option: 'Off'
+
+
+#########################################################
+#
+#          END OF CONFIGURATION FILE
+#
+#########################################################

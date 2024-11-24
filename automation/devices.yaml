@@ -1,0 +1,144 @@
+#########################################################
+#                                                                                                              
+#             Turn on Netflix on ATV                                                                   
+#                                                                                                              
+#########################################################
+
+- alias: 'turn on appletv netflix'
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.appletv_netflix
+      from: 'off'
+      to: 'on'
+  actions:
+    - action: script.appletv_netflix
+    - action: input_boolean.toggle
+      entity_id: input_boolean.appletv_netflix
+
+#########################################################
+#                                                                                                              
+#             Turn on Plex on ATV                                                                      
+#                                                                                                              
+#########################################################
+
+- alias: 'turn on appletv plex'
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.appletv_plex
+      from: 'off'
+      to: 'on'
+  actions:
+    - action: script.appletv_plex
+    - action: input_boolean.toggle
+      entity_id: input_boolean.appletv_plex
+
+#########################################################
+#                                                                                                              
+#             Toggle Jcom Tv Box                                                                       
+#                                                                                                              
+#########################################################
+
+#- alias: 'toggle jcom tv box'
+#  triggers:
+#    - trigger: state
+#      entity_id: input_boolean.jcom_tv_box
+#      from: 'off'
+#      to: 'on'
+#  actions:
+#    - action: switch.turn_on
+#      entity_id: switch.jcom_tv_box
+#    - action: input_boolean.toggle
+#      entity_id: input_boolean.jcom_tv_box
+
+#########################################################
+#                                                                                                              
+#             Toggle Floor Heater                                                                       
+#                                                                                                              
+#########################################################
+
+#- alias: 'toggle floor heater'
+#  triggers:
+#    - trigger: state
+#      entity_id: input_boolean.floor_heater
+#      from: 'off'
+#      to: 'on'
+#  actions:
+#    - action: switch.turn_on
+#      entity_id: switch.floor_heater
+#    - action: input_boolean.toggle
+#      entity_id: input_boolean.floor_heater     
+
+#########################################################
+#                                                                                                              
+#             Desktop Automations                                                                     
+#                                                                                                              
+#########################################################
+
+- alias: 'Turn on desktop in morning'
+  triggers:
+    - trigger: time
+      at: '04:15:00'
+  conditions:
+    - condition: template # Vacation mode is not On
+      value_template: "{{ not is_state('input_boolean.vacation_mode', 'on') }}"
+    - condition: template # Duc is home
+      value_template: "{{ is_state('binary_sensor.duc_presence', 'on') }}"
+    - condition: template # PC is not on
+      value_template: "{{ not is_state('binary_sensor.desktop_status', 'on') }}"
+  actions:
+    - action: switch.turn_on
+      entity_id: switch.desktop
+
+#########################################################
+#                                                                                                              
+#             ESPresense Status                                                                        
+#                                                                                                              
+#########################################################
+
+#- alias: "ESPresense Status"
+#  triggers:
+#    - trigger: template
+#      value_template : "{{ not is_state('sensor.espresense_devices', 'on') }}"
+#      for: 600
+#  actions:
+#    - action: script.email_notify
+#      data:
+#        who: duc
+#        title: 'ESPresense Offline'
+#        message: "{{ states('sensor.espresense_devices') }} appears to be offline."
+
+
+
+- alias: "ESPresense Status"
+  triggers:
+    - trigger: template
+      value_template : "{{ not is_state('sensor.espresense_devices', 'on') }}"
+      for: 600
+      id: 'offline'
+  actions:
+    - choose:
+      - conditions:
+          - condition: trigger
+            id: 'offline'
+        sequence:
+          - condition: template
+            value_template: "{{ not is_state('sensor.espresense_devices', 'on') }}"
+          - action: script.email_notify
+            data:
+              who: duc
+              title: 'ESPresense Offline'
+              message: "{{ states('sensor.espresense_devices') }} appears to be {{ states('group.espresense_devices') }}line."
+      default:
+        - action: script.email_notify
+          data:
+            who: duc
+            title: 'ESPresense Online'
+            message: "ESPresense devices appear to be {{ states('group.espresense_devices') }}line."
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################

@@ -1,0 +1,20 @@
+####################################################
+#                                                                                                    #
+#                      REST                                                                       #
+#                                                                                                    #
+####################################################
+
+#https://s3.amazonaws.com/hassio-version/stable.json - OLD
+#https://www.home-assistant.io/components/sensor.rest/
+  - platform: rest
+    resource: https://version.home-assistant.io/stable.json
+    name: Hassio Version
+    value_template: "{{ value_json.homeassistant.default }}"
+    scan_interval: 3600
+
+
+####################################################
+#                                                                                                    #
+#            END OF CONFIGURATION FILE                                                 #
+#                                                                                                    #
+####################################################

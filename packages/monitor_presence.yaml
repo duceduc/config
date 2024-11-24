@@ -1,0 +1,351 @@
+###############################################################################
+#   @author         :   Duc Su 
+#   @date           :   03/05/2022
+#   @package        :   Monitor Presence
+#   @description    :   Package for handling Presence detection based on RSSI level using Monitor script.  
+###############################################################################
+
+group:
+  espresense_devices:
+    all: true
+    entities:  
+      - binary_sensor.espresense_livingroom
+      - binary_sensor.espresense_computerroom
+      - binary_sensor.espresense_genkan
+      - binary_sensor.espresense_kitchen
+      - binary_sensor.espresense_masterroom
+      - binary_sensor.espresense_shionroom
+
+input_boolean:
+  audible_notifications:
+
+#binary_sensor:
+#  - platform: template 
+#    sensors:
+#      duc_masterroom_presence:
+#        friendly_name: "Duc Masterroom Presence"
+#        device_class: occupancy
+#        delay_off:
+#          seconds: 30 
+#        value_template: >-
+#          {% if not (states('sensor.duc_masterroom_proximity') == 'unknown') and (states('sensor.duc_masterroom_proximity')|int > -3) %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+#      duc_shionroom_presence:
+#        friendly_name: "Duc Shionroom Presence"
+#        device_class: occupancy
+#        delay_off:
+#          seconds: 30         
+#        value_template: >-
+#          {% if not (states('sensor.duc_shionroom_proximity') == 'unknown') and (states('sensor.duc_shionroom_proximity')|int > -3) %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+#      duc_livingroom_presence:
+#        friendly_name: "Duc Livingroom Presence"
+#        device_class: occupancy
+#        delay_off:
+#          seconds: 30         
+#        value_template: >-
+#          {% if not (states('sensor.duc_livingroom_proximity') == 'unknown') and (states('sensor.duc_livingroom_proximity')|int > -8) %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+
+#      eri_masterroom_presence:
+#        friendly_name: "Eri Masterroom Presence"
+#        device_class: occupancy
+#        delay_off:
+#          seconds: 30 
+#        value_template: >-
+#          {% if not (states('sensor.eri_masterroom_proximity') == 'unknown') and (states('sensor.eri_masterroom_proximity')|int > -3) %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+#      eri_shionroom_presence:
+#        friendly_name: "Eri Shionroom Presence"
+#        device_class: occupancy
+#        delay_off:
+#          seconds: 30         
+#        value_template: >-
+#          {% if not (states('sensor.eri_shionroom_proximity') == 'unknown') and (states('sensor.eri_shionroom_proximity')|int > -3) %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+#      eri_livingroom_presence:
+#        friendly_name: "Eri Livingroom Presence"
+#        device_class: occupancy
+#        delay_off:
+#          seconds: 30         
+#        value_template: >-
+#          {% if not (states('sensor.eri_livingroom_proximity') == 'unknown') and (states('sensor.eri_livingroom_proximity')|int > -8) %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+
+
+
+
+mqtt:
+  sensor:
+    - name: "Room Presence"
+      state_topic: "house/alerts/presence/current_room"
+
+
+
+
+## NEW FORMAT 
+template:
+  - sensor:
+      - name: "Room Audio"
+        unique_id: 807ea83f-2556-4a15-98f3-26b1ef2e0ff5
+        state: >-
+          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%}
+          {%- if last_alexa_called_seconds <= 60 %}  
+            {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+          {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
+            {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
+              {% if is_state('input_boolean.audible_notifications', 'off') %}
+                {% if sensor.name == 'motion cr-sensor occupancy' %}
+                  computer_room
+                {% else %}
+                  living_room
+                {%- endif %}
+              {% else %}
+                {% if sensor.name == 'motion cr-sensor occupancy' %}
+                  computer_room
+                {% elif sensor.name in ('Kitchen Moving Target','Lr Moving Target') %}
+                  living_room
+                {% elif sensor.name in ('Wr Has Moving Target','Sr Has Moving Target', 'Mr Moving Target', 'Hallway Moving Target','Genkan Moving Target') %}
+                  hallway
+                {% else %}
+                  living_room
+                {%- endif %}
+            {%- endif %}
+          {% elif is_state('media_player.theater_tv', 'on') %}
+            theater
+          {% else %}
+            {{ states('sensor.room_presence') }}
+          {% endif %}
+
+  - sensor:
+      - name: "Duc Home Location" # can delete if not want to use for espresense location
+        unique_id: 85d5b1cd-7690-43bb-af8e-4ae1209c0087
+        icon: mdi:target
+        state: >-
+          {% if is_state('sensor.duc_espresense', 'masterroom') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            master_room
+          {% elif is_state('sensor.duc_espresense', 'shionroom') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            shion_room
+          {% elif is_state('sensor.duc_espresense', 'kitchen') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            kitchen
+          {% elif is_state('sensor.duc_espresense', 'computerroom') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            computer_room
+          {% elif is_state('sensor.duc_espresense', 'livingroom') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            living_room
+          {% elif is_state('sensor.duc_espresense', 'genkan') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            genkan
+          {% elif is_state('sensor.duc_espresense', 'not_home') and
+                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+            not_home
+          {% else %}
+            --
+          {% endif %}
+
+  - sensor:
+      - name: "Eri Home Location"
+        unique_id: 25b62d84-7c53-4c9f-a80f-87b88fd8cc25
+        icon: mdi:target
+        state: >-
+          {% if is_state('sensor.eri_espresense', 'masterroom') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            master_room
+          {% elif is_state('sensor.eri_espresense', 'shionroom') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            shion_room
+          {% elif is_state('sensor.eri_espresense', 'kitchen') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            kitchen
+          {% elif is_state('sensor.eri_espresense', 'computerroom') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            computer_room
+          {% elif is_state('sensor.eri_espresense', 'livingroom') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            living_room
+          {% elif is_state('sensor.eri_espresense', 'genkan') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            genkan
+          {% elif is_state('sensor.eri_espresense', 'not_home') and
+                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+            not_home
+          {% else %}
+            --
+          {% endif %}
+
+  - sensor:
+      - name: "Shion Home Location"
+        unique_id: 08513fd1-5a87-4d12-9365-69b045513e30
+        icon: mdi:target
+        state: >-
+          {% if is_state('sensor.shion_tms_espresense', 'masterroom') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            master_room
+          {% elif is_state('sensor.shion_tms_espresense', 'shionroom') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            shion_room
+          {% elif is_state('sensor.shion_tms_espresense', 'kitchen') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            kitchen
+          {% elif is_state('sensor.shion_tms_espresense', 'computerroom') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            computer_room
+          {% elif is_state('sensor.shion_tms_espresense', 'livingroom') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            living_room
+          {% elif is_state('sensor.shion_tms_espresense', 'genkan') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            genkan
+          {% elif is_state('sensor.shion_tms_espresense', 'not_home') and
+                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+            not_home
+          {% else %}
+            --
+          {% endif %}
+
+
+  - sensor:
+      - name: "ESPresense Devices"
+        state: |
+          {% if expand('group.espresense_devices') | selectattr('state', 'eq', 'off') | list | count >= 1 %}
+            {% set sensor = expand('group.espresense_devices') | selectattr('state', 'eq', 'off') | sort(attribute='last_changed') | last %}
+              {% if sensor.name == sensor.name %}
+                {{ sensor.name }}
+              {% endif %}
+          {% else %}
+            on
+          {% endif %}
+
+automation:
+  - alias: Set Room Presence
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: sensor.room_audio
+    actions:
+      - action: input_text.set_value
+        data:
+          entity_id: input_text.room_presence
+          value: '{{ states(''sensor.room_audio'') }}'
+      - action: mqtt.publish
+        data:
+          topic: house/alerts/presence/current_room
+          payload: '{{ states(''sensor.room_audio'') }}'
+          retain: true
+
+
+##################################
+
+  - alias: Eri Arrives at Costco Notification
+    initial_state: true
+    triggers:
+      - trigger: zone
+        event: enter
+        zone: zone.costco_hq
+        entity_id: person.eri
+    actions:
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.eri_travel_monitor
+      - action: script.status_annc
+        data:
+          who: "{{ states('sensor.room_audio') }}"
+          speech_message: "Just a quick heads up. Eddie has arrived at work."
+
+  - alias: Eri Leaves Costco Notification
+    initial_state: true
+    triggers:
+      - trigger: zone
+        event: leave
+        zone: zone.costco_hq
+        entity_id: person.eri
+    actions:
+      - action: script.text_notify
+        data:
+          who: duc
+          title: "*Notification*"
+          message: "Eri has left work."
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.eri_travel_monitor
+      - action: script.status_annc
+        data:
+          who: "{{ states('sensor.room_audio') }}"
+          call_interuption: 1
+          call_eri_location: 1
+
+##
+  - alias: Duc Arrives at Jcb Notification
+    initial_state: true
+    triggers:
+      - trigger: zone
+        event: enter
+        zone: zone.jcb
+        entity_id: person.duc
+    actions:
+      - action: input_boolean.turn_off
+        entity_id: input_boolean.duc_travel_monitor
+      - action: script.status_annc
+        data:
+          who: "{{ states('sensor.room_audio') }}"
+          speech_message: "I do not mean to intrude, but, Duck has arrived at work."
+
+  - alias: Duc Leaves Jcb Notification
+    initial_state: true
+    triggers:
+      - trigger: zone
+        event: leave
+        zone: zone.jcb
+        entity_id: person.duc
+    actions:
+      - action: script.text_notify
+        data:
+          who: duc
+          title: "*Notification*"
+          message: "Duc has left work."
+      - action: input_boolean.turn_on
+        entity_id: input_boolean.duc_travel_monitor
+      - action: script.status_annc
+        data:
+          who: "{{ states('sensor.room_audio') }}"
+          call_interuption: 1
+          call_duc_location: 1
+
+##
+  - alias: Shion Home Notification
+    initial_state: true
+    triggers:
+      - trigger: state
+        entity_id: person.shion
+        to: 'home'
+    conditions:
+      - condition: template # Is a school day
+        value_template: "{{ is_state('calendar.shion_school', 'on') }}"
+      - condition: template # No afterschool
+        value_template: "{{ is_state('sensor.school_event', 'Home School') }}"
+    actions:
+      - action: script.text_notify
+        data:
+          who: duc
+          title: "*Notification*"
+          message: "Shion is home from school."

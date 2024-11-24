@@ -1,0 +1,266 @@
+#########################################################
+#                                                                                                              
+#             Text Notify                                                                             
+#                                                                                                              
+#########################################################
+
+  text_notify:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.text_notifications
+        state: 'on'
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "duc"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.mobile_app_id
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "eri"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_eri
+            state: 'on'
+          sequence:
+          - service: notify.mobile_app_ie
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "amber"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.amberthebot
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "viber"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.notify_events
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "desktop"}}'
+          sequence:
+          - service: notify.desktop_fddl8i4
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "discord_eta"}}'
+          sequence:
+          - service: notify.discord_bot
+            data:
+              target:
+              - "1093135539277942784"            
+              message: '{{ message }}'
+
+  text_notify_image:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.text_notifications
+        state: 'on'
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "desktop"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.desktop_fddl8i4
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                image: '{{ image }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "amber"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.amberthebot
+            data_template:
+              message: >-
+                {{ message}} # optional
+              data:
+                photo: 
+                   - file: >-
+                        {{ image }}
+                     caption: >-
+                       {{ caption }}
+
+
+#########################################################
+#                                                                                                              
+#             Text Alert                                                                             
+#                                                                                                              
+#########################################################
+
+  text_alert:
+    sequence:
+      - service: >
+           {% if who == 'duc' %}
+              notify.mobile_app_id
+           {% elif who == 'eri' %}  
+              notify.mobile_app_ie
+           {% endif %}        
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+
+#########################################################
+#                                                                                                              
+#             Text Alert Image                                                                       
+#                                                                                                              
+#########################################################
+
+  text_alert_image:
+    sequence:
+      - service: >
+           {% if who == 'duc' %}
+              notify.mobile_app_id
+           {% elif who == 'eri' %}  
+              notify.mobile_app_ie
+           {% endif %}        
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          data:
+            attachment:
+              url: '{{ url }}'
+              content-type: '{{ content_type }}'
+              hide-thumbnail: false
+
+#########################################################
+#                                                                                                              
+#             Announcement Alert                                                                       
+#                                                                                                              
+#########################################################
+
+  alexa_alert:
+    sequence:
+      - service: mqtt.publish
+        data_template:
+          topic: 'house/alerts/alexa/lastmsg'
+          payload: 'This message is from {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}. {{ message | striptags | truncate(220)}}'
+          retain: true
+      - service: >-
+          {% if who in ['ai_4'] %}
+             notify.alexa_media_ai_4    
+          {% else %}
+             notify.alexa_media_ai_1
+          {% endif %}      
+        data:
+          message: >-
+            {{ message }}
+          data:
+            type: tts
+
+
+#########################################################
+#                                                                                                              
+#             Email Notify                                                                       
+#                                                                                                              
+#########################################################
+
+  email_notify:
+    sequence:
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "duc"}}'
+          sequence:
+          - service: notify.home_assistant
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: []
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "eri"}}'
+          sequence:
+          - service: notify.eri
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: []
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "jcb"}}'
+          sequence:
+          - service: notify.jcb
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: []
+
+#########################################################
+#                                                                                                              
+#             Email Notify Image                                                                       
+#                                                                                                              
+#########################################################
+
+  email_notify_image:
+    sequence:
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "duc"}}'
+          sequence:
+          - service: notify.home_assistant
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: '{{ path }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "eri"}}'
+          sequence:
+          - service: notify.eri
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: '{{ path }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "jcb"}}'
+          sequence:
+          - service: notify.jcb
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: '{{ path }}'
+
+#########################################################
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
+#########################################################

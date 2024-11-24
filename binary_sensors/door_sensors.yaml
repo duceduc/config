@@ -1,0 +1,64 @@
+#########################################################
+#                                                                                                              
+#            SHELLY DOOR SENSORS                                                                  
+#                                                                                                              
+#########################################################
+
+# Shelly Genkan Door
+#  - platform: mqtt
+#    state_topic: "shellies/D8BFC01A8C6A/sensor/state"
+#    name: "Genkan Door"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+## Shelly Hallway Door
+#  - platform: mqtt
+#    state_topic: "shellies/D8BFC01A8C33/sensor/state"
+#    name: "Hallway Door"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+# Shelly Master Door
+#  - platform: mqtt
+#    state_topic: "shellies/483FDA81F97F/sensor/state"
+#    name: "Master Door"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+# Shelly Shion Door
+#  - platform: mqtt
+#    state_topic: "shellies/483FDA81F69D/sensor/state"
+#    name: "Shion Door"
+#    payload_on: 'open'
+#    payload_off: 'close'
+#    device_class: lock
+#    qos: 0
+
+
+#########################################################
+#                                                                                                              
+#            Aqara genkan door                                                                
+#                                                                                                              
+#########################################################
+##   TESTING 
+#  - platform: template
+#    sensors:
+#      genkan_doorlock:
+#        friendly_name: "Front Door Lock"
+#        device_class: lock
+#        value_template: >-
+#          {% if states('sensor.genkan_doorlock_contact').lower() in ['open', 'timeout', 'unavailable'] %}off{% else %}on{% endif %}
+
+
+
+#########################################################
+#                                                                                                              
+#             END OF CONFIGURATION FILE                                                          
+#                                                                                                              
+#########################################################
