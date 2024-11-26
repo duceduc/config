@@ -6,27 +6,35 @@
 
   lr_ac_normal_heat:
     sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Living Room Aircon
-          command: heat # 26
+#      - service: remote.send_command # not working properly. not using
+#        data:
+#          entity_id: remote.rm4_remote
+#          device: Living Room Aircon
+#          command: heat # 26
+      - service: switch.turn_on
+        entity_id: switch.lr_heat_man_26
+
 
   lr_ac_powerful_heat:
     sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Living Room Aircon
-          command: temperature heat increase # 31
+#      - service: remote.send_command # not working properly. not using
+#        data:
+#          entity_id: remote.rm4_remote
+#          device: Living Room Aircon
+#          command: temperature heat increase # 31
+      - service: switch.turn_on
+        entity_id: switch.lr_heat_man_31
+
 
   lr_ac_silent_heat:
     sequence:
-      - service: remote.send_command
-        data:
-          entity_id: remote.rm4_remote
-          device: Living Room Aircon
-          command: temperature heat decrease # 22
+#      - service: remote.send_command # not working properly. not using
+#        data:
+#          entity_id: remote.rm4_remote
+#          device: Living Room Aircon
+#          command: temperature heat decrease # 22
+      - service: switch.turn_on
+        entity_id: switch.lr_heat_man_22
 
 # LR Man Heat
   lr_heat_man:
@@ -165,27 +173,35 @@
 
   mr_ac_normal_heat:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm31_remote
-        device: Master Room Aircon
-        command: heat # 26
+#    - service: remote.send_command # not working properly. not using.
+#      data:
+#        entity_id: remote.rm31_remote
+#        device: Master Room Aircon
+#        command: heat # 26
+      - service: switch.turn_on
+        entity_id: switch.mr_heat_man_26
+
+
 
   mr_ac_powerful_heat:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm31_remote
-        device: Master Room Aircon
-        command: temperature heat increase # ai 31
+#    - service: remote.send_command
+#      data:
+#        entity_id: remote.rm31_remote
+#        device: Master Room Aircon
+#        command: temperature heat increase # ai 31
+      - service: switch.turn_on
+        entity_id: switch.mr_heat_man_31
 
   mr_ac_silent_heat:
     sequence:
-    - service: remote.send_command
-      data:
-        entity_id: remote.rm31_remote
-        device: Master Room Aircon
-        command: temperature heat decrease # 22
+#    - service: remote.send_command
+#      data:
+#        entity_id: remote.rm31_remote
+#        device: Master Room Aircon
+#        command: temperature heat decrease # 22
+      - service: switch.turn_on
+        entity_id: switch.mr_heat_man_22
 
 # MR Man Heat
   mr_heat_man:

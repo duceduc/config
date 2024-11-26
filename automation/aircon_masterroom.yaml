@@ -3,7 +3,7 @@
 #             Auto Mode Lights On/Off                                                                
 #                                                                                                              
 #########################################################
-# anker usb order. Farest -> Closes [rm3, aio, espresene, monitor2, --, --]
+# anker usb order. Farest -> Closes [rm3, aio, espresense, monitor2, sniffer]
 
 - alias: Masterroom Occupancy
   description: 'Defines occupancy state for room'
