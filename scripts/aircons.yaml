@@ -6,18 +6,17 @@
 
   lr_ac_normal_heat:
     sequence:
-#      - service: remote.send_command # not working properly. not using
-#        data:
-#          entity_id: remote.rm4_remote
-#          device: Living Room Aircon
-#          command: heat # 26
-      - service: switch.turn_on
-        entity_id: switch.lr_heat_man_26
-
+      - service: remote.send_command 
+        data:
+          entity_id: remote.rm4_remote
+          device: Living Room Aircon
+          command: heat # 26
+#      - service: switch.turn_on
+#        entity_id: switch.lr_heat_man_26
 
   lr_ac_powerful_heat:
     sequence:
-      - service: remote.send_command # not working properly. not using
+      - service: remote.send_command 
         data:
           entity_id: remote.rm4_remote
           device: Living Room Aircon
@@ -25,10 +24,9 @@
 #      - service: switch.turn_on
 #        entity_id: switch.lr_heat_man_31
 
-
   lr_ac_silent_heat:
     sequence:
-      - service: remote.send_command # not working properly. not using
+      - service: remote.send_command 
         data:
           entity_id: remote.rm4_remote
           device: Living Room Aircon
