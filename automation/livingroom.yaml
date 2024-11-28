@@ -131,12 +131,12 @@
 
 - alias: 'front area lights auto-off'
   triggers:
-    - trigger: template # after Nov light shines brightest at < 28 in the early mornings. All other < 21
-      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.28 and
+    - trigger: template # after Nov light shines brightest at < 29 in the early mornings. All other < 21
+      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.29 and
                                        states('sensor.lr_radar_illuminance') != 'unavailable' and
                                        states('sensor.time') >= '05:00' }}"
     - trigger: template
-      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.28 and
+      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < 0.29 and
                                        states('sensor.lr_radar_illuminance') != 'unavailable' }}"
   conditions:
     - condition: template  # If guest is present, do not turn off

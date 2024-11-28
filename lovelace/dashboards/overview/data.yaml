@@ -186,7 +186,7 @@ cards:
           - entity_3: sensor.hallway
           - name_3: Hallway
           - entity_4: sensor.toilet
-          - name_4: Restroom
+          - name_4: WC
 
       - type: custom:streamline-card
         template: four_sensors_tpl

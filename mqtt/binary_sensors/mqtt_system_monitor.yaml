@@ -9,17 +9,25 @@
     unique_id: 034f5313-1113-4d1d-8ae0-abad4172badb
     state_topic: house/system_monitor/servers/ngx/status
     json_attributes_topic: house/system_monitor/servers/ngx/git_update
+    device_class: connectivity
     payload_on: 1
     payload_off: 0
-    device_class: connectivity
 
   - name: ser status
     unique_id: ae266003-3371-4fee-8fa7-c5a3a714feb5
     state_topic: house/system_monitor/servers/ser/status
     json_attributes_topic: house/system_monitor/servers/ser/git_update
+    device_class: connectivity
     payload_on: 1
     payload_off: 0
+
+  - name: mrs status
+    unique_id: ae266003-3371-4fee-8fa7-c5a3a714feb5
+    state_topic: house/system_monitor/servers/mediaroomsatellite/status
+    json_attributes_topic: house/system_monitor/servers/mediaroomsatellite/git_update
     device_class: connectivity
+    payload_on: 1
+    payload_off: 0
 
 
 ####################################################
