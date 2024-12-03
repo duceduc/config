@@ -1,0 +1,26 @@
+###############################################################################
+#   @author          :   Duc Su 
+#   @date              :   12/03/2024
+#   @package        :   Integrations
+#   @description    :   All 3rd Party Integrations 
+###############################################################################
+
+automation:
+  - alias: 'BPM Record Log'
+    triggers:
+      - trigger: state
+        entity_id: sensor.withings_systolic_blood_pressure
+    actions:
+      - action: notify.send_message
+        target:
+          entity_id: notify.bpm_log
+        data:
+          message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.withings_heart_pulse') }},{{ states('sensor.withings_systolic_blood_pressure') }},/,{{ states('sensor.withings_diastolic_blood_pressure') }}"
+
+      - action: script.text_notify
+        data:
+          who: amber
+          title: '*BP Readings*'
+          message: >
+            {% set t = as_timestamp(states.sensor.withings_systolic_blood_pressure.last_changed) | timestamp_custom('%-I:%M %p') %}
+            Your last BP reading was {{ states('sensor.withings_systolic_blood_pressure') }}/{{ states('sensor.withings_diastolic_blood_pressure') }} taking at {{ t }}.

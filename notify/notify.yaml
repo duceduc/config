@@ -74,7 +74,7 @@
 #                                                                                                              
 #########################################################
 
-## Removed. File has it's own integration.
+## Removed. File has it's own File integration.
 #  - name: energy_log
 #    platform: file
 #    filename: /config/www/data/csv_logs/energy_log.csv
