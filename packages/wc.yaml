@@ -19,6 +19,29 @@ template:
          {% else %} off {% endif %}
         icon: mdi:calendar-multiple-check
 
+switch:
+  - platform: template
+    switches:
+     wc_auto_flush:
+       friendly_name: 'WC Auto Flush'
+#       value_template: "{{ states('input_boolean.ac_lr_unit') }}"
+       turn_on:
+         - service: remote.send_command
+           data:
+             entity_id: remote.rm32_remote
+             device: Toilet
+             command: auto flush enable
+       turn_off:
+         - service: remote.send_command
+           data:
+             entity_id: remote.rm32_remote
+             device: Toilet
+             command: auto flush disable
+
+#       icon_template: 
+
+
+
 script:
   toilet_seat_low_heat:
     sequence:

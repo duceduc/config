@@ -131,49 +131,6 @@ rest:
         device_class: humidity
 
 
-# Tomorrowio Pollen Count
-#  - resource: !secret tomorrowio_pollen_api
-#    scan_interval: 1800
-#    sensor:
-    ### Pollen - Tree Index
-#      - name: "Pollen - Tree Index - Day 0"
-#        value_template: "{{ value_json.data.timelines[0].intervals[0]['values']['treeIndex'] }}"
-#        json_attributes_path: "$.data.timelines[0].intervals[0].values"
-#        json_attributes:
-#          - grassIndex
-#          - weedIndex
-#          - temperature
-#      - name: "Pollen - Tree Index - Day 1"
-#        value_template: "{{ value_json.data.timelines[0].intervals[1]['values']['treeIndex'] }}"
-#        json_attributes_path: "$.data.timelines[0].intervals[1].values"
-#        json_attributes:
-#          - grassIndex
-#          - weedIndex
-#          - temperature
-#      - name: "Pollen - Tree Index - Day 2"
-#        value_template: "{{ value_json.data.timelines[0].intervals[2]['values']['treeIndex'] }}"
-#        json_attributes_path: "$.data.timelines[0].intervals[2].values"
-#        json_attributes:
-#          - grassIndex
-#          - weedIndex
-#          - temperature
-#      - name: "Pollen - Tree Index - Day 3"
-#        value_template: "{{ value_json.data.timelines[0].intervals[3]['values']['treeIndex'] }}"
-#        json_attributes_path: "$.data.timelines[0].intervals[3].values"
-#        json_attributes:
-#          - grassIndex
-#          - weedIndex
-#          - temperature
-#      - name: "Pollen - Tree Index - Day 4"
-#        value_template: "{{ value_json.data.timelines[0].intervals[4]['values']['treeIndex'] }}"
-#        json_attributes_path: "$.data.timelines[0].intervals[4].values"
-#        json_attributes:
-#          - grassIndex
-#          - weedIndex
-#          - temperature
-
-
-
 #########################################################
 #
 #             Integration

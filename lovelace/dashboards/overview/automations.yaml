@@ -230,6 +230,7 @@ cards:
             icon: mdi:thermometer-plus
             secondary_info: last-triggered
 
+
       - type: entities
         title: Automation Modes
         show_header_toggle: false
