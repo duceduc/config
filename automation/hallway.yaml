@@ -94,6 +94,30 @@
             brightness: 200
 
 
+
+#########################################################
+#
+#             Genkan Airfreshener
+#
+#########################################################
+
+- alias: 'genkan Airfreshener auto-on' # spray after 1 hr past last sprayed
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.genkan_door_contact
+      from: 'off'
+      to: 'on'
+  conditions:
+    - condition: template
+      value_template: >- 
+        {%- set trig = (now() - states.switch.gk_airfreshener.last_changed).seconds -%}
+            {{ trig >= 3600 }}
+  actions:
+    - action: switch.turn_on
+      entity_id: switch.gk_airfreshener
+
+
+
 #########################################################
 #
 #             Turn on Genkan For Eri During Workdays

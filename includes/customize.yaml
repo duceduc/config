@@ -117,6 +117,7 @@ switch.flush_small:
 switch.flush_big:
   friendly_name: Flush Big
 
+
 switch.heat_water:
   friendly_name: Heat Toilet Water
 

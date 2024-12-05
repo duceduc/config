@@ -161,9 +161,6 @@
         call_appointments: 1
 
 
-
-
-
 - alias: Appointment Reminder Tomorrow
   triggers:
     - trigger: state
@@ -232,7 +229,7 @@
                 {{ person }}, will be home in about 5 minutes.
         - action: light.turn_on
           data:
-            entity_id: light.h_1
+            entity_id: light.g_1
             brightness: 200
         - action: input_boolean.turn_off
           data:
