@@ -223,7 +223,7 @@ cards:
         entities:
           - entity: switch.wc_auto_flush
             icon: mdi:toilet
-            secondary_info: last-triggered
+#            secondary_info: last-triggered
 
           - entity: automation.enable_toilet_seat_heater_upon_arrival
             name: Turn On Toilet Seat Heat Upon Arrival
@@ -233,7 +233,6 @@ cards:
             name: Adjust Toilet Seat Temperature
             icon: mdi:thermometer-plus
             secondary_info: last-triggered
-
 
 
 

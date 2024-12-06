@@ -32,10 +32,8 @@
         type: module
       - url: /local/custom_ui/mini-graph-card-bundle.js?v=0.11
         type: module
-      - url: /local/custom_ui/lunar-phase-card.js?v=1.0.0
-        type: module
 
-      - url: /local/custom_ui/streamline-card.js?v=2
+      - url: /local/custom_ui/streamline-card.js?v=3
         type: module
 
       - url: /local/custom_ui/button-card.js

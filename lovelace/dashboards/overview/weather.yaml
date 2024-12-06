@@ -155,13 +155,6 @@ cards:
               ha-card {
               }
 
-      - type: custom:lunar-phase-card
-        entity: sensor.tokyo_moon_phase
-        use_default: false
-        show_background: true
-        compact_view: false
-
-
 ####################################################
 #                                                                                                    
 #          END OF CONFIGURATION FILE                                                   
