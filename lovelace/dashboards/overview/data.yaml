@@ -516,12 +516,8 @@ cards:
 
                 type: 'custom:fold-entity-row'
               - entities:
-                  - entity: sensor.motion_security_battery
-                    name: Front Door Security Monitor
-                  - entity: sensor.motion_c1_battery
-                    name: Master Closet
-                  - entity: sensor.motion_s1_battery
-                    name: Pantry Room
+                  - entity: sensor.washer_battery
+                    name: Washer Water Leak
                 head:
                   label: Door Sensors
                   type: section
@@ -533,8 +529,7 @@ cards:
                     name: Rain Gauge
                   - entity: sensor.dish_cabinet_battery
                     name: Dish Cabinet
-                  - entity: sensor.washer_battery
-                    name: Washer Water Leak
+
                 head:
                   label: Devices
                   type: section
