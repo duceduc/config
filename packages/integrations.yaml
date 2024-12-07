@@ -13,16 +13,17 @@
 # Find Amazon dot name
 # https://alexa.amazon.com/api/devices-v2/device
 # reaunthenicate issue - enter random string and hit submit to refresh visable captacha.
-alexa_media:
-  accounts:
-    - email: !secret amazon_duc
-      password: !secret amazon_duc_pass
-      url: amazon.com
-      include_devices:
-        - Ai.1
-        - Ai.2
-        - Ai.3
-        - Ai.4
+#alexa_media: # Ported to Integration UI
+#  accounts:
+#    - email: !secret amazon_duc
+#      password: !secret amazon_duc_pass
+#      url: amazon.com
+#      include_devices:
+#        - Ai.1
+#        - Ai.2
+#        - Ai.3
+#        - Ai.4
+
 #    - email: !secret amazon_eri
 #      password: !secret amazon_eri_pass
 #      url: amazon.co.jp
