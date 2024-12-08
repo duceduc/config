@@ -22,7 +22,7 @@
     payload_off: 0
 
   - name: mrs status
-    unique_id: ae266003-3371-4fee-8fa7-c5a3a714feb5
+    unique_id: fabf5b3e-e083-46d2-ab2d-88d00332fc57
     state_topic: house/system_monitor/servers/mediaroomsatellite/status
     json_attributes_topic: house/system_monitor/servers/mediaroomsatellite/git_update
     device_class: connectivity

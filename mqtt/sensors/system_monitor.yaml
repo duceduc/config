@@ -44,81 +44,101 @@
     unit_of_measurement: '%'
 
   - name: mediaroomsatellite cpu usage
+    unique_id: 5222da0c-be68-45fb-ac3b-bec4b735885c
     state_topic: "house/system_monitor/servers/mediaroomsatellite/cpu_load"
     unit_of_measurement: '%'
   - name: mediaroomsatellite temperature
+    unique_id: a8a587fc-e823-4374-96d2-0a69d02123e5
     state_topic: "house/system_monitor/servers/mediaroomsatellite/cpu_temp"
     unit_of_measurement: "°C" 
   - name: mediaroomsatellite disk use
+    unique_id: 7598a1eb-4cc0-49b7-ab8e-15948ccb1e5a
     state_topic: "house/system_monitor/servers/mediaroomsatellite/used_space"
     unit_of_measurement: '%'
   - name: mediaroomsatellite memory use
+    unique_id: f7aba200-3d2e-48d5-89b2-7f6f62e4d390
     state_topic: "house/system_monitor/servers/mediaroomsatellite/memory"
     unit_of_measurement: '%'
 
 ###
-#  - name: rearsatellite cpu usage
-#    state_topic: "house/system_monitor/servers/rearsatellite/cpu_load"
-#    unit_of_measurement: '%'
-    
-#  - name: rearsatellite temperature
-#    state_topic: "house/system_monitor/servers/rearsatellite/cpu_temp"
-#    unit_of_measurement: "°C"
-
-#  - name: rearsatellite disk use
-#    state_topic: "house/system_monitor/servers/rearsatellite/used_space"
-#    unit_of_measurement: '%'
-    
-#  - name: rearsatellite memory use
-#    state_topic: "house/system_monitor/servers/rearsatellite/memory"
-#    unit_of_measurement: '%'
+  - name: rearsatellite cpu usage
+    unique_id: dcc1c4cf-844d-425d-ad96-1545448f56c4
+    state_topic: "house/system_monitor/servers/rearsatellite/cpu_load"
+    unit_of_measurement: '%'
+  - name: rearsatellite temperature
+    unique_id: a39322e1-041f-4bcb-81db-e8ee7b31c9ad
+    state_topic: "house/system_monitor/servers/rearsatellite/cpu_temp"
+    unit_of_measurement: "°C"
+  - name: rearsatellite disk use
+    unique_id: 693ea04b-be31-453c-ae14-963ce14683ba
+    state_topic: "house/system_monitor/servers/rearsatellite/used_space"
+    unit_of_measurement: '%'
+  - name: rearsatellite memory use
+    unique_id: b9f1ef13-ea62-4000-b23e-55b017b87e58
+    state_topic: "house/system_monitor/servers/rearsatellite/memory"
+    unit_of_measurement: '%'
 
 # Monitor Presense
   - name: ms1 cpu usage
+    unique_id: d5e376b6-5383-40f9-a93e-49f824a5326c
     state_topic: "house/system_monitor/servers/ms1/cpu_load"
     unit_of_measurement: '%'
   - name: ms1 temperature
+    unique_id: 7f7ab989-fd81-4c23-afa6-e382ee2b026d
     state_topic: "house/system_monitor/servers/ms1/cpu_temp"
     unit_of_measurement: "°C"
   - name: ms1 disk use
+    unique_id: 6ec46d64-bb56-4062-8b5b-974fc6c8f780
     state_topic: "house/system_monitor/servers/ms1/used_space"
     unit_of_measurement: '%'
   - name: ms1 memory use
+    unique_id: 085a3e87-83db-4566-b4d2-0778be044cf5
     state_topic: "house/system_monitor/servers/ms1/memory"
     unit_of_measurement: '%'
   - name: ms1 wifi strength
+    unique_id: 81b42044-dc88-4779-bc7f-18fa3f49a16f
     state_topic: "house/system_monitor/servers/ms1/wifi_signal_dbm"
     unit_of_measurement: 'dBm'
 
   - name: ms2 cpu usage
+    unique_id: 3376bf8a-6e9e-47f5-8267-0672d052e308
     state_topic: "house/system_monitor/servers/ms2/cpu_load"
     unit_of_measurement: '%'
   - name: ms2 temperature
+    unique_id: a7dbaffd-14df-4fbd-8205-2c8d8ab35c03
     state_topic: "house/system_monitor/servers/ms2/cpu_temp"
     unit_of_measurement: "°C"
   - name: ms2 disk use
+    unique_id: c6971784-28d0-425f-adbe-22e9226d6418
     state_topic: "house/system_monitor/servers/ms2/used_space"
     unit_of_measurement: '%'
   - name: ms2 memory use
+    unique_id: 8746669a-780a-4da1-afba-7b885d47ec43
     state_topic: "house/system_monitor/servers/ms2/memory"
     unit_of_measurement: '%'
   - name: ms2 wifi strength
+    unique_id: 326f26d5-6a49-4857-8e27-60395849852a
     state_topic: "house/system_monitor/servers/ms2/wifi_signal_dbm"
     unit_of_measurement: 'dBm' 
  
   - name: ms3 cpu usage
+    unique_id: 9534f9fa-8556-4c83-b22b-4831393117da
     state_topic: "house/system_monitor/servers/ms3/cpu_load"
     unit_of_measurement: '%'
   - name: ms3 temperature
+    unique_id: 97ef25c8-42a5-46b6-9914-783069e15e1c
     state_topic: "house/system_monitor/servers/ms3/cpu_temp"
     unit_of_measurement: "°C"
   - name: ms3 disk use
+    unique_id: a1c93fb8-02bb-4600-9ad6-df82feda0991
     state_topic: "house/system_monitor/servers/ms3/used_space"
     unit_of_measurement: '%'
   - name: ms3 memory use
+    unique_id: 47eb2112-541f-4b42-abd5-9f235d288098
     state_topic: "house/system_monitor/servers/ms3/memory"
     unit_of_measurement: '%'
   - name: ms3 wifi strength
+    unique_id: f8d92b2d-65d6-4ec0-a50c-d4823aced37b
     state_topic: "house/system_monitor/servers/ms3/wifi_signal_dbm"
     unit_of_measurement: 'dBm'
 

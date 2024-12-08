@@ -116,6 +116,10 @@ switch.flush_small:
   friendly_name: Flush Small
 switch.flush_big:
   friendly_name: Flush Big
+switch.gk_airfreshener:
+  friendly_name: Closet Airfreshener
+switch.wc_airfreshener:
+  friendly_name: Toilet Airfreshener
 
 
 switch.heat_water:
