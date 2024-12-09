@@ -9,7 +9,7 @@ automation:
   - alias: 'BPM Record Log'
     triggers:
       - trigger: state
-        entity_id: sensor.withings_systolic_blood_pressure
+        entity_id: sensor.withings_systolic_blood_pressure, sensor.withings_heart_pulse
     actions:
       - action: script.text_notify
         data:
