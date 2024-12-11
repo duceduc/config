@@ -101,7 +101,7 @@
 #
 #########################################################
 
-- alias: 'genkan Airfreshener auto-on' # spray after 1 hr past last sprayed
+- alias: 'Genkan Airfreshener auto-on' # spray after 1 hr past last sprayed
   triggers:
     - trigger: state
       entity_id: binary_sensor.genkan_door_contact
