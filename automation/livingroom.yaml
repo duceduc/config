@@ -8,7 +8,7 @@
   triggers:
     - trigger: numeric_state
       entity_id: sensor.lr_radar_illuminance
-      above: 0.29
+      above: 0.31
       below: 0.41
   conditions:
     - condition: or
@@ -46,7 +46,7 @@
     - trigger: numeric_state
       entity_id: sensor.lr_radar_illuminance
       id: 'pre'
-      above: 0.29
+      above: 0.31
       below: 0.41
     - trigger: state
       entity_id: sensor.period_of_the_day
