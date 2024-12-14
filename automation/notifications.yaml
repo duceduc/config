@@ -146,7 +146,7 @@
   triggers:
     - trigger: state
       entity_id:
-       - sensor.deliveryin2week
+        - sensor.deliveryin2week
   conditions:
     - condition: template
       value_template: "{{ states('sensor.deliveryin2week') != 'unknown' }}"

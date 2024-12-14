@@ -29,6 +29,38 @@
     payload_on: 1
     payload_off: 0
 
+  - name: rrs status
+    unique_id: 94bc23b1-d241-4d17-bf43-029516108a47
+    state_topic: house/system_monitor/servers/rearsatellite/status
+    json_attributes_topic: house/system_monitor/servers/rearsatellite/git_update
+    device_class: connectivity
+    payload_on: 1
+    payload_off: 0
+
+  - name: ms1 status
+    unique_id: 3aff8358-847d-4d98-8028-8e2e717c0e51
+    state_topic: house/system_monitor/servers/ms1/status
+    json_attributes_topic: house/system_monitor/servers/ms1/git_update
+    device_class: connectivity
+    payload_on: 1
+    payload_off: 0
+
+  - name: ms2 status
+    unique_id: 968c6748-0744-4712-ba53-46f34895a922
+    state_topic: house/system_monitor/servers/ms2/status
+    json_attributes_topic: house/system_monitor/servers/ms2/git_update
+    device_class: connectivity
+    payload_on: 1
+    payload_off: 0
+
+  - name: ms3 status
+    unique_id: e145f63c-b37c-49f1-80dc-3800f01e225f
+    state_topic: house/system_monitor/servers/ms3/status
+    json_attributes_topic: house/system_monitor/servers/ms3/git_update
+    device_class: connectivity
+    payload_on: 1
+    payload_off: 0
+
 
 ####################################################
 #                                                                                                    

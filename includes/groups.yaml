@@ -29,7 +29,6 @@
 
   family_presence:
     name: Family Presence
-    icon: mdi:home
     entities:
       - binary_sensor.duc_presence
       - binary_sensor.eri_presence
@@ -106,11 +105,6 @@
 #      - binary_sensor.motion_washroom_sensor_occupancy
 #      - binary_sensor.motion_sink_sensor_occupancy
 
-# CAN DELETE???
-#  hallway_motion:
-#    - binary_sensor.genkan_moving_target
-#    - binary_sensor.motion_g1_occupancy
-
   motion_genkan_occupancy:
     - binary_sensor.genkan_moving_target
 
@@ -128,6 +122,17 @@
     - binary_sensor.lr_moving_target
     - binary_sensor.mr_moving_target
     - binary_sensor.sr_moving_target
+
+  server_status:
+    all: true
+    entities:  
+      - binary_sensor.ngx_status
+      - binary_sensor.ser_status
+      - binary_sensor.mrs_status
+      - binary_sensor.rrs_status
+      - binary_sensor.ms1_status
+      - binary_sensor.ms2_status
+      - binary_sensor.ms3_status
 
 #########################################################
 #

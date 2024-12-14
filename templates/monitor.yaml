@@ -28,6 +28,31 @@
             mdi:battery-alert
           {% endif %}
 
+####################################################
+#                                                                                                    
+#                      SERVER MONITOR                                                     
+#                                                                                                    
+####################################################
+
+  - sensor:
+      - name: Server Status
+        unique_id: eaa5f24c-8708-467b-b139-a1108f59d2e7
+        state: >-
+          {% if expand('group.server_status') | selectattr('state', 'eq', 'off') | list | count >= 1 %}
+            {% set sensor = expand('group.server_status') | selectattr('state', 'eq', 'off') | sort(attribute='last_changed') | last %}
+              {% if sensor.name == sensor.name %}
+                {{ sensor.name }}
+              {% endif %}
+          {% else %}
+            on
+          {% endif %}
+        icon: >-
+          {% if is_state('sensor.server_status', 'on') %}
+            mdi:server-network
+          {% else %}
+            mdi:server-network-off
+          {% endif %}
+
 
 
 ####################################################
