@@ -6,22 +6,42 @@
 ###############################################################################
 
 automation:
-  - alias: 'BPM Record Log'
+  - alias: 'BPM Record Log Duc'
     triggers:
       - trigger: state
-        entity_id: sensor.withings_systolic_blood_pressure, sensor.withings_heart_pulse
+        entity_id: sensor.duc_withings_systolic_blood_pressure, sensor.duc_withings_diastolic_blood_pressure
     actions:
       - action: script.text_notify
         data:
           who: amber
           title: 'BP Readings:'
           message: >
-            {% set t = as_timestamp(states.sensor.withings_systolic_blood_pressure.last_changed) | timestamp_custom('%-I:%M %p') %}
-            Your last BP reading was {{ states('sensor.withings_systolic_blood_pressure') }}/{{ states('sensor.withings_diastolic_blood_pressure') }} taking at {{ t }}.
+            {% set t = as_timestamp(states.sensor.duc_withings_systolic_blood_pressure.last_changed) | timestamp_custom('%-I:%M %p') %}
+            Your last BP reading was {{ states('sensor.duc_withings_systolic_blood_pressure') }}/{{ states('sensor.duc_withings_diastolic_blood_pressure') }} taking at {{ t }}.
 
       - action: notify.send_message
         target:
-          entity_id: notify.bpm_log
+          entity_id: notify.bpm_log_duc
         data:
-          message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.withings_heart_pulse') }},{{ states('sensor.withings_systolic_blood_pressure') }},/,{{ states('sensor.withings_diastolic_blood_pressure') }}"
+          message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.duc_withings_heart_pulse') }},{{ states('sensor.duc_withings_systolic_blood_pressure') }},/,{{ states('sensor.duc_withings_diastolic_blood_pressure') }}"
 
+
+automation:
+  - alias: 'Weight Record Log Duc'
+    triggers:
+      - trigger: state
+        entity_id: sensor.duc_withings_weight, sensor.duc_withings_fat_ratio
+    actions:
+      - action: script.text_notify
+        data:
+          who: amber
+          title: 'Today\`s Weight:'
+          message: >
+            {% set t = as_timestamp(states.sensor.duc_withings_weight.last_changed) | timestamp_custom('%-I:%M %p') %}
+            Your weight recorded at {{ t }} is {{ states('sensor.duc_withings_weight') }}.
+
+      - action: notify.send_message
+        target:
+          entity_id: notify.weight_log_duc
+        data:
+          message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.duc_withings_bone_mass') }},{{ states('sensor.duc_withings_fat_free_mass') }},{{ states('sensor.duc_withings_fat_mass')}},{{ states('sensor.duc_withings_fat_ratio')}},{{ states('sensor.duc_withings_heart_pulse')}},{{ states('sensor.duc_withings_muscle_mass')}},{{ states('sensor.duc_withings_weight') }}"

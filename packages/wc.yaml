@@ -44,7 +44,6 @@ switch:
               entity_id: remote.rm32_remote
               device: Toilet
               command: auto flush disable
-
 #       icon_template: 
 
 
@@ -154,7 +153,7 @@ automation:
                 entity_id: input_boolean.engage_toilet_airfreshener
         default:
           - action: light.turn_on
-            entity_id: light.wc
+            entity_id: light.wc_1
           - action: homeassistant.turn_on
             entity_id: input_boolean.engage_toilet_airfreshener
 
