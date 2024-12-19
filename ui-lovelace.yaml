@@ -59,7 +59,6 @@ streamline_templates:
             name: '[[name_3]]'
             icon: mdi:thermometer-lines
 
-
 # rooms.yaml
   three_sensors_tpl:
     card:
@@ -149,7 +148,6 @@ streamline_templates:
           type: entities
 
 
-
 # data.yaml
   four_sensors_tpl:
     card:
@@ -212,6 +210,38 @@ streamline_templates:
           - entity: '[[entity_4]]'
             name: CPU Temperature
             icon: mdi:thermometer
+
+# data.yaml
+  server_exc_tpl:
+    card:
+        type: entities
+        title_javascript: "states['[[entity_1]]'].state === 'unavailable' ? 'rear sate' : 'desktop';"
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_44]]' : '[[entity_4]]';"
+          detail: 3
+        entities:
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_11]]' : '[[entity_1]]';"
+            name: Memory Use
+            icon: mdi:memory
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_22]]' : '[[entity_2]]';"
+            name: Disk Use
+            icon: mdi:harddisk
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_33]]' : '[[entity_3]]';"
+            name: Processor Use
+            icon: mdi:memory
+          - type: divider
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_44]]' : '[[entity_4]]';"
+            name: CPU Temperature
+            icon: mdi:thermometer
+
+
+
+
+
+
+
 
 # data.yaml
   person_card:

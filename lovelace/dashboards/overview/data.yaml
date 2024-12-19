@@ -288,62 +288,6 @@ cards:
           - entity_3: sensor.ngx_cpu_usage
           - entity_4: sensor.ngx_temperature
 
-      - type: custom:streamline-card
-        template: server_tpl
-        variables:
-          - title: media
-          - entity_1: sensor.mediaroomsatellite_memory_use
-          - entity_2: sensor.mediaroomsatellite_disk_use
-          - entity_3: sensor.mediaroomsatellite_cpu_usage
-          - entity_4: sensor.mediaroomsatellite_temperature
-
-
-      # Hide if PC is off
-      - type: entities
-        title: desktop
-        show_header_toggle: false
-        footer:
-          type: graph
-          entity: sensor.pc_temperature
-          detail: 3
-        entities:
-          - entity: sensor.desktop_3l5pa48_memoryusage
-            name: Memory Use
-            icon: mdi:memory
-          - entity: sensor.desktop_3l5pa48_storage_c_gb
-            name: Disk Usage
-            icon: mdi:harddisk
-          - entity: sensor.desktop_3l5pa48_cputemperature
-            name: CPU Temperature
-            icon: mdi:thermometer
-          - type: divider
-          - entity: sensor.pc_temperature
-            name: Ambient Temperature
-            icon: mdi:thermometer-lines
-
-      - type: entities
-        title: Internet
-        show_header_toggle: false
-        footer:
-          type: graph
-          entity: sensor.speedtest_ping
-          detail: 3
-        entities:
-          - entity: sensor.speedtest_download
-            name: Download
-            icon: mdi:speedometer
-          - entity: sensor.speedtest_upload
-            name: Upload
-            icon: mdi:speedometer
-          - entity: sensor.speedtest_download_average
-            name: Download Average
-            icon: mdi:cloud-download
-          - type: divider
-          - entity: sensor.speedtest_ping
-            name: Ping
-            icon: mdi:access-point
-
-    ###################
 
       - type: entities
         title: Server Load
@@ -374,6 +318,78 @@ cards:
           - entity: sensor.ha_cpu_temperature
             name: CPU Temperature
             icon: mdi:thermometer
+
+      - type: custom:streamline-card
+        template: server_exc_tpl
+        variables:
+          - entity_1: sensor.desktop_3l5pa48_memoryusage
+          - entity_2: sensor.desktop_3l5pa48_storage_c_gb
+          - entity_3: sensor.desktop_3l5pa48_cpuload
+          - entity_4: sensor.desktop_3l5pa48_cputemperature
+          - entity_11: sensor.rearsatellite_memory_use
+          - entity_22: sensor.rearsatellite_disk_use
+          - entity_33: sensor.rearsatellite_cpu_usage
+          - entity_44: sensor.rearsatellite_temperature
+
+      - type: custom:streamline-card
+        template: server_tpl
+        variables:
+          - title: media sate
+          - entity_1: sensor.mediaroomsatellite_memory_use
+          - entity_2: sensor.mediaroomsatellite_disk_use
+          - entity_3: sensor.mediaroomsatellite_cpu_usage
+          - entity_4: sensor.mediaroomsatellite_temperature
+
+
+      # Hide if PC is off
+#      - type: entities
+#        title: desktop
+#        show_header_toggle: false
+#        footer:
+#          type: graph
+#          entity: sensor.pc_temperature
+#          detail: 3
+#        entities:
+#          - entity: sensor.desktop_3l5pa48_memoryusage
+#            name: Memory Use
+#            icon: mdi:memory
+#          - entity: sensor.desktop_3l5pa48_storage_c_gb
+#            name: Disk Usage
+#            icon: mdi:harddisk
+#          - entity: sensor.desktop_3l5pa48_cputemperature
+#            name: CPU Temperature
+#            icon: mdi:thermometer
+#          - type: divider
+#          - entity: sensor.pc_temperature
+#            name: Ambient Temperature
+#            icon: mdi:thermometer-lines
+
+
+      - type: entities
+        title: Internet
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity: sensor.speedtest_ping
+          detail: 3
+        entities:
+          - entity: sensor.speedtest_download
+            name: Download
+            icon: mdi:speedometer
+          - entity: sensor.speedtest_upload
+            name: Upload
+            icon: mdi:speedometer
+          - entity: sensor.speedtest_download_average
+            name: Download Average
+            icon: mdi:cloud-download
+          - type: divider
+          - entity: sensor.speedtest_ping
+            name: Ping
+            icon: mdi:access-point
+
+    ###################
+
+
 
       - type: vertical-stack
         cards:

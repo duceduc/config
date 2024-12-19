@@ -25,8 +25,6 @@ automation:
         data:
           message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.duc_withings_heart_pulse') }},{{ states('sensor.duc_withings_systolic_blood_pressure') }},/,{{ states('sensor.duc_withings_diastolic_blood_pressure') }}"
 
-
-automation:
   - alias: 'Weight Record Log Duc'
     triggers:
       - trigger: state
