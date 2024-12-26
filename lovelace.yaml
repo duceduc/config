@@ -57,8 +57,8 @@
         type: css
       - url: https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap # for lcars
         type: css
-      - url: /local/community/lcars.jsv=1
-        type: js
+#      - url: /local/community/lcars.jsv=1
+#        type: js
 
 #########################################################
 #

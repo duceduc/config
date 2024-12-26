@@ -111,16 +111,18 @@
 ####################################################
 
   - platform: rest
+    unique_id: 2735664c-1798-4ec7-a421-a87208f75ee7
     name: Christmas Countdown
     resource: !secret wolframalpha_xmas_api
-    value_template: "{{ (value|replace(' days', '')) | int }}"
+    value_template: "{{ (value|replace(' days', '')) | int + 1 }}" # +1 to adjust for the country timezone
     unit_of_measurement: Days
     scan_interval: 43200
 
   - platform: rest
+    unique_id: 1478ae4b-d907-405d-8a8e-4bab94e3ab0e
     name: Halloween Countdown
     resource: !secret wolframalpha_halloween_api
-    value_template: "{{ (value|replace(' days', '')) | int }}"
+    value_template: "{{ (value|replace(' days', '')) | int + 1 }}" # +1 to adjust for the country timezone
     unit_of_measurement: Days
     scan_interval: 43200
 
