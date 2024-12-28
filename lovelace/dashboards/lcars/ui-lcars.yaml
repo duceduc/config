@@ -1,0 +1,26 @@
+####################################################
+#                                                                                                    
+#                    LOVELACE LCARS Bridge                                                        
+#                                                                                                    
+####################################################
+
+custom_header:
+  compact_mode: true
+  button_text:
+    options: '{{ hours12LZ }}:{{ minutesLZ }}'
+  hide_help: true
+  hide_config: true
+  shadow: on
+  chevrons: false
+views:
+  - !include demo.yaml
+  - !include sun.yaml
+  - !include log.yaml
+
+
+
+####################################################
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
+####################################################
