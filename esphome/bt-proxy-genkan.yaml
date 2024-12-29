@@ -1,0 +1,12 @@
+# [08:B6:1F:C0:EC:40]
+substitutions:
+  name: bt-proxy-genkan
+
+<<: !include .base.yaml 
+<<: !include .base.sensors.yaml 
+
+packages:
+  esphome.bluetooth-proxy: github://esphome/firmware/bluetooth-proxy/esp32-generic.yaml@main
+
+esphome:
+  name: $name
