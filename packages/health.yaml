@@ -42,4 +42,4 @@ automation:
         target:
           entity_id: notify.weight_log_duc
         data:
-          message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.duc_withings_bone_mass') }},{{ states('sensor.duc_withings_fat_free_mass') }},{{ states('sensor.duc_withings_fat_mass')}},{{ states('sensor.duc_withings_fat_ratio')}},{{ states('sensor.duc_withings_heart_pulse')}},{{ states('sensor.duc_withings_muscle_mass')}},{{ states('sensor.duc_withings_weight') }}"
+          message: "{{ states('sensor.date') }},{{ states('sensor.time') }},{{ states('sensor.duc_withings_bone_mass') }},{{ states('sensor.duc_withings_fat_free_mass') }},{{ states('sensor.duc_withings_fat_mass')}},{{ states('sensor.duc_withings_fat_ratio')}},{{ states('sensor.duc_withings_heart_pulse')}},{{ states('sensor.duc_withings_hydration') }},{{ states('sensor.duc_withings_muscle_mass')}},{{ states('sensor.duc_withings_visceral_fat_index') }},{{ states('sensor.duc_withings_weight') }}"

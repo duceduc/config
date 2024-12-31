@@ -10,3 +10,15 @@ packages:
 
 esphome:
   name: $name
+  friendly_name: $name
+  name_add_mac_suffix: false
+
+
+#wifi:
+#  ssid: !secret ssid
+#  password: !secret ssid_pwd
+#  fast_connect : true
+#  manual_ip:
+#    static_ip: 192.168.1.199
+#    subnet: 255.255.255.0
+#    gateway: 192.168.1.1
