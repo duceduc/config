@@ -33,7 +33,6 @@ automation:
                 entity_id: input_boolean.eri_unlock_door
 
 
-
   - alias: Telegram - Notification Auto Unlock Door Enabled
     triggers:
       - trigger: state
@@ -76,9 +75,8 @@ automation:
                   inline_keyboard: []
               - action:  input_boolean.turn_off
                 data:
-                  entity_id: input_boolean.{{ 'eri' if is_state('input_boolean.eri_unlock_door', 'on') else 'duc' }}_unlock_door
+                  entity_id: input_boolean.{{ 'duc' if is_state('input_boolean.duc_unlock_door', 'on') else 'eri' }}_unlock_door
         default: []
-
 
 
   - alias: Auto Unlock Door
@@ -92,13 +90,12 @@ automation:
       - choose:
           - conditions:
               - condition: template # duc
-                value_template: "{{ is_state('input_boolean.duc_unlock_door', 'on') }}"
-              - condition: template
-                value_template: "{{ is_state('device_tracker.id', 'home') and is_state('device_tracker.duc_bermuda_bermuda_tracker', 'home') }}"
+                value_template: "{{ is_state('input_boolean.duc_unlock_door', 'on') and is_state('device_tracker.id', 'home') }}"
               - condition: template
                 value_template: >- 
                   {%- set trig = (now() - states.device_tracker.duc_bermuda_bermuda_tracker.last_changed).seconds -%}
-                    {{ trig <= 60 }}     
+                    {{ is_state('device_tracker.duc_bermuda_bermuda_tracker', 'home') and trig <= 60 }}
+
               - condition: template
                 value_template: "{{ is_state('lock.lock_pro_8d0a', 'locked') }}"
             sequence:
@@ -109,13 +106,12 @@ automation:
 
           - conditions:
               - condition: template # eri
-                value_template: "{{ is_state('input_boolean.eri_unlock_door', 'on') }}"
-              - condition: template
-                value_template: "{{ is_state('device_tracker.ie', 'home') and is_state('device_tracker.eri_bermuda_bermuda_tracker', 'home') }}"
+                value_template: "{{ is_state('input_boolean.eri_unlock_door', 'on') and is_state('device_tracker.ie', 'home') }}"
               - condition: template
                 value_template: >- 
                   {%- set trig = (now() - states.device_tracker.eri_bermuda_bermuda_tracker.last_changed).seconds -%}
-                    {{ trig <= 60 }}     
+                    {{ is_state('device_tracker.eri_bermuda_bermuda_tracker', 'home') and trig <= 60 }}
+
               - condition: template
                 value_template: "{{ is_state('lock.lock_pro_8d0a', 'locked') }}"
             sequence:
@@ -123,47 +119,6 @@ automation:
                 entity_id: lock.lock_pro_8d0a
               - action: input_boolean.turn_off
                 entity_id: input_boolean.eri_unlock_door
-
-
-
-
-
-
-
-
-
-#  - alias: Door Lock Automation
-#    triggers:
-#      - trigger: state
-#        entity_id: binary_sensor.entrance_moving_target
-#        from: 'off'
-#        to: 'on'
-#    conditions:
-#      - condition: template
-#        value_template: "{{ is_state('device_tracker.id', 'home') and is_state('device_tracker.duc_bermuda_bermuda_tracker', 'home') }}"
-#        value_template: >- 
-#          {%- set trig = (now() - states.device_tracker.duc_bermuda_bermuda_tracker.last_changed).seconds -%}
-#            {{ trig <= 60 }}     
-#      - condition: template
-#        value_template: "{{ is_state('lock.lock_pro_8d0a', 'locked') }}"
-
-#    actions:
-#      - action: lock.open
-#        entity_id: lock.lock_pro_8d0a
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
