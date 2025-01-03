@@ -82,7 +82,7 @@ automation:
   - alias: Auto Unlock Door
     triggers:
       - trigger: state
-        entity_id: binary_sensor.entrance_moving_target
+        entity_id: binary_sensor.entrance_moving_target, binary_sensor.entrance_presence
         from: 'off'
         to: 'on'
     conditions: []

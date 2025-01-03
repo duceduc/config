@@ -138,6 +138,8 @@ cards:
             name: iPhone8
           - entity: switch.ipad
             name: iPad
+          - entity: switch.meta
+            name: Meta
           - entity: input_boolean.disable_motion_lights
             name: Disable Motion Lights
 
