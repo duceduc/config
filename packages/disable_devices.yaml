@@ -48,8 +48,8 @@ command_line:
 
   - switch:
       name: meta # combine portainer & pihole switch
-      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.184 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable' && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Meta-Whitelist disable'"
-      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.184 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable' && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Meta-Whitelist enable'"
+      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.184 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Meta-NoAccess enable' && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Meta-Whitelist disable'"
+      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.184 && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Meta-NoAccess disable' && ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Meta-Whitelist enable'"
       command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.184"
       value_template: '{{ value == "1" }}'
 
