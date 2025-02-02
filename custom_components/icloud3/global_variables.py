@@ -94,7 +94,10 @@ class GlobalVariables(object):
     HALogger            = None
     iC3Logger           = None
     iC3Logger_last_check_exist_secs = 0
+    log_file_filter_items = []  # items to be filtered from the log file (passwords, etc)
+    log_file_hide_items = []  # email extensions filter from apple accounts to remove in the icloud3-0.log file (messaging.py)
     prestartup_log      = ''
+    disable_log_filter  = False
 
     iC3EntityPlatform   = None    # iCloud3 Entity Platform (homeassistant.helpers.entity_component)
     PyiCloud            = None    # iCloud Account service
@@ -146,6 +149,7 @@ class GlobalVariables(object):
     Devices_by_icloud_device_id       = {}  # Devices by the icloud device_id receive from Apple
     Devices_by_ha_device_id           = {}  # Device by the device_id in the entity/device registry
     Devices_by_mobapp_dname           = {}  # All verified Devices by the  conf_mobapp_dname
+    inactive_fname_by_devicename      = {}  # Devices with tracking_mode=inactive
 
     # PyiCloud objects by various categories
     conf_usernames                    = set()  # List of Apple Acct usernames in config
@@ -153,14 +157,16 @@ class GlobalVariables(object):
     owner_device_ids_by_username      = {}  # List of owner info for Devices in Apple Acct
     owner_Devices_by_username         = {}  # List of Devices in the owner Apple Acct (excludes those in the iCloud list)
     username_valid_by_username        = {}  # The username/password validation status
-    
+
+    internet_connection_error_secs    = 0       # Time https connection error received
+    internet_connection_error         = False   # Set in PyiCloud_session from an http connection error. Shuts down all PyiCloud requests
     PyiCloud_by_devicename            = {}  # PyiCloud object for each ic3 devicename
     PyiCloud_by_username              = {}  # PyiCloud object for each Apple acct username
     PyiCloud_password_by_username     = {}  # Password for each Apple acct username
     PyiCloud_logging_in_usernames     = []  # A list of usernames that are currently logging in. Used to prevent another login
     usernames_setup_error_retry_list  = []  # A list of usernames that failed to set up in Stage 4 and need to be retried
     devicenames_setup_error_retry_list= []  # A list of devices that failed to set up in Stage 4 and need to be retried
-    log_file_filter                   = []  # email extensions filter from apple accounts to remove in the icloud3-0.log file (messaging.py)
+
 
     # iCloud Device information - These is used verify the device, display on the EvLog and in the Config Flow
     # device selection list on the iCloud3 Devices screen
@@ -232,7 +238,7 @@ class GlobalVariables(object):
     evlog_version                     = ''  # EvLog version reported back from the EvLog via the event_log_version svc call
 
     # System Wide variables control iCloud3 start/restart procedures
-    polling_5_sec_loop_running      = False     # Indicates the 5-sec polling loop is set up
+    ic3_timer_events_are_setup      = False     # Indicates the 5-sec polling loop is set up
     initial_icloud3_loading_flag    = True
     start_icloud3_inprocess_flag    = True
     restart_icloud3_request_flag    = False     # iC3 needs to be restarted

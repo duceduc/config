@@ -20,27 +20,18 @@ used by iCloud3.
 '''
 
 from ..global_variables     import GlobalVariables as Gb
-# from ..const                import ()
 from ..helpers.common       import (instr, is_empty, isnot_empty, list_add, list_del, )
 from ..helpers.file_io      import (save_json_file, )
-from ..helpers.time_util    import (time_now,  )
+from ..helpers.time_util    import (time_now,  time_now_secs, )
 from ..helpers.messaging    import (_log, _evlog,
                                     log_info_msg, log_error_msg, log_debug_msg, log_warning_msg,
                                     log_rawdata, log_exception, log_rawdata_unfiltered, filter_data_dict, )
-#from ..support              import pyicloud_srp as srp
 
-# from uuid       import uuid1
 from requests   import Session, adapters
 from os         import path
-# from re         import match
-# import hashlib
-# import srp
-# import base64
 import inspect
 import json
-import http.cookiejar as cookielib
-import logging
-LOGGER = logging.getLogger(f"icloud3.pyicloud_ic3")
+# import http.cookiejar as cookielib
 
 HEADER_DATA = {
     "X-Apple-ID-Account-Country": "account_country",
@@ -122,30 +113,6 @@ app specific password notes
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #
-#   LOG FILE PASSWORD FILTER
-#
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-class PyiCloudPasswordFilter(logging.Filter):
-    '''Password log hider.'''
-
-    def __init__(self, password):
-        super(PyiCloudPasswordFilter, self).__init__(password)
-        self.filter_disabled_msg_displayed = False
-
-    def filter(self, record):
-        # if self.filter_disabled_msg_displayed is False:
-        #     self.filter_disabled_msg_displayed = True
-        #     _log('PASSWORD FILTER DISABLED')
-        # return True
-        message = record.getMessage()
-        if self.name in message:
-            record.msg = message.replace(self.name, "*" * 8)
-            record.args = []
-
-        return True
-
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#
 #   PYICLOUD SESSION
 #
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -176,13 +143,11 @@ class PyiCloudSession(Session):
         # callee.function and callee.lineno provice calling function and the line number
         callee = inspect.stack()[2]
         module = inspect.getmodule(callee[0])
-        request_logger = logging.getLogger(module.__name__).getChild("http")
+
+        if Gb.internet_connection_error:
+            return {}
 
         try:
-            if (self.validate_aa_upw is False
-                    and self.PyiCloud.password_filter not in request_logger.filters):
-                request_logger.addFilter(self.PyiCloud.password_filter)
-
             # if data is a str, unconvert it from json format,
             # it will be reconverted  to json later
             if 'data' in kwargs and type(kwargs['data']) is str:
@@ -193,7 +158,7 @@ class PyiCloudSession(Session):
             if Gb.log_rawdata_flag or log_rawdata_flag or Gb.initial_icloud3_loading_flag:
                 try:
                     log_hdr = ( f"{self.PyiCloud.username_base}, {method}, Request, "
-                                f"{callee.function}/{callee.lineno}")
+                                f"{callee.function}/{callee.lineno} ▲")
                     log_data = {'url': url[8:], 'retry': kwargs.get("retry_cnt", 0)}
                     log_data.update(kwargs)
                     log_rawdata(log_hdr, log_data, log_rawdata_flag=log_rawdata_flag)
@@ -212,34 +177,52 @@ class PyiCloudSession(Session):
 
         try:
             response = None
+
             #++++++++++++++++ REQUEST ICLOUD DATA ++++++++++++++++
 
             response = Session.request(self, method, url, **kwargs)
 
+            try:
+                data = response.json()
+
+            except Exception as err:
+                # log_exception(err)
+                data = {}
+
             #++++++++++++++++ REQUEST ICLOUD DATA +++++++++++++++
 
-        except ConnectionError as err:
-            self.PyiCloud.connection_error_retry_cnt += 1
-            # log_exception(err)
-            self._raise_error(503, f"{HTTP_RESPONSE_CODES[503]}")
-            if response is None:
-                return
+            test_err = 'connection'
+            # if a == b:
+            #     c = True
 
         except Exception as err:
             # log_exception(err)
-            self._raise_error(-2, f"Other Error Setting up iCloud Server Connection ({err})")
-            if response is None:
-                return
+
+            # Connection Error Message:
+            # "HTTPSConnectionPool(host='setup.icloud.com', port=443):
+            # Max retries exceeded with url: /setup/ws/1/accountLogin?clientBuildNumber=2021Project52
+            # &clientMasteringNumber=2021B29&ckjsBuildVersion=17DProjectDev77
+            # &clientId=3f97e836-b581-11ef-8115-2ccf674e40a8
+            # (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f832a9940>:
+            # Failed to establish a new connection: [Errno -3] Try again'))"
+
+            # if instr(err, 'connection') or instr(test_err, 'connection'):
+            if instr(str(err), 'connection'):
+                log_error_msg("iCloud3 encountered an error connecting to the Internet, Home Assistant is Offline > HTTPSConnectionPool Error: Failed to establish a new connection: [Errno -3]")
+
+                Gb.internet_connection_error = True
+                # Gb.internet_connection_error_secs = time_now_secs()
+
+                self.response_code = -3
+                self.PyiCloud.response_code = -3
+                self.response_ok = False
+                return {}
+
+            self._raise_error(-3, f"Error setting up iCloud Server Connection ({err})")
+            return {}
 
         content_type = response.headers.get("Content-Type", "").split(";")[0]
         json_mimetypes = ["application/json", "text/json"]
-
-        try:
-            data = response.json()
-
-        except Exception as err:
-            # log_exception(err)
-            data = {}
 
         self.response_code = response.status_code
         self.PyiCloud.response_code = response.status_code
@@ -248,7 +231,7 @@ class PyiCloudSession(Session):
         log_rawdata_flag = (url.endswith('refreshClient') is False) or response.status_code != 200
         if Gb.log_rawdata_flag or log_rawdata_flag or Gb.initial_icloud3_loading_flag:
             log_hdr = ( f"{self.PyiCloud.username_base}, {method}, Response, "
-                        f"{callee.function}/{callee.lineno} ")
+                        f"{callee.function}/{callee.lineno} ▼")
             log_data = {'code': response.status_code, 'ok': response.ok, 'data': data}
 
             if retry_cnt >= 2 or Gb.log_rawdata_flag_unfiltered:
@@ -319,27 +302,30 @@ class PyiCloudSession(Session):
                     error_code, error_reason = self._resolve_error_code_reason(data)
 
                     self._raise_error(response.status_code, error_reason)
+
         except Exception as err:
             log_exception(err)
 
         if content_type not in json_mimetypes:
-            return response
+            # return response
+            return data
 
-        try:
-            data = response.json()
+        # try:
+        #     data = response.json()
 
-        except:
-            if not response.ok:
-                msg = (f"Error handling data returned from iCloud, {response}")
-                request_logger.warning(msg)
-            return response
+        # except:
+        #     if not response.ok:
+        #         msg = (f"Error handling data returned from iCloud, {response}")
+        #         request_logger.warning(msg)
+        #     return response
 
         error_code, error_reason = self._resolve_error_code_reason(data)
 
         if error_reason:
             self._raise_error(error_code, error_reason)
 
-        return response
+        # return response
+        return data
 
 #------------------------------------------------------------------
     @staticmethod
@@ -455,7 +441,6 @@ class PyiCloudSession(Session):
             if 'a' in prefiltered_data:
                 filtered_data['a'] = self._shrink(prefiltered_data['a'])
 
-            # filtered_dict = prefiltered_dict.copy()
             filtered_dict['data'] = filtered_data
 
             return filtered_dict
