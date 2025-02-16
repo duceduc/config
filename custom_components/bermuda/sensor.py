@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import RestoreSensor, SensorEntity
 from homeassistant.components.sensor.const import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
@@ -58,6 +58,7 @@ async def async_setup_entry(
             entities.append(BermudaSensorRange(coordinator, entry, address))
             entities.append(BermudaSensorScanner(coordinator, entry, address))
             entities.append(BermudaSensorRssi(coordinator, entry, address))
+            entities.append(BermudaSensorAreaLastSeen(coordinator, entry, address))
 
             for scanner in scanners:
                 entities.append(BermudaSensorScannerRange(coordinator, entry, address, scanner))
@@ -141,8 +142,8 @@ class BermudaSensor(BermudaEntity, SensorEntity):
             ADDR_TYPE_IBEACON,
             ADDR_TYPE_PRIVATE_BLE_DEVICE,
         ]:
-            if len(self._device.beacon_sources) > 0:
-                current_mac = self._device.beacon_sources[0]
+            if len(self._device.metadevice_sources) > 0:
+                current_mac = self._device.metadevice_sources[0]
             else:
                 current_mac = STATE_UNAVAILABLE
 
@@ -317,6 +318,29 @@ class BermudaSensorScannerRangeRaw(BermudaSensorScannerRange):
         if distance is not None:
             return round(distance, 3)
         return None
+
+
+class BermudaSensorAreaLastSeen(BermudaSensor, RestoreSensor):
+    """Sensor for name of last seen area."""
+
+    @property
+    def unique_id(self):
+        return f"{self._device.unique_id}_area_last_seen"
+
+    @property
+    def name(self):
+        return "Area Last Seen"
+
+    @property
+    def native_value(self):
+        return self._device.area_last_seen
+
+    async def async_added_to_hass(self) -> None:
+        """Restore last saved value before adding to HASS."""
+        await super().async_added_to_hass()
+        if (sensor_data := await self.async_get_last_sensor_data()) is not None:
+            self._attr_native_value = str(sensor_data.native_value)
+            self._device.area_last_seen = str(sensor_data.native_value)
 
 
 class BermudaGlobalSensor(BermudaGlobalEntity, SensorEntity):
