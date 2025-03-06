@@ -82,17 +82,17 @@ script:
           id: spray_motor
           speed: 80 #80
           direction: forward
-      - delay: 500ms
+      - delay: 500ms #500
       - fan.hbridge.brake: spray_motor
       - fan.turn_on:
           id: spray_motor
           speed: 80 #80
           direction: reverse
-      - delay: 330ms
+      - delay: 330ms #330
       - fan.hbridge.brake: spray_motor
       - fan.turn_off:
           id: spray_motor
-      - delay: 500ms
+      - delay: 500ms #500
       - switch.turn_off: sw_spray
 
 

@@ -14,7 +14,7 @@ packages:
 
 esphome:
   name: $name
-  platform: esp8266
+esp8266:
   board: d1_mini
 
 uart:
