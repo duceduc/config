@@ -3,19 +3,20 @@ from homeassistant.helpers          import (selector, entity_registry as er, dev
                                             area_registry as ar,)
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-import pyotp
+# import pyotp
 import time
 from datetime           import datetime
 
 from .global_variables  import GlobalVariables as Gb
 from .const             import (RED_ALERT, LINK, RLINK, RARROW,
-                                IPHONE, IPAD, WATCH, AIRPODS, ICLOUD, OTHER,
+                                IPHONE, IPAD, WATCH, AIRPODS, ICLOUD, OTHER, HOME, NONE,
                                 DEVICE_TYPE_FNAME, DEVICE_TYPE_FNAMES, MOBAPP, NO_MOBAPP,
                                 INACTIVE_DEVICE, HOME_DISTANCE,
                                 PICTURE_WWW_STANDARD_DIRS, CONF_PICTURE_WWW_DIRS,
                                 CONF_EVLOG_CARD_DIRECTORY, CONF_EVLOG_BTNCONFIG_URL,
                                 CONF_APPLE_ACCOUNT, CONF_USERNAME, CONF_PASSWORD, CONF_LOCATE_ALL, CONF_TOTP_KEY,
                                 CONF_DATA_SOURCE, CONF_VERIFICATION_CODE,
+                                CONF_SERVER_LOCATION, CONF_SERVER_LOCATION_NEEDED,
                                 CONF_TRACK_FROM_ZONES, CONF_LOG_ZONES,
                                 CONF_TRACK_FROM_BASE_ZONE_USED, CONF_TRACK_FROM_BASE_ZONE, CONF_TRACK_FROM_HOME_ZONE,
                                 CONF_PICTURE, CONF_ICON, CONF_DEVICE_TYPE, CONF_INZONE_INTERVALS,
@@ -29,7 +30,7 @@ from .const             import (RED_ALERT, LINK, RLINK, RARROW,
                                 CONF_DISTANCE_BETWEEN_DEVICES,
                                 CONF_WAZE_USED, CONF_WAZE_SERVER, CONF_WAZE_MAX_DISTANCE, CONF_WAZE_MIN_DISTANCE,
                                 CONF_WAZE_REALTIME, CONF_WAZE_HISTORY_DATABASE_USED, CONF_WAZE_HISTORY_MAX_DISTANCE,
-                                CONF_WAZE_HISTORY_TRACK_DIRECTION,  
+                                CONF_WAZE_HISTORY_TRACK_DIRECTION,
                                 CONF_STAT_ZONE_FNAME, CONF_STAT_ZONE_STILL_TIME, CONF_STAT_ZONE_INZONE_INTERVAL,
                                 CONF_DISPLAY_TEXT_AS,
                                 CONF_IC3_DEVICENAME, CONF_FNAME, CONF_FAMSHR_DEVICENAME, CONF_MOBILE_APP_DEVICE,
@@ -226,11 +227,12 @@ def form_data_source(self):
     self.actions_list = []
     self.actions_list.extend(APPLE_ACCOUNT_ACTIONS)
     self.actions_list.extend(ACTION_LIST_ITEMS_BASE)
-    if self.username != '' and self.password != '' and instr(self.data_source, ICLOUD) is False:
-        self.errors['base'] = 'icloud_acct_data_source_warning'
 
     default_action = self.actions_list_default if self.actions_list_default else 'save'
     self.actions_list_default = ''
+
+    mobile_app_used_default = [MOBILE_APP_USED_HEADER] if instr(Gb.conf_tracking[CONF_DATA_SOURCE], MOBAPP) else []
+    apple_acct_used_default = [APPLE_ACCT_USED_HEADER] if instr(Gb.conf_tracking[CONF_DATA_SOURCE], ICLOUD) else []
 
     # Build list of all apple accts
     self.apple_acct_items_list= [apple_acct_item
@@ -248,15 +250,22 @@ def form_data_source(self):
     if default_item not in self.apple_acct_items_displayed:
         default_item = self.apple_acct_items_displayed[0]
 
-    if is_empty(Gb.devicenames_x_mobapp_dnames):
-        mobapp_interface.get_mobile_app_integration_device_info()
-    if is_empty(Gb.devicenames_x_mobapp_dnames):
-        self.errors['data_source_mobapp'] = 'mobile_app_error'
+    if instr(Gb.conf_tracking[CONF_DATA_SOURCE], MOBAPP):
+        if is_empty(Gb.devicenames_x_mobapp_dnames):
+            mobapp_interface.get_mobile_app_integration_device_info()
+        # if is_empty(Gb.devicenames_x_mobapp_dnames):
+        #     self.errors['data_source_mobapp'] = 'mobile_app_error'
 
     return vol.Schema({
-        vol.Optional('data_source',
-                    default=Gb.conf_tracking[CONF_DATA_SOURCE].replace(' ', '').split(',')):
-                    cv.multi_select(DATA_SOURCE_OPTIONS),
+        vol.Optional('data_source_mobapp',
+                    default=mobile_app_used_default):
+                    cv.multi_select([MOBILE_APP_USED_HEADER]),
+        # vol.Optional('data_source',
+        #             default=Gb.conf_tracking[CONF_DATA_SOURCE].replace(' ', '').split(',')):
+        #             cv.multi_select(DATA_SOURCE_OPTIONS),
+        vol.Optional('data_source_apple_acct',
+                    default=apple_acct_used_default):
+                    cv.multi_select([APPLE_ACCT_USED_HEADER]),
         vol.Optional('apple_accts',
                     default=default_item):
                     selector.SelectSelector(selector.SelectSelectorConfig(
@@ -307,8 +316,6 @@ def form_update_apple_acct(self):
     else:
         password_selector = selector.TextSelector(selector.TextSelectorConfig(type='password'))
 
-    url_suffix_china = (Gb.icloud_server_endpoint_suffix == 'cn')
-
     if (self.add_apple_acct_flag is False
             and username not in Gb.PyiCloud_by_username):
         self.errors['base'] = 'icloud_acct_not_logged_into'
@@ -333,19 +340,21 @@ def form_update_apple_acct(self):
         # vol.Optional(CONF_TOTP_KEY,
         #             default='For future use in supporting hardware keys (YubiKey)'):
         #             selector.TextSelector(),
-        vol.Optional('locate_all',
-                    default=locate_all):
-                    cv.boolean,
+
         })
 
-    if self.aa_idx == 0:
+    if Gb.country_code in ['cn', 'hk'] or Gb.conf_tracking[CONF_SERVER_LOCATION_NEEDED]:
         schema.update({
-            vol.Optional('url_suffix_china',
-                    default=url_suffix_china):
-                    cv.boolean,
+            vol.Required(CONF_SERVER_LOCATION,
+                    default=self._option_parm_to_text(CONF_SERVER_LOCATION, APPLE_SERVER_LOCATION_OPTIONS)):
+                    selector.SelectSelector(selector.SelectSelectorConfig(
+                        options=dict_value_to_list(APPLE_SERVER_LOCATION_OPTIONS), mode='dropdown')),
         })
 
     schema.update({
+        vol.Optional('locate_all',
+                    default=locate_all):
+                    cv.boolean,
         vol.Required('action_items',
                     default=self.action_default_text('save_log_into_apple_acct')):
                     selector.SelectSelector(selector.SelectSelectorConfig(
@@ -610,24 +619,35 @@ def form_add_device(self):
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def form_update_device(self):
 
+    # Build Other Tracking Parameters values text
+    log_zones_fnames = [zone_dname(zone) for zone in self.conf_device[CONF_LOG_ZONES] if zone.startswith('name') is False]
+    tfz_fnames = [zone_dname(zone) for zone in self.conf_device[CONF_TRACK_FROM_ZONES]]
+    device_type_fname = DEVICE_TYPE_FNAME(self._parm_or_device(CONF_DEVICE_TYPE))
+    otp_msg =  (f"Type ({device_type_fname}), "
+                f"inZoneInterval ({format_timer(self.conf_device[CONF_INZONE_INTERVAL]*60)})")
+    otp_msg += ", FixedInterval"
+    if self.conf_device[CONF_FIXED_INTERVAL] > 0:
+        otp_msg += f" ({format_timer(self.conf_device[CONF_FIXED_INTERVAL]*60)})"
+    otp_msg += ", LogZones"
+    if self.conf_device[CONF_LOG_ZONES] != [NONE]:
+        otp_msg += f" ({list_to_str(log_zones_fnames)})"
+    otp_msg += ", TrackFromZone"
+    if self.conf_device[CONF_TRACK_FROM_ZONES] != [HOME]:
+        otp_msg += f" ({list_to_str(tfz_fnames)})"
+    otp_msg += ", PrimaryTrackFromZone"
+    if self.conf_device[CONF_TRACK_FROM_BASE_ZONE] != HOME:
+        otp_msg += f" ({zone_dname(self.conf_device[CONF_TRACK_FROM_BASE_ZONE])})"
+    otp_action_item = ACTION_LIST_OPTIONS[
+                'update_other_device_parameters'].replace('^otp_msg', otp_msg)
+
     error_key = ''
     self.errors = self.errors or {}
     self.actions_list = []
+    self.actions_list.append(otp_action_item)
     self.actions_list.append(ACTION_LIST_OPTIONS['save'])
     self.actions_list.append(ACTION_LIST_OPTIONS['cancel_goto_menu'])
     self.actions_list.append(ACTION_LIST_OPTIONS['cancel_goto_select_device'])
 
-    # Display Advanced Tracking Parameters
-    log_zones_fnames = [zone_dname(zone) for zone in self.conf_device[CONF_LOG_ZONES] if zone.startswith('Name') is False]
-    tfz_fnames = [zone_dname(zone) for zone in self.conf_device[CONF_TRACK_FROM_ZONES]]
-    device_type_fname = DEVICE_TYPE_FNAME(self._parm_or_device(CONF_DEVICE_TYPE))
-    RARELY_UPDATED_PARMS_HEADER = ( f"DeviceType ({device_type_fname}), "
-                                    f"inZoneInterval ({format_timer(self.conf_device[CONF_INZONE_INTERVAL]*60)}), "
-                                    f"FixedInterval ({format_timer(self.conf_device[CONF_FIXED_INTERVAL]*60)}), "
-                                    f"LogFromZones ({list_to_str(log_zones_fnames)}), "
-                                    f"Track-from-Zone ({list_to_str(tfz_fnames)}), "
-                                    f"PrimaryTrackFromZone ({zone_dname(self.conf_device[CONF_TRACK_FROM_BASE_ZONE])})")
-    atp_default  = [RARELY_UPDATED_PARMS_HEADER] if self.display_rarely_updated_parms else []
 
     devicename    = self._parm_or_device(CONF_IC3_DEVICENAME)
     icloud3_fname = self._parm_or_device(CONF_FNAME) or ' '
@@ -716,23 +736,85 @@ def form_update_device(self):
                         options=dict_value_to_list(TRACKING_MODE_OPTIONS), mode='dropdown')),
         })
 
-    if self.display_rarely_updated_parms is False:
-        schema.update({
-            vol.Optional(RARELY_UPDATED_PARMS,
-                    default=atp_default):
-                    cv.multi_select([RARELY_UPDATED_PARMS_HEADER]),
-            })
+    # if self.display_rarely_updated_parms is False:
+    #     schema.update({
+    #         vol.Optional(RARELY_UPDATED_PARMS,
+    #                 default=atp_default):
+    #                 cv.multi_select([RARELY_UPDATED_PARMS_HEADER]),
+    #         })
 
-    if self.display_rarely_updated_parms:
-        device_type_fname = DEVICE_TYPE_FNAME(self._parm_or_device(CONF_DEVICE_TYPE))
-        schema.update({
+    # if self.display_rarely_updated_parms:
+    #     device_type_fname = DEVICE_TYPE_FNAME(self._parm_or_device(CONF_DEVICE_TYPE))
+    #     schema.update({
+    #         vol.Required(CONF_DEVICE_TYPE,
+    #                 default=self._option_parm_to_text(CONF_DEVICE_TYPE, DEVICE_TYPE_FNAMES)):
+    #                 selector.SelectSelector(selector.SelectSelectorConfig(
+    #                     options=dict_value_to_list(DEVICE_TYPE_FNAMES), mode='dropdown')),
+    #         vol.Required(CONF_INZONE_INTERVAL,
+    #                 default=self.conf_device[CONF_INZONE_INTERVAL]):
+    #                 # default=self._parm_or_device(CONF_INZONE_INTERVAL)):
+    #                 selector.NumberSelector(selector.NumberSelectorConfig(
+    #                     min=5, max=480, step=5, unit_of_measurement='minutes')),
+    #         vol.Required(CONF_FIXED_INTERVAL,
+    #                 default=self.conf_device[CONF_FIXED_INTERVAL]):
+    #                 selector.NumberSelector(selector.NumberSelectorConfig(
+    #                     min=0, max=480, step=5, unit_of_measurement='minutes')),
+    #         vol.Optional(CONF_LOG_ZONES,
+    #                 default=self._parm_or_device(CONF_LOG_ZONES)):
+    #                 cv.multi_select(six_item_dict(log_zones_key_text)),
+    #         vol.Required(CONF_TRACK_FROM_ZONES,
+    #                 default=self._parm_or_device(CONF_TRACK_FROM_ZONES)):
+    #                 cv.multi_select(six_item_dict(self.zone_name_key_text)),
+    #                 #cv.multi_select(self.zone_name_key_text),
+    #         vol.Required(CONF_TRACK_FROM_BASE_ZONE,
+    #                 default=self._option_parm_to_text(CONF_TRACK_FROM_BASE_ZONE,
+    #                                             self.zone_name_key_text, conf_device=True)):
+    #                 selector.SelectSelector(selector.SelectSelectorConfig(
+    #                     options=dict_value_to_list(self.zone_name_key_text), mode='dropdown')),
+    #     })
+
+    schema.update({
+        vol.Required('action_items',
+                default=self.action_default_text('save')):
+                selector.SelectSelector(selector.SelectSelectorConfig(
+                    options=self.actions_list, mode='list')),
+    })
+
+    return vol.Schema(schema)
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#            UPDATE OTHER DEVICE PARAMETERS
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+def form_update_other_device_parameters(self):
+
+    # Display Advanced Tracking Parameters
+    # log_zones_fnames = [zone_dname(zone) for zone in self.conf_device[CONF_LOG_ZONES] if zone.startswith('Name') is False]
+    # tfz_fnames = [zone_dname(zone) for zone in self.conf_device[CONF_TRACK_FROM_ZONES]]
+    # device_type_fname = DEVICE_TYPE_FNAME(self._parm_or_device(CONF_DEVICE_TYPE))
+    # RARELY_UPDATED_PARMS_HEADER = ( f"DeviceType ({device_type_fname}), "
+    #                                 f"inZoneInterval ({format_timer(self.conf_device[CONF_INZONE_INTERVAL]*60)}), "
+    #                                 f"FixedInterval ({format_timer(self.conf_device[CONF_FIXED_INTERVAL]*60)}), "
+    #                                 f"LogFromZones ({list_to_str(log_zones_fnames)}), "
+    #                                 f"Track-from-Zone ({list_to_str(tfz_fnames)}), "
+    #                                 f"PrimaryTrackFromZone ({zone_dname(self.conf_device[CONF_TRACK_FROM_BASE_ZONE])})")
+    # atp_default  = [RARELY_UPDATED_PARMS_HEADER] if self.display_rarely_updated_parms else []
+
+    self.actions_list = []
+    self.actions_list.append(ACTION_LIST_OPTIONS['save'])
+    self.actions_list.append(ACTION_LIST_OPTIONS['cancel_goto_previous'])
+
+    log_zones_key_text = {'none': 'None'}
+    log_zones_key_text.update(self.zone_name_key_text)
+    log_zones_key_text.update(LOG_ZONES_KEY_TEXT)
+
+    device_type_fname = DEVICE_TYPE_FNAME(self._parm_or_device(CONF_DEVICE_TYPE))
+    return vol.Schema({
             vol.Required(CONF_DEVICE_TYPE,
                     default=self._option_parm_to_text(CONF_DEVICE_TYPE, DEVICE_TYPE_FNAMES)):
                     selector.SelectSelector(selector.SelectSelectorConfig(
                         options=dict_value_to_list(DEVICE_TYPE_FNAMES), mode='dropdown')),
             vol.Required(CONF_INZONE_INTERVAL,
                     default=self.conf_device[CONF_INZONE_INTERVAL]):
-                    # default=self._parm_or_device(CONF_INZONE_INTERVAL)):
                     selector.NumberSelector(selector.NumberSelectorConfig(
                         min=5, max=480, step=5, unit_of_measurement='minutes')),
             vol.Required(CONF_FIXED_INTERVAL,
@@ -745,44 +827,37 @@ def form_update_device(self):
             vol.Required(CONF_TRACK_FROM_ZONES,
                     default=self._parm_or_device(CONF_TRACK_FROM_ZONES)):
                     cv.multi_select(six_item_dict(self.zone_name_key_text)),
-                    #cv.multi_select(self.zone_name_key_text),
             vol.Required(CONF_TRACK_FROM_BASE_ZONE,
                     default=self._option_parm_to_text(CONF_TRACK_FROM_BASE_ZONE,
                                                 self.zone_name_key_text, conf_device=True)):
                     selector.SelectSelector(selector.SelectSelectorConfig(
                         options=dict_value_to_list(self.zone_name_key_text), mode='dropdown')),
+
+        vol.Required('action_items',
+                    default=self.action_default_text('save')):
+                    selector.SelectSelector(selector.SelectSelectorConfig(
+                        options=self.actions_list, mode='list')),
         })
 
-    schema.update({
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#           DASHBOARD BUILDER
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+def form_dashboard_builder(self):
+    self.actions_list = ACTION_LIST_ITEMS_BASE.copy()
+    action_default = 'cancel_goto_menu'
+
+
+    return vol.Schema({
+        # vol.Optional('under_construction',
+        #             default='Under Construction'):
+        #             cv.multi_select(['Under Construction']),
         vol.Required('action_items',
-                default=self.action_default_text('save')):
-                selector.SelectSelector(selector.SelectSelectorConfig(
-                    options=self.actions_list, mode='list')),
-    })
+                    default=self.action_default_text(action_default)):
+                    selector.SelectSelector(
+                        selector.SelectSelectorConfig(options=self.actions_list, mode='list')),
+        })
 
-    return vol.Schema(schema)
-
-
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#           DELETE DEVICE
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# def form_delete_device(self):
-#     self.actions_list = DEVICE_DELETE_ACTIONS.copy()
-#     device_text = ( f"{self.conf_device[CONF_FNAME]} "
-#                     f"({self.conf_device[CONF_IC3_DEVICENAME]})")
-#     device_selected = self.device_items_list[self.conf_device_idx]
-
-#     # The first item is 'Delete this device, add the selected device's info
-#     return vol.Schema({
-#         vol.Required('device_selected',
-#                     default=device_selected):
-#                     selector.SelectSelector(selector.SelectSelectorConfig(
-#                         options=[device_selected], mode='list')),
-#         vol.Required('action_items',
-#                     default=self.action_default_text('delete_device_cancel')):
-#                     selector.SelectSelector(
-#                         selector.SelectSelectorConfig(options=self.actions_list, mode='list')),
-#         })
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #           TOOLS
@@ -931,6 +1006,10 @@ def form_format_settings(self):
                     cv.multi_select(six_item_list(self.www_directory_list)),
         vol.Required(CONF_DISPLAY_GPS_LAT_LONG,
                     default=Gb.conf_general[CONF_DISPLAY_GPS_LAT_LONG]):
+                    # cv.boolean,
+                    selector.BooleanSelector(),
+        vol.Required(CONF_SERVER_LOCATION_NEEDED,
+                    default=Gb.conf_tracking[CONF_SERVER_LOCATION_NEEDED]):
                     # cv.boolean,
                     selector.BooleanSelector(),
 

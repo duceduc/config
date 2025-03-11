@@ -23,7 +23,7 @@ from ..global_variables     import GlobalVariables as Gb
 from ..helpers.common       import (instr, is_empty, isnot_empty, list_add, list_del, )
 from ..helpers.file_io      import (save_json_file, )
 from ..helpers.time_util    import (time_now,  time_now_secs, secs_to_time, format_time_age, )
-from ..helpers.messaging    import (_log, _evlog,
+from ..helpers.messaging    import (_log, _evlog, post_error_msg,
                                     log_info_msg, log_error_msg, log_debug_msg, log_warning_msg,
                                     log_rawdata, log_exception, log_rawdata_unfiltered, filter_data_dict, )
 
@@ -201,32 +201,65 @@ class PyiCloudSession(Session):
             Gb.last_PyiCloud_request_secs = 0
             #++++++++++++++++ REQUEST ICLOUD DATA +++++++++++++++
 
+        except (requests.exceptions.SSLError) as err:
+            log_exception(err)
+            post_error_msg( f"iCloud3 Error > An SSL error occurred connecting to Apple Servers, "
+                            f"You may not be authorized access > "
+                            f"iCloudServerSuffix-`{Gb.icloud_server_suffix}`, "
+                            f"Error-{err}")
 
-        except (requests.exceptions.RetryError,
+            Gb.internet_connection_error_msg = err
+            Gb.internet_connection_error_code = self.response_code
+
+            self.response_code = -3
+            self.PyiCloud.response_code = -3
+            self.response_ok = False
+            return {}
+
+        except (requests.exceptions.ChunkedEncodingError,
                 requests.exceptions.ConnectionError,
-                requests.exceptions.HTTPError,
-                requests.exceptions.Timeout,
-                OSError,
-                requests.exceptions.SSLError,
-                requests.exceptions.ProxyError,
                 requests.exceptions.ConnectTimeout,
-                requests.exceptions.ReadTimeout,
-                requests.exceptions.URLRequired,
-                requests.exceptions.TooManyRedirects,
+                requests.exceptions.HTTPError,
                 requests.exceptions.InvalidURL,
                 requests.exceptions.InvalidHeader,
                 requests.exceptions.InvalidProxyURL,
-                requests.exceptions.ChunkedEncodingError,
-                requests.exceptions.StreamConsumedError,
+                requests.exceptions.ProxyError,
+                requests.exceptions.ReadTimeout,
                 requests.exceptions.RetryError,
+                # requests.exceptions.SSLError,
+                requests.exceptions.StreamConsumedError,
+                requests.exceptions.Timeout,
+                requests.exceptions.TooManyRedirects,
                 requests.exceptions.UnrewindableBodyError,
+                requests.exceptions.URLRequired,
+                OSError,
                 ) as err:
 
-            log_error_msg(  f"iCloud3 Error > An error occurred connecting to the Internet, "
+            log_exception(err)
+
+            # Err may be a long message with url parameters and python object info. If so, remove it
+            # Example - HTTPSConnectionPool(host='p123-fmipweb.icloud.com', port=443): Max retries exceeded
+            # with url: /fmipservice/client/web/refreshClient?clientBuildNumber=2021Project52&
+            # clientMasteringNumber=2021B29&ckjsBuildVersion=17DProjectDev77&
+            # clientId=5f2a1a22-ee4b-11ef-a8b2-2ccf674e40a8&dsid=186297810 (Caused by NewConnectionError
+            # ('<urllib3.connection.HTTPSConnection object at 0x7f6458f750>: Failed to establish a new
+            # connection: [Errno -3] Try again'
+            #
+            # Result - HTTPSConnectionPool(host='p123-fmipweb.icloud.com', port=443): Max retries exceeded
+            # with url: /fmipservice/client/web/refreshClient, Failed to establish a new
+            # connection: [Errno -3] Try again'
+            err_msg = str(err)
+            url_parm = err_msg.find('?')    # Beginning of URL parameters
+            obj_end  = err_msg.find('>:')   # End of 'object at 0x...>:
+            if url_parm > 0:
+                err_msg = f"{err_msg[0:url_parm]},{err_msg[obj_end+2:]}" if obj_end > 0 else err_msg[0:url_parm]
+            post_error_msg( f"iCloud3 Error > An error occurred connecting to the Internet, "
                             f"Home Assistant may be Offline > "
-                            f"Error-{err}")
+                            f"Error-{err_msg}")
 
             Gb.internet_connection_error = True
+            Gb.internet_connection_error_msg = err_msg
+            Gb.internet_connection_error_code = self.response_code
 
             self.response_code = -3
             self.PyiCloud.response_code = -3
@@ -366,24 +399,23 @@ class PyiCloudSession(Session):
             Gb.internet_connection_status_waiting_for_response = False
             return True
 
-        except (requests.exceptions.RetryError,
+        except (requests.exceptions.ChunkedEncodingError,
                 requests.exceptions.ConnectionError,
-                requests.exceptions.HTTPError,
-                requests.exceptions.Timeout,
-                OSError,
-                requests.exceptions.SSLError,
-                requests.exceptions.ProxyError,
                 requests.exceptions.ConnectTimeout,
-                requests.exceptions.ReadTimeout,
-                requests.exceptions.URLRequired,
-                requests.exceptions.TooManyRedirects,
+                requests.exceptions.HTTPError,
                 requests.exceptions.InvalidURL,
                 requests.exceptions.InvalidHeader,
                 requests.exceptions.InvalidProxyURL,
-                requests.exceptions.ChunkedEncodingError,
-                requests.exceptions.StreamConsumedError,
+                requests.exceptions.ProxyError,
+                requests.exceptions.ReadTimeout,
                 requests.exceptions.RetryError,
+                requests.exceptions.SSLError,
+                requests.exceptions.StreamConsumedError,
+                requests.exceptions.Timeout,
+                requests.exceptions.TooManyRedirects,
                 requests.exceptions.UnrewindableBodyError,
+                requests.exceptions.URLRequired,
+                OSError,
                 ) as err:
             pass
 

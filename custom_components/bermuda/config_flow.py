@@ -51,7 +51,7 @@ from .const import (
 from .util import rssi_to_metres
 
 if TYPE_CHECKING:
-    from homeassistant.config_entries import ConfigFlowResult
+    from homeassistant.data_entry_flow import FlowResult
 
     from . import BermudaConfigEntry
     from .bermuda_device import BermudaDevice
@@ -72,7 +72,7 @@ class BermudaFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Initialize."""
         self._errors = {}
 
-    async def async_step_bluetooth(self, discovery_info: BluetoothServiceInfoBleak) -> ConfigFlowResult:
+    async def async_step_bluetooth(self, discovery_info: BluetoothServiceInfoBleak) -> FlowResult:
         """
         Support automatic initiation of setup through bluetooth discovery.
         (we still show a confirmation form to the user, though)
@@ -175,8 +175,8 @@ class BermudaOptionsFlowHandler(OptionsFlowWithConfigEntry):
                 status = '<ha-icon icon="mdi:skull-crossbones"></ha-icon>'
 
             scanner_table += (
-                f"| {scanner.get('name', 'NAME_ERR')}| [{scanner.get('address', 'ADDR_ERR')}]"
-                f"| {status} {int(scanner.get('last_stamp_age', DISTANCE_INFINITE)):d} seconds ago.|\n"
+                f"| {scanner.get("name", "NAME_ERR")}| [{scanner.get("address", "ADDR_ERR")}]"
+                f"| {status} {int(scanner.get("last_stamp_age", DISTANCE_INFINITE)):d} seconds ago.|\n"
             )
         messages["status"] += scanner_table
 
@@ -249,7 +249,7 @@ class BermudaOptionsFlowHandler(OptionsFlowWithConfigEntry):
         for device in self.devices.values():
             # Iterate through all the discovered devices to build the options list
 
-            name = device.name
+            name = device.prefname or device.name or ""
 
             if device.is_scanner:
                 # We don't "track" scanner devices, per se
@@ -259,8 +259,8 @@ class BermudaOptionsFlowHandler(OptionsFlowWithConfigEntry):
                 continue
             if device.address_type == ADDR_TYPE_IBEACON:
                 # This is an iBeacon meta-device
-                if len(device.metadevice_sources) > 0:
-                    source_mac = f"[{device.metadevice_sources[0].upper()}]"
+                if len(device.beacon_sources) > 0:
+                    source_mac = f"[{device.beacon_sources[0].upper()}]"
                 else:
                     source_mac = ""
 
@@ -268,7 +268,7 @@ class BermudaOptionsFlowHandler(OptionsFlowWithConfigEntry):
                     SelectOptionDict(
                         value=device.address.upper(),
                         label=f"iBeacon: {device.address.upper()} {source_mac} "
-                        f"{name if device.address.upper() != name.upper() else ''}",
+                        f"{name if device.address.upper() != name.upper() else ""}",
                     )
                 )
                 continue

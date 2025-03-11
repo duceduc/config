@@ -17,7 +17,6 @@ import re
 from homeassistant.components.bluetooth import MONOTONIC_TIME, BluetoothScannerDevice
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME, STATE_UNAVAILABLE
 from homeassistant.helpers.device_registry import format_mac
-from homeassistant.util import slugify
 
 from .bermuda_device_scanner import BermudaDeviceScanner
 from .const import (
@@ -34,7 +33,6 @@ from .const import (
     CONF_DEVICES,
     CONF_DEVTRACK_TIMEOUT,
     DEFAULT_DEVTRACK_TIMEOUT,
-    DOMAIN,
 )
 
 
@@ -52,11 +50,9 @@ class BermudaDevice(dict):
 
     def __init__(self, address, options) -> None:
         """Initial (empty) data."""
-        self.name: str = f"{DOMAIN}_{slugify(address)}"  # "preferred" name built by Bermuda.
-        self.name_bt_serviceinfo: str | None = None  # From serviceinfo.device.name
-        self.name_bt_local_name: str | None = None  # From service_info.advertisement.local_name
-        self.name_devreg: str | None = None  # From device registry, for other integrations like scanners, pble devices
-        self.name_by_user: str | None = None  # Any user-defined (in the HA UI) name discovered for a device.
+        self.name: str | None = None
+        self.local_name: str | None = None
+        self.prefname: str | None = None  # "preferred" name - ideally local_name
         self.address: str = address
         self.ref_power: float = 0  # If non-zero, use in place of global ref_power.
         self.ref_power_changed: float = 0  # Stamp for last change to ref_power, for cache zapping.
@@ -69,13 +65,13 @@ class BermudaDevice(dict):
 
         self.area_distance: float | None = None  # how far this dev is from that area
         self.area_rssi: float | None = None  # rssi from closest scanner
-        self.area_scanner: BermudaDeviceScanner | None = None  # currently closest BermudaScanner
+        self.area_scanner: str | None = None  # name of closest scanner
         self.zone: str = STATE_UNAVAILABLE  # STATE_HOME or STATE_NOT_HOME
         self.manufacturer: str | None = None
         self.connectable: bool = False
         self.is_scanner: bool = False
-        self.metadevice_type: set = set()
-        self.metadevice_sources = []  # list of MAC addresses that have advertised this beacon
+        self.beacon_type: set = set()
+        self.beacon_sources = []  # list of MAC addresses that have advertised this beacon
         self.beacon_unique_id: str | None = None  # combined uuid_major_minor for *really* unique id
         self.beacon_uuid: str | None = None
         self.beacon_major: str | None = None
@@ -116,11 +112,11 @@ class BermudaDevice(dict):
                 if re.match("^[A-Fa-f0-9]{32}_[A-Fa-f0-9]*_[A-Fa-f0-9]*$", self.address):
                     # It's an iBeacon uuid_major_minor
                     self.address_type = ADDR_TYPE_IBEACON
-                    self.metadevice_type.add(BEACON_IBEACON_DEVICE)
+                    self.beacon_type.add(BEACON_IBEACON_DEVICE)
                     self.beacon_unique_id = self.address
                 elif re.match("^[A-Fa-f0-9]{32}$", self.address):
                     # 32-char hex-string is an IRK
-                    self.metadevice_type.add(BEACON_PRIVATE_BLE_DEVICE)
+                    self.beacon_type.add(BEACON_PRIVATE_BLE_DEVICE)
                     self.address_type = ADDR_TYPE_PRIVATE_BLE_DEVICE
                     self.beacon_unique_id = self.address
                 else:
@@ -134,33 +130,6 @@ class BermudaDevice(dict):
                 self.address_type = BDADDR_TYPE_PRIVATE_RESOLVABLE
             else:
                 self.address_type = BDADDR_TYPE_OTHER
-
-    def make_name(self):
-        """
-        Refreshes self.name and returns it, based on naming preferences.
-
-        Will prefer the friendly names sent by bluetooth advert, but will fall back
-        to manufacturer name and bluetooth address.
-        """
-        _newname = (
-            self.name_by_user
-            or self.name_devreg
-            or self.name_bt_local_name
-            or self.name_bt_serviceinfo
-            or self.beacon_unique_id
-        )
-
-        if _newname is not None:
-            self.name = _newname
-        else:
-            # Couldn't find anything nice, we'll have to use the address.
-            if self.manufacturer:
-                _prefix = f"{slugify(self.manufacturer)}"
-            else:
-                _prefix = DOMAIN
-            self.name = f"{_prefix}_{slugify(self.address)}"
-
-        return self.name
 
     def set_ref_power(self, new_ref_power: float):
         """
@@ -200,23 +169,23 @@ class BermudaDevice(dict):
         # FIXME: This might need to check if it's a metadevice source or dest, and
         # ensure things are applied correctly. Might be a non-issue.
         old_area = self.area_name
-        if closest_scanner is not None and closest_scanner.rssi_distance is not None:
+        if closest_scanner is not None:
             # We found a winner
-            self.area_scanner = closest_scanner
             self.area_id = closest_scanner.area_id
             self.area_name = closest_scanner.area_name
             self.area_distance = closest_scanner.rssi_distance
             self.area_rssi = closest_scanner.rssi
+            self.area_scanner = closest_scanner.name
             self.area_last_seen = closest_scanner.area_name
         else:
-            # Not close to any scanners, or closest scanner has timed out!
-            self.area_scanner = None
+            # Not close to any scanners!
             self.area_id = None
             self.area_name = None
             self.area_distance = None
             self.area_rssi = None
-
+            self.area_scanner = None
         if (old_area != self.area_name) and self.create_sensor:
+            # Our area has changed!
             _LOGGER.debug(
                 "Device %s was in '%s', now '%s'",
                 self.name,
@@ -301,4 +270,4 @@ class BermudaDevice(dict):
 
     def __repr__(self) -> str:
         """Help debug devices and figure out what device it is at a glance."""
-        return self.name
+        return self.prefname or self.local_name or self.name or self.address

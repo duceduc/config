@@ -82,8 +82,7 @@ class BermudaDeviceTracker(BermudaEntity, BaseTrackerEntity):
     @property
     def extra_state_attributes(self) -> Mapping[str, Any]:
         """Return extra state attributes for this device."""
-        _scannername = self._device.area_scanner.name if self._device.area_scanner else None
-        return {"scanner": _scannername, "area": self._device.area_name}
+        return {"scanner": self._device.area_scanner, "area": self._device.area_name}
 
     @property
     def state(self) -> str:
