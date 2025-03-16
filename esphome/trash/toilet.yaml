@@ -1,15 +1,16 @@
-# [40:91:51:4F:1B:91]
+
 # https://github.com/CDaxi/esphome-projects/tree/master/airfreshener
 substitutions:
-  name: lr-airfreshener
-  room: Lr
-  counter: Spray counter
-  reset: Reset spray counter
+  name: toilet
+  room: Toilet
+  temp_offset: '0'
+  hum_offset: '0'
 
 packages:
-  airfresh: !include components/airfresh.yaml
+#  bme280: !include components/bme280.yaml
+  aht10: !include components/aht10.yaml
 
-<<: !include .base.yaml
+<<: !include .base.yaml 
 
 esphome:
   name: $name
@@ -17,7 +18,7 @@ esp8266:
   board: d1_mini
 
 uart:
-  #id: uart_0
+  id: uart_1
   tx_pin: TX
   rx_pin: RX
   baud_rate: 256000
@@ -25,10 +26,9 @@ uart:
   stop_bits: 1
 
 i2c:
-  sda: D2 # not used
-  scl: D3
+  sda: D2
+  scl: D1
   scan: true
-#  id: bus_a
 
 ld2410:
   id: ld2410_radar
@@ -39,13 +39,14 @@ status_led:
     inverted: false
 
 sensor:
-  - platform: wifi_signal
-    name: $name wifi signal
-    update_interval: 15s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
+#  - platform: wifi_signal
+#    name: $name wifi signal
+#    update_interval: 15s
+#    filters:
+#      - sliding_window_moving_average:
+#          window_size: 15
+#          send_every: 15
+#          send_first_at: 1
 
   - platform: ld2410
     moving_distance:
@@ -60,8 +61,8 @@ sensor:
       name: $room Detection Distance
 
 binary_sensor:
-  - platform: status
-    name: $name status
+#  - platform: status
+#    name: $name status
 
   - platform: ld2410
     has_target:

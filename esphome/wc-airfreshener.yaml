@@ -10,7 +10,7 @@ packages:
   airfresh: !include components/airfresh.yaml
   bme280: !include components/bme280.yaml
 
-<<: !include .base.yaml 
+<<: !include .base.yaml #.89
 
 esphome:
   name: $name
