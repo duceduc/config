@@ -551,7 +551,8 @@ cards:
                     name: Rain Gauge
                   - entity: sensor.dish_cabinet_battery
                     name: Dish Cabinet
-
+                  - entity: sensor.sr_study_battery
+                    name: Shion Study
                 head:
                   label: Devices
                   type: section

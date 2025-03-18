@@ -32,7 +32,7 @@
         type: module
       - url: /local/custom_ui/mini-graph-card-bundle.js?v=0.11
         type: module
-      - url: /local/custom_ui/streamline-card.js?v=3
+      - url: /local/custom_ui/streamline-card.js?v=4
         type: module
 
       - url: /local/custom_ui/button-card.js
@@ -43,13 +43,13 @@
         type: module
       - url: /local/custom_ui/weather-card.js
         type: module
-      - url: /local/custom_ui/honeycomb-menu.js?v=0.12.3
+      - url: /local/custom_ui/honeycomb-menu.js?v=0.14.7
         type: module
       - url: /local/custom_ui/vertical-stack-in-card.js
         type: js
       - url: /local/custom_ui/floorplan.js
         type: js
-      - url: /local/custom_ui/auto-entities.js?v=1.0.0
+      - url: /local/custom_ui/auto-entities.js?v=1.13
         type: js
 
       - url: /local/custom_ui/ha-lcars-panel.js?v=3

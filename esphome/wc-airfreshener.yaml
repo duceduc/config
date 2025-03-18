@@ -5,12 +5,16 @@ substitutions:
   room: Wc
   counter: Spray counter
   reset: Reset spray counter
+  temp_offset: '0'
+  hum_offset: '0'
+
 
 packages:
-  airfresh: !include components/airfresh.yaml
-  bme280: !include components/bme280.yaml
+#  airfresh: !include components/airfresh.yaml # removed until glade is fixed
+#  bme280: !include components/bme280.yaml
+  aht10: !include components/aht10.yaml
 
-<<: !include .base.yaml #.89
+<<: !include .base.yaml #.89 for original esp board. 
 
 esphome:
   name: $name
@@ -25,9 +29,9 @@ uart:
   parity: NONE
   stop_bits: 1
 
-i2c:
+i2c: # override if component is use
   sda: D2
-  scl: D3
+  scl: D1
   scan: true
 
 ld2410:
@@ -59,7 +63,6 @@ sensor:
       name: $room Still Energy
     detection_distance:
       name: $room Detection Distance
-
 
 binary_sensor:
   - platform: status
