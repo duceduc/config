@@ -40,7 +40,7 @@ ld2410:
 status_led:
   pin:
     number: GPIO2 #ESP8266 OnBroad LED
-    inverted: false
+    inverted: true # false=led on
 
 sensor:
   - platform: wifi_signal

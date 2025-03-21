@@ -21,7 +21,6 @@ template:
          {% else %} off {% endif %}
         icon: mdi:calendar-multiple-check
 
-
 switch:
   - platform: template
     switches:

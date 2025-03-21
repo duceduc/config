@@ -17,7 +17,7 @@
             | rejectattr('entity_id', 'in', ignore_entities)
             | map(attribute='state')
             | reject('in', ['unknown', 'unavailable'])
-            | map('int', -1) | select('le', 46)
+            | map('int', -1) | select('le', 50)
             |select('ge', 0)
             | list | count
           }}

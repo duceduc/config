@@ -7,7 +7,7 @@
   - platform: threshold
     name: Devices with low battery
     entity_id: sensor.devices_with_low_battery
-    upper: 0.5
+    upper: 0.5 # 50%
 
 #  - platform: threshold
 #    name: ms2 updates
