@@ -140,7 +140,7 @@ automation:
                 entity_id: light.wc
           - conditions:
               - condition: trigger
-                id: 'air_' # DISABLED. NOT WORKING
+                id: 'air' # ENABLED. NOT WORKING
             sequence:
               - action: switch.turn_on
                 entity_id: switch.wc_airfreshener

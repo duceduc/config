@@ -1,32 +1,25 @@
+# C4:5B:BE:60:96:28
+# https://github.com/CDaxi/esphome-projects/tree/master/airfreshener
 substitutions:
   name: wc-airfreshener
   room: Wc
-
+  counter: Spray counter
+  reset: Reset spray counter
   temp_offset: '0'
   hum_offset: '0'
-  # Timing Intervals: Adjust to suit your Need/Situation.
-  # NOTE: Values MUST BE in "quotes"
-  interval1: "5"
-  interval2: "15"
-  interval3: "30"
-  interval4: "60"
-  interval5: "120"
-  # Plunger Pulse Duration. Range: 55-170
-  squirt_pulse: "170ms"
-  # Cannister Squirt Capacity
-  maxSquirts: "280" #default 290
+
 
 packages:
-  airfresh: !include components/airfresh-v2.yaml
+#  airfresh: !include components/airfresh.yaml # removed until glade is fixed
+#  bme280: !include components/bme280.yaml
   aht10: !include components/aht10.yaml
 
-<<: !include .base.yaml  
+<<: !include .base.yaml #.89 for original esp board. 
 
 esphome:
   name: $name
 esp8266:
   board: d1_mini
-  restore_from_flash: true
 
 uart:
   id: uart_1
@@ -35,6 +28,11 @@ uart:
   baud_rate: 256000
   parity: NONE
   stop_bits: 1
+
+i2c: # override if component is use
+  sda: D2
+  scl: D1
+  scan: true
 
 ld2410:
   id: ld2410_radar
