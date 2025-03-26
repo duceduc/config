@@ -1,31 +1,30 @@
-# [BC:DD:C2:7A:CC:B4]
-# https://github.com/CDaxi/esphome-projects/tree/master/airfreshener
+
 substitutions:
-  name: "gk-airfreshener"
-  counter: Spray counter
-  reset: Reset spray counter
-#  ssid: !secret ssid3
+  name: gk-airfreshener
+  room: Genkan # use mdf
+
+  temp_offset: '0'
+  hum_offset: '0'
+  # Timing Intervals: Adjust to suit your Need/Situation.
+  # NOTE: Values MUST BE in "quotes"
+  interval1: "5"
+  interval2: "15"
+  interval3: "30"
+  interval4: "60"
+  interval5: "120"
+  # Plunger Pulse Duration. Range: 55-180
+  squirt_pulse: "180ms"
+  # Cannister Squirt Capacity
+  maxSquirts: "280" #default 290
 
 packages:
-  airfresh: !include components/airfresh.yaml
+  airfresh: !include components/airfresh-v2.yaml
+  aht10: !include components/aht10.yaml
 
-<<: !include .base.yaml #.76
+<<: !include .base.yaml
 
 esphome:
   name: $name
-  platform: esp8266
+esp8266:
   board: d1_mini
-
-sensor:
-  - platform: wifi_signal
-    name: ${name} wifi signal
-    update_interval: 15s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
-
-binary_sensor:
-  - platform: status
-    name: ${name} status
-
+  restore_from_flash: true
