@@ -140,6 +140,9 @@
 #          {{ trigger.calendar_event.description }}
 
 
+
+
+
 ## delete when testing for discord is ok or use for MACK
 - alias: "Vehicle Delivery Notifications"
   initial_state: true

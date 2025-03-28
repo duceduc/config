@@ -3,8 +3,8 @@ substitutions:
   name: shoshuriki
   room: Shoshuriki
 
-  temp_offset: '0'
-  hum_offset: '0'
+  temp_offset: "-1.4"
+  hum_offset: "7.1"
   # Timing Intervals: Adjust to suit your Need/Situation.
   # NOTE: Values MUST BE in "quotes"
   interval1: "5"
@@ -13,7 +13,7 @@ substitutions:
   interval4: "60"
   interval5: "120"
   # Plunger Pulse Duration. Range: 55-180
-  squirt_pulse: "100ms"
+  squirt_pulse: "150ms"
   # Cannister Squirt Capacity
   maxSquirts: "1200" #max 1400
 
@@ -21,6 +21,11 @@ substitutions:
 #  aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml
+
+i2c: # for aht10
+  sda: GPIO6 
+  scl: GPIO7
+  scan: true
 
 esphome:
   name: $name
@@ -63,7 +68,7 @@ binary_sensor: # not working for small glade
     name: $name Button
     disabled_by_default: true
     pin: 
-      number: GPIO5
+      number: GPIO9 # not physically connected
       inverted: True
 
     on_press:
@@ -122,7 +127,7 @@ switch:
     id: theSquirter
     icon: mdi:spray
     pin: 
-      number: GPIO8
+      number: GPIO10  
     on_turn_on:
       then:
         - delay: $squirt_pulse
