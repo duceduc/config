@@ -130,12 +130,12 @@ cards:
         entities:
           - entity: switch.desktop_internet
             name: Desktop
-          - entity: switch.iphonex
-            name: iX
           - entity: switch.ai_4
             name: Ai4        
           - entity: switch.iphone8
             name: iPhone8
+          - entity: switch.is
+            name: iS
           - entity: switch.ipad
             name: iPad
           - entity: switch.meta

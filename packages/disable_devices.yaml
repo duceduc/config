@@ -32,10 +32,11 @@ command_line:
       command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.112"
       value_template: '{{ value == "1" }}'
 
+# temp solution to hide api key
   - switch:
-      name: iPhoneX
-      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.101"
-      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.101"
+      name: iS # combine portainer & pihole switch
+      command_on: !secret disable_is_internet
+      command_off: !secret enable_is_internet
       command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.101"
       value_template: '{{ value == "1" }}'
 
