@@ -65,28 +65,30 @@ command_line:
 #      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
 #      value_template: '{{ value == "1" }}'
 
-  - switch:
-      name: iphone8 # combine portainer & pihole switch
-      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.220"
-      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.220"
-      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.220"
-      value_template: '{{ value == "1" }}'
+#  - switch:
+#      name: iphone8 
+#      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.220"
+#      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.220"
+#      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.220"
+#      value_template: '{{ value == "1" }}'
 
 
 # pihole testing
-  - switch:
-      name: Pihole Shion NoAccess
-      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'
-      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'
-      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess status'
-      value_template: '{{ value == "1" }}'
+#  - switch:
+#      name: Pihole Shion NoAccess
+#      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'
+#      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'
+#      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess status'
+#      value_template: '{{ value == "1" }}'
 
-  - switch:
-      name: Pihole Shion Novideos
-      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos enable'
-      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos disable'
-      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos status'
-      value_template: '{{ value == "1" }}'
+#  - switch:
+#      name: Pihole Shion Novideos
+#      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos enable'
+#      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos disable'
+#      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos status'
+#      value_template: '{{ value == "1" }}'
+
+
 
 template:
   - sensor:
