@@ -2,7 +2,6 @@
 substitutions:
   name: gk-airfreshener
   room: Genkan # use mdf
-
   temp_offset: '-.8'
   hum_offset: '9'
   # Timing Intervals: Adjust to suit your Need/Situation.
