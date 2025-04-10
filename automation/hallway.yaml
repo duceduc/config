@@ -111,7 +111,7 @@
     - condition: template
       value_template: >- 
         {%- set trig = (now() - states.switch.gk_airfreshener.last_changed).seconds -%}
-            {{ trig >= 3600 }}
+            {{ trig >= 1800 }}
   actions:
     - action: switch.turn_on
       entity_id: switch.gk_airfreshener

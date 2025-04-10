@@ -10,7 +10,7 @@
         type: css
       - url: /local/lovelace/css/fontstyle.css
         type: css
-      - url: /local/custom_ui/card-mod.js?v=3.2.2
+      - url: /local/custom_ui/card-mod.js?v=3.4.4
         type: module
       - url: /local/custom_ui/fold-entity-row.js
         type: module
