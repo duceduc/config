@@ -131,7 +131,8 @@
     can_acknowledge: true
     repeat: 720
     notifiers:
-      - 'notify_events'
+      - 'amberthebot'
+#      - 'notify_events'
 
 #########################################################
 #                                                                                                              
