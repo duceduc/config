@@ -127,22 +127,36 @@ template:
       - name: 'School Start Days2go'
         unique_id: 9d1945c9-d043-4f59-9ea0-524bd1d306dc
         unit_of_measurement: 'Days'
-        state: "{{ ((state_attr('input_datetime.school_first_day', 'timestamp')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}"
+        state: "{{ ((state_attr('input_datetime.school_first_day', 'timestamp')-as_timestamp(now())) | int /86400) | round(0) }}"
       - name: 'School End Days2go'
         unique_id: 3852ec14-b6a9-4c4b-bb09-37fefddf1cb8
         unit_of_measurement: 'Days'
-        state: "{{ ((state_attr('input_datetime.school_last_day', 'timestamp')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}"
+        state: "{{ ((state_attr('input_datetime.school_last_day', 'timestamp')-as_timestamp(now())) | int /86400) | round(0) }}"
       - name: 'Vacation Days2go' # No upcoming vacation will cause error in log.
         unique_id: bd85ebff-50dc-4af5-addf-6b92a5ba71d1
         unit_of_measurement: 'Days'
-        state:  "{{ ((as_timestamp(state_attr('calendar.vacation', 'start_time'), '%Y-%m-%d')-as_timestamp(now())) | int(0) /60/1440) | round(0) }}"
-
-      - name: 'School Tomorrow'
-        unique_id: cace00f8-bf49-4206-85ea-2be58c98f178
-        state: >-
-          {%- set tt=(as_timestamp(now())+ (86400)) | timestamp_custom("%Y-%m-%d",true) %}
-          {% if states.calendar.shion_school.attributes.start_time == tt + " 08:15:00" %}
-            on
+        state: >
+          {% if state_attr('calendar.vacation', 'start_time') %}
+            {{ ((as_timestamp(strptime(state_attr('calendar.vacation', 'start_time'), '%Y-%m-%d'))-as_timestamp(now())) | int /86400) | round(0) }}
           {% else %}
-            off
+            999
           {% endif %}
+
+#      - name: 'School Tomorrow'
+#        unique_id: cace00f8-bf49-4206-85ea-2be58c98f178
+#        state: >-
+#          {%- set tt=(as_timestamp(now())+ (86400)) | timestamp_custom("%Y-%m-%d",true) %}
+#          {% if states.calendar.shion_school.attributes.start_time == tt + " 08:15:00" %}
+#            on
+#          {% else %}
+#            off
+#          {% endif %}
+
+
+  - binary_sensor:
+      - name: 'School Tomorrow'
+        unique_id: cace00f8-bf49-4206-85ea-2be58c98f179
+        state: >-
+          {% set tomorrow=as_timestamp(state_attr('calendar.shion_school','start_time')) | timestamp_custom("%Y-%m-%d",true) %}
+          {% set next_event=(now().date() + timedelta(days=1)) | string %}
+          {{ tomorrow == next_event }}

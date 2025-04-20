@@ -116,7 +116,9 @@
       entity_id: input_boolean.good_morning_report
       state: 'off'
   actions:
-    - action: script.morning_briefing
+    - action: script.morning_briefing #TETSING get_duc_briefing
+    - action: script.battery_notification
+
     - action: input_boolean.turn_on
       entity_id: input_boolean.good_morning_report
 

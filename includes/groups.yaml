@@ -34,6 +34,11 @@
       - binary_sensor.eri_presence
       - binary_sensor.shion_presence
 
+  room_presence:
+    - sensor.duc_espresense
+    - sensor.eri_espresense
+    - sensor.shion_tms_espresense
+
   guest_presence:
     - binary_sensor.sachiko_presence
     - binary_sensor.tomokun_presence

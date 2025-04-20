@@ -121,17 +121,17 @@
 #             Low Battery Alert                                    
 #                                                                                                              
 #########################################################
-
-  low_battery_alert:
-    name: Replace Battery Alert
-    entity_id: binary_sensor.devices_with_low_battery
-    title: "Replace Battery"
-    message: "There are {{ states('sensor.devices_with_low_battery') }} {% if is_state('sensor.devices_with_low_battery', '1') %}device{% else %}devices{% endif %} need battery replacement."
-    state: 'on'
-    can_acknowledge: true
-    repeat: 720
-    notifiers:
-      - 'amberthebot'
+# replace with critical battery area method
+#  low_battery_alert:
+#    name: Replace Battery Alert
+#    entity_id: binary_sensor.devices_with_low_battery
+#    title: "Replace Battery"
+#    message: "There are {{ states('sensor.devices_with_low_battery') }} {% if is_state('sensor.devices_with_low_battery', '1') %}device{% else %}devices{% endif %} need battery replacement."
+#    state: 'on'
+#    can_acknowledge: true
+#    repeat: 720
+#    notifiers:
+#      - 'amberthebot'
 #      - 'notify_events'
 
 #########################################################

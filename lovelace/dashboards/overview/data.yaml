@@ -508,8 +508,8 @@ cards:
             title: Device Battery Status
             state_color: true
             entities:
-              - entity: sensor.devices_with_low_battery
-                name: Battery Check
+#              - entity: sensor.devices_with_low_battery
+#                name: Battery Check
               - entities:
                   - entity: sensor.master_dimmer_battery
                     name: Master Room Dimmer
