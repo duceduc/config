@@ -75,6 +75,13 @@
       entity_id: automation.presence_restart_daily # restart monitor every reboot of Ha
     - delay: 270 # 280 300
     - action: script.set_device_tracker_shion # need to run x2 between 3 mins
+# reset heavy load entities
+    - action: script.update_critical_battery_group
+
+
+
+
+
 
 - alias: Refresh special event sensors # daily at midnight
   initial_state: true

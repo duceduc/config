@@ -28,6 +28,20 @@
           {% if is_state("binary_sensor.genkan_door_contact", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
 
 
+  - sensor:
+      - name: Christmas Countdown
+        unique_id: 2735664c-1798-4ec7-a421-a87208f75ee8
+        unit_of_measurement: Days
+        state: >
+          {{ ((as_timestamp(now().replace(month=12, day=25)) - as_timestamp(now()) | int) / 86400) | round(0) +1 }}
+
+      - name: Halloween Countdown
+        unique_id: 1478ae4b-d907-405d-8a8e-4bab94e3ab0f
+        unit_of_measurement: Days
+        state: >
+          {{ ((as_timestamp(now().replace(month=10, day=31)) - as_timestamp(now()) | int) / 86400) | round(0) +1 }}  
+
+
 
 #########################################################
 #
