@@ -108,12 +108,12 @@ automation:
   - alias: 'motion wc room'
     triggers:
       - trigger: state
-        entity_id: binary_sensor.wc_moving_target
+        entity_id: binary_sensor.wc_occupied # binary_sensor.wc_moving_target
         to: 'on'
       - trigger: state
-        entity_id: binary_sensor.wc_still_target
+        entity_id: binary_sensor.wc_occupied # binary_sensor.wc_still_target
         to: 'off'
-        for: 30
+        for: 10 # 30
         id: 'off'
       - trigger: state
         entity_id: input_boolean.engage_toilet_airfreshener
@@ -155,6 +155,10 @@ automation:
             entity_id: light.wc_1
           - action: homeassistant.turn_on
             entity_id: input_boolean.engage_toilet_airfreshener
+
+
+
+
 
 
 # Automate Toilet Seat Heater Arrival
