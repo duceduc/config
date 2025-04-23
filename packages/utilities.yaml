@@ -35,7 +35,7 @@ template:
                  list | count > 0) }}
 
       - name: wc_occupied
-        unique_id: wc_occupied # entity must be send to an area
+        unique_id: wc_occupied
         icon: mdi:account-group
         state: >
           {{ (states.binary_sensor | 
@@ -45,6 +45,112 @@ template:
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
+
+      - name: genkan_occupied
+        unique_id: genkan_occupied 
+        icon: mdi:account-group
+        state: >
+          {{ (states.binary_sensor | 
+                 selectattr('entity_id', 'in', area_entities('Genkan')) |
+                 rejectattr('attributes.device_class', 'undefined') |
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('state', 'eq', 'on') |
+                 map(attribute='entity_id') |
+                 list | count > 0) }}
+
+      - name: hallway_occupied
+        unique_id: hallway_occupied 
+        icon: mdi:account-group
+        state: >
+          {{ (states.binary_sensor | 
+                 selectattr('entity_id', 'in', area_entities('Hallway')) |
+                 rejectattr('attributes.device_class', 'undefined') |
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('state', 'eq', 'on') |
+                 map(attribute='entity_id') |
+                 list | count > 0) }}
+
+      - name: kitchen_occupied
+        unique_id: kitchen_occupied 
+        icon: mdi:account-group
+        state: >
+          {{ (states.binary_sensor | 
+                 selectattr('entity_id', 'in', area_entities('Kitchen')) |
+                 rejectattr('attributes.device_class', 'undefined') |
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('state', 'eq', 'on') |
+                 map(attribute='entity_id') |
+                 list | count > 0) }}
+        attributes: 
+          people_count: >
+            {{ expand('group.room_presence') 
+            | selectattr('state', 'eq', 'kitchen') 
+            | list 
+            | count }}
+
+
+      - name: livingroom_occupied
+        unique_id: livingroom_occupied 
+        icon: mdi:account-group
+        state: >
+          {{ (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'livingroom') 
+            | list 
+            | count >= 1 )
+            or 
+            (states.binary_sensor | 
+                selectattr('entity_id', 'in', area_entities('Living Room')) |
+                rejectattr('attributes.device_class', 'undefined') |
+                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                selectattr('state', 'eq', 'on') |
+                map(attribute='entity_id') |
+                list | count > 0 )
+            or (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'livingroom') 
+            | list 
+            | count >= 1)
+            }}
+        attributes: 
+          people_count: >
+            {{ expand('group.room_presence') 
+            | selectattr('state', 'eq', 'livingroom') 
+            | list 
+            | count }}
+
+      - name: masterroom_occupied
+        unique_id: masterroom_occupied
+        icon: mdi:account-group
+        state: >
+          {{ (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'masterroom') 
+            | list 
+            | count >= 1 )
+            or 
+            (states.binary_sensor | 
+                selectattr('entity_id', 'in', area_entities('Master Room')) |
+                rejectattr('attributes.device_class', 'undefined') |
+                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                selectattr('state', 'eq', 'on') |
+                map(attribute='entity_id') |
+                list | count > 0 )
+            or (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'masterroom') 
+            | list 
+            | count >= 1)
+            }}
+        attributes: 
+          people_count: >
+            {{ expand('group.room_presence') 
+            | selectattr('state', 'eq', 'masterroom') 
+            | list 
+            | count }}
+
+
+
+
+
+
+
 
 
 
