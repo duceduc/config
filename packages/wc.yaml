@@ -108,12 +108,11 @@ automation:
   - alias: 'motion wc room'
     triggers:
       - trigger: state
-        entity_id: binary_sensor.wc_occupied # binary_sensor.wc_moving_target
+        entity_id: binary_sensor.wc_occupied # _occupied has a delay off for 10secs.  binary_sensor.wc_moving_target
         to: 'on'
       - trigger: state
         entity_id: binary_sensor.wc_occupied # binary_sensor.wc_still_target
         to: 'off'
-        for: 10 # 30
         id: 'off'
       - trigger: state
         entity_id: input_boolean.engage_toilet_airfreshener

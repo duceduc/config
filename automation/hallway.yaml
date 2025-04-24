@@ -8,7 +8,7 @@
   mode: restart
   triggers:
     - trigger: state
-      entity_id: binary_sensor.hallway_moving_target
+      entity_id: binary_sensor.hallway_occupied #binary_sensor.hallway_moving_target
       to: 'on'
   conditions:
     - condition: template # Not on vacation
@@ -50,9 +50,9 @@
 - alias: 'motion hallway auto-off'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.hallway_presence
+      entity_id: binary_sensor.hallway_occupied # binary_sensor.hallway_presence
       to: 'off'
-      for: 15
+#      for: 15
 #  conditions:
 #    - condition: template # disable motion light
 #      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"

@@ -45,6 +45,7 @@ template:
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
+        delay_off: 10
 
       - name: genkan_occupied
         unique_id: genkan_occupied 
@@ -53,7 +54,7 @@ template:
           {{ (states.binary_sensor | 
                  selectattr('entity_id', 'in', area_entities('Genkan')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion|door)') | 
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
@@ -121,35 +122,19 @@ template:
         unique_id: masterroom_occupied
         icon: mdi:account-group
         state: >
-          {{ (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'masterroom') 
-            | list 
-            | count >= 1 )
-            or 
-            (states.binary_sensor | 
-                selectattr('entity_id', 'in', area_entities('Master Room')) |
-                rejectattr('attributes.device_class', 'undefined') |
-                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
-                selectattr('state', 'eq', 'on') |
-                map(attribute='entity_id') |
-                list | count > 0 )
-            or (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'masterroom') 
-            | list 
-            | count >= 1)
-            }}
+          {{ (states.binary_sensor | 
+                 selectattr('entity_id', 'in', area_entities('Master Room')) |
+                 rejectattr('attributes.device_class', 'undefined') |
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('state', 'eq', 'on') |
+                 map(attribute='entity_id') |
+                 list | count > 0) }}
         attributes: 
           people_count: >
             {{ expand('group.room_presence') 
             | selectattr('state', 'eq', 'masterroom') 
             | list 
             | count }}
-
-
-
-
-
-
 
 
 
