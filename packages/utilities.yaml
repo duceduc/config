@@ -136,6 +136,24 @@ template:
             | list 
             | count }}
 
+      - name: computerroom_occupied
+        unique_id: computerroom_occupied
+        icon: mdi:account-group
+        state: >
+          {{ (states.binary_sensor | 
+                 selectattr('entity_id', 'in', area_entities('Computer Room')) |
+                 rejectattr('attributes.device_class', 'undefined') |
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('state', 'eq', 'on') |
+                 map(attribute='entity_id') |
+                 list | count > 0) }}
+        delay_off: 60
+        attributes: 
+          people_count: >
+            {{ expand('group.room_presence') 
+            | selectattr('state', 'eq', 'computerroom') 
+            | list 
+            | count }}
 
 
 
