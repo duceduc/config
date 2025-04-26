@@ -14,7 +14,7 @@ substitutions:
   # Plunger Pulse Duration. Range: 55-200
   squirt_pulse: "200ms"
   # Cannister Squirt Capacity
-  maxSquirts: "280" #default 290
+  maxSquirts: "270" #default 280
 
 packages:
   airfresh: !include components/airfresh-v2.yaml

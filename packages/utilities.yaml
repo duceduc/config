@@ -118,6 +118,24 @@ template:
             | list 
             | count }}
 
+      - name: shionroom_occupied
+        unique_id: shionroom_occupied
+        icon: mdi:account-group
+        state: >
+          {{ (states.binary_sensor | 
+                 selectattr('entity_id', 'in', area_entities('Shion Room')) |
+                 rejectattr('attributes.device_class', 'undefined') |
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('state', 'eq', 'on') |
+                 map(attribute='entity_id') |
+                 list | count > 0) }}
+        attributes: 
+          people_count: >
+            {{ expand('group.room_presence') 
+            | selectattr('state', 'eq', 'shionroom') 
+            | list 
+            | count }}
+
       - name: masterroom_occupied
         unique_id: masterroom_occupied
         icon: mdi:account-group
@@ -140,13 +158,18 @@ template:
         unique_id: computerroom_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
-                 selectattr('entity_id', 'in', area_entities('Computer Room')) |
-                 rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
-                 selectattr('state', 'eq', 'on') |
-                 map(attribute='entity_id') |
-                 list | count > 0) }}
+          {{ (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'computeroom') 
+            | list 
+            | count >= 1 )
+            or 
+            (states.binary_sensor | 
+                selectattr('entity_id', 'in', area_entities('Computer Room')) |
+                rejectattr('attributes.device_class', 'undefined') |
+                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                selectattr('state', 'eq', 'on') |
+                map(attribute='entity_id') |
+                list | count > 0 ) }}
         delay_off: 60
         attributes: 
           people_count: >
