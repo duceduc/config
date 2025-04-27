@@ -106,8 +106,8 @@ template:
   - sensor:
       - name: "Room Audio"
         unique_id: 807ea83f-2556-4a15-98f3-26b1ef2e0ff5
-        state: >-
-          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='last_updated') | first)).seconds -%}
+        state: >- # rejectattr fix
+          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.last_called', 'undefined') | map(attribute='last_updated') | first)).seconds -%}
           {%- if last_alexa_called_seconds <= 60 %}  
             {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
           {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}

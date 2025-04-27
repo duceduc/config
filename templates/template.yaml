@@ -11,6 +11,14 @@
         state: >
           {{ (states('sensor.average_house_temperature') | float(0) > 22) and (states('sensor.entrance_temperature') | float(0) < (states('sensor.average_house_temperature') | float(0) - 1)) }}
 
+      - name: shion_sleep_status
+        unique_id: shion_sleep_status
+        state: >
+          {{ is_state('group.bed_sensors','on') }}
+        device_class: moving
+
+
+
 
 #########################################################
 #

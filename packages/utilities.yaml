@@ -18,6 +18,7 @@ template:
         state: >
           {{ expand('group.critical_batteries') 
           | rejectattr('state', 'eq', '100')
+          | rejectattr('state', 'in', ['unavailable','unknown'])
           | selectattr('state', 'lt', '30') | list | count }}
     
 # TESTING
@@ -125,7 +126,7 @@ template:
           {{ (states.binary_sensor | 
                  selectattr('entity_id', 'in', area_entities('Shion Room')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion|moving)') | 
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}

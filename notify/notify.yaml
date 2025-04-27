@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Email                                                                                          
-#                                                                                                              
+#
+#             Email
+#
 #########################################################
 
   - name: home_assistant
@@ -13,7 +13,7 @@
     encryption: starttls
     username: !secret gmail_email
     password: !secret gmail_pass
-    sender_name: Home Assistant    
+    sender_name: Home Assistant
     recipient:
       - !secret recipient_1
 
@@ -26,7 +26,7 @@
     encryption: starttls
     username: !secret gmail_email
     password: !secret gmail_pass
-    sender_name: Home Assistant    
+    sender_name: Home Assistant
     recipient:
       - !secret recipient_2
 
@@ -39,15 +39,15 @@
     encryption: starttls
     username: !secret gmail_email
     password: !secret gmail_pass
-    sender_name: Duc Su    
+    sender_name: Duc Su
     recipient:
       - !secret recipient_3
 
 
 #########################################################
-#                                                                                                              
-#             Social Media                                                                                 
-#                                                                                                              
+#
+#             Social Media
+#
 #########################################################
 
 # Free Basic 300 msg/ month
@@ -56,22 +56,22 @@
 
   - name: amberthebot
     platform: telegram
-    chat_id: !secret telegram_chatid 
+    chat_id: !secret telegram_chatid
 
 
 #########################################################
-#                                                                                                              
-#             Notification for TTS Service                                                                                 
-#                                                                                                              
+#
+#             Notification for TTS Service
+#
 #########################################################
 
 
 
 
 #########################################################
-#                                                                                                              
-#             Misc                                                                                          
-#                                                                                                              
+#
+#             Misc
+#
 #########################################################
 
 ## Removed. File has it's own File integration.
@@ -92,7 +92,7 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

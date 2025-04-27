@@ -46,7 +46,7 @@ template:
         state: "{{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}"
       - name: 'Month is'
         unique_id: 2f43d01a-6661-40f7-964b-2650204881cd
-        state: "{{ ['January','February','March','April','May','June','August','September','October','November','December'][now().month-2] }}" 
+        state: "{{ ['January','February','March','April','May','June','August','September','October','November','December'][now().month-2] }}"
 
       - name: 'Human Time'
         unique_id: 7d5bc561-1fc6-4531-9194-5f12effb09c5
@@ -54,7 +54,7 @@ template:
           {% if now().strftime('%-H') | float(0) >= 0 and now().strftime('%-H') | float(0) < 6 %}
             {% set timeofday = "at night" %}
           {% elif now().strftime('%-H') | float(0) >= 6 and now().strftime('%-H') | float(0) < 12 %}
-            {% set timeofday = "in the morning" %} 
+            {% set timeofday = "in the morning" %}
           {% elif now().strftime('%-H') | float(0) >= 12 and now().strftime('%-H') | float(0) < 18 %}
             {% set timeofday = "in the afternoon" %}
           {% elif now().strftime('%-H') | float(0) >= 18 and now().strftime('%-H') | float(0) < 25 %}
@@ -84,28 +84,28 @@ template:
             {% endif %}
 
           {% elif (now().minute | float(0)) == 31 %}
-            {% if (now().strftime('%-I')) | float(0) < 12 %}        
-              {{ now().minute | int(0) - 30 }} minute past half {{ now().strftime('%-I') | int(0) }} {{ timeofday }}       
+            {% if (now().strftime('%-I')) | float(0) < 12 %}
+              {{ now().minute | int(0) - 30 }} minute past half {{ now().strftime('%-I') | int(0) }} {{ timeofday }}
             {% elif (now().strftime('%-I')) | float(0) >= 12 %}
               {{ now().minute | int(0) - 30 }} minute past half {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
             {% endif %}
 
           {% elif (now().minute | float(0)) >= 32 and (now().minute | float(0)) <= 44 %}
-            {% if (now().strftime('%-I'))  | float(0) < 12 %}        
-              {{ now().minute | int(0) - 30 }} minutes past half {{ now().strftime('%-I') | int(0) }} {{ timeofday }}       
+            {% if (now().strftime('%-I'))  | float(0) < 12 %}
+              {{ now().minute | int(0) - 30 }} minutes past half {{ now().strftime('%-I') | int(0) }} {{ timeofday }}
             {% elif (now().strftime('%-I')) | float(0) >= 12 %}
               {{ now().minute | int(0) - 30 }} minutes past half {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
             {% endif %}
 
           {% elif (now().minute | float(0)) == 45 %}
-            {% if (now().strftime('%-I')) | float(0) < 12 %}        
+            {% if (now().strftime('%-I')) | float(0) < 12 %}
               quarter to {{ now().strftime('%-I') | int(0) + 1 }} {{ timeofday }}
             {% elif (now().strftime('%-I')) | float(0) >= 12 %}
               quarter to {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
             {% endif %}
 
           {% elif (now().minute | float(0)) >= 46 and (now().minute | float(0)) <=59 %}
-            {% if (now().strftime('%-I')) | float(0) < 12 %}        
+            {% if (now().strftime('%-I')) | float(0) < 12 %}
               {{ 60 - now().minute | int(0) }} minutes to {{ now().strftime('%-I') | int(0) + 1 }} {{ timeofday }}
             {% elif (now().strftime('%-I')) | float(0) >= 12 %}
             {{ 60 - now().minute | int(0) }} minutes to {{ now().strftime('%-H') | int(0) - 11 }} {{ timeofday }}
@@ -117,7 +117,7 @@ template:
           {% elif now().strftime('%-H') | float(0) >= 6 and now().strftime('%-H') | float(0) <= 12 %}
             mdi-weather-sunset
           {% elif now().strftime('%-H') | float(0) >= 12 and now().strftime('%-H') | float(0) <= 18 %}
-            mdi:weather-sunny        
+            mdi:weather-sunny
           {% elif now().strftime('%-H') | float(0) >= 18 and now().strftime('%-H') | float(0) <= 25 %}
             mdi:weather-sunset
           {% else %}
