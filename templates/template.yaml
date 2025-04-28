@@ -35,6 +35,13 @@
         icon: >
           {% if is_state("binary_sensor.genkan_door_contact", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
 
+      - name: "Last Alexa"
+        unique_id: last_alexa
+        state: >
+          {{ expand('group.echos') | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+        availability: >
+          {{ expand('group.echos') | selectattr('attributes.last_called','eq',True) | first is defined }}
+
 
   - sensor:
       - name: Christmas Countdown

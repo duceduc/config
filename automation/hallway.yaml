@@ -53,9 +53,9 @@
       entity_id: binary_sensor.hallway_occupied # binary_sensor.hallway_presence
       to: 'off'
 #      for: 10
-#  conditions:
-#    - condition: template # disable motion light
-#      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   actions:
     - action: light.turn_off
       entity_id: light.h_1
@@ -77,6 +77,9 @@
 #      value_template: "{{ is_state('binary_sensor.genkan_presence', 'off') }}"
       for: 10
       id: 'off'
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   actions:
     - choose:
         - conditions:
