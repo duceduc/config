@@ -23,30 +23,13 @@ substitutions:
 packages:
   aht10: !include components/aht10.yaml
 
-
-
-wifi:
-  ssid: !secret ssid
-  password: !secret ssid_pwd
-logger:
-#  level: WARN
-  baud_rate: 0
-#  hardware_uart: uart0
-api:
-  encryption:
-    key: !secret esphome_apikey
-ota:
-  - platform: esphome
-    password: !secret ota_pass
-captive_portal:
-
-
+<<: !include .base.yaml
 
 # LD2410C
 uart:
   #id: uart_0
-  tx_pin: TX #GPIO21
-  rx_pin: RX #GPIO20
+  tx_pin: TX #GPIO21 D6
+  rx_pin: RX #GPIO20 D7
   baud_rate: 256000
   parity: NONE
   stop_bits: 1
