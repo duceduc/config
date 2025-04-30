@@ -83,9 +83,13 @@ binary_sensor: # not working for small glade
   - platform: gpio
     name: $name Button
     disabled_by_default: true
-    pin: 
-      number: GPIO9 # D9 Not tested if work on the esp32 C3
+    pin:
+      number: GPIO9 # GPIO9 not working.
       inverted: True
+      mode:
+        input: true
+        pullup: true
+
 
     on_press:
       then:
@@ -155,7 +159,7 @@ switch:
     name: $name
     id: theSquirter
     icon: mdi:spray
-    pin: 
+    pin:
       number: GPIO10  #D10 confirm to work
     on_turn_on:
       then:
