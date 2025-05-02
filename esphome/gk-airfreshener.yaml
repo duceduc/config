@@ -6,8 +6,8 @@ substitutions:
   name: gk-airfreshener
   room: Genkan
 
-  temp_offset: "0"
-  hum_offset: "0"
+  temp_offset: "-.2"
+  hum_offset: "3"
   # Timing Intervals: Adjust to suit your Need/Situation.
   # NOTE: Values MUST BE in "quotes"
   interval1: "5"
