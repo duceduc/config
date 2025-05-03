@@ -105,7 +105,7 @@
 #
 #########################################################
 
-- alias: 'Genkan Airfreshener auto-on' # spray after 1 hr past last sprayed
+- alias: 'Genkan Airfreshener auto-on' # spray after 30 min past last sprayed
   triggers:
     - trigger: state
       entity_id: binary_sensor.genkan_moving_target # binary_sensor.genkan_door_contact
@@ -115,7 +115,7 @@
     - condition: template
       value_template: >- 
         {%- set trig = (now() - states.switch.gk_airfreshener.last_changed).seconds -%}
-            {{ trig >= 1800 }}
+            {{ trig >= 3600 }}
   actions:
     - action: switch.turn_on
       entity_id: switch.gk_airfreshener

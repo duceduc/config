@@ -19,12 +19,10 @@ from homeassistant.components.bluetooth import (
 )
 from homeassistant.components.bluetooth.api import _get_manager
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_STATE_CHANGED
 from homeassistant.const import MAJOR_VERSION as HA_VERSION_MAJ
 from homeassistant.const import MINOR_VERSION as HA_VERSION_MIN
 from homeassistant.core import (
     Event,
-    EventStateChangedData,
     HassJob,
     HomeAssistant,
     ServiceCall,
@@ -91,7 +89,8 @@ from .const import (
     PRUNE_MAX_COUNT,
     PRUNE_TIME_DEFAULT,
     PRUNE_TIME_INTERVAL,
-    PRUNE_TIME_IRK,
+    PRUNE_TIME_KNOWN_IRK,
+    PRUNE_TIME_UNKNOWN_IRK,
     REPAIR_SCANNER_WITHOUT_AREA,
     SAVEOUT_COOLDOWN,
     SIGNAL_DEVICE_NEW,
@@ -199,7 +198,8 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
         # to stabilise. So set the stamp into the future.
         self.last_config_entry_update_request = MONOTONIC_TIME() + SAVEOUT_COOLDOWN  # Stamp for save-out requests
 
-        self.config_entry.async_on_unload(self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.handle_state_changes))
+        # AJG 2025-04-23 Disabling, see the commented method below for notes.
+        # self.config_entry.async_on_unload(self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.handle_state_changes))
 
         # First time around we freshen the restored scanner info by
         # forcing a scan of the captured info.
@@ -301,34 +301,37 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
             member_uuids_yaml = yaml.safe_load(f)["uuids"]
         self.member_uuids = {hex(member["uuid"])[2:]: member["name"] for member in member_uuids_yaml}
 
-    @callback
-    def handle_state_changes(self, ev: Event[EventStateChangedData]):
-        """Watch for new mac addresses on private ble devices and act."""
-        if ev.event_type == EVENT_STATE_CHANGED:
-            event_entity = ev.data.get("entity_id", "invalid_event_entity")
-            if event_entity in self.pb_state_sources:
-                # It's a state change of an entity we are tracking.
-                new_state = ev.data.get("new_state")
-                if new_state:
-                    # _LOGGER.debug("New state change! %s", new_state)
-                    # check new_state.attributes.assumed_state
-                    if hasattr(new_state, "attributes"):
-                        new_address = new_state.attributes.get("current_address")
-                        if new_address is not None and new_address.lower() != self.pb_state_sources[event_entity]:
-                            _LOGGER.debug(
-                                "Have a new source address for %s, %s",
-                                event_entity,
-                                new_address,
-                            )
-                            self.pb_state_sources[event_entity] = new_address.lower()
-                            # Flag that we need new pb checks, and work them out:
-                            self._do_private_device_init = True
-                            # If no sensors have yet been configured, the coordinator
-                            # won't be getting polled for fresh data. Since we have
-                            # found something, we should get it to do that.
-                            # No longer using async_config_entry_first_refresh as it
-                            # breaks
-                            self.hass.add_job(self.async_refresh())
+    # AJG 2025-04-23 - This is probably no longer necessary, since we now hook a callback
+    # directly in Private_ble_devices to get updates on new MAC addresses.
+    # The device_registry events should cover anything else we need.
+    # @callback
+    # def handle_state_changes(self, ev: Event[EventStateChangedData]):
+    #     """Watch for new mac addresses on private ble devices and act."""
+    #     if ev.event_type == EVENT_STATE_CHANGED:
+    #         event_entity = ev.data.get("entity_id", "invalid_event_entity")
+    #         if event_entity in self.pb_state_sources:
+    #             # It's a state change of an entity we are tracking.
+    #             new_state = ev.data.get("new_state")
+    #             if new_state:
+    #                 # _LOGGER.debug("New state change! %s", new_state)
+    #                 # check new_state.attributes.assumed_state
+    #                 if hasattr(new_state, "attributes"):
+    #                     new_address = new_state.attributes.get("current_address")
+    #                     if new_address is not None and new_address.lower() != self.pb_state_sources[event_entity]:
+    #                         _LOGGER.debug(
+    #                             "Have a new source address for %s, %s",
+    #                             event_entity,
+    #                             new_address,
+    #                         )
+    #                         self.pb_state_sources[event_entity] = new_address.lower()
+    #                         # Flag that we need new pb checks, and work them out:
+    #                         self._do_private_device_init = True
+    #                         # If no sensors have yet been configured, the coordinator
+    #                         # won't be getting polled for fresh data. Since we have
+    #                         # found something, we should get it to do that.
+    #                         # No longer using async_config_entry_first_refresh as it
+    #                         # breaks
+    #                         self.hass.add_job(self.async_refresh())
 
     @callback
     def handle_devreg_changes(self, ev: Event[EventDeviceRegistryUpdatedData]):
@@ -557,7 +560,7 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
         self.update_in_progress = True
 
         nowstamp = MONOTONIC_TIME()
-        _timestamp_cutoff = nowstamp - min(PRUNE_TIME_DEFAULT, PRUNE_TIME_IRK)
+        _timestamp_cutoff = nowstamp - min(PRUNE_TIME_DEFAULT, PRUNE_TIME_UNKNOWN_IRK)
 
         for service_info in bluetooth.async_discovered_service_info(self.hass, False):
             # Note that some of these entries are restored from storage,
@@ -785,16 +788,23 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
             # We ran recently enough, bail out.
             return
         # stamp the run.
-        self.stamp_last_prune = MONOTONIC_TIME()
+        nowstamp = self.stamp_last_prune = MONOTONIC_TIME()
 
-        prune_list: list[str] = []
-        prunable_stamps = {}
+        prune_list: list[str] = []  # list of addresses to be pruned
+        prunable_stamps: dict[str, float] = {}  # dict of potential prunees if we need to be more aggressive.
 
-        # build a set of source devices that are still metadevice_sources[0]
-        metadevice_source_primos = set()
+        metadevice_source_keepers = set()
         for metadevice in self.metadevices.values():
             if len(metadevice.metadevice_sources) > 0:
-                metadevice_source_primos.add(metadevice.metadevice_sources[0])
+                # Always keep the most recent source, which we keep in index 0.
+                # This covers static iBeacon sources, and possibly IRKs that might exceed
+                # the spec lifetime but are going stale because they're away for a bit.
+                _first = True
+                for address in metadevice.metadevice_sources:
+                    if _first or self.devices[address].last_seen > nowstamp - PRUNE_TIME_KNOWN_IRK:
+                        # The source has been seen within the spec's limits, keep it.
+                        metadevice_source_keepers.add(address)
+                        _first = False
 
         for device_address, device in self.devices.items():
             # Prune any devices that haven't been heard from for too long, but only
@@ -808,36 +818,37 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
             # then it should be up for pruning. A stale iBeacon that we don't actually track
             # should totally be pruned if it's no longer around.
             if (
-                device_address not in metadevice_source_primos
+                device_address not in metadevice_source_keepers
                 and device_address not in self.scanner_list
                 and (not device.create_sensor)  # Not if we track the device
-                and (not device.is_scanner)
-                # and (device.last_seen > 0)  # Don't prune if we haven't initialised yet!
+                and (not device.is_scanner)  # redundant, but whatevs.
                 and device.address_type != BDADDR_TYPE_NOT_MAC48
             ):
                 if device.address_type == BDADDR_TYPE_PRIVATE_RESOLVABLE:
-                    # This is an IRK source address. We'll *only* want to keep
-                    # if if belongs to one of our known Private BLE devices *and*
-                    # it's the latest address we have for it.
-
-                    if device.last_seen < MONOTONIC_TIME() - PRUNE_TIME_IRK:
+                    # This is an *UNKNOWN* IRK source address, or a known one which is
+                    # well and truly stale (ie, not in keepers).
+                    # We prune unknown irk's aggressively because they pile up quickly
+                    # in high-density situations, and *we* don't need to hang on to new
+                    # enrollments because we'll seed them from PBLE.
+                    if device.last_seen < nowstamp - PRUNE_TIME_UNKNOWN_IRK:
                         _LOGGER.debug(
                             "Marking stale IRK address for pruning: [%s] %s",
                             device_address,
                             device.name,
                         )
                         prune_list.append(device_address)
-                    else:
-                        # It's not stale, but we will prune it if we have to later to fit
-                        # into PRUNE_MAX_COUNT
-                        # prunable_stamps[device_address] = device.last_seen
+                    elif device.last_seen < nowstamp - 200:  # BlueZ cache time
+                        # It's not stale, but we will prune it if we can't make our
+                        # quota of PRUNE_MAX_COUNT we'll shave these off too.
 
-                        # Actually, let's keep it. A more recent stamp implies
-                        # that it's probably still in the advert cache of BlueZ
-                        # or BaseHaRemoteScanner, so we'd just create churn.
-                        pass
+                        # Note that because BlueZ doesn't give us timestamps, we guess them
+                        # based on whether the rssi has changed. If we delete our existing
+                        # device we have nothing to compare too and will forever churn them.
+                        # This can change if we drop support for BlueZ or we find a way to
+                        # make stamps (we could also just keep a separate list but meh)
+                        prunable_stamps[device_address] = device.last_seen
 
-                elif device.last_seen < MONOTONIC_TIME() - PRUNE_TIME_DEFAULT:
+                elif device.last_seen < nowstamp - PRUNE_TIME_DEFAULT:
                     # It's a static address, and stale.
                     _LOGGER.debug(
                         "Marking old device entry for pruning: %s",
@@ -845,47 +856,63 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
                     )
                     prune_list.append(device_address)
                 else:
-                    # Device is static, not so old, but we might have to prune it anyway
+                    # Device is static, not tracked, not so old, but we might have to prune it anyway
                     prunable_stamps[device_address] = device.last_seen
 
-            # Prune metadevices and scanners
-            #
+            # Do nothing else at this level without excluding the keepers first.
+
+        _LOGGER.debug(
+            "Prune list contains %d to prune and %d available to make quota.", len(prune_list), len(prunable_stamps)
+        )
+
+        prune_quota_shortfall = len(self.devices) - len(prune_list) - PRUNE_MAX_COUNT
+        if prune_quota_shortfall > 0:
+            # We need to find more addresses to prune. Perhaps we live
+            # in a busy train station, or are under some sort of BLE-MAC
+            # DOS-attack.
+            # Sort the prunables by timestamp ascending
+            sorted_addresses = sorted([(v, k) for k, v in prunable_stamps.items()])
+            cutoff = min(len(sorted_addresses), prune_quota_shortfall)
+
+            _LOGGER.info(
+                "Prune quota short by %d. Pruning %d extra devices (down to age %d seconds)",
+                prune_quota_shortfall,
+                cutoff,
+                nowstamp - sorted_addresses[prune_quota_shortfall][0],
+            )
+            # pylint: disable-next=unused-variable
+            for _stamp, address in sorted_addresses[:prune_quota_shortfall]:
+                prune_list.append(address)
+
+        # ###############################################
+        # Prune_list is now ready to action. It contains no keepers, and is already
+        # expanded if necessary to meet quote, as much as we can.
+
+        # Prune the source devices
+        for device_address in prune_list:
+            _LOGGER.debug("Acting on prune list for %s", device_address)
+            del self.devices[device_address]
+
+        # Clean out the scanners dicts in metadevices and scanners
+        # (scanners will have entries if they are also beacons, although
+        # their addresses should never get stale, but one day someone will
+        # have a beacon that uses randomised source addresses for some reason.
+        for device in self.devices.values():
             if (
                 device.is_scanner
                 or METADEVICE_PRIVATE_BLE_DEVICE in device.metadevice_type
                 or METADEVICE_IBEACON_DEVICE in device.metadevice_type
             ):
-                # For scanners and metadevices we will want to prune their scanners entries, since
-                # they may fill up with dynamic addresses.
-                # create a list of keys so we can del items while iterating
-                nowstamp = MONOTONIC_TIME()
+                # clean out the metadevice_sources field
+                for address in device.metadevice_sources:
+                    if address in prune_list:
+                        device.metadevice_sources.remove(address)
+
+                # clean out the device/scanner pair entries in scanners{}
                 for scannerkey in list(device.scanners.keys()):
-                    scannerstamp = device.scanners[scannerkey].stamp
-                    if scannerstamp is None or scannerstamp < (nowstamp - PRUNE_TIME_IRK):
+                    if device.scanners[scannerkey].device_address in prune_list:
                         del device.scanners[scannerkey]
                         _LOGGER.debug("Pruning metadevice advert %s", scannerkey)
-
-            # Clean up the device.metadevices lists (otherwise update_metadevices will re-populate)
-            for metadevice in self.metadevices.values():
-                for source_address in prune_list:
-                    if source_address in metadevice.metadevice_sources:
-                        metadevice.metadevice_sources.remove(source_address)
-
-        prune_quota = len(self.devices) - len(prune_list) - PRUNE_MAX_COUNT
-        if prune_quota > 0:
-            # We need to find more addresses to prune. Perhaps we live
-            # in a busy train station, or are under some sort of BLE-MAC
-            # DOS-attack.
-            sorted_addresses = sorted([(v, k) for k, v in prunable_stamps.items()])
-            _LOGGER.info("Having to prune %s extra devices to make quota", prune_quota)
-            # pylint: disable-next=unused-variable
-            for _stamp, address in sorted_addresses[:prune_quota]:
-                prune_list.append(address)
-
-        # Perform any pruning we found to do
-        for device_address in prune_list:
-            _LOGGER.debug("Acting on prune list for %s", device_address)
-            del self.devices[device_address]
 
     def discover_private_ble_metadevices(self):
         """
@@ -1227,6 +1254,7 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
         reason: str | None = None  # reason/result
 
         def sensortext(self) -> str:
+            """Return a text summary suitable for use in a sensor entity."""
             out = ""
             for var, val in vars(self).items():
                 out += f"{var}|"
@@ -1387,18 +1415,17 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
             #     # How long new scanner has been closer
             #     time_new_has_been_closer_for,
             # )
-
-            if False:  # tests.last_closer[0] < 3:
-                # Our worst hasn't yet beat its best, we're out.
-                if _superchatty:
-                    _LOGGER.debug(
-                        "%s not closest to %s vs %s: we need to dwell more\n%s",
-                        device.name,
-                        scanner.name,
-                        closest_scanner.name,
-                        tests,
-                    )
-                continue
+            # if tests.last_closer[0] < 3:
+            #     # Our worst hasn't yet beat its best, we're out.
+            #     if _superchatty:
+            #         _LOGGER.debug(
+            #             "%s not closest to %s vs %s: we need to dwell more\n%s",
+            #             device.name,
+            #             scanner.name,
+            #             closest_scanner.name,
+            #             tests,
+            #         )
+            #     continue
 
             _pda = scanner.rssi_distance
             _pdb = closest_scanner.rssi_distance
@@ -1481,6 +1508,7 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
                     if self.hass_version_min_2025_4:
                         self._hascanner_timestamps[hascanner.source.lower()] = hascanner.discovered_device_timestamps
                     else:
+                        # pylint: disable=W0212,C0301
                         self._hascanner_timestamps[hascanner.source.lower()] = hascanner._discovered_device_timestamps  # noqa: SLF001
             return True
         return False
