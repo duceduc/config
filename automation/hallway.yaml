@@ -29,7 +29,7 @@
             entity_id: light.h_1
       - conditions:
           - condition: template
-            value_template: '{{ now().hour > 19 or now().hour < 7 }}'
+            value_template: "{{ now().hour > 19 or now().hour < 7 or is_state('binary_sensor.hallway_nightlight', 'on') }}"    # '{{ now().hour > 19 or now().hour < 7 }}'
         sequence:
           - action: script.tradfri_transition
             data:
@@ -55,7 +55,7 @@
 #      for: 10
   conditions:
     - condition: template # disable motion light
-      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') or is_state('binary_sensor.hallway_nightlight', 'on') }}"
   actions:
     - action: light.turn_off
       entity_id: light.h_1

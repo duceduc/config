@@ -72,6 +72,13 @@ template:
                  map(attribute='entity_id') |
                  list | count > 0) }}
 
+      - name: hallway_nightlight
+        unique_id: hallway_nightlight 
+        icon: mdi:account-group
+        state: >
+         {{ now().hour > 23 or now().hour < 6 }}
+
+
       - name: kitchen_occupied
         unique_id: kitchen_occupied 
         icon: mdi:account-group
