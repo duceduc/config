@@ -53,6 +53,10 @@
       entity_id: binary_sensor.hallway_occupied # binary_sensor.hallway_presence
       to: 'off'
 #      for: 10
+    - trigger: state
+      entity_id: binary_sensor.hallway_nightlight
+      from: 'off'
+      to: 'on'
   conditions:
     - condition: template # disable motion light
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') or is_state('binary_sensor.hallway_nightlight', 'on') }}"
