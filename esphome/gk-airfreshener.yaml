@@ -21,23 +21,10 @@ substitutions:
   maxSquirts: "280" #max 280
 
 packages:
+#  ld2410: !include components/ld2410-v2.yaml
   aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml
-
-
-# LD2410C
-#uart:
-#  #id: uart_0
-#  tx_pin: TX #GPIO21 D6
-#  rx_pin: RX #GPIO20 D7
-#  baud_rate: 256000
-#  parity: NONE
-#  stop_bits: 1
-
-#LD2410C
-#ld2410:
-#  id: ld2410_radar
 
 i2c: # for aht10
   sda: GPIO6 #D4
@@ -104,16 +91,6 @@ binary_sensor: # not working for small glade
             id(can_level).publish_state(100);
             global_preferences->sync();
             }
-
-#LD2410C
-#  - platform: ld2410
-#    has_target:
-#      name: $room Presence
-#    has_moving_target:
-#      name: $room Moving Target
-#    has_still_target:
-#      name: $room Still Target
-
   - platform: status
     name: $name status
 
@@ -176,19 +153,6 @@ sensor:
       - sliding_window_moving_average:
           window_size: 15
           send_every: 15
-
-#LD2410C
-#  - platform: ld2410
-#    moving_distance:
-#      name : $room Moving Distance
-#    still_distance:
-#      name: $room Still Distance
-#    moving_energy:
-#      name: Move Energy
-#    still_energy:
-#      name: $room Still Energy
-#    detection_distance:
-#      name: $room Detection Distance
 
   # Cannister Percentage
   - platform: template

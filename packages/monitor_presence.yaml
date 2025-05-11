@@ -105,9 +105,9 @@ mqtt:
 template:
   - sensor:
       - name: "Room Audio"
-        unique_id: 807ea83f-2556-4a15-98f3-26b1ef2e0ff5
+        unique_id: room_audio
         state: >- # rejectattr fix
-          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.last_called', 'undefined') | map(attribute='last_updated') | first)).seconds -%}
+          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.app_id', 'in',['music_assistant','satellite']) | map(attribute='last_updated') | first)).seconds -%}
           {%- if last_alexa_called_seconds <= 60 %}  
             {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
           {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
@@ -121,16 +121,16 @@ template:
               {% else %}
                 {% if sensor.name == 'motion cr-sensor occupancy' %}
                   computer_room
-                {% elif sensor.name in ('Kitchen Moving Target','Lr Moving Target') %}
+                {% elif sensor.name in ('Wr Has Moving Target','Kitchen Moving Target','Lr Moving Target') %}
                   living_room
-                {% elif sensor.name in ('Wr Has Moving Target','Sr Has Moving Target', 'Mr Moving Target', 'Hallway Moving Target','Genkan Moving Target') %}
+                {% elif sensor.name in ('Wc Moving Target','Sr Has Moving Target', 'Mr Moving Target', 'Hallway Moving Target','Genkan Moving Target') %}
                   hallway
                 {% else %}
                   living_room
                 {%- endif %}
             {%- endif %}
-          {% elif is_state('media_player.theater_tv', 'on') %}
-            theater
+          {% elif is_state('media_player.spotify_duc', 'playing') %}
+            computer_room
           {% else %}
             {{ states('sensor.room_presence') }}
           {% endif %}

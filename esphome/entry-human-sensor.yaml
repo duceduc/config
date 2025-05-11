@@ -85,7 +85,7 @@ web_server:
 
 binary_sensor:
 # Hallway HLK
-  - platform: ld2410 
+  - platform: ld2410
     ld2410_id: ld2410_0
     has_target:
       name: $hlk0 Presence
@@ -149,14 +149,19 @@ sensor:
     ld2410_id: ld2410_0
     moving_distance:
       name: $hlk0 Moving Distance
+      disabled_by_default: true
     still_distance:
       name: $hlk0 Still Distance
+      disabled_by_default: true
     moving_energy:
       name: $hlk0 Move Energy
+      disabled_by_default: true
     still_energy:
       name: $hlk0 Still Energy
+      disabled_by_default: true
     detection_distance:
       name: $hlk0 Detection Distance
+      disabled_by_default: true
     light:
       name: $hlk0 Sun Light
 
@@ -166,14 +171,19 @@ sensor:
     ld2410_id: ld2410_1
     moving_distance:
       name: $hlk1 Moving Distance
+      disabled_by_default: true
     still_distance:
       name: $hlk1 Still Distance
+      disabled_by_default: true
     moving_energy:
       name: $hlk1 Move Energy
+      disabled_by_default: true
     still_energy:
       name: $hlk1 Still Energy
+      disabled_by_default: true
     detection_distance:
       name: $hlk1 Detection Distance
+      disabled_by_default: true
     light:
       name: $hlk1 Sun Light
 

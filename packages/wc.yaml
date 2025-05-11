@@ -175,7 +175,7 @@ automation:
             - action: script.toilet_seat_off_heat
         - conditions: >
             {{ trigger.to_state.state == 'Home' and
-               states('sensor.entrance_temperature')| int(0) >= 21 }}
+               states('sensor.entrance_temperature')| int(0) > 21 }}
           sequence:
             - action: script.toilet_seat_off_heat
         - conditions: >
@@ -216,7 +216,7 @@ automation:
     actions:
       choose:
         - conditions: >
-            {{ states('sensor.entrance_temperature')| int(0) >= 21 and
+            {{ states('sensor.entrance_temperature')| int(0) > 21 and
                is_state('input_select.home_mode', 'Home') }}
           sequence:
             - action: script.toilet_seat_off_heat

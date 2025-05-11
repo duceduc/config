@@ -6,24 +6,15 @@ substitutions:
   hum_offset: '4'
 
 packages:
+  ld2410: !include components/ld2410-v2.yaml
   aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml 
 
 esphome:
   name: $name
-  platform: esp8266
+esp8266:
   board: d1_mini
-
-uart:
-  tx_pin: TX
-  rx_pin: RX
-  baud_rate: 256000
-  parity: NONE
-  stop_bits: 1
-
-ld2410:
-  id: ld2410_radar
 
 status_led:
   pin:
@@ -39,26 +30,7 @@ sensor:
           window_size: 15
           send_every: 15
 
-  - platform: ld2410
-    moving_distance:
-      name : $room Moving Distance
-    still_distance:
-      name: $room Still Distance
-    moving_energy:
-      name: Move Energy
-    still_energy:
-      name: $room Still Energy
-    detection_distance:
-      name: $room Detection Distance
-
 binary_sensor:
   - platform: status
     name: $name status
 
-  - platform: ld2410
-    has_target:
-      name: $room Presence
-    has_moving_target:
-      name: $room Moving Target
-    has_still_target:
-      name: $room Still Target

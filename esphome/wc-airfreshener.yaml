@@ -17,6 +17,7 @@ substitutions:
   maxSquirts: "270" #default 280
 
 packages:
+  ld2410: !include components/ld2410-v2.yaml
   airfresh: !include components/airfresh-v2.yaml
   aht10: !include components/aht10.yaml
 
@@ -27,17 +28,6 @@ esphome:
 esp8266:
   board: d1_mini
   restore_from_flash: true
-
-uart:
-  id: uart_1
-  tx_pin: TX
-  rx_pin: RX
-  baud_rate: 256000
-  parity: NONE
-  stop_bits: 1
-
-ld2410:
-  id: ld2410_radar
 
 status_led:
   pin:
@@ -54,26 +44,6 @@ sensor:
           send_every: 15
           send_first_at: 1
 
-  - platform: ld2410
-    moving_distance:
-      name : $room Moving Distance
-    still_distance:
-      name: $room Still Distance
-    moving_energy:
-      name: Move Energy
-    still_energy:
-      name: $room Still Energy
-    detection_distance:
-      name: $room Detection Distance
-
 binary_sensor:
   - platform: status
     name: $name status
-
-  - platform: ld2410
-    has_target:
-      name: $room Presence
-    has_moving_target:
-      name: $room Moving Target
-    has_still_target:
-      name: $room Still Target

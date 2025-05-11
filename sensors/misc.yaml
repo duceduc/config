@@ -7,8 +7,8 @@
   - platform: template
     sensors:
       jarvis_voice_speed:
-        value_template: >
-          {% if is_state('input_select.jarvis_voice', 'Brian') %}
+        value_template: > # brain= fast or 115%
+          {% if is_state('input_select.jarvis_voice', 'Brian') %} 
              fast
           {% else %}
              medium

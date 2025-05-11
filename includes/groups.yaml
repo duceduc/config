@@ -122,6 +122,7 @@
     - binary_sensor.genkan_moving_target
     - binary_sensor.motion_cr_sensor_occupancy
     - binary_sensor.wr_has_moving_target
+    - binary_sensor.wc_moving_target
 
   home_alarm_motion_sensors:
     - binary_sensor.lr_moving_target

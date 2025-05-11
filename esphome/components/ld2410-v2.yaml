@@ -1,0 +1,38 @@
+
+uart:
+  id: uart_1
+  tx_pin: TX
+  rx_pin: RX
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
+
+ld2410:
+  id: ld2410_radar
+
+sensor:
+  - platform: ld2410
+    moving_distance:
+      name : $room Moving Distance
+      disabled_by_default: true
+    still_distance:
+      name: $room Still Distance
+      disabled_by_default: true
+    moving_energy:
+      name: Move Energy
+      disabled_by_default: true
+    still_energy:
+      name: $room Still Energy
+      disabled_by_default: true
+    detection_distance:
+      name: $room Detection Distance
+      disabled_by_default: true
+
+binary_sensor:
+  - platform: ld2410
+    has_target:
+      name: $room Presence
+    has_moving_target:
+      name: $room Moving Target
+    has_still_target:
+      name: $room Still Target
