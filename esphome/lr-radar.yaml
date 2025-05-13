@@ -1,4 +1,5 @@
 #ESP8266 with LD1115H Radar Sensor [E0:98:06:91:07:C2]
+# https://github.com/rainchi/ESPHome-LD2410
 substitutions:
   name: lr-radar
   room: livingroom

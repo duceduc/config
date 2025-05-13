@@ -39,7 +39,7 @@
   actions:
     - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
       entity_id: light.laundry
-    - delay: 12
+    - delay: 10
     - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
       entity_id: light.sink, light.vanity
 

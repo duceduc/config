@@ -23,7 +23,7 @@ template:
     
 # TESTING
   - binary_sensor:
-      - name: wash_occupied # entity must be send to an area
+      - name: wash_occupied # entity must be set to an area
         unique_id: wash_occupied
         icon: mdi:account-group
         state: >
