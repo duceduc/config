@@ -21,6 +21,10 @@
               'In case you have not been keeping track, you might like to know that today is ',
               'Well done for dragging yourself out of bed. Now that you are up, I can inform you that today is ',
               'This may or may not be good news, but today is '
+              'Today is ',
+              'If you have not been keeping track today is ',
+              'Do you know what day of the week it is? Today is ',
+              'I hate to be the bearer of bad news, but today is '
                 ]|random }}{{ states('sensor.date_dayoftheweek') }}. The time is {{ now().strftime('%H')|int }} {{ now().strftime('%M')|int }} a.m.
         {% endif %}
 
@@ -39,32 +43,18 @@
 
       {% endif %}
       </p>
-      
-      <p>
-      {{ [
-          'Today is ',
-          'If you have not been keeping track today is ',
-          'Do you know what day of the week it is? Today is ',
-          'I hate to be the bearer of bad news, but today is '
-      ]|random }}
-      {{states('sensor.date_dayoftheweek') }}.
-      </p>
-      
+
       <p>
         It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.entrance_temperature')|round}} degrees in Kawagoodchi. 
       </p>
-
-
       
       <p>
         {{ [
             'The rest of the day should be,',
-            'Todays forecast should be,'
+            'Weather forecast should be,'
         ]|random }}
           {{ states('sensor.wbio_current_condition') }}. 
         </p>
-
-
 
         <p>
           {% if is_state('sensor.date_dayoftheweek', 'Sunday') %}
@@ -111,7 +101,7 @@
           {% endif %}
           {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) and 'After School Care' not in states('sensor.school_event') %}
             {% if is_state('sensor.school_lunch', 'Nothing') %}
-              I am not sure what the school menu is for today, so plan on She on taking his lunch 
+              I am not sure what the school menu is, so plan on She on taking his lunch 
             {% else %}
               School lunch is {{ states('sensor.school_lunch') }}, lets hope She on is not too picky on his plate.
             {% endif %}
@@ -181,7 +171,7 @@
                 'So I guess you know what to do.' ] | random }}
             {% endfor %}
             {% else %} 
-                you have no batteries to replace today.
+                you have no batteries to replace.
             {% endif %}
       </p>
 
