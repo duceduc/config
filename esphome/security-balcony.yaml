@@ -10,7 +10,7 @@ packages:
 
 esphome:
   name: $name
-  platform: esp32
+esp32:
   board: nodemcu-32s #esp-wrover-kit  
 
 sensor:
@@ -22,7 +22,6 @@ sensor:
           window_size: 15
           send_every: 15
           send_first_at: 1
-
 
 binary_sensor:
   - platform: gpio

@@ -27,10 +27,8 @@ esphome:
       - lambda: |-
           auto uart_component = static_cast<LD2410 *>(ld2410);
           uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);
-
 esp8266:
   board: d1_mini
-
 
 sensor:
   - platform: wifi_signal

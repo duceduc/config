@@ -13,7 +13,7 @@ packages:
 
 esphome:
   name: $name
-  platform: esp32
+esp32:
   board: featheresp32 # need this chipset CP2104 
 
 color:

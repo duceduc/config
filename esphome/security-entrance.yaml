@@ -10,7 +10,7 @@ packages:
 
 esphome:
   name: $name
-  platform: esp32
+esp32:
   board: nodemcu-32s
 
 sensor:
