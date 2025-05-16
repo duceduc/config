@@ -34,7 +34,7 @@
           - binary_sensor.mr_presence        
           - input_boolean.masterroom_mcl
 
-- alias: Masterroom Light
+- alias: Masterroom Light #disable for testing automation below.
   description: 'toggle light depending on timer state'
   mode: single  
   triggers:
@@ -101,6 +101,47 @@
               target:
                 entity_id: timer.masterroom_timer
       default: []
+
+
+#### TEST for above removal #####
+
+
+- alias: Masterroom Auto-on
+  mode: single  
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.masterroom_occupied
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # pc is not off
+      value_template: "{{ not is_state('binary_sensor.desktop_status', 'off') }}"      
+    - condition: time
+      after: '06:00:00'
+      before: '22:01:00'
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.masterroom_occupied
+              state: "on"
+          sequence:
+            - action: script.tradfri_transition
+              data:
+                entity_id: light.m_1
+                color_temp: 370 # beige color
+                transition: 2
+                brightness: 255
+              entity_id: light.m_1
+      default:
+        - action: light.turn_off
+          target:
+            entity_id: light.master
+
+
+
 
 
 #########################################################

@@ -96,7 +96,9 @@ template:
             | selectattr('state', 'eq', 'kitchen') 
             | list 
             | count }}
-
+          full_on: >
+            {%- set trig = (now() - states.light.cabinet.last_changed).seconds -%}
+              {{ is_state('light.cabinet', 'on') and trig > 30 }}
 
       - name: livingroom_occupied
         unique_id: livingroom_occupied 
@@ -155,6 +157,7 @@ template:
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
+        delay_off: 5
         attributes: 
           people_count: >
             {{ expand('group.room_presence') 
