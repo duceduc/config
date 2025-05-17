@@ -134,7 +134,6 @@
                 color_temp: 370 # beige color
                 transition: 2
                 brightness: 255
-              entity_id: light.m_1
       default:
         - action: light.turn_off
           target:

@@ -111,6 +111,86 @@
             entity_id: timer.kitchen_timer
       default: []
 
+
+
+#### TEST for above removal #####
+- alias: Kitchen Auto-on
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_occupied
+      id: 'pre'
+      from: 'off'
+      to: 'on'
+
+    - trigger: template
+      value_template: "{{ state_attr('binary_sensor.kitchen_occupied', 'full_on') == true }}"
+      id: 'on'
+    - trigger: state
+      entity_id: sensor.kt_illuminance
+      id: 'on'
+      from: 'off'
+      to: 'on'
+
+    - trigger: state # manual turn off lights
+      entity_id: light.cabinet
+      id: 'off'
+      from: 'on'
+      to: 'off'
+    - trigger: state
+      entity_id: binary_sensor.kitchen_occupied
+      id: 'off'
+      from: 'on'
+      to: 'off'
+  
+  conditions: []
+#    - condition: template # disable motion light
+#      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+  actions:
+    - choose:
+      - conditions:
+          - condition: trigger
+            id: 'pre'
+        sequence:
+          - action: light.turn_on
+            data:
+              entity_id: |
+               {% if is_state('binary_sensor.lr_radar_status', 'off') %}
+                  light.k_1, light.k_3
+               {% elif states.sensor.lr_radar_illuminance.state | float <= 0.09 %}
+                  light.k_1
+               {% else %}
+                  light.k_1, light.k_3
+               {% endif %}
+      - conditions:
+          - condition: trigger
+            id: 'on'
+        sequence:
+          - condition: template
+            value_template: "{{ is_state('light.cabinet', 'on') }}"
+          - service_template: script.motion_kitchen_lights_illuminance_{{ 'offline' if is_state('binary_sensor.lr_radar_status', 'off') else 'online' }}
+
+      - conditions:
+          - condition: trigger
+            id: 'off'
+          - condition: template # disable motion light
+            value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
+        sequence:
+          - action: light.turn_off
+            entity_id: light.cabinet, light.counter
+          - action: timer.finish
+            entity_id: timer.kitchen_timer
+      default: []
+            
+
+
+
+
+
+
+
+
+
 #########################################################
 #
 #             Override Auto Mode Lights On/Off

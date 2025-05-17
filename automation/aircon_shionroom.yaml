@@ -100,6 +100,44 @@
       default: []
 
 
+
+
+#### TEST for above removal #####
+
+- alias: Shionroom Auto-on 
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.shionroom_occupied
+  conditions:
+    - condition: template # disable motion light
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
+    - condition: template # Someone is home
+      value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
+    - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
+      value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.shionroom_occupied
+              state: "on"
+          sequence:
+            - action: script.tradfri_transition
+              data:
+                entity_id: light.shion
+                color_temp: 143
+                transition: 2
+                brightness: '{% if states.sensor.aio_human_sensor_illuminance.state | float(0) < 0.15 %} 160 {% else %} 255 {% endif %}'
+      default:
+        - action: light.turn_off
+          target:
+            entity_id: light.shion
+
+
+
+
+
 #########################################################
 #                                                                                                              
 #             Override Auto Mode Lights On/Off                                                    
