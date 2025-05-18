@@ -273,24 +273,23 @@ cards:
       - type: custom:streamline-card
         template: server_tpl
         variables:
-          - title: ser
-          - entity_1: sensor.ser_memory_use
-          - entity_2: sensor.ser_disk_use
-          - entity_3: sensor.ser_cpu_usage
-          - entity_4: sensor.ser_temperature
-
-      - type: custom:streamline-card
-        template: server_tpl
-        variables:
-          - title: ngx
+          - title: ngx ###
           - entity_1: sensor.ngx_memory_use
           - entity_2: sensor.ngx_disk_use
           - entity_3: sensor.ngx_cpu_usage
           - entity_4: sensor.ngx_temperature
 
+      - type: custom:streamline-card
+        template: server_tpl
+        variables:
+          - title: ser ####
+          - entity_1: sensor.ser_memory_use
+          - entity_2: sensor.ser_disk_use
+          - entity_3: sensor.ser_cpu_usage
+          - entity_4: sensor.ser_temperature
 
       - type: entities
-        title: Server Load
+        title: hass ####
         show_header_toggle: false
         footer:
           type: graph
@@ -318,7 +317,6 @@ cards:
           - entity: sensor.ha_cpu_temperature
             name: CPU Temperature
             icon: mdi:thermometer
-
 
 
 ##RESOURCE INTENSE

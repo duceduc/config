@@ -76,11 +76,11 @@ template:
             {{ now().hour > 23 or now().hour < 6 }}
 
 # can delete this if above attr fires.
-      - name: hallway_nightlight
-        unique_id: hallway_nightlight 
-        icon: mdi:account-group
-        state: >
-         {{ now().hour > 23 or now().hour < 6 }}
+#      - name: hallway_nightlight
+#        unique_id: hallway_nightlight 
+#        icon: mdi:account-group
+#        state: >
+#         {{ now().hour > 23 or now().hour < 6 }}
 
 
       - name: kitchen_occupied
