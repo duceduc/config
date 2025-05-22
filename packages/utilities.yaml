@@ -102,7 +102,7 @@ template:
             | count }}
           full_on: >
             {%- set trig = (now() - states.light.cabinet.last_changed).seconds -%}
-              {{ is_state('light.cabinet', 'on') and trig > 10 }}
+              {{ is_state('light.cabinet', 'on') and trig > 15 }}
 
       - name: livingroom_occupied
         unique_id: livingroom_occupied 
