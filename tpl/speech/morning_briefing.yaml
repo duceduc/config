@@ -14,7 +14,7 @@
       <p>
       {% if now().strftime('%H')|int < 12 %}
         {% if now().strftime('%M')|int == 0 %}
-          It is {{ now().strftime('%H')|int }} AM.
+          It is {{ now().strftime('%H')|int }} a. m.
         {% else %}
           {{ ['Is anyone there? Ah yes,there you are. Today is ',
               'Wipe the sleep from your eyes humans, because today is ',
@@ -30,7 +30,7 @@
 
       {% elif now().strftime('%H')|int > 12 %}
         {% if now().strftime('%M')|int == 0 %}
-          It is {{ now().strftime('%H')|int }} PM.
+          It is {{ now().strftime('%H')|int }} p. m.
         {% else %}
           {{ ['Ahem! What time do you call this? You have missed half of ',
               'The sun is well up passed the building arm and in case you have not been keeping track today is ',

@@ -57,10 +57,7 @@
       </p>
 
 
-
-
       <p>
-
 
         {% if is_state('binary_sensor.evening','on') %}
           The overnight forecast says we can expect {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].condition }}.
