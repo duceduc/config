@@ -261,6 +261,7 @@ template:
         state: "{{ daily['weather.my_weather'].forecast[0].condition }}"
         attributes:
           forecast: "{{ daily['weather.my_weather'].forecast }}"
+          
 
 # My Weather Entities Hourly
   - trigger:
