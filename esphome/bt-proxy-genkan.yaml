@@ -2,7 +2,7 @@
 substitutions:
   name: bt-proxy-genkan
 
-<<: !include .base.yaml 
+<<: !include .base.yaml #.200
 <<: !include .base.sensors.yaml 
 
 packages:
@@ -10,7 +10,7 @@ packages:
 
 esphome:
   name: $name
-  friendly_name: $name
+#  friendly_name: $name
   name_add_mac_suffix: false
 
 
@@ -19,6 +19,6 @@ esphome:
 #  password: !secret ssid_pwd
 #  fast_connect : true
 #  manual_ip:
-#    static_ip: 192.168.1.199
+#    static_ip: 192.168.1.200
 #    subnet: 255.255.255.0
 #    gateway: 192.168.1.1

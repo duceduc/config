@@ -10,6 +10,12 @@ input_boolean:
     name: Freeze Warning
     icon: mdi:snowflake-alert
 
+input_number:
+  weather_forecast_max_temp_today:
+    min: 0
+    max: 50
+    step: 1
+
 sensor:
   - platform: template
     sensors:
@@ -261,7 +267,13 @@ template:
         state: "{{ daily['weather.my_weather'].forecast[0].condition }}"
         attributes:
           forecast: "{{ daily['weather.my_weather'].forecast }}"
-          
+          weather_forecast_max_temp_today: > # not showing up in ha. 
+            {% if daily['weather.my_weather'].forecast[0].temperature != None %}
+              {{ daily['weather.my_weather'].forecast[0].temperature }}
+            {% else %}
+              {{ states('input_number.weather_forecast_max_temp_today') }}
+            {% endif %}
+
 
 # My Weather Entities Hourly
   - trigger:
@@ -368,6 +380,20 @@ utility_meter:
     cycle: yearly
 
 automation:
+# the weather channel integration fix for temp not showing after 2pm
+  - alias: Weather - Set Daily Maximum Forecasted Temperature
+    trigger:
+    - platform: time
+      at: '14:00:00'
+    condition: []
+    action:
+    - service: input_number.set_value
+      data:
+        value: "{{ state_attr('sensor.my_weather_forecast_daily', 'weather_forecast_max_temp_today') }}"
+      target:
+        entity_id: input_number.weather_forecast_max_temp_today
+    mode: single
+
   - alias: Forecast Low Near Freezing
     triggers:
       - trigger: numeric_state
