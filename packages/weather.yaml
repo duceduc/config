@@ -138,7 +138,7 @@ sensor:
 
       wbio_current_temperature:
         friendly_name: 'Current Temperature'
-        value_template: "{{ state_attr('weather.my_weather', 'temperature') }}"
+        value_template: "{{ states('sensor.entrance_temperature') }}"
         device_class: temperature
       wbio_daytime_temperature:
         friendly_name: 'Daytime Temperature'
