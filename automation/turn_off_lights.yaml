@@ -17,7 +17,6 @@
       data:
         entity_id: "{{ trigger.entity_id }}"
 
-
 - alias: 'closet storage room auto-off'
   triggers:
     - trigger: state
@@ -45,6 +44,27 @@
       to: 'on' 
   actions:
     - action: script.lights_out
+
+
+
+#- alias: 'Duc Presence Alone'
+#  triggers:
+#    - trigger: state
+#      entity_id: binary_sensor.duc_presence_alone
+#  conditions: []
+#  actions:
+#    - choose:
+#        - conditions:
+#            - condition: state
+#              entity_id: binary_sensor.duc_presence_alone
+#              state: 'off'
+#          sequence: 
+#            - action: input_boolean.turn_on
+#              entity_id: input_boolean.disable_motion_lights
+#      default:
+#        - action: input_boolean.turn_off
+#          entity_id: input_boolean.disable_motion_lights
+
 
 
 #########################################################

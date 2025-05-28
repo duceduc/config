@@ -18,12 +18,13 @@
           {% else %} mdi:home-outline
           {% endif %}
 
+
   - platform: template
     sensors:
       duc_presence_alone: # for auto light triggers
         device_class: presence
         friendly_name: 'Duc Presence Alone'
-        value_template: "{{ not is_state('device_tracker.ie', 'home') and not is_state('device_tracker.shion', 'home') and is_state('device_tracker.id', 'home' ) }}"
+        value_template: "{{ is_state('binary_sensor.eri_presence', 'off') and is_state('binary_sensor.shion_presence', 'off') and is_state('device_tracker.id', 'home' ) }}"
         icon_template: >-
           {% if is_state('binary_sensor.duc_presence_alone','on') %} mdi:motion-sensor
           {% else %} mdi:motion-sensor-off
