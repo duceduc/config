@@ -47,23 +47,23 @@
 
 
 
-#- alias: 'Duc Presence Alone'
-#  triggers:
-#    - trigger: state
-#      entity_id: binary_sensor.duc_presence_alone
-#  conditions: []
-#  actions:
-#    - choose:
-#        - conditions:
-#            - condition: state
-#              entity_id: binary_sensor.duc_presence_alone
-#              state: 'off'
-#          sequence: 
-#            - action: input_boolean.turn_on
-#              entity_id: input_boolean.disable_motion_lights
-#      default:
-#        - action: input_boolean.turn_off
-#          entity_id: input_boolean.disable_motion_lights
+- alias: 'Duc Presence Alone'
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.duc_presence_alone
+  conditions: []
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.duc_presence_alone
+              state: 'off'
+          sequence: 
+            - action: input_boolean.turn_on
+              entity_id: input_boolean.disable_motion_lights
+      default:
+        - action: input_boolean.turn_off
+          entity_id: input_boolean.disable_motion_lights
 
 
 
