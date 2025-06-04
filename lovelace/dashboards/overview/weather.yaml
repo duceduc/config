@@ -31,6 +31,23 @@ cards:
         entity: camera.security_balcony
         camera_view: live
 
+      - type: custom:webrtc-camera
+        entity: camera.balcony
+        poster: image.entrance_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.balcony
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.balcony
+
+
       - type: custom:hui-element
         card_type: weather-forecast
         entity: weather.my_weather

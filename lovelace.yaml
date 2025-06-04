@@ -34,6 +34,9 @@
         type: module
       - url: /local/custom_ui/streamline-card.js?v=4
         type: module
+      - url: /webrtc/webrtc-camera.js
+        type: module
+
 
       - url: /local/custom_ui/button-card.js
         type: module
