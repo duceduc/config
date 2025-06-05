@@ -84,6 +84,30 @@ binary_sensor:
 
 
 automation:
+# There is delay due to cloud polling
+  - alias: 'Enable Balcony Light'
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.balcony_motion_detected
+    conditions:
+      - condition: state
+        entity_id: sensor.period_of_the_day
+        state: nightlight
+    actions:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.balcony_motion_detected
+                state: "off"
+            sequence:
+              - action: switch.turn_off
+                entity_id: switch.balcony_light
+        default:
+          - action: switch.turn_on
+            entity_id: switch.balcony_light
+
+
+
   #############################################
   # When sentry mode is enabled / security armed by any method, check the doors and notify everyone.
   - id: sentry_mode_enabled
