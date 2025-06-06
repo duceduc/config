@@ -47,6 +47,8 @@
 
 
 
+
+
 - alias: 'Duc Presence Alone'
   triggers:
     - trigger: state
@@ -64,6 +66,10 @@
       default:
         - action: input_boolean.turn_off
           entity_id: input_boolean.disable_motion_lights
+
+
+
+
 
 
 
