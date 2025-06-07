@@ -94,6 +94,71 @@ automation:
         entity_id: switch.balcony_light
 
 
+  - alias: Capture Image on Trigger, Send Mobile Notification with Actions, Snooze or Alarm via Actions
+    trigger:
+      - platform: state
+        entity_id:
+          - image.balcony_event_image
+        id: sensor
+      - platform: event
+        event_type: mobile_app_notification_action
+        id: snooze
+        event_data:
+          action: SNOOZE
+      - platform: event
+        event_type: mobile_app_notification_action
+        id: alarm
+        event_data:
+          action: ALARM
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ as_timestamp(states.image.balcony_event_image.last_changed) == as_timestamp(states.image.balcony_event_image.last_updated) }}
+      - condition: template # Someone is not home
+        value_template: "{{ not is_state('input_select.home_mode', 'Home') }}"
+    actions:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: sensor
+            sequence:
+              - delay: 3
+              - action: notify.mobile_app_id
+                data:
+                  message: Motion detected - Balcony
+                  data:
+                    image: /api/image_proxy/image.balcony_event_image
+                    actions:
+                      - action: ALARM
+                        title: Alarm
+                      - action: SNOOZE
+                        title: Snooze
+          - conditions:
+              - condition: trigger
+                id: snooze
+            sequence:
+              - action: eufy_security.snooze
+                data:
+                  snooze_time: 10
+                  snooze_chime: false
+                  snooze_motion: true
+                  snooze_homebase: false
+                target:
+                  entity_id: camera.balcony
+          - conditions:
+              - condition: trigger
+                id: alarm
+            sequence:
+              - action: eufy_security.trigger_camera_alarm_with_duration
+                data:
+                  duration: 1
+                target:
+                  entity_id: camera.balcony
+    mode: single
+
+
+
+
 
   #############################################
   # When sentry mode is enabled / security armed by any method, check the doors and notify everyone.
