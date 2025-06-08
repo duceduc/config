@@ -262,7 +262,7 @@ template:
         response_variable: daily
     sensor:
       - name: My Weather Forecast Daily
-        unique_id: 70ee7e23-c14f-4ba4-bfd3-02df54f5b33b
+        unique_id: my_weather_forecast daily
         icon: mdi:weather-cloudy
         state: "{{ daily['weather.my_weather'].forecast[0].condition }}"
         attributes:
@@ -273,7 +273,6 @@ template:
             {% else %}
               {{ states('input_number.weather_forecast_max_temp_today') }}
             {% endif %}
-
 
 # My Weather Entities Hourly
   - trigger:
@@ -288,11 +287,40 @@ template:
         response_variable: hourly
     sensor:
       - name: My Weather Forecast Hourly
-        unique_id: b7e93d06-2d73-465c-826a-a786f462ef42
+        unique_id: my_weather_forecast hourly
         icon: mdi:weather-cloudy
         state: "{{ hourly['weather.my_weather'].forecast[0].condition }}"
         attributes:
           forecast: "{{ hourly['weather.my_weather'].forecast }}"
+
+# My Weather Precipitation Chance Hourly
+  - trigger:
+      - platform: time_pattern
+        minutes: /15
+      - platform: homeassistant
+        event: start
+    action:
+      - action: weather.get_forecasts
+        data:
+          type: hourly
+        target:
+          entity_id: weather.my_weather
+        response_variable: hourly_forecast_data
+    sensor:
+      - name: My Weather Forecast Precipitation Hourly
+        unique_id: my_weather_forecast_precipitation_hourly
+        unit_of_measurement: "%"
+        icon: mdi:weather-pouring
+        state: >
+          {% set forecast = hourly_forecast_data['weather.my_weather'].forecast %}
+          {% if forecast is not none and forecast | length > 1 %}
+            {{ (forecast[1].precipitation_probability) | round(0) }}
+          {% else %}
+            unavailable
+          {% endif %}
+        attributes:
+          last_fetch: "{{ now().isoformat() }}"
+
 
   - binary_sensor:
       - name: "Freeze Warning"

@@ -33,7 +33,7 @@ cards:
 
       - type: custom:webrtc-camera
         entity: camera.balcony
-        poster: image.entrance_event_image
+        poster: image.balcony_event_image
         ui: true
         shortcuts:
           - name: Play
