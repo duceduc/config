@@ -54,6 +54,8 @@
         type: js
       - url: /local/custom_ui/auto-entities.js?v=1.13
         type: js
+      - url: /local/custom_ui/simple-inventory-card.js?v=0.1.5
+        type: js
 
       - url: /local/custom_ui/ha-lcars-panel.js?v=3
         type: module
