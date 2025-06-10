@@ -62,6 +62,8 @@ cards:
              cycle_days: 60
 
 
+      - type: custom:simple-inventory-card
+        entity: sensor.home_inventory
 
 
 

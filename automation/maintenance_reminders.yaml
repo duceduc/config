@@ -1,5 +1,46 @@
 #########################################################
 #                                                                                                              
+#             Inventory Items Reminder                                                                 
+#                                                                                                              
+#########################################################
+
+- alias: Notify about expiring inventory items
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.items_expiring_soon
+      above: 0
+    - platform: time
+      at: "06:00:00"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.items_expiring_soon
+      above: 0
+  action:
+    - service: notify.mobile_app_id
+      data:
+        title: "🗓️ Inventory Items Expiring Soon"
+        message: >
+          {% set expiring = state_attr('sensor.items_expiring_soon', 'expiring_items') %}
+          {% set expired = state_attr('sensor.items_expiring_soon', 'expired_items') %}
+          {% if expired %}
+            ⚠️ {{ expired | length }} expired items: {{ expired[:3] | map(attribute='name') | join(', ') }}
+          {% endif %}
+          {% if expiring %}
+            📅 {{ expiring | length }} expiring soon: {{ expiring[:3] | map(attribute='name') | join(', ') }}
+          {% endif %}
+        data:
+          actions:
+            - action: "view_inventory"
+              title: "View Inventory"
+
+
+
+
+
+
+
+#########################################################
+#                                                                                                              
 #             Maintenance Reminders                                                                  
 #                                                                                                              
 #########################################################
