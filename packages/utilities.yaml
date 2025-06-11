@@ -19,7 +19,7 @@ template:
           {{ expand('group.critical_batteries') 
           | rejectattr('state', 'eq', '100')
           | rejectattr('state', 'in', ['unavailable','unknown'])
-          | selectattr('state', 'lt', '30') | list | count }}
+          | selectattr('state', 'lt', '41') | list | count }}
     
 # TESTING
   - binary_sensor:

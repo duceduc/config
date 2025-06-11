@@ -148,7 +148,7 @@
           {% set batts = expand('group.critical_batteries') 
             | rejectattr('state', 'eq', '100')
             | rejectattr('state', 'in', ['unavailable','unknown'])
-            | selectattr('state', 'lt', '30') | list %}
+            | selectattr('state', 'lt', '41') | list %}
           {% for bat in batts %}
             The {{ bat.name }} is at {{ bat.state }}%. 
             {{ ['This is lower than the minimum thresshold for satisfactory operation.',
@@ -162,7 +162,7 @@
           {% set batts = expand('group.srv_critical_batteries')
             | selectattr('state', 'eq', 'on') | list %}
           {% for bat in batts %}
-            The {{ bat.name }} is less than 35%.
+            The {{ bat.name }} is less than 45%.
             {{ ['This is lower than the minimum thresshold for satisfactory operation.',
                 'Any lower and it will cease to function.',
                 'That is pretty low'] | random }}
