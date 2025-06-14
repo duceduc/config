@@ -15,10 +15,10 @@ substitutions:
   interval3: "30"
   interval4: "60"
   interval5: "120"
-  # Plunger Pulse Duration. Range: 55-200
-  squirt_pulse: "210ms"
+  # Plunger Pulse Duration. Range: 55-100, 3v at 210
+  squirt_pulse: "140ms"
   # Cannister Squirt Capacity
-  maxSquirts: "280" #max 280
+  maxSquirts: "300" #max 280
 
 packages:
 #  ld2410: !include components/ld2410-v2.yaml
