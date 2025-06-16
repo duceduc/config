@@ -1,0 +1,40 @@
+substitutions:
+  manufacturer: Tuya
+  model: HC-S050-WIFI
+
+esphome:
+  name: usb-relay-adapter1
+bk72xx:
+  board: generic-bk7231n-qfn32-tuya
+
+<<: !include .base.yaml  
+
+switch:
+  - platform: gpio
+    id: relay
+    name: "Relay"
+    pin: P7
+    restore_mode: RESTORE_DEFAULT_OFF
+
+light:
+  - platform: status_led
+    name: "Status LED"
+    disabled_by_default: true
+    entity_category: diagnostic
+    pin:
+      number: P6
+      inverted: true
+
+binary_sensor:
+  - platform: gpio
+    id: btn
+    pin:
+      number: P8
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: Side button
+    on_release:
+      then:
+        - switch.toggle: relay
