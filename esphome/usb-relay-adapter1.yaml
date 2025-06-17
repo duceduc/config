@@ -1,9 +1,10 @@
 substitutions:
   manufacturer: Tuya
-  model: HC-S050-WIFI
+  model: hc-s050-wifi
+  name: usb-relay-adapter1
 
 esphome:
-  name: usb-relay-adapter1
+  name: $name
 bk72xx:
   board: generic-bk7231n-qfn32-tuya
 
