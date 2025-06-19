@@ -93,6 +93,33 @@ automation:
       - action: switch.toggle
         entity_id: switch.balcony_light
 
+  - alias: 'Charge Balcony Camera'
+    triggers:
+      - platform: numeric_state
+        entity_id: sensor.balcony_battery_percentage
+        below: 25
+      - platform: numeric_state
+        entity_id: sensor.balcony_battery_percentage
+        above: 95
+    conditions: []
+    actions:
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.balcony_battery_percentage
+                below: 25
+            sequence:
+              - action: switch.turn_on
+                entity_id: switch.usb_relay_adapter1_relay
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.balcony_battery_percentage
+                above: 95
+            sequence:
+              - action: switch.turn_off
+                entity_id: switch.usb_relay_adapter1_relay
+        default: []
+
 
   - alias: Capture Image on Trigger, Send Mobile Notification with Actions, Snooze or Alarm via Actions
     trigger:
