@@ -261,6 +261,12 @@
       data:
         option: 'Home'
     - action: script.standby
+    - action: select.select_option
+      target:
+        entity_id: select.balcony_guard_mode
+      data:
+        option: Home
+
 
 # Away
 - alias: Home Mode - Leaving
@@ -288,6 +294,11 @@
         title: '*Home Status*'
     - action: input_boolean.turn_on #### RE ENABLE THIS WHEN RETURN FROM USA
       entity_id: input_boolean.sentry_mode
+    - action: select.select_option
+      target:
+        entity_id: select.balcony_guard_mode
+      data:
+        option: Away
 
         
 # Returning
