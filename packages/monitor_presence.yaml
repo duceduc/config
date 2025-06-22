@@ -227,7 +227,7 @@ template:
 
 
   - sensor:
-      - name: "ESPresense Devices"
+      - name: "ESPresense Devices" # espresense is online
         state: |
           {% if expand('group.espresense_devices') | selectattr('state', 'eq', 'off') | list | count >= 1 %}
             {% set sensor = expand('group.espresense_devices') | selectattr('state', 'eq', 'off') | sort(attribute='last_changed') | last %}

@@ -1,8 +1,8 @@
-# [08:B6:1F:C0:EC:40]
+# [D8:13:2A:2E:DB:10]
 substitutions:
-  name: bt-proxy-genkan
+  name: bt-proxy-livingroom
 
-<<: !include .base.yaml #.200
+<<: !include .base.yaml #.221 
 <<: !include .base.sensors.yaml 
 
 packages:

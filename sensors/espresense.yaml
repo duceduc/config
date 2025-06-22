@@ -10,7 +10,7 @@
 
 # id iphone - irk:8bcf809f09f2919c1094ba36979ae5d5
 # ie iphone - irk:753cc977a5339bf6074a99949a2f1267
-# is iphone - irk:6421f5964ea2c29d1dcd14a8293d0c3a [iphone:is]
+# is iphone - irk:6421f5964ea2c29d1dcd14a8293d0c3a
 # id watch: 051e96f65fdb83de199d30070ef37f7e 
 # ie watch: fc5505f5ea6bb804e3f1febb43d1cce3
 
@@ -26,8 +26,8 @@
 
   - platform: mqtt_room
     name: 'Duc iWatch ESPresense'
-    device_id: irk:051e96f65fdb83de199d30070ef37f7e # apple:1005:9-24
-    state_topic: espresense/devices/irk:051e96f65fdb83de199d30070ef37f7e
+    device_id: 'irk:051e96f65fdb83de199d30070ef37f7e' # apple:1005:9-24
+    state_topic: 'espresense/devices/irk:051e96f65fdb83de199d30070ef37f7e'
     timeout: 10
     away_timeout: 45
 
@@ -41,16 +41,16 @@
 
   - platform: mqtt_room
     name: 'Eri iWatch ESPresense'
-    device_id: irk:fc5505f5ea6bb804e3f1febb43d1cce3 # apple:1005:9-26
-    state_topic: espresense/devices/irk:fc5505f5ea6bb804e3f1febb43d1cce3
+    device_id: 'irk:fc5505f5ea6bb804e3f1febb43d1cce3' # apple:1005:9-26
+    state_topic: 'espresense/devices/irk:fc5505f5ea6bb804e3f1febb43d1cce3'
     timeout: 10
     away_timeout: 45
 
 # Shion iphone
   - platform: mqtt_room
     name: 'Shion ESPresense'
-    device_id: iphone:is
-    state_topic: espresense/devices/iphone:is
+    device_id: 'irk:6421f5964ea2c29d1dcd14a8293d0c3a'
+    state_topic: 'espresense/devices/irk:6421f5964ea2c29d1dcd14a8293d0c3a'
     timeout: 10
     away_timeout: 45
 
@@ -61,10 +61,6 @@
     state_topic: 'espresense/devices/tile:ed5cc31a97c6'
     timeout: 10
     away_timeout: 60
-
-
-
-
 
 
 #  DELETE 3 BELOW
