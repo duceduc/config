@@ -2,11 +2,8 @@
 substitutions:
   name: shoshuriki
   room: Shoshuriki
-
   temp_offset: "-1.3"
   hum_offset: "6"
-  # Timing Intervals: Adjust to suit your Need/Situation.
-  # NOTE: Values MUST BE in "quotes"
   interval1: "5"
   interval2: "15"
   interval3: "30"
@@ -89,7 +86,6 @@ binary_sensor: # not working for small glade
             }
 
 select:
-  # Drop-Down Menu, "Select" in Home Assistant for Interval Automation
   - platform: template
     id: intervalSelect
     name: $name Interval
@@ -117,7 +113,6 @@ script:
             lambda: 'return id(intervalSelect).state != "Off";'
           then:
             - delay: !lambda 'return atoi(id(intervalSelect).state.c_str()) * 60000;' # For testing. Default 60000
-            # Fire off a Squirt
             - switch.turn_on: theSquirter
 
 switch:
@@ -139,7 +134,6 @@ switch:
             global_preferences->sync();
 
 sensor:
-  # Cannister Percentage
   - platform: template
     id: can_level
     name: $name Can
