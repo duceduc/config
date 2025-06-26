@@ -46,9 +46,6 @@
     - action: script.lights_out
 
 
-
-
-
 - alias: 'Duc Presence Alone'
   triggers:
     - trigger: state

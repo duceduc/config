@@ -1,0 +1,160 @@
+#  [ ]
+# change network ssid
+# https://0xbadcoffee.se/blog/migrating-esphome-devices-to-a-new-network-ota
+
+substitutions:
+  name: sr-airfreshener
+  room: Sr
+
+  temp_offset: "0"
+  hum_offset: "0"
+  interval1: "5"
+  interval2: "15"
+  interval3: "30"
+  interval4: "60"
+  interval5: "120"
+  # Plunger Pulse Duration. Range: 55-100, 3v at 210
+  squirt_pulse: "140ms"
+  # Cannister Squirt Capacity
+  maxSquirts: "300" #max 280
+
+packages:
+#  ld2410: !include components/ld2410-v2.yaml
+#  aht10: !include components/aht10.yaml
+
+<<: !include .base.yaml
+
+i2c: # for aht10
+  sda: GPIO5
+  scl: GPIO6
+  scan: true
+
+esphome:
+  name: $name
+  platformio_options:
+    board_build.flash_mode: dio
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: arduino
+    platform_version: 5.4.0
+
+globals:
+  # Store the Cannister Percentage
+  - id: squirts
+    type: float
+    restore_value: yes
+
+  # Timer for Hold Button Reset
+  - id: press_duration
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+button:
+  - platform: template
+    name: $room Alt Button
+    icon: mdi:restart
+    on_press:
+      then:
+        - lambda: |-
+            ESP_LOGD("Scent-a-Tron", "Can Percentage RESET");
+            id(squirts) = 0;
+            id(can_level).publish_state(100);
+            global_preferences->sync();
+
+binary_sensor: 
+  - platform: gpio
+    name: $name Button
+    disabled_by_default: true
+    pin:
+      number: GPIO2
+      inverted: True
+
+    on_press:
+      then:
+        - lambda: |-
+            id(press_duration) = millis();
+    on_release:
+      then:
+        - lambda: |-
+            if (millis() - id(press_duration) < 3000) {
+            ESP_LOGD("Scent-a-Tron", "The Button Was Pressed!");
+            id(theSquirter).turn_on();
+            } else {
+            ESP_LOGD("Scent-a-Tron", "Can Percentage RESET");
+            id(squirts) = 0;
+            id(can_level).publish_state(100);
+            global_preferences->sync();
+            }
+  - platform: status
+    name: $name status
+
+
+select:
+  - platform: template
+    id: intervalSelect
+    name: $name Interval
+    icon: mdi:timer-outline
+    optimistic: true
+    restore_value: true
+    options:
+      - "Off"
+      - $interval1 Minutes
+      - $interval2 Minutes
+      - $interval3 Minutes
+      - $interval4 Minutes
+      - $interval5 Minutes
+    on_value:
+      then:
+        - script.execute: squirtTimer
+
+script:
+  - id: squirtTimer
+    mode: restart
+    then:
+      - while:
+          condition:
+            lambda: 'return id(intervalSelect).state != "Off";'
+          then:
+            - delay: !lambda 'return atoi(id(intervalSelect).state.c_str()) * 60000;' # For testing. Default 60000
+            # Fire off a Squirt
+            - switch.turn_on: theSquirter
+
+switch:
+  # The Glade DC Motor
+  - platform: gpio
+    name: $name
+    id: theSquirter
+    icon: mdi:spray
+    pin:
+      number: GPIO10
+    on_turn_on:
+      then:
+        - delay: $squirt_pulse
+        - switch.turn_off: theSquirter
+        - lambda: |-
+            id(squirts) += 1;
+            id(can_level).publish_state( (($maxSquirts-id(squirts))/$maxSquirts) * 100 );
+            ESP_LOGD("Scent-a-Tron", "I Squirted!");
+            global_preferences->sync();
+
+sensor:
+  - platform: wifi_signal
+    name: $name wifi signal
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+
+  # Cannister Percentage
+  - platform: template
+    id: can_level
+    name: $name Can
+    device_class: volume
+    unit_of_measurement: "Can"
+    update_interval: $interval1 min
+    lambda: |-
+      return (($maxSquirts-id(squirts))/$maxSquirts) * 100;
