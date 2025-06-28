@@ -1,13 +1,15 @@
-#  [ ]
+#  [ 24:ec:4a:ca:71:4c]
 # change network ssid
 # https://0xbadcoffee.se/blog/migrating-esphome-devices-to-a-new-network-ota
 
 substitutions:
-  name: sr-airfreshener
-  room: Sr
+  name: shion-airfreshener
+  room: Shion
 
-  temp_offset: "0"
-  hum_offset: "0"
+  temp_offset: "-.2"
+  hum_offset: "3"
+  # Timing Intervals: Adjust to suit your Need/Situation.
+  # NOTE: Values MUST BE in "quotes"
   interval1: "5"
   interval2: "15"
   interval3: "30"
@@ -19,22 +21,30 @@ substitutions:
   maxSquirts: "300" #max 280
 
 packages:
-#  ld2410: !include components/ld2410-v2.yaml
-#  aht10: !include components/aht10.yaml
+  ld2410: !include components/ld2410-v2.yaml
+  aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml
 
 i2c: # for aht10
-  sda: GPIO5
-  scl: GPIO6
+  sda: GPIO6 #D4
+  scl: GPIO7 #D5
   scan: true
+
+uart: # for ld2410
+  id: uart_1
+  tx_pin: GPIO21
+  rx_pin: GPIO20
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
 
 esphome:
   name: $name
   platformio_options:
     board_build.flash_mode: dio
 esp32:
-  board: esp32-c3-devkitm-1
+  board: seeed_xiao_esp32c3
   variant: esp32c3
   framework:
     type: arduino
@@ -64,12 +74,13 @@ button:
             id(can_level).publish_state(100);
             global_preferences->sync();
 
-binary_sensor: 
+binary_sensor: # not working for small glade
+  # Unit's Top Button for local Manual "Squirts" and Resetting Cannister Percentage
   - platform: gpio
     name: $name Button
     disabled_by_default: true
     pin:
-      number: GPIO2
+      number: GPIO9 # GPIO9 partial working
       inverted: True
 
     on_press:
@@ -93,6 +104,7 @@ binary_sensor:
 
 
 select:
+  # Drop-Down Menu, "Select" in Home Assistant for Interval Automation
   - platform: template
     id: intervalSelect
     name: $name Interval
@@ -111,6 +123,7 @@ select:
         - script.execute: squirtTimer
 
 script:
+  # Script for Auto squirt
   - id: squirtTimer
     mode: restart
     then:
@@ -129,7 +142,7 @@ switch:
     id: theSquirter
     icon: mdi:spray
     pin:
-      number: GPIO10
+      number: GPIO10  #D10 confirm to work
     on_turn_on:
       then:
         - delay: $squirt_pulse
