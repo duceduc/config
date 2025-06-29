@@ -5,6 +5,7 @@
 #   @description    :   Package for handling Presence detection based on RSSI level using Monitor script.  
 ###############################################################################
 
+# remove when convert over to bermuda
 group:
   espresense_devices:
     all: true
@@ -225,7 +226,7 @@ template:
             --
           {% endif %}
 
-
+# remove when convert over to bermuda
   - sensor:
       - name: "ESPresense Devices" # espresense is online
         state: |

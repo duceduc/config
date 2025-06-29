@@ -12,4 +12,3 @@ esphome:
   name: $name
   name_add_mac_suffix: false
 
-

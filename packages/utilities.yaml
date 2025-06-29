@@ -149,6 +149,9 @@ template:
             | selectattr('state', 'eq', 'shionroom') 
             | list 
             | count }}
+          squirt: >
+            {%- set squirt = (now() - states.switch.shion_airfreshener.last_changed).seconds -%}
+              {{ squirt > 3600 }}
 
       - name: masterroom_occupied
         unique_id: masterroom_occupied

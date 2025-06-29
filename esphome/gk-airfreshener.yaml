@@ -45,8 +45,10 @@ esp32:
   board: esp32-c3-devkitm-1
   variant: esp32c3
   framework:
-    type: arduino
-    platform_version: 5.4.0
+    type: esp-idf
+#    type: arduino # esp-idf (need to use cable when switching between types)
+
+
 
 globals:
   # Store the Cannister Percentage

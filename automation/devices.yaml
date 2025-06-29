@@ -107,7 +107,7 @@
 #        title: 'ESPresense Offline'
 #        message: "{{ states('sensor.espresense_devices') }} appears to be offline."
 
-
+# remove when convert over to bermuda
 - alias: "ESPresense Status"
   triggers:
     - trigger: template

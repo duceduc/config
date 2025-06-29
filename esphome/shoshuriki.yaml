@@ -4,13 +4,14 @@ substitutions:
   room: Shoshuriki
   temp_offset: "-1.3"
   hum_offset: "6"
+
   interval1: "5"
   interval2: "15"
   interval3: "30"
   interval4: "60"
   interval5: "120"
   # Plunger Pulse Duration. Range: 55-180
-  squirt_pulse: "150ms"
+  squirt_pulse: "170ms"
   # Cannister Squirt Capacity
   maxSquirts: "1400" #max 1400
 
@@ -101,7 +102,7 @@ select:
       - $interval5 Minutes
     on_value:
       then:
-        - script.execute: squirtTimer
+        - script.execute: squirtTimer 
 
 script:
   # Script for Auto squirt

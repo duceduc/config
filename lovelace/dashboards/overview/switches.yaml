@@ -37,6 +37,8 @@ cards:
             name: Yuasa Fan
           - entity: switch.gk_airfreshener
             name: Genkan Airfreshener
+          - entity: switch.shion_airfreshener
+            name: Shion Airfreshener
           - entity: switch.shoshuriki
             name: Desk Airfreshener
           - entity: switch.lr_airfreshener

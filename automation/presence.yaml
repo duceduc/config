@@ -4,6 +4,13 @@
 #                                                                                                             
 #########################################################
 
+#Testing bermuda.
+#espresense - duc_espresense, eri_espresense, shion_tms_espresense
+
+#sensor.duc_bermuda_area
+#sensor.eri_bermuda_area
+#sensor.shion_tms_bermuda_area
+
 # Duc combing both monitor and espresense detections
 - alias: Presence Duc On
   triggers:
@@ -11,7 +18,7 @@
       entity_id: sensor.id_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.duc_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
+      value_template: "{{ states('sensor.duc_bermuda_area').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
   actions:
     - action: input_boolean.turn_on
       data:
@@ -23,14 +30,14 @@
       entity_id: sensor.id_presence
       below: 10
     - trigger: state
-      entity_id: sensor.duc_espresense
-      to: 'not_home'
+      entity_id: sensor.duc_bermuda_area
+      to: 'unknown'
       
   conditions:
     - condition: template
       value_template: "{{ states('sensor.id_presence')| float(0) == 0.0 }}"   
     - condition: template
-      value_template: "{{ is_state('sensor.duc_espresense', 'not_home') }}"   
+      value_template: "{{ is_state('sensor.duc_bermuda_area', 'unknown') }}"   
 
   actions:
     - action: input_boolean.turn_off
@@ -45,7 +52,7 @@
       entity_id: sensor.ie_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.eri_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"
+      value_template: "{{ states('sensor.eri_bermuda_area').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
   actions:
     - action: input_boolean.turn_on
       data:
@@ -57,14 +64,14 @@
       entity_id: sensor.ie_presence
       below: 10
     - trigger: state
-      entity_id: sensor.eri_espresense
-      to: 'not_home'
+      entity_id: sensor.eri_bermuda_area
+      to: 'unknown'
 
   conditions:      
     - condition: template
       value_template: "{{ states('sensor.ie_presence')| float(0) == 0.0 }}"   
     - condition: template
-      value_template: "{{ is_state('sensor.eri_espresense', 'not_home') }}"   
+      value_template: "{{ is_state('sensor.eri_bermuda_area', 'unknown') }}"   
       
   actions:
     - action: input_boolean.turn_off
@@ -78,7 +85,7 @@
       entity_id: sensor.tms_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.shion_tms_espresense').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'livingroom', 'genkan'] }}"    
+      value_template: "{{ states('sensor.shion_tms_bermuda_area').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"    
   actions:
     - action: input_boolean.turn_on
       data:
@@ -90,11 +97,11 @@
       entity_id: sensor.tms_presence
       below: 10
     - trigger: state
-      entity_id: sensor.shion_tms_espresense
-      to: 'not_home'
+      entity_id: sensor.shion_tms_bermuda_area
+      to: 'unknown'
   conditions:
     - condition: template
-      value_template: "{{ is_state('sensor.shion_tms_espresense', 'not_home') }}"      
+      value_template: "{{ is_state('sensor.shion_tms_bermuda_area', 'unknown') }}"      
   actions:
     - action: input_boolean.turn_off
       data:

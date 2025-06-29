@@ -253,9 +253,13 @@ cards:
 #################################################
 
             - entities:
-              - sensor.eri_espresense
-              - sensor.duc_espresense
-              - sensor.shion_tms_espresense
+              - sensor.eri_bermuda_area
+              - sensor.duc_bermuda_area
+              - sensor.shion_tms_bermuda_area
+#              - sensor.eri_espresense
+#              - sensor.duc_espresense
+#              - sensor.shion_tms_espresense
+
               tap_action: false
               state_action:
                 action: call-service
@@ -264,7 +268,7 @@ cards:
                   element: "${entity.entity_id}"
                   style: |
                     >
-                    if( entity.state == "not_home" )
+                    if( entity.state == "unknown" )
                          return "display: none;";
                          return "display: block;"
 
