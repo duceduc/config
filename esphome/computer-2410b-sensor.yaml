@@ -10,7 +10,7 @@ esphome:
     board_build.flash_mode: dio
   project:
     name: Screek.Human_Sensor
-    version: 1W
+    version: 1w
 
 external_components:
   - source:
@@ -20,7 +20,6 @@ external_components:
     components: [uart, ld2410]
 
 #packages:
-#  esphome.bluetooth-proxy: github://esphome/firmware/bluetooth-proxy/esp32-generic.yaml@main
 #  aht10: !include components/aht10.yaml
 
 bluetooth_proxy:
@@ -38,8 +37,8 @@ i2c: # for aht10
 
 uart:
   id: uart_ld2410
-  tx_pin: TX
-  rx_pin: RX
+  tx_pin: GPIO3
+  rx_pin: GPIO1
   baud_rate: 256000
   parity: NONE
   stop_bits: 1
@@ -85,19 +84,26 @@ sensor:
     unit_of_measurement: 'kB'
     state_class: measurement
     entity_category: "diagnostic"
+
   - platform: ld2410
     moving_distance:
       name : Moving Distance
       id: moving_distance
+      disabled_by_default: true
     still_distance:
       name: Still Distance
       id: still_distance
+      disabled_by_default: true
     moving_energy:
       name: Move Energy
+      disabled_by_default: true
     still_energy:
       name: Still Energy
+      disabled_by_default: true
     detection_distance:
       name: Detection Distance
+      disabled_by_default: true
+
     light:
       name: Sun Light
 

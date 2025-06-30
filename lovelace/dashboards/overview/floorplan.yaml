@@ -97,7 +97,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.eri_bermuda_area
-            state: 'genkan'
+            state: 'Genkan'
         elements:
           - type: image
             image: /local/img/people/avatar-eri.png
@@ -110,7 +110,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.duc_bermuda_area
-            state: 'genkan'
+            state: 'Genkan'
         elements:
           - type: image
             image: /local/img/people/avatar-duc.png
@@ -289,7 +289,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.duc_bermuda_area
-            state: 'computerroom'
+            state: 'Computer'
         elements:
           - type: image
             image: /local/img/people/avatar-duc.png
@@ -302,7 +302,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.eri_bermuda_area
-            state: 'computerroom'
+            state: 'Computer'
         elements:
           - type: image
             image: /local/img/people/avatar-eri.png
@@ -315,7 +315,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.shion_tms_bermuda_area
-            state: 'computerroom'
+            state: 'Computer'
         elements:
           - type: image
             image: /local/img/people/avatar-shion.png

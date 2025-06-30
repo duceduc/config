@@ -18,7 +18,7 @@
       entity_id: sensor.id_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.duc_bermuda_area').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
+      value_template: "{{ states('sensor.duc_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
   actions:
     - action: input_boolean.turn_on
       data:
@@ -52,7 +52,7 @@
       entity_id: sensor.ie_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.eri_bermuda_area').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
+      value_template: "{{ states('sensor.eri_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
   actions:
     - action: input_boolean.turn_on
       data:
@@ -85,7 +85,7 @@
       entity_id: sensor.tms_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.shion_tms_bermuda_area').lower() in ['computerroom', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"    
+      value_template: "{{ states('sensor.shion_tms_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"    
   actions:
     - action: input_boolean.turn_on
       data:

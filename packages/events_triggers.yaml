@@ -54,6 +54,18 @@ automation:
           - action: script.turn_on
             target:
               entity_id: script.lr_ac_cool_toggle # Normal cool
+
+#          - action: input_select.select_option
+#            target:
+#              entity_id: input_select.lr_ac_mode
+#            data:
+#              option: Powerful Cool
+
+
+
+
+
+
         - conditions:
           - condition: template
             value_template: "{{trigger.to_state.attributes.event_type == 'arrow_right_hold'}}"
