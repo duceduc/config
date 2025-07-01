@@ -74,7 +74,7 @@
 - alias: 'Morning Wakeup Report'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.motion_cr_sensor_occupancy 
+      entity_id: binary_sensor.bt_proxy_computer_moving_target 
       to: 'on'
   conditions:
     - condition: time
@@ -102,7 +102,7 @@
 - alias: 'Morning Report'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.motion_cr_sensor_occupancy #binary_sensor.cr_has_moving_target
+      entity_id: binary_sensor.bt_proxy_computer_moving_target 
       to: 'on'
   conditions:
     - condition: time
@@ -132,7 +132,7 @@
 - alias: 'Daily Report'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.motion_cr_sensor_occupancy #binary_sensor.cr_has_moving_target
+      entity_id: binary_sensor.bt_proxy_computer_moving_target 
       to: 'on'
   conditions:
     - condition: time

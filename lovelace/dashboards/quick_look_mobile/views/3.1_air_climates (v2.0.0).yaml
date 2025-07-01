@@ -136,7 +136,7 @@ cards:
           - type: custom:button-card
             template: climate
             variables:
-              entity: sensor.computerroom_temperature
+              entity: sensor.bt_proxy_computer_room_temperature
               temperature_unit:
               temperature:
               battery:

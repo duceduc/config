@@ -97,7 +97,7 @@ template:
         attributes: 
           people_count: >
             {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'kitchen') 
+            | selectattr('state', 'eq', 'Kitchen') 
             | list 
             | count }}
           full_on: >
@@ -109,7 +109,7 @@ template:
         icon: mdi:account-group
         state: >
           {{ (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'livingroom') 
+            | selectattr('state', 'eq', 'Living') 
             | list 
             | count >= 1 )
             or 
@@ -121,16 +121,45 @@ template:
                 map(attribute='entity_id') |
                 list | count > 0 )
             or (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'livingroom') 
+            | selectattr('state', 'eq', 'Living') 
             | list 
             | count >= 1)
             }}
         attributes: 
           people_count: >
             {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'livingroom') 
+            | selectattr('state', 'eq', 'Living') 
             | list 
             | count }}
+
+      - name: computerroom_occupied
+        unique_id: computerroom_occupied 
+        icon: mdi:account-group
+        state: >
+          {{ (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'Computer') 
+            | list 
+            | count >= 1 )
+            or 
+            (states.binary_sensor | 
+                selectattr('entity_id', 'in', area_entities('Computer Room')) |
+                rejectattr('attributes.device_class', 'undefined') |
+                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                selectattr('state', 'eq', 'on') |
+                map(attribute='entity_id') |
+                list | count > 0 )
+            or (expand('group.room_presence') 
+            | selectattr('state', 'eq', 'Computer') 
+            | list 
+            | count >= 1)
+            }}
+        attributes: 
+          people_count: >
+            {{ expand('group.room_presence') 
+            | selectattr('state', 'eq', 'Computer') 
+            | list 
+            | count }}
+
 
       - name: shionroom_occupied
         unique_id: shionroom_occupied
@@ -171,33 +200,6 @@ template:
             | selectattr('state', 'eq', 'masterroom') 
             | list 
             | count }}
-
-      - name: computerroom_occupied
-        unique_id: computerroom_occupied
-        icon: mdi:account-group
-        state: >
-          {{ (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'computeroom') 
-            | list 
-            | count >= 1 )
-            or 
-            (states.binary_sensor | 
-                selectattr('entity_id', 'in', area_entities('Computer Room')) |
-                rejectattr('attributes.device_class', 'undefined') |
-                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
-                selectattr('state', 'eq', 'on') |
-                map(attribute='entity_id') |
-                list | count > 0 ) }}
-        delay_off: 60
-        attributes: 
-          people_count: >
-            {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'computerroom') 
-            | list 
-            | count }}
-
-
-
 
 script:
   update_critical_battery_group:

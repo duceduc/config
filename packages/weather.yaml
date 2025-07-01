@@ -217,7 +217,7 @@ sensor:
 #    entity_ids:
 #     - sensor.master_temperature
 #     - sensor.entry_temperature
-#     - sensor.computerroom_temperature
+#     - sensor.bt_proxy_computer_room_temperature
 #     - sensor.kitchen_temperature
 
   - platform: average
@@ -230,7 +230,7 @@ sensor:
       - sensor.master_temperature
       - sensor.livingroom_temperature
       - sensor.entry_temperature
-      - sensor.computerroom_temperature
+      - sensor.bt_proxy_computer_room_temperature
       - sensor.kitchen_temperature
 
   - platform: history_stats

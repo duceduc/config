@@ -47,7 +47,7 @@
         type: module
       - url: /local/custom_ui/weather-card.js
         type: module
-      - url: /local/custom_ui/honeycomb-menu.js?v=1
+      - url: /local/custom_ui/honeycomb-menu.js?v=7
         type: module
       - url: /local/custom_ui/vertical-stack-in-card.js
         type: js

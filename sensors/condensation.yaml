@@ -63,8 +63,8 @@
 # Computer Room Mold Chance
   - platform: mold_indicator
     name: Computerroom Condensation Chance
-    indoor_temp_sensor: sensor.computerroom_temperature 
-    indoor_humidity_sensor: sensor.computerroom_humidity 
+    indoor_temp_sensor: sensor.bt_proxy_computer_room_temperature 
+    indoor_humidity_sensor: sensor.bt_proxy_computer_room_humidity 
     outdoor_temp_sensor: sensor.entrance_temperature
     calibration_factor: 0.6
 

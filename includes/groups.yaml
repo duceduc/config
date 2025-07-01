@@ -35,9 +35,9 @@
       - binary_sensor.shion_presence
 
   room_presence:
-    - sensor.duc_espresense
-    - sensor.eri_espresense
-    - sensor.shion_tms_espresense
+    - sensor.duc_bermuda_area
+    - sensor.eri_bermuda_area
+    - sensor.shion_tms_bermuda_area
 
   guest_presence:
     - binary_sensor.sachiko_presence
@@ -120,7 +120,7 @@
     - binary_sensor.sr_has_moving_target
     - binary_sensor.hallway_moving_target
     - binary_sensor.genkan_moving_target
-    - binary_sensor.motion_cr_sensor_occupancy
+    - binary_sensor.bt_proxy_computer_moving_target
     - binary_sensor.wr_has_moving_target
     - binary_sensor.wc_moving_target
 

@@ -340,7 +340,7 @@ cards:
           bottom: 42.5%
           right: 33.2%
       - type: state-label
-        entity: sensor.computerroom_temperature
+        entity: sensor.bt_proxy_computer_room_temperature
         style:
           top: 24%
           right: 25%

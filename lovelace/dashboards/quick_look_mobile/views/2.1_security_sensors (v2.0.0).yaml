@@ -151,7 +151,7 @@ cards:
             variables:
               name: Computer
               contact: 
-              occupancy: binary_sensor.motion_cr_sensor_occupancy
+              occupancy: binary_sensor.bt_proxy_computer_moving_target
               lock: binary_sensor.computerroom_window
               contact_battery: 
               occupancy_battery: sensor.cr_window_battery

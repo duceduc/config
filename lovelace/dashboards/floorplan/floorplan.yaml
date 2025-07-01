@@ -200,7 +200,7 @@ cards:
 
             - entities:
               - sensor.espresense_computerroom_temperature
-              - sensor.computerroom_temperature
+              - sensor.bt_proxy_computer_room_temperature
               - sensor.kitchen_temperature
               - sensor.entrance_temperature
               - sensor.entrance_humidity                    
@@ -219,7 +219,7 @@ cards:
          
             - entities:
               - sensor.espresense_computerroom_temperature
-              - sensor.computerroom_temperature
+              - sensor.bt_proxy_computer_room_temperature
               - sensor.kitchen_temperature
               - sensor.entrance_temperature
               - sensor.shionroom_temperature

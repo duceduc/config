@@ -104,9 +104,9 @@
 # binary_sensor.cr_has_moving_target        
       computerroom:
         value_template: >-
-         {% if is_state("binary_sensor.motion_cr_sensor_occupancy", "off") %}Off{% else %}On{% endif %}
+         {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.motion_cr_sensor_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+         {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
       closet:
         value_template: >-
          {% if is_state("binary_sensor.master_clo_door_contact", "off") %}Close{% else %}Open{% endif %}
