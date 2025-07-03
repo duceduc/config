@@ -1,0 +1,18 @@
+# []
+substitutions:
+  name: bt-proxy-kitchen
+
+<<: !include .base.yaml
+<<: !include .base.sensors.yaml 
+
+packages:
+  esphome.bluetooth-proxy: github://esphome/firmware/bluetooth-proxy/esp32-generic.yaml@main
+
+esphome:
+  name: $name
+  name_add_mac_suffix: false
+
+esp32_ble_tracker:
+    scan_parameters:
+      window: 900ms
+      interval: 1000ms

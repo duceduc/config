@@ -36,7 +36,7 @@ cards:
             name: Entry Human
           - entity: sensor.kt_human_sensor_wifi_signal
             name: Kitchen Human
-          - entity: sensor.cr_sensor_wifi_signal
+          - entity: sensor.bt_proxy_computer_rssi
             name: Computerroom Sensor
 
         severity:
@@ -137,7 +137,7 @@ cards:
             name: Livingroom
           - entity: binary_sensor.sr_radar_status
             name: Shion Room
-          - entity: binary_sensor.cr_sensor_status
+          - entity: binary_sensor.bt_proxy_computer_online
             name: Computer Room
 
 
