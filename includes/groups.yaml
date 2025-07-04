@@ -106,7 +106,7 @@
   motion_showerroom_occupancy:
     name: Motion Shower Room Occupancy
     entities:
-      - binary_sensor.wr_has_moving_target
+      - binary_sensor.washroom_radar_moving_target
 #      - binary_sensor.motion_washroom_sensor_occupancy
 #      - binary_sensor.motion_sink_sensor_occupancy
 
@@ -121,7 +121,7 @@
     - binary_sensor.hallway_moving_target
     - binary_sensor.genkan_moving_target
     - binary_sensor.bt_proxy_computer_moving_target
-    - binary_sensor.wr_has_moving_target
+    - binary_sensor.washroom_radar_moving_target
     - binary_sensor.wc_moving_target
 
   home_alarm_motion_sensors:

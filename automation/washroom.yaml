@@ -7,10 +7,8 @@
 - alias: 'motion washroom auto-on'
   mode: parallel
   triggers:
-    - trigger: state
-      entity_id: binary_sensor.wash_occupied
-      from: 'off'
-      to: 'on'
+    - trigger: template
+      value_template: "{{ state_attr('binary_sensor.wash_occupied', 'initiated') == true }}"
     - trigger: state
       entity_id: binary_sensor.washer_door_button
       to: 'on'

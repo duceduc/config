@@ -23,6 +23,7 @@ binary_sensor:
       name: Still Target
 
 sensor:
+# debugging attributes only for esp32
   - platform: template
     id: sys_esp_temperature
     name: ESP Temperature
@@ -31,6 +32,15 @@ sensor:
     device_class: TEMPERATURE
     update_interval: 30s
     entity_category: "diagnostic"
+  - platform: template
+    id: esp_memory
+    icon: mdi:memory
+    name: ESP Free Memory
+    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+    unit_of_measurement: 'kB'
+    state_class: measurement
+    entity_category: "diagnostic"
+
   - platform: uptime
     name: Uptime
     id: sys_uptime
@@ -39,14 +49,6 @@ sensor:
     name: RSSI
     id: wifi_signal_db
     update_interval: 1s
-    entity_category: "diagnostic"
-  - platform: template
-    id: esp_memory
-    icon: mdi:memory
-    name: ESP Free Memory
-    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
-    unit_of_measurement: 'kB'
-    state_class: measurement
     entity_category: "diagnostic"
 
   - platform: ld2410
