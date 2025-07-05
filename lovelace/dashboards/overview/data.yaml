@@ -179,7 +179,7 @@ cards:
         template: four_sensors_tpl
         variables:
           - title: Motion Detection Hallway
-          - entity_1: binary_sensor.entrance_moving_target #genkan_door_contact
+          - entity_1: binary_sensor.aio_human_sensor_entrance_moving_target
           - name_1: Entrance
           - entity_2: sensor.genkan
           - name_2: Genkan

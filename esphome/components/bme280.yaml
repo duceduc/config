@@ -9,17 +9,17 @@ sensor:
     update_interval: 50s
     address: 0x76
     temperature:
-      name: "$room Temperature"
+      name: Temperature
       id: bme280_temperature
       oversampling: 16x
 
     pressure:
-      name: "$room Pressure"
+      name: Pressure
       id: bme280_pressure
       oversampling: 16x
 
     humidity:
-      name: "$room Humidity"
+      name: Humidity
       id: bme280_humidity
       oversampling: 16x
 
@@ -29,7 +29,7 @@ sensor:
     id: my_weather_pressure
 
 #  - platform: template
-#    name: $room Altitude
+#    name: Altitude
 #    lambda: |-
 #      const float STANDARD_SEA_LEVEL_PRESSURE = 1011.85; //in hPa, see note
 #      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
@@ -38,11 +38,11 @@ sensor:
 #    icon: 'mdi:signal'
 #    unit_of_measurement: 'm'
 #  - platform: absolute_humidity
-#    name: $room Abs Humidity
+#    name: Abs Humidity
 #    temperature: bme280_temperature
 #    humidity: bme280_humidity
 #  - platform: template
-#    name: $room Dew Point
+#    name: Dew Point
 #    lambda: |-
 #      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
 #      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-

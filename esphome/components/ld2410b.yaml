@@ -53,7 +53,7 @@ sensor:
 
   - platform: ld2410
     moving_distance:
-      name : Moving Distance
+      name: Moving Distance
       id: moving_distance
       disabled_by_default: true
     still_distance:

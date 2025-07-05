@@ -10,12 +10,12 @@
       lr_ac_heat_required:
         friendly_name: "LR AC Heat Required"
         value_template: >-
-          {{ states('sensor.livingroom_temperature') | float(default=19) < states('input_number.lr_heater_heat_temp_set') | float(default=18) }}
+          {{ states('sensor.lr_radar_temperature') | float(default=19) < states('input_number.lr_heater_heat_temp_set') | float(default=18) }}
 
       lr_ac_cool_required:
         friendly_name: "LR AC Cool Required"
         value_template: >-
-          {{ states('sensor.livingroom_temperature') | float(default=24) > states('input_number.lr_ac_cool_temp_set') | float(default=25) }}
+          {{ states('sensor.lr_radar_temperature') | float(default=24) > states('input_number.lr_ac_cool_temp_set') | float(default=25) }}
 
       lr_ac_am_automation_time_active:
         friendly_name: "LR AM Automation Time Active"

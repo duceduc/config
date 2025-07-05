@@ -8,7 +8,7 @@ packages:
 
 esphome:
   name: $name
-  platform: esp32
+esp32:
   board: nodemcu-32s
 
 wifi:
@@ -41,7 +41,7 @@ binary_sensor:
   - platform: esp32_touch
     name: 'Top'
     pin: GPIO14
-    threshold: 31 #30
+    threshold: 21 #21
     id: top
     filters:
       - delayed_off: 1s
@@ -55,7 +55,7 @@ binary_sensor:
   - platform: esp32_touch
     name: 'Bottom'
     pin: GPIO27
-    threshold: 31
+    threshold: 30
     id: bottom
     filters:
       - delayed_off: 1s
@@ -74,10 +74,13 @@ binary_sensor:
 remote_receiver:
   pin:
     number: GPIO15 # Pin is adjacent to GPIO2
+    ignore_strapping_warning: true
     inverted: true
     mode: INPUT_PULLUP
   dump: raw
 
 remote_transmitter:
-  pin: GPIO2 # Pin is adjacent to GPIO15
+  pin: # GPIO2 # Pin is adjacent to GPIO15
+    number: GPIO2 # Pin is adjacent to GPIO15
+    ignore_strapping_warning: true
   carrier_duty_percent: 66%

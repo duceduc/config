@@ -335,17 +335,17 @@ cards:
 
 
       - type: state-label
-        entity: sensor.livingroom_temperature
+        entity: sensor.lr_radar_temperature
         style:
           bottom: 42.5%
           right: 33.2%
       - type: state-label
-        entity: sensor.bt_proxy_computer_room_temperature
+        entity: sensor.bt_proxy_computer_temperature
         style:
           top: 24%
           right: 25%
       - type: state-label
-        entity: sensor.kitchen_temperature
+        entity: sensor.kt_human_sensor_temperature
         style:
           bottom: 42.5%
           right: 48%
@@ -355,12 +355,12 @@ cards:
           bottom: 42.5%
           left: 31%
       - type: state-label
-        entity: sensor.master_temperature
+        entity: sensor.aio_human_sensor_master_temperature
         style:
           top: 24%
           left: 31%
       - type: state-label
-        entity: sensor.entry_temperature
+        entity: sensor.entry_human_sensor_temperature
         style:
           bottom: 51.2%
           left: 31%
@@ -370,7 +370,7 @@ cards:
           bottom: 42.5%
           left: 38.5%
       - type: state-label
-        entity: sensor.entrance_temperature
+        entity: sensor.aio_human_sensor_entrance_temperature
         style:
           top: 24%
           left: 7.2%

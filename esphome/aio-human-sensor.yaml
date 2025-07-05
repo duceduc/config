@@ -3,13 +3,13 @@
 #  EC:64:C9:91:D6:64 (192.168.1.178)
 substitutions:
   name: aio-human-sensor
-  room: Entrance
   hlk0: Master
   hlk1: Entrance
   temp_offset0: '0'
   hum_offset0: '0'
   temp_offset1: '0'
   hum_offset1: '0'
+#  room: Entrance
 
 packages:
   aht10_dual: !include components/aht10-dual.yaml
@@ -38,7 +38,6 @@ globals:
      initial_value: '0'
 
 external_components:
-  # - source: github://screek-workshop/custom_components_support_for_screek_1u
   - source:
       type: git
       url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
@@ -73,7 +72,9 @@ ota:
 i2c: 
   - id: i2c_0 #aht10 master
     sda: GPIO23
-    scl: GPIO5
+    scl: # GPIO5
+      number: GPIO5
+      ignore_strapping_warning: true
     scan: true
   - id: i2c_1 #aht10 oa
     sda: GPIO26 #18
@@ -104,11 +105,11 @@ binary_sensor:
       name: $hlk1 Still Target
 
   - platform: status # consolidate
-    name: $name Online
+    name: Online
 
 sensor:
   - platform: template
-    name: $name ESP Cpu Speed
+    name: ESP Cpu Speed
     accuracy_decimals: 0
     unit_of_measurement: Mhz
     lambda: |-
@@ -117,7 +118,7 @@ sensor:
 
   - platform: template
     id: sys_esp_temperature
-    name: $name ESP Temperature
+    name: ESP Temperature
     lambda: return temperatureRead();
     unit_of_measurement: °C
     device_class: TEMPERATURE
@@ -125,12 +126,12 @@ sensor:
     entity_category: "diagnostic"
 
   - platform: uptime
-    name: $name Uptime
+    name: Uptime
     id: sys_uptime
     update_interval: 10s
 
   - platform: wifi_signal # consolidate
-    name: $name RSSI
+    name: RSSI
     id: wifi_signal_db
     update_interval: 5s
     entity_category: "diagnostic"
@@ -138,7 +139,7 @@ sensor:
   - platform: template
     id: esp_memory
     icon: mdi:memory
-    name: $name ESP Free Memory
+    name: ESP Free Memory
     lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
     unit_of_measurement: 'kB'
     state_class: measurement
@@ -149,14 +150,19 @@ sensor:
     ld2410_id: ld2410_0
     moving_distance:
       name: $hlk0 Moving Distance
+      disabled_by_default: true
     still_distance:
       name: $hlk0 Still Distance
+      disabled_by_default: true
     moving_energy:
       name: $hlk0 Move Energy
+      disabled_by_default: true
     still_energy:
       name: $hlk0 Still Energy
+      disabled_by_default: true
     detection_distance:
       name: $hlk0 Detection Distance
+      disabled_by_default: true
     light:
       name: $hlk0 Sun Light
 
@@ -165,27 +171,36 @@ sensor:
     ld2410_id: ld2410_1
     moving_distance:
       name: $hlk1 Moving Distance
+      disabled_by_default: true
     still_distance:
       name: $hlk1 Still Distance
+      disabled_by_default: true
     moving_energy:
       name: $hlk1 Move Energy
+      disabled_by_default: true
     still_energy:
       name: $hlk1 Still Energy
+      disabled_by_default: true
     detection_distance:
       name: $hlk1 Detection Distance
+      disabled_by_default: true
     light:
       name: $hlk1 Sun Light
 
 light:
   - platform: status_led
-    name: $name sys_status
-    pin: GPIO2
+    name: sys_status
+    pin: 
+      number: GPIO2
+      ignore_strapping_warning: true
     internal: True
     restore_mode: ALWAYS_OFF
 
 time:
   - platform: sntp
-    id: time_sntp
+    id: time_now
+    servers:
+      - ntp.aliyun.com
 
 uart:
 # Master HLK
@@ -269,9 +284,9 @@ button:
 
   - platform: restart
     icon: mdi:power-cycle
-    name: "$name ESP Reboot"
+    name: ESP Reboot
 
   - platform: factory_reset
     disabled_by_default: True
-    name: $name Factory Reset
+    name: Factory Reset
     id: factory_reset_all

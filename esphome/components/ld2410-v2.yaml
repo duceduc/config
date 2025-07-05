@@ -13,26 +13,26 @@ ld2410:
 sensor:
   - platform: ld2410
     moving_distance:
-      name : $room Moving Distance
+      name: Moving Distance
       disabled_by_default: true
     still_distance:
-      name: $room Still Distance
+      name: Still Distance
       disabled_by_default: true
     moving_energy:
       name: Move Energy
       disabled_by_default: true
     still_energy:
-      name: $room Still Energy
+      name: Still Energy
       disabled_by_default: true
     detection_distance:
-      name: $room Detection Distance
+      name: Detection Distance
       disabled_by_default: true
 
 binary_sensor:
   - platform: ld2410
     has_target:
-      name: $room Presence
+      name: Presence
     has_moving_target:
-      name: $room Moving Target
+      name: Moving Target
     has_still_target:
-      name: $room Still Target
+      name: Still Target

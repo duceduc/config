@@ -77,10 +77,10 @@ cards:
             background: none;
             box-shadow: none;
           }
-
+# any changes, update file ver and refresh frontend
         config:
-          image: '/local/lovelace/floorplan/floorplan_optimized.svg?8'
-          stylesheet: '/local/lovelace/css/floorplan.css?8'
+          image: '/local/lovelace/floorplan/floorplan_optimized.svg?11'
+          stylesheet: '/local/lovelace/css/floorplan.css?11'
           console_log_level: error
           rules:
 
@@ -200,16 +200,16 @@ cards:
 
             - entities:
               - sensor.espresense_computerroom_temperature
-              - sensor.bt_proxy_computer_room_temperature
-              - sensor.kitchen_temperature
-              - sensor.entrance_temperature
-              - sensor.entrance_humidity                    
+              - sensor.bt_proxy_computer_temperature
+              - sensor.kt_human_sensor_temperature
+              - sensor.aio_human_sensor_entrance_temperature
+              - sensor.aio_human_sensor_entrance_humidity                    
               - sensor.shionroom_temperature
-              - sensor.master_temperature
+              - sensor.aio_human_sensor_master_temperature
               - sensor.wc_temperature
-              - sensor.livingroom_temperature
+              - sensor.lr_radar_temperature
               - sensor.mdf_temperature
-              - sensor.entry_temperature
+              - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
               - sensor.washer_device_temperature
               tap_action: false
@@ -219,15 +219,15 @@ cards:
          
             - entities:
               - sensor.espresense_computerroom_temperature
-              - sensor.bt_proxy_computer_room_temperature
-              - sensor.kitchen_temperature
-              - sensor.entrance_temperature
+              - sensor.bt_proxy_computer_temperature
+              - sensor.kt_human_sensor_temperature
+              - sensor.aio_human_sensor_entrance_temperature
               - sensor.shionroom_temperature
-              - sensor.master_temperature
+              - sensor.aio_human_sensor_master_temperature
               - sensor.wc_temperature
-              - sensor.livingroom_temperature
+              - sensor.lr_radar_temperature
               - sensor.mdf_temperature
-              - sensor.entry_temperature
+              - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
               - sensor.washer_device_temperature
               tap_action: false
@@ -239,7 +239,7 @@ cards:
                   text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : (entity.state)}°'
 
             - entities:
-              - sensor.entrance_humidity
+              - sensor.aio_human_sensor_entrance_humidity
               tap_action: false
               state_action:
                 action: call-service

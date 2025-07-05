@@ -123,7 +123,7 @@ cards:
             name: Master Room
           - entity: binary_sensor.wc_airfreshener_status
             name: Restroom
-          - entity: binary_sensor.washroom_radar_status
+          - entity: binary_sensor.washroom_radar_online
             name: Wash Room
 
           - type: divider

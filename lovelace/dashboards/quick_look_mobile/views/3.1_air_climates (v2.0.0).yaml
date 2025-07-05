@@ -55,7 +55,7 @@ cards:
               entity: climate.lr_ac_mode
               temperature_unit:
               input_select: input_select.lr_ac_mode
-              room_temp_target: sensor.livingroom_temperature
+              room_temp_target: sensor.lr_radar_temperature
               battery:
               name: Living
               expand_to: #required path if climate_expandable template is used
@@ -65,7 +65,7 @@ cards:
               entity: climate.mr_ac_mode
               temperature_unit:
               input_select: input_select.mr_ac_mode
-              room_temp_target: sensor.master_temperature
+              room_temp_target: sensor.aio_human_sensor_master_temperature
               battery:
               name: Master
               expand_to:
@@ -99,7 +99,7 @@ cards:
           - type: custom:button-card
             template: climate
             variables:
-              entity: sensor.entrance_temperature
+              entity: sensor.aio_human_sensor_entrance_temperature
               temperature_unit:
               temperature:
               battery:
@@ -136,7 +136,7 @@ cards:
           - type: custom:button-card
             template: climate
             variables:
-              entity: sensor.bt_proxy_computer_room_temperature
+              entity: sensor.bt_proxy_computer_temperature
               temperature_unit:
               temperature:
               battery:
@@ -145,7 +145,7 @@ cards:
           - type: custom:button-card
             template: climate
             variables:
-              entity: sensor.kitchen_temperature
+              entity: sensor.kt_human_sensor_temperature
               temperature_unit:
               temperature:
               battery:
@@ -154,7 +154,7 @@ cards:
           - type: custom:button-card
             template: climate
             variables:
-              entity: sensor.livingroom_temperature
+              entity: sensor.lr_radar_temperature
               temperature_unit:
               temperature:
               battery:

@@ -204,7 +204,7 @@
 - alias: Presence Scan Arrival
   triggers:
     - trigger: state
-      entity_id: binary_sensor.entrance_moving_target
+      entity_id: binary_sensor.aio_human_sensor_entrance_moving_target
       to: 'on'
   conditions:
     - condition: template

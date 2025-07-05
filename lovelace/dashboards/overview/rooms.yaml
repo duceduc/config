@@ -24,8 +24,8 @@ cards:
           - room: lr
           - entity_1: input_select.lr_ac_mode
           - entity_2: sensor.lr_aircon_target
-          - entity_3: sensor.livingroom_temperature
-          - entity_4: sensor.livingroom_humidity
+          - entity_3: sensor.lr_radar_temperature
+          - entity_4: sensor.lr_radar_humidity
 #          - entity_5: sensor.lr_condensation_chance
 
       - type: custom:streamline-card
@@ -46,8 +46,8 @@ cards:
           - room: mr
           - entity_1: input_select.mr_ac_mode
           - entity_2: sensor.mr_aircon_target
-          - entity_3: sensor.master_temperature
-          - entity_4: sensor.master_humidity
+          - entity_3: sensor.aio_human_sensor_master_temperature
+          - entity_4: sensor.aio_human_sensor_master_humidity
 #          - entity_5: sensor.mr_condensation_chance
 
       - type: 'custom:vertical-stack-in-card'

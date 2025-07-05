@@ -3,6 +3,7 @@ wifi:
   ssid: !secret ssid
   password: !secret ssid_pwd
 
+
 logger:
 #  level: WARN
   baud_rate: 0

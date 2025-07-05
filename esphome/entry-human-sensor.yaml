@@ -3,7 +3,6 @@
 
 substitutions:
   name: entry-human-sensor
-  room: Entry
   hlk0: Hallway
   hlk1: Genkan
   temp_offset: '-4.3'
@@ -35,7 +34,6 @@ globals:
      initial_value: '0'
 
 external_components:
-  # - source: github://screek-workshop/custom_components_support_for_screek_1u
   - source:
       type: git
       url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
@@ -77,7 +75,9 @@ ota:
 
 i2c: # for aht10
   sda: GPIO23
-  scl: GPIO5
+  scl: # GPIO5
+      number: GPIO5
+      ignore_strapping_warning: true
   scan: true
 
 web_server:
@@ -104,11 +104,11 @@ binary_sensor:
       name: $hlk1 Still Target
 
   - platform: status # consolidate
-    name: $name Online
+    name: Online
 
 sensor:
   - platform: template
-    name: $name ESP Cpu Speed
+    name: ESP Cpu Speed
     accuracy_decimals: 0
     unit_of_measurement: Mhz
     lambda: |-
@@ -117,7 +117,7 @@ sensor:
 
   - platform: template
     id: sys_esp_temperature
-    name: $name ESP Temperature
+    name: ESP Temperature
     lambda: return temperatureRead();
     unit_of_measurement: °C
     device_class: TEMPERATURE
@@ -125,12 +125,12 @@ sensor:
     entity_category: "diagnostic"
 
   - platform: uptime
-    name: $name Uptime
+    name: Uptime
     id: sys_uptime
     update_interval: 10s
 
   - platform: wifi_signal # consolidate
-    name: $name RSSI
+    name: RSSI
     id: wifi_signal_db
     update_interval: 5s
     entity_category: "diagnostic"
@@ -138,7 +138,7 @@ sensor:
   - platform: template
     id: esp_memory
     icon: mdi:memory
-    name: $name ESP Free Memory
+    name: ESP Free Memory
     lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
     unit_of_measurement: 'kB'
     state_class: measurement
@@ -165,7 +165,6 @@ sensor:
     light:
       name: $hlk0 Sun Light
 
-
 # Genkan HLK
   - platform: ld2410
     ld2410_id: ld2410_1
@@ -187,11 +186,12 @@ sensor:
     light:
       name: $hlk1 Sun Light
 
-
 light:
   - platform: status_led
-    name: $name sys_status
-    pin: GPIO2
+    name: sys_status
+    pin: #GPIO2
+      number: GPIO2
+      ignore_strapping_warning: true
     internal: True
     restore_mode: ALWAYS_OFF
 
@@ -223,7 +223,6 @@ ld2410:
   - id: ld2410_1 # Genkan HLK
     timeout: 150s
     uart_id: uart_1
-
 
 button:
 # Hallway HLK
@@ -282,9 +281,9 @@ button:
 
   - platform: restart
     icon: mdi:power-cycle
-    name: "$name ESP Reboot"
+    name: ESP Reboot
 
   - platform: factory_reset
     disabled_by_default: True
-    name: $name Factory Reset
+    name: Factory Reset
     id: factory_reset_all

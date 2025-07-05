@@ -38,22 +38,31 @@ sensor:
         id: movingTargetDistance
         unit_of_measurement: "cm"
         accuracy_decimals: 0
+        disabled_by_default: true
+
       - name: "$upper Moving Target Energy"
         id: movingTargetEnergy
         unit_of_measurement: "%"
         accuracy_decimals: 0
+        disabled_by_default: true
+
       - name: "$upper Still Target Distance"
         id: stillTargetDistance
         unit_of_measurement: "cm"
         accuracy_decimals: 0
+        disabled_by_default: true
+
       - name: "$upper Still Target Energy"
         id: stillTargetEnergy
         unit_of_measurement: "%"
         accuracy_decimals: 0
+        disabled_by_default: true
+
       - name: "$upper Detect Distance"
         id: detectDistance
         unit_of_measurement: "cm"
         accuracy_decimals: 0
+        disabled_by_default: true
 
 number:        
   - platform: template
@@ -96,7 +105,7 @@ number:
 
 button:
   - platform: template
-    name: "Reboot $name"
+    name: Reboot
     on_press:
       lambda: 'static_cast<LD2410 *>(ld2410)->reboot();'
   - platform: template
@@ -126,4 +135,4 @@ button:
 
   - platform: restart
     icon: mdi:power-cycle
-    name: "$name ESP Reboot"
+    name: ESP Reboot

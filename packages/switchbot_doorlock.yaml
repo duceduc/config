@@ -128,11 +128,10 @@ automation:
                   entity_id: input_boolean.{{ 'duc' if is_state('input_boolean.duc_unlock_door', 'on') else 'eri' }}_unlock_door
         default: []
 
-
   - alias: Auto Unlock Door
     triggers:
       - trigger: state
-        entity_id: binary_sensor.entrance_moving_target, binary_sensor.entrance_presence
+        entity_id: binary_sensor.aio_human_sensor_entrance_moving_target, binary_sensor.aio_human_sensor_entrance_presence
         from: 'off'
         to: 'on'
     conditions: []

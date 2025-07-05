@@ -97,14 +97,14 @@
              'The current livingroom temperature is TT degrees ',
              'The temperature in the livingroom is TT degrees ',
              'TT degrees is what my system is detecting in the livingroom currently'
-             ]| random | replace('TT', states('sensor.lr_radar_temperature')) }}
+             ]| random | replace('TT', states('sensor.lr_radar_temperature', rounded=True)) }}
 
             {{ [
              '.The humidity is TT %.',
              '.Humidity is TT %.',
              'And the humidity is TT %.',
              '.TT % humidity is what my console is detecting in the livingroom.'
-             ]| random | replace('TT', states('sensor.livingroom_humidity')) }}
+             ]| random | replace('TT', states('sensor.lr_radar_humidity', rounded=True)) }}
 
             {%- if is_state('sensor.washer_status_m', 'complete') %}
               The washing machine completed its cycle 

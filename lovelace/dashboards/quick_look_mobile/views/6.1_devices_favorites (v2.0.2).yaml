@@ -70,8 +70,8 @@ cards:
           - type: custom:button-card # ENTITY 03
             template: device
             variables:
-              entity: switch.kt_airfreshener
-              name: Kitchen
+              entity: switch.shoshuriki
+              name: Desktop
               battery:
               expand_to:
               label_on: 'Active'
@@ -79,8 +79,8 @@ cards:
           - type: custom:button-card # ENTITY 04
             template: device
             variables:
-              entity:
-              name:
+              entity: switch.gk_airfreshener
+              name: Genkan
               battery:
               expand_to:
               label_on: 'Active'

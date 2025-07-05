@@ -508,7 +508,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:20px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:1px;opacity:0.5;fill:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="762.3382"
        y="823.40887"
-       id="sensor.livingroom_temperature"
+       id="sensor.lr_radar_temperature"
        transform="skewY(-42.058286)"><tspan
          sodipodi:role="line"
          id="tspan558"
@@ -518,7 +518,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:14px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:1px;opacity:0.5;fill:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="470.07315"
        y="787.49774"
-       id="sensor.bt_proxy_computer_room_temperature"
+       id="sensor.bt_proxy_computer_temperature"
        transform="skewY(-43.482535)"><tspan
          sodipodi:role="line"
          id="tspan2046"
@@ -539,7 +539,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:22px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:0.5px;opacity:0.5;fill:#ffffff;stroke-width:1.0234;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="1148.6265"
        y="-124.63403"
-       id="sensor.master_temperature"
+       id="sensor.aio_human_sensor_master_temperature"
        transform="matrix(0.88699692,0.65491386,-0.70396603,0.60762656,0,0)"><tspan
          sodipodi:role="line"
          id="tspan5905"
@@ -561,7 +561,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:22px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:0.5px;opacity:0.5;fill:#ffffff;stroke-width:1.0234;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="1148.2102"
        y="-207.07179"
-       id="sensor.entry_temperature"
+       id="sensor.entry_human_sensor_temperature"
        transform="matrix(0.88699692,0.65491386,-0.70396603,0.60762656,0,0)"
        sodipodi:insensitive="true"><tspan
          sodipodi:role="line"
@@ -595,7 +595,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:20px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:1px;opacity:0.5;fill:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="1114.3643"
        y="-584.66644"
-       id="sensor.kitchen_temperature"
+       id="sensor.kt_human_sensor_temperature"
        transform="skewY(37.867964)"><tspan
          sodipodi:role="line"
          id="tspan8409"
@@ -605,7 +605,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:21.5928px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:0px;opacity:0.5;fill:#ffffff;stroke-width:1.00444;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="133.12437"
        y="1419.2444"
-       id="sensor.entrance_temperature"
+       id="sensor.aio_human_sensor_entrance_temperature"
        transform="matrix(0.75551306,-0.64584821,0.81409824,0.62767427,0,0)"><tspan
          sodipodi:role="line"
          id="tspan10753"
@@ -616,7 +616,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:21.5928px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:0px;opacity:0.5;fill:#ffffff;stroke-width:1.00444;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="132.8045"
        y="1440.4232"
-       id="sensor.entrance_humidity"
+       id="sensor.aio_human_sensor_entrance_humidity"
        transform="matrix(0.75551306,-0.64584821,0.81409824,0.62767427,0,0)"><tspan
          sodipodi:role="line"
          id="tspan1032"

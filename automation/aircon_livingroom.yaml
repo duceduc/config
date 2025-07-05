@@ -490,7 +490,7 @@
     - condition: template # Only if currently Off
       value_template: "{{ is_state('input_select.sb_humidifier_mode', 'Off') }}"
     - condition: numeric_state
-      entity_id: sensor.livingroom_humidity # sb_humidifier_humidity
+      entity_id: sensor.lr_radar_humidity # sb_humidifier_humidity
       above: input_number.lrh_humidity_low_set
       below: input_number.lrh_humidity_high_set
     - condition: template # Water tank not empty

@@ -1,3 +1,4 @@
+
 preferences:
   flash_write_interval: 1min
 
@@ -12,7 +13,7 @@ output:
 fan:
   - platform: hbridge
     id: spray_motor
-    name: ${name} Motor
+    name: Motor
     pin_a: motor_forward_pin
     pin_b: motor_reverse_pin
     decay_mode: slow
@@ -33,7 +34,7 @@ number:
 
 sensor:
   - platform: template
-    name: ${name} ${counter}
+    name: ${counter}
     icon: mdi:counter
     id: spray_counter_tpl
     state_class: measurement
@@ -45,7 +46,7 @@ sensor:
 
 switch:
   - platform: template
-    name: ${name}
+    name: ' '
     id: sw_spray
     icon: mdi:spray
     restore_mode: always_off
@@ -61,7 +62,7 @@ switch:
 
 button:
   - platform: template
-    name: ${name} ${reset}
+    name: ${reset}
     icon: mdi:restart
     on_press:
       then:

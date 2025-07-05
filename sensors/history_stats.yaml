@@ -55,13 +55,13 @@
 
   - platform: statistics
     name: "Living Room Temp Sats"
-    entity_id: sensor.livingroom_temperature
+    entity_id: sensor.lr_radar_temperature
     state_characteristic: mean
     sampling_size: 20
 
   - platform: statistics
     name: "Hallway Temp Sats"
-    entity_id: sensor.entry_temperature
+    entity_id: sensor.entry_human_sensor_humidity
     state_characteristic: mean
     sampling_size: 20
 
@@ -71,8 +71,8 @@
       - sensor.shionroom_temperature
       - sensor.master_temperature
       - sensor.wc_temperature
-      - sensor.livingroom_temperature
-      - sensor.entry_temperature
+      - sensor.lr_radar_temperature
+      - sensor.entry_human_sensor_humidity
 
 
 ####################################################

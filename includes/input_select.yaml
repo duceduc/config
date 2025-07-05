@@ -35,17 +35,17 @@
      - switch.ac_lr_unit # 0
      - switch.ac_mr_unit
      - switch.ac_sr_unit
-     - sensor.entrance_temperature
-     - sensor.livingroom_temperature
+     - sensor.aio_human_sensor_entrance_temperature
+     - sensor.lr_radar_temperature
      - group.bed_sensors #5
-     - sensor.entrance_humidity
-     - sensor.livingroom_humidity
+     - sensor.aio_human_sensor_entrance_humidity
+     - sensor.lr_radar_humidity
      - sensor.shionroom_temperature
      - sensor.shionroom_humidity
-     - sensor.master_temperature #10
-     - sensor.master_humidity
-     - sensor.entry_temperature # need to remove and change order
-     - sensor.entry_humidity # need to remove and change order
+     - sensor.aio_human_sensor_master_temperature #10
+     - sensor.aio_human_sensor_master_humidity
+     - sensor.entry_human_sensor_temperature # need to remove and change order
+     - sensor.entry_human_sensor_humidity # need to remove and change order
      - sensor.mdf_temperature
      - sensor.mdf_humidity #15
      - light.shion

@@ -3,7 +3,7 @@
 
 substitutions:
   name: mr-human-sensor
-  room: Mr
+#  room: Mr
 
 esphome:
   name: $name
@@ -65,21 +65,21 @@ web_server:
 
 binary_sensor:
   - platform: status # consolidate
-    name: $name Online
+    name: Online
     id: ink_ha_connected
 
   - platform: ld2410
     ld2410_id: ld2410_0
     has_target:
-      name: $room Presence
+      name: Presence
     has_moving_target:
-      name: $room Moving Target
+      name: Moving Target
     has_still_target:
-      name: $room Still Target
+      name: Still Target
 
 sensor:
   - platform: template
-    name: $name ESP Cpu Speed
+    name: ESP Cpu Speed
     accuracy_decimals: 0
     unit_of_measurement: Mhz
     lambda: |-
@@ -88,7 +88,7 @@ sensor:
 
   - platform: template
     id: sys_esp_temperature
-    name: $name ESP Temperature
+    name: ESP Temperature
     lambda: return temperatureRead();
     unit_of_measurement: °C
     device_class: TEMPERATURE
@@ -96,12 +96,12 @@ sensor:
     entity_category: "diagnostic"
 
   - platform: uptime
-    name: $name Uptime
+    name: Uptime
     id: sys_uptime
     update_interval: 10s
 
   - platform: wifi_signal # consolidate
-    name: $name RSSI
+    name: RSSI
     id: wifi_signal_db
     update_interval: 5s
     entity_category: "diagnostic"
@@ -109,7 +109,7 @@ sensor:
   - platform: template
     id: esp_memory
     icon: mdi:memory
-    name: $name ESP Free Memory
+    name: ESP Free Memory
     lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
     unit_of_measurement: 'kB'
     state_class: measurement
@@ -118,23 +118,28 @@ sensor:
   - platform: ld2410
     ld2410_id: ld2410_0
     moving_distance:
-      name: $room Moving Distance
+      name: Moving Distance
       id: moving_distance
+      disabled_by_default: true
     still_distance:
-      name: $room Still Distance
+      name: Still Distance
       id: still_distance
+      disabled_by_default: true
     moving_energy:
-      name: $room Move Energy
+      name: Move Energy
+      disabled_by_default: true
     still_energy:
-      name: $room Still Energy
+      name: Still Energy
+      disabled_by_default: true
     detection_distance:
-      name: $room Detection Distance
+      name: Detection Distance
+      disabled_by_default: true
     light:
-      name: $room Sun Light
+      name: Sun Light
 
 light:
   - platform: status_led
-    name: $name sys_status
+    name: sys_status
     pin: GPIO15
     internal: True
     restore_mode: ALWAYS_OFF
@@ -158,7 +163,7 @@ ld2410:
 
 button:
   - platform: template
-    name: "$name Enable LD2410 BLE"
+    name: Enable LD2410 BLE
     # disabled_by_default: True
     entity_category: "config"
     icon: mdi:bluetooth
@@ -167,7 +172,7 @@ button:
         id(ld2410_0) -> ble_control(true);
 
   - platform: template
-    name: "$name Disable LD2410 BLE"
+    name: Disable LD2410 BLE
     # disabled_by_default: True
     entity_category: "config"
     icon: mdi:bluetooth-off
@@ -176,7 +181,7 @@ button:
         id(ld2410_0) -> ble_control(false);
 
   - platform: template
-    name: "$name LD2410 Reboot"
+    name: LD2410 Reboot
     icon: mdi:radar
     entity_category: "config"
     on_press:
@@ -187,9 +192,9 @@ button:
 
   - platform: restart
     icon: mdi:power-cycle
-    name: "$name ESP Reboot"
+    name: ESP Reboot
 
   - platform: factory_reset
     disabled_by_default: True
-    name: $name Factory Reset
+    name: Factory Reset
     id: factory_reset_all

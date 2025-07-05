@@ -4,7 +4,7 @@
 
 substitutions:
   name: gk-airfreshener
-  room: Gk
+#  room: Gk
 
   temp_offset: "0"
   hum_offset: "0"
@@ -23,6 +23,11 @@ packages:
   aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml
+
+wifi:
+  ssid: !secret ssid
+  password: !secret ssid_pwd
+  output_power: 8.5dB
 
 i2c: # for aht10
   sda: GPIO5
@@ -48,8 +53,6 @@ esp32:
     type: esp-idf
 #    type: arduino # esp-idf (need to use cable when switching between types)
 
-
-
 globals:
   # Store the Cannister Percentage
   - id: squirts
@@ -64,7 +67,7 @@ globals:
 
 button:
   - platform: template
-    name: $room Alt Button
+    name: Alt Button
     icon: mdi:restart
     on_press:
       then:
@@ -76,7 +79,7 @@ button:
 
 binary_sensor: 
   - platform: gpio
-    name: $name Button
+    name: Button
     disabled_by_default: true
     pin:
       number: GPIO4 # not working
@@ -98,13 +101,12 @@ binary_sensor:
             global_preferences->sync();
             }
   - platform: status
-    name: $name status
-
+    name: status
 
 select:
   - platform: template
     id: intervalSelect
-    name: $name Interval
+    name: Interval
     icon: mdi:timer-outline
     optimistic: true
     restore_value: true
@@ -134,7 +136,7 @@ script:
 switch:
   # The Glade DC Motor
   - platform: gpio
-    name: $name
+    name: ' '
     id: theSquirter
     icon: mdi:spray
     pin:
@@ -151,7 +153,7 @@ switch:
 
 sensor:
   - platform: wifi_signal
-    name: $name wifi signal
+    name: wifi signal
     update_interval: 15s
     filters:
       - sliding_window_moving_average:
@@ -161,7 +163,7 @@ sensor:
   # Cannister Percentage
   - platform: template
     id: can_level
-    name: $name Can
+    name: Can
     device_class: volume
     unit_of_measurement: "Can"
     update_interval: $interval1 min

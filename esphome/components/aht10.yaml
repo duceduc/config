@@ -11,7 +11,7 @@ sensor:
     update_interval: 50s
 
     temperature:
-      name: "$room Temperature"
+      name: 'Temperature'
       accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
@@ -21,7 +21,7 @@ sensor:
         - offset: "$temp_offset"
 
     humidity:
-      name: "$room Humidity"
+      name: 'Humidity'
       accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:

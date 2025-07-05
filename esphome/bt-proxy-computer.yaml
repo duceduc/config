@@ -1,11 +1,11 @@
 
 substitutions:
-  room: room
+  name: bt-proxy-computer
   temp_offset: '-5'
   hum_offset: '10'
 
 esphome:
-  name: bt-proxy-computer
+  name: $name
   platformio_options:
     board_build.flash_mode: dio
   project:

@@ -13,7 +13,7 @@
       id: time
       seconds: '10'
     - trigger: state
-      entity_id: binary_sensor.mr_moving_target 
+      entity_id: binary_sensor.mr_human_sensor_moving_target 
       id: motion
       to: 'on'
   conditions:
@@ -29,7 +29,7 @@
         roomname: masterroom
         timeout: 2 # timeout of the room, timer gets set to this
         entities_toggle: # entities that can mark a room as occupied
-          - binary_sensor.mr_moving_target
+          - binary_sensor.mr_human_sensor_moving_target
         entities_keep:
           - binary_sensor.mr_presence        
           - input_boolean.masterroom_mcl

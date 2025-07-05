@@ -91,8 +91,8 @@ automation:
   - alias: "Replace Toilet Airfreshener Notification"
     triggers:
       - trigger: numeric_state
-        entity_id: sensor.wc_airfreshener_spray_counter
-        above: 300
+        entity_id: sensor.wc_airfreshener_can
+        below: 10
     actions:
       - action: script.email_notify
         data:
@@ -101,17 +101,16 @@ automation:
           message: >-
             <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
             <br>
-            The wc air freshener bottle needs to be replaced. It has sprayed {{ states('sensor.wc_airfreshener_spray_counter') }} times.<br>
+            The wc air freshener bottle needs to be replaced. It has about {{ states('sensor.wc_airfreshener_can') }}% left.<br>
             <br>
-
 
   - alias: 'motion wc room'
     triggers:
       - trigger: state
-        entity_id: binary_sensor.wc_occupied # _occupied has a delay off for 10secs.  binary_sensor.wc_moving_target
+        entity_id: binary_sensor.wc_occupied
         to: 'on'
       - trigger: state
-        entity_id: binary_sensor.wc_occupied # binary_sensor.wc_still_target
+        entity_id: binary_sensor.wc_occupied
         to: 'off'
         id: 'off'
       - trigger: state
@@ -154,10 +153,6 @@ automation:
             entity_id: light.wc_1
           - action: homeassistant.turn_on
             entity_id: input_boolean.engage_toilet_airfreshener
-
-
-
-
 
 
 # Automate Toilet Seat Heater Arrival

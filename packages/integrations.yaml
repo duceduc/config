@@ -28,9 +28,10 @@
 #      password: !secret amazon_eri_pass
 #      url: amazon.co.jp
 
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_apikey
-    allowed_chat_ids:
-      - !secret telegram_chatid
-      - !secret telegram_userid
+# now in ui
+#telegram_bot:
+#  - platform: polling
+#    api_key: !secret telegram_apikey
+#    allowed_chat_ids:
+#      - !secret telegram_chatid
+#      - !secret telegram_userid

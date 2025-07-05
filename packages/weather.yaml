@@ -25,7 +25,7 @@ sensor:
           {% if is_state('binary_sensor.overnight', 'off') %}
             {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
           {% else %}
-            {% set temp = states('sensor.entrance_temperature')|round(0) %}
+            {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|round(0) %}
           {% endif %}
           {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
             {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
@@ -138,7 +138,7 @@ sensor:
 
       wbio_current_temperature:
         friendly_name: 'Current Temperature'
-        value_template: "{{ states('sensor.entrance_temperature') }}"
+        value_template: "{{ states('sensor.aio_human_sensor_entrance_temperature') }}"
         device_class: temperature
       wbio_daytime_temperature:
         friendly_name: 'Daytime Temperature'
@@ -199,8 +199,8 @@ sensor:
         friendly_name: 'Outside Feels Like'
         unit_of_measurement: "°C"
         value_template: >
-          {% set temp = states('sensor.entrance_temperature')|float(0) %}
-          {% set humidity = states('sensor.entrance_humidity')|float(0) %}
+          {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|float(0) %}
+          {% set humidity = states('sensor.aio_human_sensor_entrance_humidity')|float(0) %}
           {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
 
       home_windspeed:
@@ -215,10 +215,10 @@ sensor:
 #    round_digits: 1
 #    type: mean
 #    entity_ids:
-#     - sensor.master_temperature
-#     - sensor.entry_temperature
-#     - sensor.bt_proxy_computer_room_temperature
-#     - sensor.kitchen_temperature
+#     - sensor.aio_human_sensor_master_temperature
+#     - sensor.entry_human_sensor_temperature
+#     - sensor.bt_proxy_computer_temperature
+#     - sensor.kt_human_sensor_temperature
 
   - platform: average
     name: "average_house_temperature"
@@ -227,11 +227,11 @@ sensor:
     precision: 1
     entities:
       - sensor.shionroom_temperature
-      - sensor.master_temperature
-      - sensor.livingroom_temperature
-      - sensor.entry_temperature
-      - sensor.bt_proxy_computer_room_temperature
-      - sensor.kitchen_temperature
+      - sensor.aio_human_sensor_master_temperature
+      - sensor.lr_radar_temperature
+      - sensor.entry_human_sensor_temperature
+      - sensor.bt_proxy_computer_temperature
+      - sensor.kt_human_sensor_temperature
 
   - platform: history_stats
     name: Rainsensor flips

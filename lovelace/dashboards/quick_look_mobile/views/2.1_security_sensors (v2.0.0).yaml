@@ -54,7 +54,7 @@ cards:
             variables:
               name: Patio
               contact:
-              occupancy: binary_sensor.entrance_moving_target
+              occupancy: binary_sensor.aio_human_sensor_entrance_moving_target
               lock:
               contact_battery:
               occupancy_battery:
@@ -76,7 +76,7 @@ cards:
             variables:
               name: Master
               contact:
-              occupancy: binary_sensor.mr_moving_target
+              occupancy: binary_sensor.mr_human_sensor_moving_target
               lock:
               contact_battery:
               occupancy_battery:
@@ -162,7 +162,7 @@ cards:
             variables:
               name: Living
               contact:
-              occupancy: binary_sensor.lr_moving_target
+              occupancy: binary_sensor.lr_airfreshener_moving_target
               lock:  binary_sensor.livingroom_window
               contact_battery: 
               occupancy_battery:
