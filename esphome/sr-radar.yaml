@@ -1,9 +1,9 @@
 #  [98:CD:AC:31:B8:E7]
 substitutions:
   name: sr-radar
-  room: shionroom #sr-radar
-  upper: Sr
-  lower: sr
+#  room: shionroom #sr-radar
+#  upper: Sr
+#  lower: sr
   temp_offset: '0'
   hum_offset: '0'
 
@@ -54,14 +54,14 @@ wifi:
 
 sensor:
   - platform: wifi_signal
-    name: $name wifi signal
+    name: wifi signal
     update_interval: 15s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
-          send_first_at: 1
+#    filters:
+#      - sliding_window_moving_average:
+#          window_size: 15
+#          send_every: 15
+#          send_first_at: 1
 
 binary_sensor:
   - platform: status
-    name: $name status
+    name: status

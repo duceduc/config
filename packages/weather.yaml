@@ -226,7 +226,7 @@ sensor:
 #    end: '{{ now() }}'
     precision: 1
     entities:
-      - sensor.shionroom_temperature
+      - sensor.sr_radar_temperature
       - sensor.aio_human_sensor_master_temperature
       - sensor.lr_radar_temperature
       - sensor.entry_human_sensor_temperature

@@ -1,7 +1,7 @@
 #  a0:85:e3:0e:37:94
 substitutions:
   name: shoshuriki
-  room: Shoshuriki
+#  room: Shoshuriki
   temp_offset: "-1.3"
   hum_offset: "6"
 
@@ -50,7 +50,7 @@ globals:
 
 button:
   - platform: template
-    name: $room Alt Button
+    name: Alt Button
     icon: mdi:restart
     on_press:
       then:
@@ -63,7 +63,7 @@ button:
 binary_sensor: # not working for small glade
   # Unit's Top Button for local Manual "Squirts" and Resetting Cannister Percentage
   - platform: gpio
-    name: $name Button
+    name: Button
     disabled_by_default: true
     pin: 
       number: GPIO9 # not physically connected
@@ -89,7 +89,7 @@ binary_sensor: # not working for small glade
 select:
   - platform: template
     id: intervalSelect
-    name: $name Interval
+    name: Interval
     icon: mdi:timer-outline
     optimistic: true
     restore_value: true
@@ -119,7 +119,7 @@ script:
 switch:
   # The Glade DC Motor
   - platform: gpio
-    name: $name
+    name: ' '
     id: theSquirter
     icon: mdi:spray
     pin: 
@@ -137,7 +137,7 @@ switch:
 sensor:
   - platform: template
     id: can_level
-    name: $name Can
+    name: Can
     device_class: volume
     unit_of_measurement: "Can"
     update_interval: $interval1 min

@@ -75,12 +75,12 @@
       sr_ac_heat_required:
         friendly_name: "SR AC Heat Required"
         value_template: >-
-          {{ states('sensor.shionroom_temperature') | float(default=19) < states('input_number.sr_heater_heat_temp_set') | float(default=18) }}
+          {{ states('sensor.sr_radar_temperature') | float(default=19) < states('input_number.sr_heater_heat_temp_set') | float(default=18) }}
 
       sr_ac_cool_required:
         friendly_name: "SR AC Cool Required"
         value_template: >-
-          {{ states('sensor.shionroom_temperature') | float(default=24) > states('input_number.sr_ac_cool_temp_set') | float(default=25) }}
+          {{ states('sensor.sr_radar_temperature') | float(default=24) > states('input_number.sr_ac_cool_temp_set') | float(default=25) }}
 
       sr_ac_am_automation_time_active:
         friendly_name: "SR AM Automation Time Active"

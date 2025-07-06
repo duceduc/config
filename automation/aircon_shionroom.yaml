@@ -203,7 +203,7 @@
 - alias: Squirt Shion Airfreshener
   triggers:
     - trigger: state
-      entity_id: binary_sensor.shion_airfreshener_shion_moving_target
+      entity_id: binary_sensor.shion_airfreshener_moving_target
       from: 'off'
       to: 'on'
   conditions:
@@ -211,15 +211,9 @@
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
-
     - condition: template # trigger once an hour
-      value_template: >-
-        {%- set trig = (now() - states.switch.shion_airfreshener.last_changed).seconds -%}
-          {{ trig > 3600 }}
-#      - condition: template
-#        value_template: "{{ state_attr('binary_sensor.shionroom_occupied','squirt') == true }}"
-
-
+      - condition: template
+        value_template: "{{ state_attr('binary_sensor.shionroom_occupied','squirt') == true }}"
   actions:
     - action: switch.toggle
       entity_id: switch.shion_airfreshener

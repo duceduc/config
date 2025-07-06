@@ -13,7 +13,7 @@ globals:
 
 button:
   - platform: template
-    name: $room Alt Button
+    name: Alt Button
     icon: mdi:restart
     on_press:
       then:
@@ -26,7 +26,7 @@ button:
 binary_sensor: # not working for small glade
   # Unit's Top Button for local Manual "Squirts" and Resetting Cannister Percentage
   - platform: gpio
-    name: $name Button
+    name: Button
     disabled_by_default: true
     pin:
       number: D3 # May not work on some esp8266 board.
@@ -53,7 +53,7 @@ select:
   # Drop-Down Menu, "Select" in Home Assistant for Interval Automation
   - platform: template
     id: intervalSelect
-    name: $name Interval
+    name: Interval
     icon: mdi:timer-outline
     optimistic: true
     restore_value: true
@@ -84,7 +84,7 @@ script:
 switch:
   # The Glade DC Motor
   - platform: gpio
-    name: $name
+    name: ' '
     id: theSquirter
     icon: mdi:spray
     pin:
@@ -103,7 +103,7 @@ sensor:
   # Cannister Percentage
   - platform: template
     id: can_level
-    name: $name Can
+    name: Can
     device_class: volume
     unit_of_measurement: "Can"
     update_interval: $interval1 min

@@ -60,7 +60,7 @@ automation:
     max_exceeded: silent
     triggers:
       - trigger: state
-        entity_id: binary_sensor.motion_balcony_occupancy
+        entity_id: binary_sensor.security_balcony_occupancy
         from: 'off'
         to: 'on'
     conditions:

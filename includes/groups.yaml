@@ -122,7 +122,7 @@
     - binary_sensor.genkan_moving_target
     - binary_sensor.bt_proxy_computer_moving_target
     - binary_sensor.washroom_radar_moving_target
-    - binary_sensor.wc_moving_target
+    - binary_sensor.wc_airfreshener_moving_target
 
   home_alarm_motion_sensors:
     - binary_sensor.lr_airfreshener_moving_target

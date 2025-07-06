@@ -37,7 +37,7 @@
 
   - platform: statistics
     name: "Shion Room Temp Sats"
-    entity_id: sensor.shionroom_temperature
+    entity_id: sensor.sr_radar_temperature
     state_characteristic: mean
     sampling_size: 20
 
@@ -49,7 +49,7 @@
 
   - platform: statistics
     name: "Toilet Room Temp Sats"
-    entity_id: sensor.wc_temperature
+    entity_id: sensor.wc_airfreshener_temperature
     state_characteristic: mean
     sampling_size: 20
 
@@ -68,9 +68,9 @@
   - platform: min_max
     name: Inside Temp Stats
     entity_ids:
-      - sensor.shionroom_temperature
+      - sensor.sr_radar_temperature
       - sensor.master_temperature
-      - sensor.wc_temperature
+      - sensor.wc_airfreshener_temperature
       - sensor.lr_radar_temperature
       - sensor.entry_human_sensor_humidity
 

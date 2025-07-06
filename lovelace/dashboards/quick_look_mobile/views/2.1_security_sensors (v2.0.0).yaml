@@ -118,7 +118,7 @@ cards:
             variables:
               name: Toilet
               contact:
-              occupancy: binary_sensor.wc_moving_target
+              occupancy: binary_sensor.wc_airfreshener_moving_target
               lock:
               contact_battery:
               occupancy_battery:

@@ -23,16 +23,16 @@
 # SR Mold Chance
   - platform: mold_indicator
     name: Sr Condensation Chance
-    indoor_temp_sensor: sensor.shionroom_temperature
-    indoor_humidity_sensor: sensor.shionroom_humidity
+    indoor_temp_sensor: sensor.sr_radar_temperature
+    indoor_humidity_sensor: sensor.sr_radar_humidity
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 1.4
 
 # MDF Mold Chance
   - platform: mold_indicator
     name: MDF Condensation Chance
-    indoor_temp_sensor: sensor.mdf_temperature
-    indoor_humidity_sensor: sensor.mdf_humidity
+    indoor_temp_sensor: sensor.security_mdf_temperature
+    indoor_humidity_sensor: sensor.security_mdf_humidity
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 2.8
 
@@ -47,8 +47,8 @@
 # Toilet Mold Chance
   - platform: mold_indicator
     name: Wc Condensation Chance
-    indoor_temp_sensor: sensor.wc_temperature
-    indoor_humidity_sensor: sensor.wc_humidity
+    indoor_temp_sensor: sensor.wc_airfreshener_temperature
+    indoor_humidity_sensor: sensor.wc_airfreshener_humidity
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 1.1
 

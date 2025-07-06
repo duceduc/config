@@ -66,9 +66,9 @@ cards:
       - icon: weather-rainy
       - entity_1: sensor.mdf_condensation_chance
       - name_1: MDF Condensation
-      - entity_2: sensor.mdf_humidity
+      - entity_2: sensor.security_mdf_humidity
       - name_2: Shoe Closet Humidity
-      - entity_3: sensor.mdf_temperature
+      - entity_3: sensor.security_mdf_temperature
       - name_3: Shoe Closet Temperature
 
   - type: custom:streamline-card
@@ -78,9 +78,9 @@ cards:
       - icon: weather-rainy
       - entity_1: sensor.sr_condensation_chance
       - name_1: Room Condensation
-      - entity_2: sensor.shionroom_humidity
+      - entity_2: sensor.sr_radar_humidity
       - name_2: Room Humidity
-      - entity_3: sensor.shionroom_temperature
+      - entity_3: sensor.sr_radar_temperature
       - name_3: Room Temperature
 
   - type: custom:streamline-card
@@ -128,9 +128,9 @@ cards:
       - icon: weather-rainy
       - entity_1: sensor.wc_condensation_chance
       - name_1: Room Condensation
-      - entity_2: sensor.wc_humidity
+      - entity_2: sensor.wc_airfreshener_humidity
       - name_2: Room Humidity
-      - entity_3: sensor.wc_temperature
+      - entity_3: sensor.wc_airfreshener_temperature
       - name_3: Room Temperature
 
 

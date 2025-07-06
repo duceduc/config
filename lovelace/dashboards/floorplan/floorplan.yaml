@@ -79,8 +79,8 @@ cards:
           }
 # any changes, update file ver and refresh frontend
         config:
-          image: '/local/lovelace/floorplan/floorplan_optimized.svg?11'
-          stylesheet: '/local/lovelace/css/floorplan.css?11'
+          image: '/local/lovelace/floorplan/floorplan_optimized.svg?14'
+          stylesheet: '/local/lovelace/css/floorplan.css?14'
           console_log_level: error
           rules:
 
@@ -204,11 +204,11 @@ cards:
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
               - sensor.aio_human_sensor_entrance_humidity                    
-              - sensor.shionroom_temperature
+              - sensor.sr_radar_temperature
               - sensor.aio_human_sensor_master_temperature
-              - sensor.wc_temperature
+              - sensor.wc_airfreshener_temperature
               - sensor.lr_radar_temperature
-              - sensor.mdf_temperature
+              - sensor.security_mdf_temperature
               - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
               - sensor.washer_device_temperature
@@ -222,11 +222,11 @@ cards:
               - sensor.bt_proxy_computer_temperature
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
-              - sensor.shionroom_temperature
+              - sensor.sr_radar_temperature
               - sensor.aio_human_sensor_master_temperature
-              - sensor.wc_temperature
+              - sensor.wc_airfreshener_temperature
               - sensor.lr_radar_temperature
-              - sensor.mdf_temperature
+              - sensor.security_mdf_temperature
               - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
               - sensor.washer_device_temperature

@@ -3,7 +3,7 @@
 
 substitutions:
   name: sniffer1
-  upper: Sniffer1
+#  upper: Sniffer1
 
 packages:
   stats: !include components/stats.yaml
@@ -58,7 +58,7 @@ binary_sensor:
       inverted: true
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
-    name: "${upper} Button S1"
+    name: Button S1
     id: button0
     on_press:
       then:
@@ -68,7 +68,7 @@ binary_sensor:
     pin:
       number: GPIO35
       inverted: true
-    name: "${upper} Button S2"
+    name: Button S2
     id: button1
     on_press:
       then:
@@ -76,7 +76,7 @@ binary_sensor:
 
 switch:
   - platform: gpio
-    name: "${upper} Backlight"
+    name: Backlight
     pin: 
       number: GPIO4
       allow_other_uses: true
@@ -98,7 +98,9 @@ display:
     backlight_pin:
       number: GPIO4
       allow_other_uses: true
-    cs_pin: GPIO5
+    cs_pin: #GPIO5
+      number: GPIO5
+      ignore_strapping_warning: true
     dc_pin: GPIO16
     reset_pin: GPIO23
     update_interval: 1s
@@ -110,9 +112,9 @@ display:
       it.strftime(4,  3, id(sz_13), id(my_yellow), TextAlign::TOP_LEFT, "%Y-%m-%d %H:%M:%S", id(esptime).now());
 
       if (id(system_status).state) {
-        it.print(236, 3, id(sz_13), id(my_green), TextAlign::TOP_RIGHT, "${upper} Online");
+        it.print(236, 3, id(sz_13), id(my_green), TextAlign::TOP_RIGHT, "${name} Online");
       } else {
-        it.print(236, 3, id(sz_13), id(my_red), TextAlign::TOP_RIGHT, "${upper} Offline");
+        it.print(236, 3, id(sz_13), id(my_red), TextAlign::TOP_RIGHT, "${name} Offline");
       }
 
       int r = 18;
@@ -163,7 +165,7 @@ sensor:
 
     pm_1_0:
       id: pm_1_0
-      name: "${upper} PM <1.0 µm"
+      name: PM <1.0 µm
       filters:
       - sliding_window_moving_average:
           window_size: 30
@@ -171,7 +173,7 @@ sensor:
 
     pm_2_5:
       id: pm_2_5
-      name: "${upper} PM <2.5 µm"
+      name: PM <2.5 µm
       filters:
       - sliding_window_moving_average:
           window_size: 30
@@ -204,14 +206,14 @@ sensor:
 
     pm_10_0:
       id: pm_10
-      name: "${upper} PM <10.0 µm"
+      name: PM <10.0 µm
       filters:
       - sliding_window_moving_average:
           window_size: 30
           send_every: 10
 
   - platform: template
-    name: "${upper} PM <2.5 AQI"
+    name: PM <2.5 AQI
     unit_of_measurement: "AQI"
     icon: "mdi:air-filter"
     accuracy_decimals: 0

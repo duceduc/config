@@ -15,7 +15,7 @@ esp32:
 
 sensor:
   - platform: wifi_signal
-    name: '$name wifi signal'
+    name: wifi signal
     update_interval: 15s
     filters:
       - sliding_window_moving_average:
@@ -26,13 +26,13 @@ sensor:
 binary_sensor:
   - platform: gpio
     pin: GPIO14 # D17 ??
-    name: motion balcony occupancy
+    name: occupancy
     device_class: motion    
 
   - platform: status
-    name: "$name status"
+    name: status
 
 switch:
   - platform: restart
-    name: "$name Restart"
+    name: restart
     icon: mdi:restart    

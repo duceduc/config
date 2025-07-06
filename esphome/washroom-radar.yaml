@@ -40,8 +40,8 @@ binary_sensor:
     has_target:
       name: Presence
       filters: # fix false positive
-        - delayed_on: 5s
-        - delayed_off: 10s
+        - delayed_on: 3s # 5s
+        - delayed_off: 5s #10s
     has_moving_target:
       name: Moving Target
     has_still_target:
@@ -110,12 +110,12 @@ ld2410:
   timeout: 150s # fix false positive
   max_move_distance : 6m
   max_still_distance: 0.75m
-  g0_move_threshold: 10
-  g0_still_threshold: 20
-  g1_move_threshold: 10
-  g1_still_threshold: 20
-  g2_move_threshold: 20
-  g2_still_threshold: 21
+  g0_move_threshold: 20 #10
+  g0_still_threshold: 30 #20
+  g1_move_threshold: 20 #10
+  g1_still_threshold: 30 #20
+  g2_move_threshold: 30 #20
+  g2_still_threshold: 31 #21
   g3_move_threshold: 30
   g3_still_threshold: 31
   g4_move_threshold: 40

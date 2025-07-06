@@ -58,7 +58,7 @@
     min_temp: 15
     max_temp: 35
     temp_step: 0.5
-    current_temperature_template: "{{ states('sensor.shionroom_temperature') }}"
+    current_temperature_template: "{{ states('sensor.sr_radar_temperature') }}"
     target_temperature_template: "{{ states('input_number.sr_target_temperature') }}"
     set_temperature:
       service: input_number.set_value

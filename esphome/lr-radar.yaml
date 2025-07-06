@@ -3,8 +3,8 @@
 substitutions:
   name: lr-radar
 #  room: livingroom
-  upper: Lr
-  lower: lr
+#  upper: Lr
+#  lower: lr
 
 packages:
   ld2410: !include components/ld2410.yaml

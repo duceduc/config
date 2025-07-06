@@ -23,10 +23,10 @@ binary_sensor:
       auto uart_component = static_cast<LD2410 *>(ld2410);
       return {uart_component->hasTarget,uart_component->hasMovingTarget,uart_component->hasStillTarget,uart_component->lastCommandSuccess};
     binary_sensors:
-      - name: "$upper Has Target"
-      - name: "$upper Has Moving Target"
-      - name: "$upper Has Still Target"
-      - name: "$upper Last Command Success"
+      - name: Has Target
+      - name: Has Moving Target
+      - name: Has Still Target
+      - name: Last Command Success
 
 sensor:
   - platform: custom
@@ -34,31 +34,31 @@ sensor:
       auto uart_component = static_cast<LD2410 *>(ld2410);
       return {uart_component->movingTargetDistance,uart_component->movingTargetEnergy,uart_component->stillTargetDistance,uart_component->stillTargetEnergy,uart_component->detectDistance};
     sensors:
-      - name: "$upper Moving Target Distance"
+      - name: Moving Target Distance
         id: movingTargetDistance
         unit_of_measurement: "cm"
         accuracy_decimals: 0
         disabled_by_default: true
 
-      - name: "$upper Moving Target Energy"
+      - name: Moving Target Energy
         id: movingTargetEnergy
         unit_of_measurement: "%"
         accuracy_decimals: 0
         disabled_by_default: true
 
-      - name: "$upper Still Target Distance"
+      - name: Still Target Distance
         id: stillTargetDistance
         unit_of_measurement: "cm"
         accuracy_decimals: 0
         disabled_by_default: true
 
-      - name: "$upper Still Target Energy"
+      - name: Still Target Energy
         id: stillTargetEnergy
         unit_of_measurement: "%"
         accuracy_decimals: 0
         disabled_by_default: true
 
-      - name: "$upper Detect Distance"
+      - name: Detect Distance
         id: detectDistance
         unit_of_measurement: "cm"
         accuracy_decimals: 0
@@ -66,7 +66,7 @@ sensor:
 
 number:        
   - platform: template
-    name: "$upper Max Moving Distance Range"
+    name: Max Moving Distance Range
     id: maxMovingDistanceRange
     min_value: 1
     max_value: 8
@@ -78,7 +78,7 @@ number:
           auto uart_component = static_cast<LD2410 *>(ld2410);
           uart_component->setMaxDistancesAndNoneDuration(x,id(maxStillDistanceRange).state,id(noneDuration).state);
   - platform: template
-    name: "$upper Max Still Distance Range"
+    name: Max Still Distance Range
     id: maxStillDistanceRange
     min_value: 1
     max_value: 8
@@ -90,7 +90,7 @@ number:
           auto uart_component = static_cast<LD2410 *>(ld2410);
           uart_component->setMaxDistancesAndNoneDuration(id(maxMovingDistanceRange).state,x,id(noneDuration).state);
   - platform: template
-    name: "$upper None Duration"
+    name: None Duration
     id: noneDuration
     min_value: 0
     max_value: 32767
@@ -109,27 +109,27 @@ button:
     on_press:
       lambda: 'static_cast<LD2410 *>(ld2410)->reboot();'
   - platform: template
-    name: "Turn on $lower config mode"
+    name: Turn on config mode
     on_press:
       - lambda: 'static_cast<LD2410 *>(ld2410)->setConfigMode(true);'
   - platform: template
-    name: "Turn off $lower config mode"
+    name: Turn off config mode
     on_press:
       - lambda: 'static_cast<LD2410 *>(ld2410)->setConfigMode(false);'
   - platform: template
-    name: "Get $lower config"
+    name: Get config
     on_press:
       - lambda: 'static_cast<LD2410 *>(ld2410)->queryParameters();'
   - platform: template
-    name: "Set $lower baud rate to 256000"
+    name: Set baud rate to 256000
     on_press:
       - lambda: 'static_cast<LD2410 *>(ld2410)->setBaudrate(7);'
   - platform: template
-    name: "Set $lower baud rate to 115200"
+    name: Set baud rate to 115200
     on_press:
       - lambda: 'static_cast<LD2410 *>(ld2410)->setBaudrate(5);'
   - platform: template
-    name: "Set $lower baud rate to 9600"
+    name: Set baud rate to 9600
     on_press:
       - lambda: 'static_cast<LD2410 *>(ld2410)->setBaudrate(1);'
 

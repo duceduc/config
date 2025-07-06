@@ -48,7 +48,7 @@ sensor:
   - platform: wifi_signal
     name: RSSI
     id: wifi_signal_db
-    update_interval: 1s
+    update_interval: 5s
     entity_category: "diagnostic"
 
   - platform: ld2410

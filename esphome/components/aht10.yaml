@@ -14,18 +14,18 @@ sensor:
       name: 'Temperature'
       accuracy_decimals: 1
       filters:
+        - offset: "$temp_offset"
         - sliding_window_moving_average:
             window_size: 15
             send_every: 15
             send_first_at: 1
-        - offset: "$temp_offset"
 
     humidity:
       name: 'Humidity'
       accuracy_decimals: 1
       filters:
+        - offset: "$hum_offset"
         - sliding_window_moving_average:
             window_size: 15
             send_every: 15
             send_first_at: 1
-        - offset: "$hum_offset"

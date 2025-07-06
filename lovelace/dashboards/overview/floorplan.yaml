@@ -350,7 +350,7 @@ cards:
           bottom: 42.5%
           right: 48%
       - type: state-label
-        entity: sensor.shionroom_temperature
+        entity: sensor.sr_radar_temperature
         style:
           bottom: 42.5%
           left: 31%
@@ -365,7 +365,7 @@ cards:
           bottom: 51.2%
           left: 31%
       - type: state-label
-        entity: sensor.wc_temperature
+        entity: sensor.wc_airfreshener_temperature
         style:
           bottom: 42.5%
           left: 38.5%
@@ -375,7 +375,7 @@ cards:
           top: 24%
           left: 7.2%
       - type: state-label
-        entity: sensor.mdf_temperature
+        entity: sensor.security_mdf_temperature
         style:
           bottom: 42.6%
           left: 15.1%

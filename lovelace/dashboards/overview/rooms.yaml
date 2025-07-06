@@ -35,8 +35,8 @@ cards:
           - room: sr
           - entity_1: input_select.sr_ac_mode
           - entity_2: sensor.sr_aircon_target
-          - entity_3: sensor.shionroom_temperature
-          - entity_4: sensor.shionroom_humidity
+          - entity_3: sensor.sr_radar_temperature
+          - entity_4: sensor.sr_radar_humidity
 #          - entity_5: sensor.sr_condensation_chance
 
       - type: custom:streamline-card
