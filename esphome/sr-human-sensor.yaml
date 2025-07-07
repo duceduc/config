@@ -1,10 +1,9 @@
 # This is a custom firmware for Human Presence Sensor 1U
 # https://screek.io/1u
-## web_server needs to be disabled for this esp32 ##
+## web_server needs to be disabled for this esp32-S2##
 
 substitutions:
   name: sr-human-sensor
-#  room: Sr
 
 esphome:
   name: $name
@@ -18,15 +17,11 @@ esphome:
         id(cpu_speed) = ESP.getCpuFreqMHz() ;
   project: 
     name: Screek.Human Presence Sensor
-    version: 1U
-  min_version: 2023.6.1
+    version: 1w
 
+#  NEED TO UPLOAD VIA CABLE DUE TO CHANGE IN PLATFORM
 esp32:
   board: lolin_s2_mini
-  framework:
-    type: arduino
-    version: 2.0.9
-    platform_version: 6.3.2
 
 globals:
    - id: cpu_speed
@@ -38,9 +33,9 @@ external_components:
   # - source: github://screek-workshop/custom_components_support_for_screek_1u
   - source:
       type: git
-      url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
-      ref: master
-    # components: [ ld2410, uart ]
+      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
+      ref: main
+    components: [ ld2410, uart ]
 
 improv_serial:
 

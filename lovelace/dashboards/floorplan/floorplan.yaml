@@ -37,6 +37,7 @@ cards:
               - entity_id: '/sensor\..*phone/'
               - entity_id: '/sensor\.device*/'
               - entity_id: '/sensor\..*_watch*/'
+              - entity_id: '/sensor\.critical_battery_count/'
               - attributes:
                   show_battery_alert: false
           card:
@@ -256,9 +257,6 @@ cards:
               - sensor.eri_bermuda_area
               - sensor.duc_bermuda_area
               - sensor.shion_tms_bermuda_area
-#              - sensor.eri_espresense
-#              - sensor.duc_espresense
-#              - sensor.shion_tms_espresense
 
               tap_action: false
               state_action:

@@ -212,8 +212,7 @@
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
       value_template: "{{ is_state('binary_sensor.motion_sr_auto_on', 'on') }}"
     - condition: template # trigger once an hour
-      - condition: template
-        value_template: "{{ state_attr('binary_sensor.shionroom_occupied','squirt') == true }}"
+      value_template: "{{ state_attr('binary_sensor.shionroom_occupied','squirt') == true }}"
   actions:
     - action: switch.toggle
       entity_id: switch.shion_airfreshener

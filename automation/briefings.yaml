@@ -111,12 +111,12 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # Don't play if eri present
-      value_template: "{{ not is_state('sensor.eri_espresense', 'livingroom') }}"
+      value_template: "{{ not is_state('sensor.eri_bermuda_area', 'Living') }}"
     - condition: state
       entity_id: input_boolean.good_morning_report
       state: 'off'
   actions:
-    - action: script.morning_briefing #TETSING get_duc_briefing
+    - action: script.morning_briefing
     - action: script.battery_notification
 
     - action: input_boolean.turn_on
