@@ -38,6 +38,7 @@ cards:
               - entity_id: '/sensor\.device*/'
               - entity_id: '/sensor\..*_watch*/'
               - entity_id: '/sensor\.critical_battery_count/'
+              - entity_id: '/sensor\.hdmi_selector_battery/'
               - attributes:
                   show_battery_alert: false
           card:
@@ -237,7 +238,7 @@ cards:
                 service: floorplan.text_set
                 service_data:
     #              element: ${entity.entity_id}.text
-                  text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : (entity.state)}°'
+                  text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : Math.round(entity.state*10)/10}°' # math fix for ha pecision change
 
             - entities:
               - sensor.aio_human_sensor_entrance_humidity
@@ -247,7 +248,7 @@ cards:
                 service: floorplan.text_set
                 service_data:
     #              element: ${entity.entity_id}.text
-                  text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : (entity.state)}%'
+                  text: '${(entity.state === "unavailable") ? "---" : (entity.state === "nan") ? "---" : Math.round(entity.state)}%' # math fix for ha pecision change
 
 #################################################
 ### Presence

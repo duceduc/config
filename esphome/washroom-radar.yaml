@@ -1,5 +1,7 @@
 
 substitutions:
+  temp_offset: '-6'
+  hum_offset: '18'
 
 esphome:
   name: washroom-radar
@@ -16,7 +18,8 @@ external_components:
       ref: main
     components: [uart, ld2410]
 
-#packages:
+packages:
+  aht10: !include components/aht10.yaml
 #  ld2410B: !include components/ld2410b.yaml
 
 esp8266:

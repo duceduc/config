@@ -45,7 +45,7 @@
       </p>
 
       <p>
-        It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.entrance_temperature')|round}} degrees in Kawagoodchi. 
+        It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.aio_human_sensor_entrance_temperature', rounded=True) }} degrees in Kawagoodchi. 
       </p>
       
       <p>

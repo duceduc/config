@@ -31,7 +31,7 @@
 
   - platform: statistics
     name: Outside Temp Stats
-    entity_id: sensor.entrance_temperature
+    entity_id: sensor.aio_human_sensor_entrance_temperature
     state_characteristic: mean
     sampling_size: 500
 

@@ -19,7 +19,6 @@ esphome:
     name: Screek.Human Presence Sensor
     version: 1w
 
-#  NEED TO UPLOAD VIA CABLE DUE TO CHANGE IN PLATFORM
 esp32:
   board: lolin_s2_mini
 
