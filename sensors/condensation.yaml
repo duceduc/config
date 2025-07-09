@@ -68,7 +68,13 @@
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 0.6
 
-
+# Wash Room Mold Chance
+  - platform: mold_indicator
+    name: Washroom Condensation Chance
+    indoor_temp_sensor: sensor.washroom_radar_temperature
+    indoor_humidity_sensor: sensor.washroom_radar_humidity
+    outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
+    calibration_factor: 0.6 # need to calibrate
 
 ####################################################
 #                                                                                                    

@@ -12,14 +12,14 @@ uart:
 sensor:
   - platform: pm1006
     pm_2_5:
-      name: $name
+      name: ' '
     uart_id: uart_1
     
   - platform: mhz19
     co2:
-      name: "Carbon Dioxide"
+      name: Carbon Dioxide
     temperature:
-      name: "$name Temperature"
+      name: Temperature
     update_interval: 120s
     automatic_baseline_calibration: false
     uart_id: uart_2
@@ -27,7 +27,7 @@ sensor:
 # Danger above 50% CO    
   - platform: adc
     pin: A0
-    name: "Carbon Monoxide"
+    name: Carbon Monoxide
     update_interval: 60s
     filters:
       - lambda: return (x * 1024/5);
