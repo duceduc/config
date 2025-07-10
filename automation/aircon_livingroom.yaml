@@ -146,7 +146,7 @@
       entity_id: binary_sensor.hallway_door
       state: 'off'
     - condition: state
-      entity_id: binary_sensor.lr_sensor_dht_status # only if temperature sensor is available - prevents glitching when unavailable
+      entity_id: binary_sensor.lr_radar_status # only if temperature sensor is available - prevents glitching when unavailable
       state: 'on'
     - condition: or # And only if room heating or cooling is required (for the case of a time trigger)
       conditions:
@@ -196,7 +196,7 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # Someone is not in LR
-      value_template: "{{ states('sensor.lr_still_target_energy')| int(0) < 40 }}"      
+      value_template: "{{ is_state('binary_sensor.lr_airfreshener_presence', 'off') }}"
   actions:
     - action: input_select.select_option
       data:
@@ -218,7 +218,7 @@
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # Someone is not in LR
-      value_template: "{{ is_state('binary_sensor.lr_has_still_target', 'off') }}"
+      value_template: "{{ is_state('binary_sensor.lr_airfreshener_presence', 'off') }}"
   actions:
     - action: input_select.select_option
       data:
