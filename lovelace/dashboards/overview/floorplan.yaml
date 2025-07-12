@@ -375,7 +375,7 @@ cards:
           top: 24%
           left: 7.2%
       - type: state-label
-        entity: sensor.security_mdf_temperature
+        entity: sensor.gk_airfreshener_temperature
         style:
           bottom: 42.6%
           left: 15.1%

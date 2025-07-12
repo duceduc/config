@@ -4,21 +4,18 @@
 #                                                                                                             
 #########################################################
 
-#Testing bermuda.
-#espresense - duc_espresense, eri_espresense, shion_tms_espresense
-
 #sensor.duc_bermuda_area
 #sensor.eri_bermuda_area
 #sensor.shion_tms_bermuda_area
 
-# Duc combing both monitor and espresense detections
+# Duc combing both monitor and bermuda detections
 - alias: Presence Duc On
   triggers:
     - trigger: numeric_state
       entity_id: sensor.id_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.duc_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
+      value_template: "{{ states('sensor.duc_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'genkan'] }}"
   actions:
     - action: input_boolean.turn_on
       data:
@@ -45,14 +42,14 @@
         entity_id: input_boolean.duc_presence
 
 
-# Eri combing both monitor and espresense detections
+# Eri combing both monitor and bermuda detections
 - alias: Presence Eri On
   triggers:
     - trigger: numeric_state
       entity_id: sensor.ie_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.eri_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"
+      value_template: "{{ states('sensor.eri_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'genkan'] }}"
   actions:
     - action: input_boolean.turn_on
       data:
@@ -78,14 +75,14 @@
       data:
         entity_id: input_boolean.eri_presence
 
-# Shion combing both monitor and espresense detections
+# Shion combing both monitor and bermuda detections
 - alias: Presence Shion On
   triggers:
     - trigger: numeric_state
       entity_id: sensor.tms_presence
       above: 10
     - trigger: template
-      value_template: "{{ states('sensor.shion_tms_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'livingroom', 'genkan'] }}"    
+      value_template: "{{ states('sensor.shion_tms_bermuda_area').lower() in ['computer', 'shionroom', 'kitchen', 'masterroom', 'living', 'genkan'] }}"    
   actions:
     - action: input_boolean.turn_on
       data:
@@ -430,15 +427,6 @@
               data: {}
               entity_id: input_boolean.eri_travel_monitor
       default: []
-
-
-####################################################
-#                                                                                                    
-#            Monitor RPIw Devices                                         
-#                                                                                                    
-####################################################
-
-
 
 
 

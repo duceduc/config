@@ -5,20 +5,8 @@
 #   @description    :   Package for handling Presence detection based on RSSI level using Monitor script.  
 ###############################################################################
 
-#irk:
+# iphone irk:
 # 8bcf809f09f2919c1094ba36979ae5d5 753cc977a5339bf6074a99949a2f1267 051e96f65fdb83de199d30070ef37f7e fc5505f5ea6bb804e3f1febb43d1cce3 tile:ed5cc31a97c6 8179f6bccb43f921ce60a480f1d8f28c fde3aef775146c642f726e1494431aa8 6421f5964ea2c29d1dcd14a8293d0c3a
-
-# remove when convert over to bermuda
-group:
-  espresense_devices:
-    all: true
-    entities:  
-      - binary_sensor.espresense_livingroom
-      - binary_sensor.espresense_computerroom
-      - binary_sensor.espresense_genkan
-      - binary_sensor.espresense_kitchen
-      - binary_sensor.espresense_masterroom
-      - binary_sensor.espresense_shionroom
 
 input_boolean:
   audible_notifications:
@@ -140,30 +128,30 @@ template:
           {% endif %}
 
   - sensor:
-      - name: "Duc Home Location" # can delete if not want to use for espresense location
+      - name: "Duc Home Location" # can delete if not want to use for bermuda location
         unique_id: 85d5b1cd-7690-43bb-af8e-4ae1209c0087
         icon: mdi:target
         state: >-
-          {% if is_state('sensor.duc_espresense', 'masterroom') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% if is_state('sensor.duc_bermuda_area', 'Master Room') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             master_room
-          {% elif is_state('sensor.duc_espresense', 'shionroom') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.duc_bermuda_area', 'Shion Room') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             shion_room
-          {% elif is_state('sensor.duc_espresense', 'kitchen') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.duc_bermuda_area', 'Kitchen') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             kitchen
-          {% elif is_state('sensor.duc_espresense', 'computerroom') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.duc_bermuda_area', 'Computer') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             computer_room
-          {% elif is_state('sensor.duc_espresense', 'livingroom') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.duc_bermuda_area', 'Living') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             living_room
-          {% elif is_state('sensor.duc_espresense', 'genkan') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.duc_bermuda_area', 'Genkan') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             genkan
-          {% elif is_state('sensor.duc_espresense', 'not_home') and
-                (now() > states.sensor.duc_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.duc_bermuda_area', 'unknown') and
+                (now() > states.sensor.duc_bermuda_area.last_changed + timedelta(seconds=5)) %}
             not_home
           {% else %}
             --
@@ -174,26 +162,26 @@ template:
         unique_id: 25b62d84-7c53-4c9f-a80f-87b88fd8cc25
         icon: mdi:target
         state: >-
-          {% if is_state('sensor.eri_espresense', 'masterroom') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% if is_state('sensor.eri_bermuda_area', 'Master Room') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             master_room
-          {% elif is_state('sensor.eri_espresense', 'shionroom') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.eri_bermuda_area', 'Shion Room') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             shion_room
-          {% elif is_state('sensor.eri_espresense', 'kitchen') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.eri_bermuda_area', 'Kitchen') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             kitchen
-          {% elif is_state('sensor.eri_espresense', 'computerroom') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.eri_bermuda_area', 'Computer') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             computer_room
-          {% elif is_state('sensor.eri_espresense', 'livingroom') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.eri_bermuda_area', 'Living') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             living_room
-          {% elif is_state('sensor.eri_espresense', 'genkan') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.eri_bermuda_area', 'Genkan') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             genkan
-          {% elif is_state('sensor.eri_espresense', 'not_home') and
-                (now() > states.sensor.eri_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.eri_bermuda_area', 'unknown') and
+                (now() > states.sensor.eri_bermuda_area.last_changed + timedelta(seconds=5)) %}
             not_home
           {% else %}
             --
@@ -204,43 +192,31 @@ template:
         unique_id: 08513fd1-5a87-4d12-9365-69b045513e30
         icon: mdi:target
         state: >-
-          {% if is_state('sensor.shion_tms_espresense', 'masterroom') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% if is_state('sensor.shion_tms_bermuda_area', 'Master Room') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             master_room
-          {% elif is_state('sensor.shion_tms_espresense', 'shionroom') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.shion_tms_bermuda_area', 'Shion Room') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             shion_room
-          {% elif is_state('sensor.shion_tms_espresense', 'kitchen') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.shion_tms_bermuda_area', 'Kitchen') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             kitchen
-          {% elif is_state('sensor.shion_tms_espresense', 'computerroom') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.shion_tms_bermuda_area', 'Computer') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             computer_room
-          {% elif is_state('sensor.shion_tms_espresense', 'livingroom') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.shion_tms_bermuda_area', 'Living') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             living_room
-          {% elif is_state('sensor.shion_tms_espresense', 'genkan') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.shion_tms_bermuda_area', 'Genkan') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             genkan
-          {% elif is_state('sensor.shion_tms_espresense', 'not_home') and
-                (now() > states.sensor.shion_tms_espresense.last_changed + timedelta(seconds=5)) %}
+          {% elif is_state('sensor.shion_tms_bermuda_area', 'unknown') and
+                (now() > states.sensor.shion_tms_bermuda_area.last_changed + timedelta(seconds=5)) %}
             not_home
           {% else %}
             --
           {% endif %}
 
-# remove when convert over to bermuda
-  - sensor:
-      - name: "ESPresense Devices" # espresense is online
-        state: |
-          {% if expand('group.espresense_devices') | selectattr('state', 'eq', 'off') | list | count >= 1 %}
-            {% set sensor = expand('group.espresense_devices') | selectattr('state', 'eq', 'off') | sort(attribute='last_changed') | last %}
-              {% if sensor.name == sensor.name %}
-                {{ sensor.name }}
-              {% endif %}
-          {% else %}
-            on
-          {% endif %}
 
 automation:
   - alias: Set Room Presence

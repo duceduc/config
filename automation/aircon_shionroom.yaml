@@ -3,7 +3,7 @@
 #             Auto Mode Lights On/Off                                                                
 #                                                                                                              
 #########################################################
-# usb plug order. Top -> bottom -> right [espresense,radar,monitor]
+# usb plug order. Top -> bottom -> right [bermuda,radar,monitor]
 
 - alias: Shionroom Occupancy
   description: 'Defines occupancy state for room'

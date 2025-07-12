@@ -39,7 +39,7 @@ automation:
     max_exceeded: silent
     triggers:
       - trigger: state
-        entity_id: binary_sensor.espresense_genkan_motion # deleted not alternate
+        entity_id: binary_sensor.gk_airfreshener_moving_target
         from: 'off'
         to: 'on'
     conditions:

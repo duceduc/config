@@ -550,7 +550,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:14px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:0.5px;display:inline;opacity:0.5;fill:#ffffff;stroke-width:1.0234;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="1212.4152"
        y="-254.7446"
-       id="sensor.security_mdf_temperature"
+       id="sensor.gk_airfreshener_temperature"
        transform="matrix(0.88699692,0.65491386,-0.70396603,0.60762656,0,0)"><tspan
          sodipodi:role="line"
          id="tspan2399"

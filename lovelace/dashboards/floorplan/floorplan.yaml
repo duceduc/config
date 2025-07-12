@@ -201,7 +201,6 @@ cards:
 #################################################
 
             - entities:
-              - sensor.espresense_computerroom_temperature
               - sensor.bt_proxy_computer_temperature
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
@@ -210,7 +209,7 @@ cards:
               - sensor.aio_human_sensor_master_temperature
               - sensor.wc_airfreshener_temperature
               - sensor.lr_radar_temperature
-              - sensor.security_mdf_temperature
+              - sensor.gk_airfreshener_temperature
               - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
               - sensor.washer_device_temperature
@@ -220,7 +219,6 @@ cards:
                   service_data: 'static-temp'
          
             - entities:
-              - sensor.espresense_computerroom_temperature
               - sensor.bt_proxy_computer_temperature
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
@@ -228,7 +226,7 @@ cards:
               - sensor.aio_human_sensor_master_temperature
               - sensor.wc_airfreshener_temperature
               - sensor.lr_radar_temperature
-              - sensor.security_mdf_temperature
+              - sensor.gk_airfreshener_temperature
               - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
               - sensor.washer_device_temperature

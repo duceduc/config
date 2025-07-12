@@ -66,9 +66,9 @@ cards:
       - icon: weather-rainy
       - entity_1: sensor.mdf_condensation_chance
       - name_1: MDF Condensation
-      - entity_2: sensor.security_mdf_humidity
+      - entity_2: sensor.gk_airfreshener_humidity
       - name_2: Shoe Closet Humidity
-      - entity_3: sensor.security_mdf_temperature
+      - entity_3: sensor.gk_airfreshener_temperature
       - name_3: Shoe Closet Temperature
 
   - type: custom:streamline-card

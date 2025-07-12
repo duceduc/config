@@ -16,10 +16,11 @@
 
 #########################################################
 #                                                                                                              
-#             ESPresense Room Timer Control                                                       
+#             Room Timer Control                                                       
 #                                                                                                              
 #########################################################
 
+# can delete ??
   shionroom_timer:
   masterroom_timer:
   livingroom_timer:

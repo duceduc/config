@@ -209,29 +209,18 @@ sensor:
         value_template: >
           {{ state_attr('weather.my_weather', 'wind_speed') }}
 
-
-#  - platform: min_max
-#    name: "average_house_temperature"
-#    round_digits: 1
-#    type: mean
-#    entity_ids:
-#     - sensor.aio_human_sensor_master_temperature
-#     - sensor.entry_human_sensor_temperature
-#     - sensor.bt_proxy_computer_temperature
-#     - sensor.kt_human_sensor_temperature
-
   - platform: average
     name: "average_house_temperature"
 #    start: '{{ 0 }}'
 #    end: '{{ now() }}'
     precision: 1
     entities:
-      - sensor.sr_radar_temperature
-      - sensor.aio_human_sensor_master_temperature
       - sensor.lr_radar_temperature
-      - sensor.entry_human_sensor_temperature
+      - sensor.sniffer0_temperature
+      - sensor.sniffer1_temperature
       - sensor.bt_proxy_computer_temperature
       - sensor.kt_human_sensor_temperature
+
 
   - platform: history_stats
     name: Rainsensor flips

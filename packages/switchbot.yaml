@@ -638,7 +638,7 @@ automation:
       - condition: template # open after 6am
         value_template: "{{ states('sensor.time') > '05:00' }}"
       - condition: template # don't run if eri is front area
-        value_template: "{{ not states('sensor.eri_espresense').lower() in ['kitchen', 'livingroom'] }}"
+        value_template: "{{ not states('sensor.eri_bermuda_area').lower() in ['kitchen', 'living'] }}"
     actions:
       - action: cover.set_cover_position
         data:

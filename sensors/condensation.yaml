@@ -31,8 +31,8 @@
 # MDF Mold Chance
   - platform: mold_indicator
     name: MDF Condensation Chance
-    indoor_temp_sensor: sensor.security_mdf_temperature
-    indoor_humidity_sensor: sensor.security_mdf_humidity
+    indoor_temp_sensor: sensor.gk_airfreshener_temperature
+    indoor_humidity_sensor: sensor.gk_airfreshener_humidity
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 2.8
 
