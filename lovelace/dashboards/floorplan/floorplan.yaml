@@ -81,8 +81,8 @@ cards:
           }
 # any changes, update file ver and refresh frontend
         config:
-          image: '/local/lovelace/floorplan/floorplan_optimized.svg?14'
-          stylesheet: '/local/lovelace/css/floorplan.css?14'
+          image: '/local/lovelace/floorplan/floorplan_optimized.svg?17'
+          stylesheet: '/local/lovelace/css/floorplan.css?17'
           console_log_level: error
           rules:
 
@@ -212,7 +212,7 @@ cards:
               - sensor.gk_airfreshener_temperature
               - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
-              - sensor.washer_device_temperature
+              - sensor.washroom_radar_temperature
               tap_action: false
               state_action:
                 - service: floorplan.class_set
@@ -229,7 +229,7 @@ cards:
               - sensor.gk_airfreshener_temperature
               - sensor.entry_human_sensor_temperature
               - sensor.average_house_temperature
-              - sensor.washer_device_temperature
+              - sensor.washroom_radar_temperature
               tap_action: false
               state_action:
                 action: call-service
