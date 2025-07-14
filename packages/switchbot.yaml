@@ -607,7 +607,7 @@ automation:
   - alias: '24hr fan toggle speed'
     triggers:
       - trigger: time
-        at: '04:01:30'
+        at: '04:05:00'
       - trigger: state
         entity_id: sensor.period_of_the_day
         to: 'dusklight'
