@@ -551,6 +551,8 @@ cards:
                     name: Dish Cabinet
                   - entity: sensor.sr_study_battery
                     name: Shion Study
+                  - entity: sensor.balcony_battery_percentage
+                    name: Balcony Camera
                 head:
                   label: Devices
                   type: section

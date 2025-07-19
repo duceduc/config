@@ -111,6 +111,11 @@ automation:
             sequence:
               - action: switch.turn_on
                 entity_id: switch.usb_relay_adapter1_relay
+              - action: script.text_notify
+                data:
+                  who: "duc"
+                  title: "Balcony Cam Batt Low"
+                  message: "Balcony camera battery is currently charging."
           - conditions:
               - condition: numeric_state
                 entity_id: sensor.balcony_battery_percentage
@@ -118,6 +123,11 @@ automation:
             sequence:
               - action: switch.turn_off
                 entity_id: switch.usb_relay_adapter1_relay
+              - action: script.text_notify
+                data:
+                  who: "duc"
+                  title: "Balcony Cam Batt Charged"
+                  message: "Balcony camera battery has completed charging."
         default: []
 
 
