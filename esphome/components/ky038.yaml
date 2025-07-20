@@ -1,0 +1,57 @@
+
+
+wifi:
+  on_connect:
+    then:
+      - logger.log: "WiFi connected. Starting fast sampling."
+      - component.resume:
+          id: volume_sensor_main
+          # This sets the high-frequency sampling rate.
+          update_interval: 50ms
+
+sensor:
+  - platform: volume_sensor
+    id: volume_sensor_main
+    internal: true # The main component is just a controller.
+    pin: A0
+
+    # Start with a very long interval to allow Wi-Fi to connect reliably.
+    # The 'on_connect' automation above will override this.
+    update_interval: 100s
+
+    # Publish the peak value found every 5 seconds.
+    publish_interval: 5s
+
+    # Each sample burst lasts 30ms. The next burst starts immediately.
+    sampling_duration: 30ms
+
+    # --- Measurement Configuration ---
+    sensitivity: 50
+    # Use calibration to narrow the focus to your sensor's actual operating range,
+    # determined after completing the hardware calibration in Step 1.
+    adc_min_calibration: 200
+    adc_max_calibration: 900
+
+    # --- Child Sensors ---
+    db_sensor:
+      name: "Volume DB"
+
+    raw_max_sensor:
+      name: "Raw ADC Max"
+
+    raw_min_sensor:
+      name: "Raw ADC Min"
+
+    percentage_sensor:
+      name: "Volume Percent"
+
+number:
+  - platform: template
+    name: "Sound Sensitivity"
+    optimistic: true
+    initial_value: 50
+    min_value: 0.0
+    max_value: 100.0
+    step: 0.5
+    set_action:
+      - lambda: id(volume_sensor_main).set_sensitivity(x);

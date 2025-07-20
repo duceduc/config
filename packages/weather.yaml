@@ -216,10 +216,9 @@ sensor:
     precision: 1
     entities:
       - sensor.lr_radar_temperature
+      -sensor.lr_airfreshener_temperature
       - sensor.bt_proxy_computer_temperature
       - sensor.kt_human_sensor_temperature
-#      - sensor.sniffer0_temperature
-#      - sensor.sniffer1_temperature
 
   - platform: history_stats
     name: Rainsensor flips
