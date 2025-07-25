@@ -3,7 +3,7 @@
 # https://www.digi.com/resources/examples-guides/xbee-scent-generator
 substitutions:
   name: lr-airfreshener
-  temp_offset: "0"
+  temp_offset: "-2"
   hum_offset: "0"
   # Timing Intervals: Adjust to suit your Need/Situation.
   # NOTE: Values MUST BE in "quotes"
