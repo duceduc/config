@@ -38,9 +38,11 @@ sensor:
 
     raw_max_sensor:
       name: "Raw ADC Max"
+      disabled_by_default: true
 
     raw_min_sensor:
       name: "Raw ADC Min"
+      disabled_by_default: true
 
     percentage_sensor:
       name: "Volume Percent"

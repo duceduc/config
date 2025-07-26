@@ -124,6 +124,7 @@ automation:
       - trigger: numeric_state # TESTING KY-038
         entity_id: sensor.lr_airfreshener_volume_percent
         above: 0.6
+        below: 40
         for: 16
         id: 'air'
 
