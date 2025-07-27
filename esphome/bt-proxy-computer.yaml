@@ -33,6 +33,7 @@ esp32_ble_tracker:
 esp32:
   board: wemos_d1_mini32
 
+
 <<: !include .base.yaml
 
 i2c: # for aht10

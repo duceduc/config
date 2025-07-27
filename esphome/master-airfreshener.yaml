@@ -1,40 +1,34 @@
 #  [ ]
-# change network ssid
-# https://0xbadcoffee.se/blog/migrating-esphome-devices-to-a-new-network-ota
 
 substitutions:
-  name: gk-airfreshener
-#  room: Gk
+  name: master-airfreshener
 
   temp_offset: "0"
   hum_offset: "0"
+  # Timing Intervals: Adjust to suit your Need/Situation.
+  # NOTE: Values MUST BE in "quotes"
   interval1: "5"
   interval2: "15"
   interval3: "30"
   interval4: "60"
   interval5: "120"
   # Plunger Pulse Duration. Range: 55-100, 3v at 210
-  squirt_pulse: "160ms"
+  squirt_pulse: "140ms"
   # Cannister Squirt Capacity
   maxSquirts: "300" #max 280
 
-packages:
-  ld2410: !include components/ld2410-v2.yaml
-  aht10: !include components/aht10.yaml
+#packages:
+#  ld2410: !include components/ld2410-v2.yaml
+#  aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml
 
-wifi:
-  ssid: !secret ssid
-  password: !secret ssid_pwd
-  output_power: 8.5dB
-
 i2c: # for aht10
-  sda: GPIO5
-  scl: GPIO6
+  sda: GPIO6 #D4
+  scl: GPIO7 #D5
   scan: true
 
-uart:
+uart: # for ld2410
   id: uart_1
   tx_pin: GPIO21
   rx_pin: GPIO20
@@ -47,11 +41,10 @@ esphome:
   platformio_options:
     board_build.flash_mode: dio
 esp32:
-  board: esp32-c3-devkitm-1
+  board: seeed_xiao_esp32c3
   variant: esp32c3
   framework:
     type: esp-idf
-#    type: arduino # esp-idf (need to use cable when switching between types)
 
 globals:
   # Store the Cannister Percentage
@@ -77,14 +70,14 @@ button:
             id(can_level).publish_state(100);
             global_preferences->sync();
 
-binary_sensor: 
+binary_sensor: # not working for small glade
+  # Unit's Top Button for local Manual "Squirts" and Resetting Cannister Percentage
   - platform: gpio
     name: Button
     disabled_by_default: true
     pin:
-      number: GPIO4 # not working
+      number: GPIO9 # GPIO9 partial working
       inverted: True
-
     on_press:
       then:
         - lambda: |-
@@ -105,6 +98,7 @@ binary_sensor:
     name: status
 
 select:
+  # Drop-Down Menu, "Select" in Home Assistant for Interval Automation
   - platform: template
     id: intervalSelect
     name: Interval
@@ -123,6 +117,7 @@ select:
         - script.execute: squirtTimer
 
 script:
+  # Script for Auto squirt
   - id: squirtTimer
     mode: restart
     then:
@@ -141,7 +136,7 @@ switch:
     id: theSquirter
     icon: mdi:spray
     pin:
-      number: GPIO10
+      number: GPIO10  #D10 confirm to work
     on_turn_on:
       then:
         - delay: $squirt_pulse
