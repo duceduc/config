@@ -39,7 +39,7 @@
         who: duc
         title: 'Weather'
         message: >-
-          Currently {{ states('sensor.entrance_temperature') }}°,
+          Currently {{ states('sensor.aio_human_sensor_entrance_temperature', rounded=true) }}°,
           feels like {{states('sensor.oa_feels_like')}}°.
           Today
           {{ (state_attr('sensor.my_weather_forecast_daily', 'forecast')
