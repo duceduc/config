@@ -2,8 +2,7 @@
 
 substitutions:
   name: master-airfreshener
-
-  temp_offset: "0"
+  temp_offset: ".8"
   hum_offset: "0"
   # Timing Intervals: Adjust to suit your Need/Situation.
   # NOTE: Values MUST BE in "quotes"
@@ -13,13 +12,21 @@ substitutions:
   interval4: "60"
   interval5: "120"
   # Plunger Pulse Duration. Range: 55-100, 3v at 210
-  squirt_pulse: "140ms"
+  squirt_pulse: "200ms"
   # Cannister Squirt Capacity
   maxSquirts: "300" #max 280
 
-#packages:
-#  ld2410: !include components/ld2410-v2.yaml
-#  aht10: !include components/aht10.yaml
+packages:
+  ld2410: !include components/ld2410-v2.yaml
+  aht10: !include components/aht10.yaml
+#  ky038: !include components/ky038.yaml
+
+# This is for ky038
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Reubertt/esphome-components
+    components: [volume_sensor]
 
 <<: !include .base.yaml
 
@@ -76,8 +83,10 @@ binary_sensor: # not working for small glade
     name: Button
     disabled_by_default: true
     pin:
+      ignore_strapping_warning: true
       number: GPIO9 # GPIO9 partial working
       inverted: True
+
     on_press:
       then:
         - lambda: |-
