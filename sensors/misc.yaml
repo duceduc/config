@@ -65,9 +65,9 @@
          {% if is_state("binary_sensor.hallway_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
       toilet:
         value_template: >-
-         {% if is_state("binary_sensor.lr_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+         {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.lr_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+         {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 # Kitchen
       kitchen:
         value_template: >-
@@ -97,9 +97,9 @@
          {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
       livingroom:
         value_template: >-
-         {% if is_state("binary_sensor.lr_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+         {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
         icon_template: >-
-         {% if is_state("binary_sensor.lr_airfreshener_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+         {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
          
 # binary_sensor.cr_has_moving_target        
       computerroom:

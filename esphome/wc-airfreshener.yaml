@@ -1,8 +1,10 @@
+# [40:91:51:4F:1B:91]
+# https://www.youtube.com/watch?v=gmUkuQgKljo
+# https://www.digi.com/resources/examples-guides/xbee-scent-generator
 substitutions:
-  name: wc-airfreshener
-
-  temp_offset: '0'
-  hum_offset: '0'
+  name: "wc-airfreshener"
+  temp_offset: "-2"
+  hum_offset: "0"
   # Timing Intervals: Adjust to suit your Need/Situation.
   # NOTE: Values MUST BE in "quotes"
   interval1: "5"
@@ -10,28 +12,35 @@ substitutions:
   interval3: "30"
   interval4: "60"
   interval5: "120"
-  # Plunger Pulse Duration. Range: 55-200
+  # Plunger Pulse Duration. Range: 55-100, 3v at 210
   squirt_pulse: "200ms"
   # Cannister Squirt Capacity
-  maxSquirts: "300" #default 280
+  maxSquirts: "300" #max 280
 
 packages:
   ld2410: !include components/ld2410-v2.yaml
   airfresh: !include components/airfresh-v2.yaml
   aht10: !include components/aht10.yaml
+  ky038: !include components/ky038.yaml
 
-<<: !include .base.yaml  
+# This is for ky038
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Reubertt/esphome-components
+    components: [volume_sensor]
+
+<<: !include .base.yaml
 
 esphome:
   name: $name
 esp8266:
   board: d1_mini
-  restore_from_flash: true
 
 status_led:
   pin:
     number: GPIO2 #ESP8266 OnBroad LED
-    inverted: true # false=led on
+    inverted: false # false=led on
 
 sensor:
   - platform: wifi_signal
@@ -41,8 +50,8 @@ sensor:
       - sliding_window_moving_average:
           window_size: 15
           send_every: 15
-          send_first_at: 1
 
 binary_sensor:
   - platform: status
     name: status
+

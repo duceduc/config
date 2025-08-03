@@ -41,8 +41,8 @@ cards:
             name: Shion Airfreshener
           - entity: switch.shoshuriki
             name: Desk Airfreshener
-          - entity: switch.lr_airfreshener
-            name: Livingroom Airfreshener
+          - entity: switch.wc_airfreshener
+            name: WC Airfreshener
           - entity: switch.master_airfreshener
             name: Master Airfreshener
           - entity: switch.floor_heat

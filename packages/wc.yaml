@@ -122,10 +122,10 @@ automation:
         value_template: "{{ is_state('light.wc', ['unavailable','off']) }}"
         id: 'reset'
       - trigger: numeric_state # TESTING KY-038
-        entity_id: sensor.lr_airfreshener_volume_percent
-        above: 0.7
+        entity_id: sensor.wc_airfreshener_volume_percent
+        above: 0.8
         below: 20
-        for: 15
+        for: 16
         id: 'air'
 
     conditions: []
@@ -150,7 +150,7 @@ automation:
               - condition: template
                 value_template: "{{ is_state('light.wc', 'on') }}"
               - action: switch.turn_on
-                entity_id: switch.lr_airfreshener  # TESTING KY-038  switch.wc_airfreshener 
+                entity_id: switch.wc_airfreshener  # TESTING KY-038
           - conditions:
               - condition: trigger
                 id: 'reset'
