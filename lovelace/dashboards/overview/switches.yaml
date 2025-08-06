@@ -43,8 +43,8 @@ cards:
             name: Desk Airfreshener
           - entity: switch.wc_airfreshener
             name: WC Airfreshener
-          - entity: switch.master_airfreshener
-            name: Master Airfreshener
+          - entity: switch.living_airfreshener
+            name: Living Airfreshener
           - entity: switch.floor_heat
             name: Floor Heater
           - entity: switch.sb_humidifier
