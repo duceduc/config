@@ -1,0 +1,160 @@
+# [C8:47:8C:42:88:48]
+
+substitutions:
+  name: tuya-ir01
+
+<<: !include .base.yaml 
+
+
+esphome:
+  name: $name
+
+bk72xx:
+  family: t1a
+
+logger:
+  level: DEBUG  # study the code
+
+api:
+  services:
+    - service: send_ir
+      variables:
+        raw_data: int[]
+      then:
+        - remote_transmitter.transmit_raw:
+            transmitter_id: ir01_ir_tx
+            code: !lambda 'return raw_data;'
+            carrier_frequency: 38kHz
+
+
+
+status_led:
+  pin: P26
+# Global
+globals:
+  - id: last_ir_code
+    type: std::string
+    restore_value: no
+    initial_value: ""
+  - id: ir_code_buf
+    type: std::vector<int32_t>
+    restore_value: no
+
+remote_receiver:
+  id: ir01_ir_rx
+  pin:
+    number: P8
+    inverted: true
+  dump:
+    - raw
+  tolerance: 50%  
+  buffer_size: 4kb 
+  on_raw:
+    then:
+      - lambda: |-
+          if (id(learning_mode).state && !x.empty()) {
+            std::string code;
+            
+            code.reserve(x.size() * 8); 
+            for (size_t i = 0; i < x.size(); ++i) {
+              if (i != 0) code += ",";
+              code += std::to_string(x[i]);
+            }
+            id(ir01_code).publish_state("RAW:" + code);
+            id(last_ir_code) = code;
+            id(ir_code_buf) = x; 
+          }
+
+switch:
+  - platform: template
+    name: "Learning Mode"
+    id: learning_mode
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+
+remote_transmitter:
+  id: ir01_ir_tx
+  pin: P6
+  carrier_duty_percent: 50%
+binary_sensor:
+  - platform: gpio
+    pin: P9
+    name: "Learn Button"
+    on_press:
+      then:
+        - switch.toggle: learning_mode
+
+button:
+  - platform: template
+    name: "Repeat code"
+    icon: "mdi:repeat"
+    disabled_by_default: false
+    on_press:
+      then:
+        - if:
+            condition:
+              lambda: |-
+                if (id(ir_code_buf).empty()) {
+                  ESP_LOGW("IR01", "Code buffer is empty!");
+                  return false;
+                }
+                return true;
+            then:
+              - lambda: |-
+                  ESP_LOGI("IR01", "Sending code: %s", id(last_ir_code).c_str());
+                  ESP_LOGD("IR01", "Buffer size: %d", id(ir_code_buf).size());
+              - remote_transmitter.transmit_raw:
+                  transmitter_id: ir01_ir_tx
+                  code: !lambda |-
+                    ESP_LOGD("IR01", "First element of the code: %d", id(ir_code_buf)[0]);
+                    return id(ir_code_buf);
+                  carrier_frequency: 38kHz
+                  repeat:
+                    times: 3  
+                    wait_time: 100ms  # pause
+              - delay: 50ms  
+              - lambda: |-
+                  ESP_LOGI("IR01", "Code sent successfully");
+            else:
+              - logger.log:
+                  level: ERROR
+                  format: "Error: No saved code for redo"
+
+  - platform: template
+    name: "Laser"
+    icon: "mdi:laser-pointer"
+    id: ir01_laser_button
+    disabled_by_default: false
+    on_press:
+      then:
+        - remote_transmitter.transmit_raw:
+            transmitter_id: ir01_ir_tx
+            carrier_frequency: 38kHz
+            code: [
+              8925,-4508,560,-559,563,-563,562,-563,531,-594,
+              563,-563,562,-563,563,-563,563,-562,532,-1719,
+              532,-1719,532,-1719,563,-1691,560,-1688,562,-1689,
+              593,-1657,594,-1688,563,-563,531,-1720,563,-1688,
+              562,-1689,562,-563,563,-562,563,-563,562,-563,
+              563,-1688,563,-562,563,-563,562,-563,563,-1688,
+              563,-1688,563,-1688,562,-1689,531,-10000
+            ]
+        - delay: 200ms
+
+
+
+
+# tuya mcu
+tuya:
+uart:
+  rx_pin: RX1
+  tx_pin: TX1
+  baud_rate: 9600
+text_sensor:
+  - platform: template
+    name: "Last IR Code"
+    id: ir01_code
+sensor:
+  - platform: wifi_signal
+    name: "RSSI"
+    update_interval: 50s
