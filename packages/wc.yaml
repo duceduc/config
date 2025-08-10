@@ -125,7 +125,7 @@ automation:
         entity_id: sensor.wc_airfreshener_volume_percent
         above: 0.8
         below: 20
-        for: 16
+        for: 15
         id: 'air'
 
     conditions: []
