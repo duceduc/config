@@ -12,10 +12,11 @@ input_datetime:
     initial: '21:30'
 
   weekend_disable_internet:
-    name: Weekend Disable Interent
+    name: Weekend Disable Internet
     has_time: true
     initial: '22:30'
 
+# From Arpspoof Portainer
 command_line:
 #ai3: .163; nes: .102 for laptop use .104  (.104 was .251 [70:66:55:D0:4E:C9])
   - switch:
@@ -32,6 +33,7 @@ command_line:
       command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.112"
       value_template: '{{ value == "1" }}'
 
+# From Pihole & Arpspoof Portainer
 # temp solution to hide api key
   - switch:
       name: iS # combine portainer & pihole switch
