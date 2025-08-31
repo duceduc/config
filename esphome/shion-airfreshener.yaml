@@ -16,7 +16,7 @@ substitutions:
   interval4: "60"
   interval5: "120"
   # Plunger Pulse Duration. Range: 55-100, 3v at 210
-  squirt_pulse: "170ms"
+  squirt_pulse: "190ms"
   # Cannister Squirt Capacity
   maxSquirts: "300" #max 280
 
