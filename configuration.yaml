@@ -12,7 +12,6 @@ lovelace_gen:
 momentary:
   yaml_config: True
 
-
 homeassistant:
   name: Home
   latitude: !secret home_latitude
