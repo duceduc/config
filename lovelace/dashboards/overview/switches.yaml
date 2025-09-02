@@ -132,6 +132,8 @@ cards:
         title: Disable Devices
         show_header_toggle: false
         entities:
+          - entity: switch.openwrt_yellow_dwar
+            name: OpenWRT
           - entity: switch.desktop_internet
             name: Desktop
           - entity: switch.ai_4
