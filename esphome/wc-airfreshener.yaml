@@ -15,7 +15,7 @@ substitutions:
   # Plunger Pulse Duration. Range: 55-100, 3v at 210
   squirt_pulse: "200ms"
   # Cannister Squirt Capacity
-  maxSquirts: "300" #max 280
+  maxSquirts: "320" #300 too less
 
 packages:
   ld2410: !include components/ld2410-v2.yaml
