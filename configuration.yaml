@@ -80,7 +80,7 @@ mqtt:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - 192.168.1.5 #ser
+    - 192.168.1.180 #proxmox traefik
     - 192.168.1.197 #proxmox nginx
 
     - 172.30.33.0/24 # Docker network
