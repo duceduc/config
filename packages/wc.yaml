@@ -107,7 +107,7 @@ automation:
   - alias: 'motion wc room'
     triggers:
       - trigger: state
-        entity_id: binary_sensor.wc_occupied
+        entity_id: binary_sensor.wc_occupied, binary_sensor.wc_door_contact
         to: 'on'
       - trigger: state
         entity_id: binary_sensor.wc_occupied
