@@ -137,11 +137,11 @@
       command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
       value_template: '{{ value_json.subjectAltName }}'
 
-  - sensor:
-      name: ig token expiry
-      scan_interval: 43200
-      command: !secret ig_token
-      value_template: '{{ (value_json.expires_in / 86400) |  round(0) }}'
+#  - sensor:
+#      name: ig token expiry
+#      scan_interval: 43200
+#      command: !secret ig_token
+#      value_template: '{{ (value_json.expires_in / 86400) |  round(0) }}'
 
 ####################################################
 #
