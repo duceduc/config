@@ -126,16 +126,22 @@
 ####################################################
 
   - sensor:
-      name: ha ssl cert issued
+      name: lions ssl cert issued
       scan_interval: 21600
-      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_traefik duc@192.168.1.180 python3 /srv/docker-compose/traefik/certs/ssl-gen/ssl/pem2json.py /srv/docker-compose/traefik/certs/ssl-gen/ssl/traefik-server-cert.pem"
       value_template: '{{ value_json.notBefore }}'
 
-  - sensor:
-      name: ha ssl cert cn
-      scan_interval: 21600
-      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
-      value_template: '{{ value_json.subjectAltName }}'
+#  - sensor:
+#      name: ha ssl cert issued
+#      scan_interval: 21600
+#      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+#      value_template: '{{ value_json.notBefore }}'
+
+#  - sensor:
+#      name: ha ssl cert cn
+#      scan_interval: 21600
+#      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_ha ser@192.168.1.5 python3 /etc/ssl/live/pem2json.py /etc/ssl/live/ha.localdomain/ha.localdomain.crt"
+#      value_template: '{{ value_json.subjectAltName }}'
 
 #  - sensor:
 #      name: ig token expiry
