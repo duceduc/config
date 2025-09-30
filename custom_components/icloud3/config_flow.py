@@ -48,18 +48,18 @@ from .const             import (DOMAIN, ICLOUD3, DATETIME_FORMAT, STORAGE_DIR,
                                 )
 from .const_sensor      import (SENSOR_GROUPS )
 
-from .utils.utils       import (instr, isnumber, is_empty, isnot_empty, list_to_str, str_to_list,
+from .utils.utils       import (instr, is_number, is_empty, isnot_empty, list_to_str, str_to_list,
                                 is_statzone, zone_dname, isbetween, list_del, list_add,
                                 sort_dict_by_values,
                                 encode_password, decode_password, )
 from .utils.messaging import (log_exception, log_debug_msg, log_info_msg, add_log_file_filter,
-                                _log, _evlog, more_info, write_config_file_to_ic3log, close_ic3_log_file,
-                                post_event, post_monitor_msg, post_alert, )
+                                _log, _evlog, more_info, write_config_file_to_ic3log, close_ic3log_file,
+                                post_event, post_monitor_msg, update_alert_sensor, )
 
 from .configure         import forms
 from .configure         import apple_acct_support as aas
 from .configure         import selection_lists as lists
-from .configure         import sensors
+from .configure         import sensors as config_sensors
 from .configure         import utils_configure as utils
 from .configure         import dashboard_builder as dbb
 from .configure.const_form_lists import *
@@ -68,6 +68,7 @@ from .                  import sensor as ic3_sensor
 from .                  import device_tracker as ic3_device_tracker
 from .startup           import start_ic3
 from .startup           import config_file
+from .startup           import restore_state
 from .utils             import entity_io
 from .utils             import file_io
 
@@ -283,8 +284,10 @@ class iCloud3_ConfigFlow(config_entries.ConfigFlow, FlowHandler, domain=DOMAIN):
             self.errors['base'] = 'internet_error_no_change'
             action_item = ''
 
-        elif _OptFlow.PyiCloud is None:
-            self.errors['base'] = 'apple_acct_not_logged_into'
+        # elif _OptFlow.PyiCloud is None:
+        if _OptFlow.PyiCloud is None:
+            # self.errors['base'] = 'apple_acct_not_logged_into'
+            self.errors['account_selected'] = 'apple_acct_not_logged_into'
             action_item = 'goto_previous'
 
         elif (action_item == 'send_verification_code'
@@ -428,7 +431,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         self.logging_into_icloud_flag = False
 
         # Variables used for device selection and update on the device_list and device_update forms
-        self.devices_added_deleted_flag    = False    # Set when a devices is added or deleted. Used to update the Dashboards
+        self.rebuild_ic3db_dashboards    = False    # Set when a devices is added or deleted. Used to update the Dashboards
         self.device_items_by_devicename    = {}       # List of the apple_accts in the Gb.conf_tracking[apple_accts] parameter
         self.device_items_displayed        = []       # List of the apple_accts displayed on the device_list form
         self.dev_page_item                 = ['', '', '', '', ''] # Device's devicename last displayed on each page
@@ -483,29 +486,40 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         self.cdo_curr_idx      = 0
 
         # Dashboard Builder
-        self.db_templates               = {}    # iCloud3 device templates from icloud3/dashboard folder
-        self.db_templates_used          = []    # Templates used in master-dashboard template
-        self.db_templates_used_by_device = []   # Templates used in master-dashboard template to be built
-                                                # by device rather than by template. the names start with
-                                                # template-device
-        self.master_dashboard           = {}    # Master Dashboard dictionary (json str --> dict)
-        self.dashboards                 = []    # List of dashboards (lovelace.icloud3_xxx files) in conig./storage)
-        self.icloud3_dashboards         = []    # List of iCloud3 dashboards created by the Dashboard Builder
-        self.ic3db_Dashboards_by_dbname = {}    # HA Dashboard by dashboard name for Dashboards with Device-x available
-        self.AllDashboards_by_dashboard = {}    # All HA Dashboard objects by dashboard name
-        self.selected_dbname            = 'add' # Dashboard currently selected on Dashboard Builder screen
-        self.dbname                     = ''    # Dashboard  being created or updates
-        self.Dashboard                  = None
-        self.dbnames_just_added         = []    # The dbnames (url_path) added in this session. Used to see if the dashboard was deleted
-        self.dbf_main_view_devices_key_text = {}
-        self.main_view_template_style   = ''    # Template used to build main view iphone-fitst-2/all, result summary
-        self.main_view_devices          = ['result-summary']    # Devices to be inserted into the dashboard layout
-        self.dbf_dashboard_key_text     = {}    # db form device selection dictionary
+        self.db_templates                = {}    # iCloud3 device templates from icloud3/dashboard folder
+        self.db_templates_used           = []    # Templates used in master-dashboard template
+        self.db_templates_used_by_device = []    # Templates used in master-dashboard template to be built
+                                                    # by device rather than by template. the names start with
+                                                    # template-device
+        self.master_dashboard            = {}    # Master Dashboard dictionary (json str --> dict)
+        self.dashboards                  = []    # List of dashboards (lovelace.icloud3_xxx files) in conig./storage)
+        self.icloud3_dashboards          = []    # List of iCloud3 dashboards created by the Dashboard Builder
+        self.ic3db_Dashboards_by_dbname  = {}    # HA Dashboard by dashboard name for Dashboards with Device-x available
+        self.AllDashboards_by_dbname  = {}    # All HA Dashboard objects by dashboard name
+        self.dbname                      = ''    # Dashboard  being created or updates
+        self.Dashboard                   = None
 
-        self.main_view_device_fnames_by_dashboard  = {}    # Devices on the Main view of the dashboard
-        self.main_view_devicenames_by_dashboard    = {}    # Devicenames on the Main view of the dashboard
-        self.main_view_template_style_by_dashboard = {}    # Devices on the Main view of the dashboard
-        self.other_view_device_fnames_by_dashboard = {}    # Devices on the Other view of the dashboard
+        # These items are extracted from the main view when the dashboard is loaded. They are used to build to
+        # selection list on the dashboard form
+        self.main_view_extracted_dnames_by_dbname = {}  # Devicenames on the Main view of the dashboard
+        self.main_view_extracted_fnames_by_dbname = {}  # Devices on the Main view of the dashboard
+
+        # These items are set in config_flow dashboard form and passed to the dashboard functions when a dashboard
+        # is recreated
+        self.ui_main_view_style          = ''    #
+        self.ui_selected_dbname          = ADD   # Dashboard currently selected on Dashboard Builder screen
+        self.ui_main_view_dnames         = []    # Devices to be inserted into the dashboard layout
+        self.dbf_dashboard_key_text      = {}    # db form device selection dictionary
+
+        # Main View Info from the main_view_info_str on the Events Log view
+        # These items are loaded when the ic3db dashboards are loaded. They are used to set ui_xxx values when
+        # a device is added or deleted and the dashboards are recreated
+        self.main_view_info_style_by_dbname          = {}  # Devices on the Main view of the dashboard
+        self.main_view_info_dnames_by_dbname         = {}  # Devices on the Main view of the dashboard
+        self.main_view_dbfile_length_by_dbname  = {}  # Length of the main view str from the Lovelace db file
+        self.main_view_created_length_by_dbname = {}  # Length of the main view str right now
+        self.main_view_infomsg_length_by_dbname = {}  # Length of the main view str right now
+
 
         # away_time_zone_adjustment
         self.away_time_zone_hours_key_text   = {}
@@ -543,7 +557,6 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
         if self.abort_flag:
             return await self.async_step_restart_ha()
-            # return await self.async_step_restart_ha_load_error()
 
         return await self.async_step_menu_0()
 
@@ -590,7 +603,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                 and is_empty(self.master_dashboard)):
             await start_ic3.update_lovelace_resource_event_log_js_entry(silent=True)
 
-            icloud3_dashboard_status = await dbb.install_initial_icloud3_dashboard(self)
+            icloud3_dashboard_status = await dbb.build_initial_icloud3_dashboard(self)
             if icloud3_dashboard_status:
                 self.header_msg = 'dashboard_created_initial'
 
@@ -630,19 +643,8 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         user_input, menu_item = utils.menu_text_to_item(self, user_input, 'menu_items')
         user_input, menu_action_item = utils.menu_text_to_item(self, user_input, 'action_items')
 
-        if menu_action_item == 'exit':
-            Gb.config_flow_flag = False
-            self.initialize_options_required_flag = False
-
-            # If the initial config file was just installed, set it to 'has been reviewed'
-            if Gb.conf_profile[CONF_VERSION] <= 0:
-                Gb.conf_profile[CONF_VERSION] = 1
-                list_add(self.config_parms_update_control, 'restart')
-                self._update_config_file_tracking(user_input, update_config_flag=True)
-
-            # Update the *ic3db- dashboard views when devices have been added or deleted
-            if self.devices_added_deleted_flag:
-                await dbb.update_dashboard_ic3db_views_new_deleted_devices(self)
+        if menu_action_item.startswith('exit'):
+            await self.exit_configure_tasks()
 
             if ('restart' in self.config_parms_update_control
                     or self._set_inactive_devices_header_msg() in ['all', 'most']):
@@ -701,6 +703,25 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                             errors=self.errors,
                             last_step=False)
 
+#-------------------------------------------------------------------------------------------
+    async def exit_configure_tasks(self):
+        Gb.config_flow_flag = False
+        self.initialize_options_required_flag = False
+
+        # If the initial config file was just installed, set it to 'has been reviewed'
+        if Gb.conf_profile[CONF_VERSION] <= 0:
+            Gb.conf_profile[CONF_VERSION] = 1
+            list_add(self.config_parms_update_control, 'restart')
+            user_input = {CONF_VERSION: 1}
+            self._update_config_file_tracking(user_input, update_config_flag=True)
+
+        # Update the *ic3db- dashboard views when devices have been added or deleted
+        if self.rebuild_ic3db_dashboards:
+            dbb.load_ic3db_dashboards_from_ha_data(self)
+
+            if isnot_empty(self.ic3db_Dashboards_by_dbname):
+                await dbb.update_ic3db_dashboards_new_deleted_devices(self)
+                self.rebuild_ic3db_dashboards = False
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #             RESTART ICLOUD3
@@ -714,7 +735,12 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         self.step_id = 'restart_icloud3'
         self.errors = errors or {}
         self.errors_user_input = {}
+        await config_sensors.update_configure_file_device_sensors()
         await self._async_write_icloud3_configuration_file()
+
+        for devicename in Gb.sensors_removed_by_devicename.keys():
+            ic3_sensor.log_sensors_added_deleted('ADDED', devicename)
+            ic3_sensor.log_sensors_added_deleted('REMOVED', devicename)
 
         user_input, action_item = utils.action_text_to_item(self, user_input)
         utils.log_step_info(self, user_input, action_item)
@@ -739,6 +765,11 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                     list_del(self.config_parms_update_control, 'restart')
                 Gb.config_parms_update_control = self.config_parms_update_control.copy()
                 self.config_parms_update_control = []
+
+            # Update the *ic3db- dashboard views when devices have been added or deleted
+            if self.rebuild_ic3db_dashboards:
+                await dbb.update_ic3db_dashboards_new_deleted_devices(self)
+                self.rebuild_ic3db_dashboards = False
 
             data = {}
             data = {'added': dt_util.now().strftime(DATETIME_FORMAT)[0:19]}
@@ -798,7 +829,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                     conf_device[CONF_TRACKING_MODE] = TRACK_DEVICE
 
                 if devicename not in Gb.DeviceTrackers_by_devicename:
-                    sensors.create_device_tracker_and_sensor_entities(self, devicename, conf_device)
+                    config_sensors.create_device_tracker_and_sensor_entities(self, devicename, conf_device)
 
             self.header_msg = 'action_completed'
             list_add(self.config_parms_update_control, 'restart')
@@ -856,7 +887,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         elif self.step_id == "special_zones":
             user_input = self._validate_special_zones(user_input)
         elif self.step_id == "sensors":
-            sensors.remove_and_create_sensors(self, user_input)
+            config_sensors.remove_and_create_sensors(self, user_input)
 
         utils.log_step_info(self, user_input, action_item)
 
@@ -1118,6 +1149,8 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
         if (action_item == 'save'
                 and self.common_form_handler(user_input, action_item, errors)):
+            Gb.sensor_names_by_devicename = {}
+
             return await self.async_step_menu()
 
         if utils.any_errors(self):
@@ -1195,6 +1228,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
             if Gb.conf_sensors[CONF_EXCLUDED_SENSORS] != self.excluded_sensors:
                 Gb.conf_sensors[CONF_EXCLUDED_SENSORS] = self.excluded_sensors.copy()
+                Gb.sensor_names_by_devicename = {}
                 self._update_config_file_general(user_input, update_config_flag=True)
 
                 self.errors['excluded_sensors'] = 'excluded_sensors_ha_restart'
@@ -1536,7 +1570,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         elif action_item == 'restart_icloud3':
             list_add(self.config_parms_update_control, 'restart')
 
-        elif action_item == 'exit':
+        elif action_item.startswith('exit'):
             return self.async_create_entry(title="iCloud3", data={})
 
         return await self.async_step_menu()
@@ -1566,7 +1600,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
             post_event("RELOAD ICLOUD3")
             write_config_file_to_ic3log()
             await config_file.async_write_icloud3_configuration_file()
-            close_ic3_log_file()
+            close_ic3log_file()
 
             await Gb.hass.services.async_call(
                     "homeassistant",
@@ -1727,6 +1761,16 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
             Gb.conf_tracking[CONF_DEVICES]        = Gb.conf_devices
             list_add(self.config_parms_update_control, ['tracking', 'restart'])
             self.config_file_commit_updates = True
+
+            Gb.sensor_names_by_devicename = {}
+
+            # if devicename := user_input.get(CONF_IC3_DEVICENAME):
+            #     ic3_sensor.log_sensors_added_deleted('ADDED',
+            #                             devicename, Gb.sensors_added_by_devicenames[devicename])
+            #     ic3_sensor.log_sensors_added_deleted('REMOVED',
+            #                             devicename, Gb.sensors_removed_by_devicenames[devicename])
+
+
 
 #-------------------------------------------------------------------------------------------
     def _validate_format_settings(self, user_input):
@@ -2125,12 +2169,17 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         action_item = ''
         await self._async_write_icloud3_configuration_file()
 
-        if Gb.internet_error:
-            self.errors['base'] = 'internet_error_no_change'
-
         user_input, action_item = utils.action_text_to_item(self, user_input)
 
-        if user_input is None or CONF_USERNAME in self.errors:
+        if action_item == 'cancel_goto_previous':
+            self.username = self.conf_apple_acct[CONF_USERNAME]
+            self.password = decode_password(self.conf_apple_acct[CONF_PASSWORD])
+            self.PyiCloud = Gb.PyiCloud_by_username.get(self.username)
+            return await self.async_step_data_source(user_input=None)
+
+        if (user_input is None
+                or instr(self.errors.get(CONF_USERNAME, ''), 'invalid')
+                or instr(self.errors.get(CONF_USERNAME, ''), 'error')):
             return self.async_show_form(step_id='update_apple_acct',
                         data_schema=forms.form_update_apple_acct(self),
                         errors=self.errors)
@@ -2254,7 +2303,13 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                     or user_input[CONF_TOTP_KEY] != self.conf_apple_acct[CONF_TOTP_KEY]):
                 other_flds_changed = True
 
-            if valid_upw is False:
+            if valid_upw:
+                if aa_login_info_changed or other_flds_changed:
+                    self._update_conf_apple_accounts(self.aa_idx, user_input)
+                    await self._async_write_icloud3_configuration_file()
+                    self.add_apple_acct_flag = False
+
+            if valid_upw is False or aa_login_info_changed:
                 valid_upw = await Gb.ValidateAppleAcctUPW.async_validate_username_password(ui_username, ui_password)
             Gb.username_valid_by_username[ui_username] = valid_upw
 
@@ -2289,28 +2344,38 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
             successful_login = await aas.log_into_apple_account(self,
                                                 user_input, called_from_step_id='update_apple_acct')
 
+            await self._async_write_icloud3_configuration_file()
 
-            if successful_login:
-                if instr(self.data_source, ICLOUD) is False:
-                    self._update_data_source({CONF_DATA_SOURCE: [ICLOUD, self.data_source]})
-                Gb.PyiCloud_by_username[user_input[CONF_USERNAME]] = \
-                                    self.PyiCloud or Gb.PyiCloudLoggingInto
-                Gb.PyiCloud_password_by_username[user_input[CONF_USERNAME]] = user_input[CONF_PASSWORD]
-                apple_acct = user_input[CONF_USERNAME]
-
-                if (aa_login_info_changed and
-                        ui_username in Gb.username_pyicloud_503_internet_error):
-                    self.errors['base'] = 'apple_acct_updated_not_logged_into'
-
-                if aa_login_info_changed or other_flds_changed:
-                    self._update_conf_apple_accounts(self.aa_idx, user_input)
-                    await self._async_write_icloud3_configuration_file()
-                    self.add_apple_acct_flag = False
-
-                if self.PyiCloud.requires_2fa:
-                    action_item = 'verification_code'
+            if successful_login is False:
+                self.add_apple_acct_flag = False
+                ipv6_info = Gb.InternetError.ha_system_network_ipv6_info()
+                if ipv6_info:
+                    self.errors[CONF_USERNAME] = 'apple_acct_login_error_ipv6'
+                elif Gb.internet_error:
+                    self.errors[CONF_USERNAME] = 'internet_error'
                 else:
-                    return await self.async_step_data_source(user_input=None)
+                    self.errors[CONF_USERNAME] = 'apple_acct_login_error_other'
+
+                return await self.async_step_update_apple_acct(
+                                    user_input=user_input,
+                                    errors=self.errors)
+
+            if instr(self.data_source, ICLOUD) is False:
+                self._update_data_source({CONF_DATA_SOURCE: [ICLOUD, self.data_source]})
+
+            Gb.PyiCloud_by_username[user_input[CONF_USERNAME]] = \
+                                self.PyiCloud or Gb.PyiCloudLoggingInto
+            Gb.PyiCloud_password_by_username[user_input[CONF_USERNAME]] = user_input[CONF_PASSWORD]
+            apple_acct = user_input[CONF_USERNAME]
+
+            if (aa_login_info_changed and
+                    ui_username in Gb.username_pyicloud_503_internet_error):
+                self.errors['base'] = 'apple_acct_updated_not_logged_into'
+
+            if self.PyiCloud.requires_2fa:
+                action_item = 'verification_code'
+            else:
+                return await self.async_step_data_source(user_input=None)
 
         if action_item == 'verification_code':
             return await self.async_step_reauth(called_from_step_id='update_apple_acct')
@@ -2508,7 +2573,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                 updated_conf_devices.append(conf_device)
 
             elif device_action == 'delete_devices':
-                sensors.remove_device_tracker_entity(self, devicename)
+                config_sensors.remove_device_tracker_entity(self, devicename)
 
             elif device_action == 'set_devices_inactive':
                 conf_device[CONF_APPLE_ACCOUNT] = ''
@@ -2590,8 +2655,11 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
         if Gb.internet_error:
             self.errors['base'] = 'internet_error_no_change'
-        elif self.PyiCloud and self.PyiCloud.requires_2fa:
-            self.errors['base'] = 'verification_code_needed'
+
+        if self.PyiCloud and self.PyiCloud.requires_2fa:
+            self.errors['account_selected'] = 'verification_code_needed'
+        elif self.PyiCloud is None:
+            self.errors['account_selected'] = 'apple_acct_not_logged_into'
 
         log_debug_msg(  f"OF-{self.step_id.upper()} ({action_item}) > "
                         f"FromForm-{called_from_step_id}, UserInput-{user_input}, Errors-{errors}")
@@ -2624,6 +2692,8 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_show_form(step_id=self.called_from_step_id_1,
                                             data_schema=self.form_schema(self.called_from_step_id_1),
                                             errors=self.errors)
+
+
             ui_username = None
             if 'account_selected' in user_input:
                 ui_username = user_input['account_selected']
@@ -2642,10 +2712,32 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
             self.apple_acct_reauth_username = username
             self.PyiCloud = Gb.PyiCloud_by_username.get(username, self.PyiCloud)
 
+            # if self.PyiCloud is None:
+            #     self.errors['account_selected'] = 'apple_acct_not_logged_into'
+            #     action_item = 'log_into_apple_acct'
+
             if action_item == 'log_into_apple_acct':
                 if username and password:
-                    await aas.log_into_apple_account(
-                                        self, user_input, called_from_step_id='reauth')
+                    successful_login = await aas.log_into_apple_account(self, user_input, called_from_step_id='reauth')
+
+                if successful_login is False:
+                    self.add_apple_acct_flag = False
+                    ipv6_info = Gb.InternetError.ha_system_network_ipv6_info()
+                    if ipv6_info:
+                        self.errors[CONF_USERNAME] = 'apple_acct_login_error_ipv6'
+                    elif Gb.internet_error:
+                        self.errors[CONF_USERNAME] = 'internet_error'
+                    else:
+                        self.errors[CONF_USERNAME] = 'apple_acct_login_error_other'
+
+                    return self.async_show_form(step_id='reauth',
+                                        data_schema=forms.form_reauth(self, reauth_username=reauth_username),
+                                        errors=self.errors)
+
+                Gb.PyiCloud_by_username[user_input[CONF_USERNAME]] = self.PyiCloud or Gb.PyiCloudLoggingInto
+                Gb.PyiCloud_password_by_username[username] = password
+                if instr(self.data_source, ICLOUD) is False:
+                    self._update_data_source({CONF_DATA_SOURCE: [ICLOUD, self.data_source]})
 
             elif (action_item == 'send_verification_code'
                     and user_input.get(CONF_VERIFICATION_CODE, '') == ''):
@@ -2658,11 +2750,10 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                                             data_schema=self.form_schema(self.called_from_step_id_1),
                                             errors=self.errors)
 
-            if action_item == 'send_verification_code':
-                # if self.conf_apple_acct[CONF_TOTP_KEY]:
-                #     OTP = pyotp.TOTP(conf_apple_acct[CONF_TOTP_KEY].replace('-', ''))
-                #     otp_code = OTP.now()
-                #     user_input[CONF_VERIFICATION_CODE] = otp_code
+            if self.PyiCloud is None:
+                self.errors['account_selected'] = 'verification_code_requested'
+
+            elif action_item == 'send_verification_code':
                 valid_code = await aas.reauth_send_verification_code_handler(self, user_input)
 
                 if valid_code:
@@ -2675,6 +2766,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                                                 errors=self.errors)
 
             elif action_item == 'request_verification_code':
+                # TODO - ERROR ACT OWNER = None IF IPV6 ERROR
                 self.errors['base'] = 'verification_code_requested'
                 post_event( f"{EVLOG_NOTICE}Configure Apple Acct > {self.PyiCloud.account_owner}, "
                             f"Requested a new Verification Code")
@@ -2837,7 +2929,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
             if len(Gb.conf_devices) <= 1:
                 return self._delete_all_devices()
 
-            sensors.remove_device_tracker_entity(self, devicename)
+            config_sensors.remove_device_tracker_entity(self, devicename)
 
             self.dev_page_item[self.dev_page_no] = ''
             Gb.conf_devices.pop(self.conf_device_idx)
@@ -2866,7 +2958,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         try:
             for conf_device in Gb.conf_devices:
                 devicename = conf_device[CONF_IC3_DEVICENAME]
-                sensors.remove_device_tracker_entity(self, devicename)
+                config_sensors.remove_device_tracker_entity(self, devicename)
 
             Gb.conf_devices = []
             self.device_items_by_devicename    = {}       # List of the apple_accts in the Gb.conf_tracking[apple_accts] parameter
@@ -2965,11 +3057,11 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         if Gb.async_add_entities_device_tracker is None:
             await Gb.hass.config_entries.async_forward_entry_setups(Gb.config_entry, ['device_tracker'])
 
-            sensors_list = sensors.build_all_sensors_list()
-            sensors.create_sensor_entity(ui_devicename, self.conf_device, sensors_list)
+            sensors_list = config_sensors.build_all_sensors_list()
+            config_sensors.create_sensor_entity(ui_devicename, self.conf_device, sensors_list)
 
         else:
-            sensors.create_device_tracker_and_sensor_entities(self, ui_devicename, self.conf_device)
+            config_sensors.create_device_tracker_and_sensor_entities(self, ui_devicename, self.conf_device)
             ic3_device_tracker.get_ha_device_ids_from_device_registry(Gb.hass)
 
         # Add the new device to the device_list form and and set it's position index
@@ -3430,21 +3522,21 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         # devicename and add them for new_devicename
         if devicename != new_devicename:
             self._update_config_file_tracking()
-            sensors.create_device_tracker_and_sensor_entities(self, new_devicename, self.conf_device)
-            sensors.remove_device_tracker_entity(self, devicename)
+            config_sensors.create_device_tracker_and_sensor_entities(self, new_devicename, self.conf_device)
+            config_sensors.remove_device_tracker_entity(self, devicename)
 
         # If the device was 'inactive' it's entity may not exist since they are not created for
         # inactive devices. If so, create it now if it is no longer 'inactive'.
         elif (tracking_mode == INACTIVE_DEVICE
                 and new_tracking_mode != INACTIVE_DEVICE
                 and new_devicename not in Gb.DeviceTrackers_by_devicename):
-            sensors.create_device_tracker_and_sensor_entities(self, new_devicename, self.conf_device)
+            config_sensors.create_device_tracker_and_sensor_entities(self, new_devicename, self.conf_device)
 
         # If the device was 'monitored' and is now tracked, create the tracked sensors
         elif (tracking_mode == MONITOR_DEVICE
                 and new_tracking_mode == TRACK_DEVICE):
-            sensors_list = sensors.build_all_sensors_list()
-            sensors.create_sensor_entity(devicename, self.conf_device, sensors_list)
+            sensors_list = config_sensors.build_all_sensors_list()
+            config_sensors.create_sensor_entity(devicename, self.conf_device, sensors_list)
             # self.devices_added_deleted_flag = True
 
 
@@ -3491,8 +3583,9 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
             self.conf_device.update(user_input)
             self._update_config_file_tracking(update_config_flag=True)
+
             if tfz_changed:
-                sensors.update_track_from_zones_sensors(self, user_input)
+                config_sensors.update_track_from_zones_sensors(self, user_input)
 
         if self.add_device_flag:
             return await self.async_step_device_list()
@@ -3530,7 +3623,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
         # See if there are any track_from_zone changes that will be processed after the
         # device is updated
         new_tfz_zones_list, remove_tfz_zones_list = \
-                    sensors.devices_form_identify_new_and_removed_tfz_zones(self, user_input)
+                    config_sensors.devices_form_identify_new_and_removed_tfz_zones(self, user_input)
 
         self.update_device_ha_sensor_entity['new_tfz_zones']    = new_tfz_zones_list
         self.update_device_ha_sensor_entity['remove_tfz_zones'] = remove_tfz_zones_list
@@ -3627,21 +3720,20 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
                                         data_schema=forms.form_dashboard_builder(self),
                                         errors=self.errors)
 
-        user_input = utils.option_text_to_parm(user_input,
-                                'selected_dashboard', self.dbf_dashboard_key_text)
+        user_input = utils.option_text_to_parm(user_input, 'selected_dashboard', self.dbf_dashboard_key_text)
+        user_input = utils.option_text_to_parm(user_input, 'main_view_style', DASHBOARD_MAIN_VIEW_STYLE_OPTIONS)
+
         utils.log_step_info(self, user_input, action_item)
 
         if action_item == 'cancel_goto_menu':
             return await self.async_step_menu()
 
-        # if 'selected_dashboard' not in user_input:
-        #     user_input['selected_dashboard'] = 'add'
-
-        self.selected_dbname = user_input.get('selected_dashboard', 'add')
-        if self.selected_dbname == 'add':
+        self.ui_selected_dbname = user_input.get('selected_dashboard', 'add')
+        if self.ui_selected_dbname == 'add':
             action_item == 'create_dashboard'
 
-        self.main_view_devices  = [devicename
+        self.ui_main_view_style  = user_input['main_view_style']
+        self.ui_main_view_dnames = [devicename
                                         for devicename in user_input['main_view_devices']
                                         if devicename.startswith('.') is False]
         self.errors = {}
@@ -3651,7 +3743,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
         user_input['action_item'] = action_item
 
-        await dbb.update_or_create_dashboard(self, user_input)
+        await dbb.update_or_create_dashboard(self)
         await dbb.build_existing_dashboards_selection_list(self)
         dbb.select_available_dashboard(self)
 
@@ -3661,8 +3753,8 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow):
 
 # #-------------------------------------------------------------------------------------------
     def _validate_dashboard_user_input(self, action_item, user_input):
-        if is_empty(self.main_view_devices):
-            self.errors['main_view_devices'] = 'required_field'
+        if is_empty(self.ui_main_view_dnames):
+            self.ui_main_view_dnames = ['Display All']
 
 
 

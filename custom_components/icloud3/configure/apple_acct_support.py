@@ -7,15 +7,16 @@ from ..const            import (CRLF_DOT, EVLOG_NOTICE, EVLOG_ERROR, EVLOG_ALERT
                                 ALERT_APPLE_ACCT,
                                 )
 
-from ..utils.utils      import (instr, isnumber, is_empty, isnot_empty, list_add, list_del,
+from ..utils.utils      import (instr, is_number, is_empty, isnot_empty, list_add, list_del,
                                 encode_password, decode_password, username_id, )
-from ..utils.messaging  import (post_event, post_monitor_msg, post_error_msg, post_alert,
+from ..utils.messaging  import (post_event, post_monitor_msg, post_error_msg, update_alert_sensor,
                                 log_exception, log_debug_msg, log_info_msg, _log, _evlog,
                                 add_log_file_filter, )
 
 from .                  import selection_lists as lists
 
 from ..apple_acct.pyicloud_ic3  import (PyiCloudManager, PyiCloudFailedLoginException, )
+from ..apple_acct.pyicloud_session  import (HTTP_RESPONSE_CODES )
 from ..startup          import start_ic3
 from ..utils            import file_io
 
@@ -53,54 +54,58 @@ async def log_into_apple_account(self, user_input, called_from_step_id=None):
                 A dictionary with the devicename and identifiers
                 used in the tracking configuration devices icloud_device parameter
     '''
-    self.errors = {}
-    called_from_step_id = called_from_step_id or 'update_apple_acct'
+    try:
+        self.errors = {}
+        called_from_step_id = called_from_step_id or 'update_apple_acct'
 
-    # The username may be changed to assign a new account, if so, log into the new one
-    if CONF_USERNAME not in user_input or CONF_PASSWORD not in user_input:
-        return
+        # The username may be changed to assign a new account, if so, log into the new one
+        if CONF_USERNAME not in user_input or CONF_PASSWORD not in user_input:
+            return False
 
-    username = user_input[CONF_USERNAME].lower()
-    password = user_input[CONF_PASSWORD]
+        username = user_input[CONF_USERNAME].lower()
+        password = user_input[CONF_PASSWORD]
 
-    add_log_file_filter(username, f"**{self.aa_idx}**")
-    add_log_file_filter(password)
+        add_log_file_filter(username, f"**{self.aa_idx}**")
+        add_log_file_filter(password)
 
-    apple_server_location = user_input.get(CONF_SERVER_LOCATION,'usa')
+        apple_server_location = user_input.get(CONF_SERVER_LOCATION,'usa')
 
-    log_info_msg(   f"Apple Acct > {username}, Logging in, "
-                    f"UserInput-{user_input}, Errors-{self.errors}, "
-                    f"Step-{self.step_id}, CalledFrom-{called_from_step_id}")
+        log_info_msg(   f"Apple Acct > {username}, Logging in, "
+                        f"UserInput-{user_input}, Errors-{self.errors}, "
+                        f"Step-{self.step_id}, CalledFrom-{called_from_step_id}")
 
-    # Already logged in and no changes
-    PyiCloud = Gb.PyiCloud_by_username.get(username)
-    if (PyiCloud
-            and password == PyiCloud.password
-            and apple_server_location == PyiCloud.apple_server_location
-            and PyiCloud.login_successful):
-        self.PyiCloud = PyiCloud
-        self.username = username
-        self.password = password
-        self.header_msg = 'apple_acct_logged_into'
+        # Already logged in and no changes
+        PyiCloud = Gb.PyiCloud_by_username.get(username)
+        if (PyiCloud
+                and password == PyiCloud.password
+                and apple_server_location == PyiCloud.apple_server_location
+                and PyiCloud.login_successful):
+            self.PyiCloud = PyiCloud
+            self.username = username
+            self.password = password
+            self.header_msg = 'apple_acct_logged_into'
 
-        log_info_msg(f"Apple Acct > {username}, Already Logged in, {self.PyiCloud}")
-        return True
+            log_info_msg(f"Apple Acct > {username}, Already Logged in, {self.PyiCloud}")
+            return True
 
-    # Validate the account before actually logging in
-    valid_upw = await Gb.ValidateAppleAcctUPW.async_validate_username_password(username, password)
+        # Validate the account before actually logging in
+        valid_upw = await Gb.ValidateAppleAcctUPW.async_validate_username_password(username, password)
 
-    if valid_upw is False:
-        if username in Gb.username_valid_by_username:
-            del Gb.username_valid_by_username[username]
-        self.errors[CONF_USERNAME] = 'apple_acct_invalid_upw'
-        log_info_msg(f"Apple Acct > {username}, Invalid Username/password")
-        return False
+        if valid_upw is False:
+            if username in Gb.username_valid_by_username:
+                del Gb.username_valid_by_username[username]
+            self.errors[CONF_USERNAME] = 'apple_acct_invalid_upw'
+            log_info_msg(f"Apple Acct > {username}, Invalid Username/password")
+            return False
 
 
-    event_msg =(f"{EVLOG_NOTICE}Configure Settings > Logging into Apple Account {username}")
-    if apple_server_location != 'usa':
-        event_msg += f", iCloud.com ServerSuffix-{apple_server_location}"
-    log_info_msg(event_msg)
+        event_msg =(f"{EVLOG_NOTICE}Configure Settings > Logging into Apple Account {username}")
+        if apple_server_location != 'usa':
+            event_msg += f", iCloud.com ServerSuffix-{apple_server_location}"
+        log_info_msg(event_msg)
+
+    except Exception as err:
+        log_exception(err)
 
     try:
         await file_io.async_make_directory(Gb.icloud_cookie_directory)
@@ -111,6 +116,16 @@ async def log_into_apple_account(self, user_input, called_from_step_id=None):
                                     username,
                                     password,
                                     apple_server_location)
+
+        # TEST CODE -Test Internet error and PyiCloud login failure
+        # _log("TEST CODE ENABLED")
+        # PyiCloud = None
+        # Gb.internet_error = True
+
+        if PyiCloud is None:
+            self.PyiCloud = None
+            log_info_msg(f"Apple Acct > {username}, Login Failed")
+            return False
 
         # Successful login, set PyiCloud fields
         self.PyiCloud = PyiCloud
@@ -128,12 +143,7 @@ async def log_into_apple_account(self, user_input, called_from_step_id=None):
 
         self.header_msg = 'apple_acct_logged_into'
 
-        if called_from_step_id is None:
-            return True
-
-        return self.async_show_form(step_id=called_from_step_id,
-                    data_schema=self.form_schema(called_from_step_id),
-                    errors=self.errors)
+        return True
 
     # Login Failed, display error messages
     except (PyiCloudFailedLoginException) as err:
@@ -143,19 +153,16 @@ async def log_into_apple_account(self, user_input, called_from_step_id=None):
         # if called_from_step_id == 'update_apple_acct':
         response_code = Gb.PyiCloudLoggingInto.response_code
         if Gb.PyiCloudLoggingInto.response_code_pwsrp_err == 503:
+            response_code = 503
             list_add(Gb.username_pyicloud_503_internet_error, username)
-            error_msg = 'apple_acct_login_error_503'
         elif response_code == 302:
-            error_msg = 'apple_acct_login_error_302'
-
-            if Gb.PyiCloudLoggingInto is not None:
-                country_code = Gb.PyiCloudLoggingInto.account_country_code
-                apple_server_location = Gb.PyiCloudLoggingInto.apple_server_location
-
-                if (country_code == 'CHN' and apple_server_location == 'usa'):
-                    self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302_cn'
-                elif (country_code != 'CHN' and apple_server_location == '.cn'):
-                    self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302_usa'
+            apple_server_location = Gb.PyiCloudLoggingInto.apple_server_location
+            if (apple_server_location == 'usa'):
+                self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302_cn'
+            elif (apple_server_location == '.cn'):
+                self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302_usa'
+            else:
+                self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302'
 
         elif response_code == 400:
             self.errors['base'] = 'apple_acct_invalid_upw'
@@ -163,10 +170,19 @@ async def log_into_apple_account(self, user_input, called_from_step_id=None):
             self.errors['base'] = 'apple_acct_login_error_srp_401'
         elif response_code == 401:
             self.errors[CONF_USERNAME] = 'apple_acct_invalid_upw'
+        elif response_code == 302:
+            apple_server_location = Gb.PyiCloudLoggingInto.apple_server_location
+            if (apple_server_location == 'usa'):
+                self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302_cn'
+            elif (apple_server_location == '.cn'):
+                self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302_usa'
+            else:
+                self.errors[CONF_SERVER_LOCATION] = 'apple_acct_login_error_302'
         else:
             self.errors['base'] = 'apple_acct_login_error_other'
+        error_msg = HTTP_RESPONSE_CODES.get(response_code, 'Other Error')
 
-        log_info_msg(   f"Apple Acct > {username}, Login Failed, "
+        post_error_msg( f"Apple Acct > {username}, Login Failed, "
                         f"Error-{err}/{error_msg}, Code-{response_code}")
 
     except Exception as err:
@@ -187,19 +203,31 @@ def create_PyiCloudManager_config_flow(username, password, apple_server_location
     authentication test routines. This is used by config_flow to open a second
     PyiCloud session
     '''
-    PyiCloud = PyiCloudManager( username,
-                                password,
-                                apple_server_location=apple_server_location,
-                                cookie_directory=Gb.icloud_cookie_directory,
-                                session_directory=Gb.icloud_session_directory,
-                                config_flow_login=True)
+    try:
+        PyiCloud = None
+        PyiCloud = PyiCloudManager( username,
+                                    password,
+                                    apple_server_location=apple_server_location,
+                                    cookie_directory=Gb.icloud_cookie_directory,
+                                    session_directory=Gb.icloud_session_directory,
+                                    config_flow_login=True)
+
+    except Exception as err:
+        PyiCloud = None
+        pass
+
+    # TEST CODE -Test Internet error and PyiCloud login failure
+    # _log("TEST CODE ENABLED")
+    # PyiCloud = None
+    # Gb.internet_error = True
 
     if PyiCloud and PyiCloud.login_successful:
         log_debug_msg(  f"Apple Acct > {PyiCloud.account_owner}, Login Successful, "
                         f"{PyiCloud.response_code_desc}, "
                         f"Update Connfiguration")
     else:
-        raise PyiCloudFailedLoginException
+        # raise PyiCloudFailedLoginException
+        return None
 
     # start_ic3.dump_startup_lists_to_log()
     return PyiCloud
@@ -265,7 +293,7 @@ async def reauth_send_verification_code_handler(caller_self, user_input):
             lists.build_apple_accounts_list(caller_self)
 
             caller_self.errors['base'] = caller_self.header_msg = 'verification_code_accepted'
-            post_alert(PyiCloud.username_id, '')
+            update_alert_sensor(PyiCloud.username_id, '')
 
         else:
             post_event( f"{EVLOG_NOTICE}Configure Apple Acct > Verification Code is invalid "
@@ -293,9 +321,9 @@ async def async_finish_authentication_and_data_refresh(caller_self):
                                 PyiCloud.authenticate)
 
     if PyiCloud.login_successful is False:
-        err_msg = ( f"Apple Acct > {caller_self.username_base}, Authentication Failed, "
-                            f"{caller_self.response_code_desc}, "
-                            f"AppleServerLocation-`{caller_self.apple_server_location}`, "
+        err_msg = ( f"Apple Acct > {PyiCloud.username_base}, Authentication Failed, "
+                            f"{PyiCloud.response_code_desc}, "
+                            f"AppleServerLocation-`{PyiCloud.apple_server_location}`, "
                             "Location Data not Refreshed")
         post_error_msg(err_msg)
         return

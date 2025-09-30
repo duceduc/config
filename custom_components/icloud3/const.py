@@ -12,7 +12,7 @@
 
 # from homeassistant.const import (Platform)
 
-VERSION                         = '3.2.3'
+VERSION                         = '3.2.4.2'
 VERSION_BETA                    = ''
 #-----------------------------------------
 DOMAIN                          = 'icloud3'
@@ -101,52 +101,55 @@ WAZE                            = 'waze'
 CALC                            = 'calc'
 DIST                            = 'dist'
 
+# Tracking Method
+ICLOUD                          = 'iCloud'    #iCloud Location Services
+FAMSHR                          = 'iCloud'    #Family Sharing
+MOBAPP                          = 'MobApp'    #HA Mobile App v1.5x or v2.x
+NO_MOBAPP                       = 'no_mobapp'
+IOSAPP                          = 'iosapp'
+NO_IOSAPP                       = 'no_iosapp'
+
+# Apple Device Types
 IPHONE_FNAME                    = 'iPhone'
-IPHONE                          = 'iphone'
-IPAD_FNAME                      = 'iPad'
-IPAD                            = 'ipad'
+WATCH_FNAME                     = 'Watch-WiFi+Cell'
+WATCH_WIFI_FNAME                = 'Watch-WiFi'
+IPAD_FNAME                      = 'iPad-WiFi'
+IPAD_CELL_FNAME                 = 'iPad-WiFi+Cell'
 MAC_FNAME                       = 'Mac'
-MAC                             = 'mac'
 IPOD_FNAME                      = 'iPod'
-IPOD                            = 'ipod'
-WATCH_FNAME                     = 'Watch'
-WATCH                           = 'watch'
 AIRPODS_FNAME                   = 'AirPods'
-AIRPODS                         = 'airpods'
 OTHER_FNAME                     = 'Other'
+
+IPHONE                          = 'iphone'
+WATCH                           = 'watch'
+WATCH_WIFI                      = 'watch_wifi'
+IPAD                            = 'ipad'
+IPAD_CELL                       = 'ipad_cell'
+MAC                             = 'mac'
+IPOD                            = 'ipod'
+AIRPODS                         = 'airpods'
 OTHER                           = 'other'
 
-#tracking_method config parameter being used
-ICLOUD            = 'iCloud'    #iCloud Location Services
-FAMSHR            = 'iCloud'    #Family Sharing
-MOBAPP            = 'MobApp'    #HA Mobile App v1.5x or v2.x
-NO_MOBAPP         = 'no_mobapp'
-IOSAPP            = 'iosapp'
-NO_IOSAPP         = 'no_iosapp'
-
-# Apple is using a country specific iCloud server based on the country code in pyicloud_ic3.
-# Add to the HOME_ENDPOINT & SETUP_ENDPOINT urls if the HA country code is one of these values.
-ICLOUD_SERVER_COUNTRY_CODE = ['cn', 'CN']
-APPLE_SERVER_ENDPOINT = {
-        'home':     'https://www.icloud.com',
-        'setup':    'https://setup.icloud.com/setup/ws/1',
-        'auth':     'https://idmsa.apple.com/appleauth/auth',
-        'auth_url': 'https://setup.icloud.com/setup/authenticate'
-}
-
 DEVICE_TYPES = [
-        IPHONE, IPAD, WATCH, AIRPODS, MAC, IPOD, ICLOUD,
-        IPHONE_FNAME, IPAD_FNAME, WATCH_FNAME, AIRPODS_FNAME,
-        MAC_FNAME, IPOD_FNAME, ICLOUD,
+        IPHONE, IPAD, IPAD_CELL, WATCH, WATCH_WIFI,
+        IPHONE_FNAME, IPAD_FNAME, IPAD_CELL_FNAME, WATCH_FNAME, WATCH_WIFI_FNAME,
+        MAC, IPOD, AIRPODS,
+        MAC_FNAME, IPOD_FNAME, AIRPODS_FNAME,
+        ICLOUD,
 ]
 DEVICE_TYPE_FNAMES = {
         IPHONE: IPHONE_FNAME,
-        IPAD: IPAD_FNAME,
         WATCH: WATCH_FNAME,
+        WATCH_WIFI: WATCH_WIFI_FNAME,
+        IPAD: IPAD_FNAME,
+        IPAD_CELL: IPAD_CELL_FNAME,
         AIRPODS: AIRPODS_FNAME,
         MAC: MAC_FNAME,
         IPOD: IPOD_FNAME,
         OTHER: OTHER_FNAME,
+}
+DEVICE_TYPES_CELL_SVC = {
+        IPHONE, WATCH, IPAD_CELL,
 }
 def DEVICE_TYPE_FNAME(device_type):
         return DEVICE_TYPE_FNAMES.get(device_type, device_type)
@@ -154,7 +157,9 @@ def DEVICE_TYPE_FNAME(device_type):
 DEVICE_TYPE_ICONS = {
         IPHONE: "mdi:cellphone",
         IPAD: "mdi:tablet",
+        IPAD_CELL: "mdi:tablet",
         WATCH: "mdi:watch-variant",
+        WATCH_WIFI: "mdi:watch-variant",
         AIRPODS: "mdi:earbuds-outline",
         MAC : "mdi:laptop",
         IPOD: "mdi:ipod",
@@ -164,11 +169,23 @@ DEVICE_TYPE_ICONS = {
 DEVICE_TYPE_INZONE_INTERVALS = {
         IPHONE: 120,
         IPAD: 120,
+        IPAD_CELL: 120,
         WATCH: 15,
+        WATCH_WIFI: 15,
         MAC: 120,
         AIRPODS: 15,
         NO_MOBAPP: 15,
         OTHER: 120,
+}
+
+# Apple is using a country specific iCloud server based on the country code in pyicloud_ic3.
+# Add to the HOME_ENDPOINT & SETUP_ENDPOINT urls if the HA country code is one of these values.
+ICLOUD_SERVER_COUNTRY_CODE = ['cn', 'CN']
+APPLE_SERVER_ENDPOINT = {
+        'home':     'https://www.icloud.com',
+        'setup':    'https://setup.icloud.com/setup/ws/1',
+        'auth':     'https://idmsa.apple.com/appleauth/auth',
+        'auth_url': 'https://setup.icloud.com/setup/authenticate'
 }
 
 INTERNET_STATUS_PING_IPS = {
@@ -234,7 +251,7 @@ MOBAPP_DT_ENTITY = True
 ICLOUD_DT_ENTITY = False
 ICLOUD_LOCATION_DATA_ERROR   = False
 CMD_RESET_PYICLOUD_SESSION   = 'reset_session'
-NEAR_DEVICE_DISTANCE         = 20
+NEAR_DEVICE_DISTANCE         = 25       # Distance between nearby devices  (det_interval)
 PASS_THRU_ZONE_INTERVAL_SECS = 60       # Delay time before moving into a non-tracked zone to see if if just passing thru
 STATZONE_RADIUS_1M       = 1
 ICLOUD3_ERROR_MSG        = "ICLOUD3 ERROR-SEE EVENT LOG"
@@ -345,16 +362,19 @@ CIRCLE_LETTERS_LITE =  {'a':'Ⓐ', 'b':'Ⓑ', 'c':'Ⓒ', 'd':'Ⓓ', 'e':'Ⓔ', '
 lite_circled_letters = "Ⓐ Ⓑ Ⓒ Ⓓ Ⓔ Ⓕ Ⓖ Ⓗ Ⓘ Ⓙ Ⓚ Ⓛ Ⓜ Ⓝ Ⓞ Ⓟ Ⓠ Ⓡ Ⓢ Ⓣ Ⓤ Ⓥ Ⓦ Ⓧ Ⓨ Ⓩ"
 dark_circled_letters = "🅐 🅑 🅒 🅓 🅔 🅕 🅖 🅗 🅘 🅙 🅚 🅛 🅜 🅝 🅞 🅟 🅠 🅡 🅢 🅣 🅤 🅥 🅦 🅧 🅨 🅩 ✪"
 Symbols = ±▪•●▬⮾ ⊗ ⊘✓×ø¦ ▶◀ ►◄▲▼ ∙▪ »« oPhone=►▶→⟾➤➟➜➔➤🡆🡪🡺⟹🡆➔ᐅ◈🝱☒☢⦻⛒⊘Ɵ⊗ⓧⓍ⛒z🜔
-Important =✔️❗❌✨➰⚠️☢❓⚽⛔🛑⚡⭐◌\⭕🔶🔸ⓘ• ⍰ ‶″“”‘’‶″ 🕓 🔻🔺✔✅❎☑️☁️🍎🔻⏭️⏮️🍏🅰️⮽➕⚙️
-🔵🔴🟠🟡🟢🟣🟤🟦🟥🟧🟨🟩🟪🟫🛑🔶🔷🔸🔹🔺🔻
+Important =✔️❗❌✨➰⚠️☢❓⚽⛔🛑⚡⭐◌\⭕🔶🔸ⓘ• ⍰ ‶″“”‘’‶″ 🕓 🔻🔺✔☁️🍎🔻⮽➕⚙️
+🔵🔴🟠🟡🟢🟣🟤🟦🟥🟧🟨🟩🟪🟫🔶🔷🔸🔹🔺🔻
+✅❎☑️⏭️⏮️🍏🅰️
 ↺↻⟲⟳⭯⭮↺↻⥀⥁↶↷⮌⮍⮎⮏⤻⤸⤾⤿⤺⤼⤽⤹🗘⮔⤶⤷⃕⟳↻🔄🔁➡️🔃⬇️🔗
 ●•✶✹✽♦✱✥❄✪⬥⨳✫✡  ﹡✱*⨯⧫♦⚙⚹⚙️✳🞺🞴🞸🞳
-  ═ ⎯ — –ᗒ⋮… ⁃ » ━▶ ━➤🡺 —> > ❯↦ …⋯⋮ ⋱⋰🡪ᗕᗒ ᐳ ─🡢 ⎯ ━ ──ᗒ 🡢 ─ᐅ ↣ ➙ →《》◆aak◈◉● ⟷•⟛⚯⧟⫗' '᚛᚜ 〉〈 ⦒⦑  ⟩⟨ ⓧ≻≺ ⸩⸨
-  ▐‖  ▹▻◁─▷◅◃‖╠ᐅ🡆▶▐🡆▐▶‖➤▐➤➜➔❰❰❱❱ ⠤ … ² ⚯⟗⟐⥄⥵⧴⧕⫘⧉⯏≷≶≳≲≪≫⋘⋙ ∮∯ ❪❫❴❵❮❯❰❱
- ⣇⠈⠉⠋⠛⠟⠿⡿⣿ ⠗⠺ ⠿  ⸩⸨⯎⟡⯌✦⯌⯏⯍aak✧ 🙾 🙿 (ⲶⲼ+≈⟣⟢aak. 🀫█ (▊Ⲷ (▉Ⲷ ▆ (■ ▦ ◼ ▉ (🀫Ⲷ▩▤
- ≽≼≽ ⋞⋟≺≻ ≪≫≾≿⋘⋙ ⋖⋗
- https://www.fileformat.info/info/unicode/block/braille_patterns/utf8test.htm
- https://www.htmlsymbols.xyz/unit-symbols
+═ ⎯ — –ᗒ ⁃ » ━▶ ━➤🡺 —> > ❯↦ 🡪ᗕᗒ ᐳ ─🡢 ⎯ ━ ──ᗒ 🡢 ─ᐅ ↣ ➙ →《》◆aak◈◉● ⟷
+•⟛⚯⧟⫗' '᚛᚜ 〉〈 ⦒⦑  ⟩⟨ ⓧ≻≺ ⸩⸨
+▐‖  ▹▻◁─▷◅◃‖╠ᐅ🡆▶▐🡆▐▶‖➤▐➤➜➔❰❰❱❱ ⠤ … ² ⚯⟗⟐⥄⥵⧴⧕⫘⧉⯏≷≶≳≲≪≫⋘⋙ ∮∯ ❪❫❴❵❮❯❰❱
+.…⋯⋮ ⋱⋰ ⠁⠂⠐⠄⠠⠈⣇⠈⠉⠋⠛⠟⠿⡿⣿ ⠗⠺ ⠿  ⸩⸨⯎⟡⯌✦⯌⯏⯍aak✧ 🙾 🙿 (ⲶⲼ+≈⟣⟢aak. 
+🀫█ (▊Ⲷ (▉Ⲷ ▆ (■ ▦ ◼ ▉ (🀫Ⲷ▩▤
+≽≼≽ ⋞⋟≺≻ ≪≫≾≿⋘⋙ ⋖⋗
+https://www.fileformat.info/info/unicode/block/braille_patterns/utf8test.htm
+https://www.htmlsymbols.xyz/unit-symbols
 '''
 NBSP              = '⠈' #'&nbsp;'
 NBSP2             = '⠉' #'&nbsp;&nbsp;'
@@ -364,6 +384,10 @@ NBSP5             = '⠟' #'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 NBSP6             = '⠿' #'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 CRLF              = '⣇' #'<br>'
 NL                = '\n'
+NLSP4             = '\n⠂   '
+NL4               = '\n⠀⠀⠀'
+NL4_DATA          = '\n⠀⠀⠀❗ '
+BSP4              = '⠀⠀⠀⠀'  # Braille spaces
 LLINK             = ''
 RLINK             = ''
 LINK              = '⟢'
@@ -594,6 +618,7 @@ CONF_CONFIG_IC3_FILE_NAME  = 'config_ic3_file_name'
 ICLOUD_TIMESTAMP           = 'timeStamp'
 ICLOUD_HORIZONTAL_ACCURACY = 'horizontalAccuracy'
 ICLOUD_VERTICAL_ACCURACY   = 'verticalAccuracy'
+ICLOUD_POSITION_TYPE       = 'positionType'
 ICLOUD_BATTERY_STATUS      = 'batteryStatus'
 ICLOUD_BATTERY_LEVEL       = 'batteryLevel'
 ICLOUD_DEVICE_CLASS        = 'deviceClass'
@@ -615,6 +640,7 @@ NAME                       = 'name'
 FRIENDLY_NAME              = 'friendly_name'
 LATITUDE                   = 'latitude'
 LONGITUDE                  = 'longitude'
+POSITION_TYPE              = 'position_type'
 DEVICE_CLASS               = 'device_class'
 DEVICE_ID                  = 'device_id'
 PASSIVE                    = 'passive'
@@ -763,6 +789,7 @@ CONF_PASSTHRU_ZONE_TIME         = 'passthru_zone_time'
 CONF_LOG_LEVEL                  = 'log_level'
 CONF_LOG_LEVEL_DEVICES          = 'log_level_devices'
 CONF_DISPLAY_GPS_LAT_LONG       = 'display_gps_lat_long'
+CONF_RECREATE_MAIN_DASHBOARD    = 'recreate_main_dashboard'
 
 # Zone Parameters
 CONF_DEVICE_TRACKER_STATE_SOURCE= 'device_tracker_state_source'
@@ -790,7 +817,6 @@ CONF_STAT_ZONE_STILL_TIME       = 'stat_zone_still_time'
 CONF_STAT_ZONE_INZONE_INTERVAL  = 'stat_zone_inzone_interval'
 CONF_STAT_ZONE_BASE_LATITUDE    = 'stat_zone_base_latitude'
 CONF_STAT_ZONE_BASE_LONGITUDE   = 'stat_zone_base_longitude'
-CONF_SENSORS                    = 'sensors'
 
 # Display Text As Parameter
 CONF_DISPLAY_TEXT_AS            = 'display_text_as'
@@ -840,6 +866,7 @@ CONF_AWAY_TIME_ZONE_2_DEVICES   = 'away_time_zone_2_devices'
 
 CONF_SENSORS_MONITORED_DEVICES = 'monitored_devices'
 
+CONF_SENSORS = SENSORS         = 'sensors'
 CONF_SENSORS_DEVICE            = 'device'
 NAME                           = "name"
 BADGE                          = "badge"
@@ -920,6 +947,7 @@ CF_DATA_DEVICES    = 'devices'
 CF_DATA_APPLE_ACCOUNTS = 'apple_accounts'
 CF_GENERAL         = 'general'
 CF_SENSORS         = 'sensors'
+CF_DEVICE_SENSORS  = 'device_sensors'
 
 #--------------------------------------------------------
 DEFAULT_PROFILE_CONF = {
@@ -932,7 +960,6 @@ DEFAULT_PROFILE_CONF = {
         CONF_EVLOG_CARD_DIRECTORY: EVLOG_CARD_WWW_DIRECTORY,
         CONF_EVLOG_CARD_PROGRAM: EVLOG_CARD_WWW_JS_PROG,
         CONF_EVLOG_BTNCONFIG_URL: '',
-        CONF_EXTERNAL_IP_ADDRESS: '',
         CONF_PICTURE_WWW_DIRS: []
 }
 
@@ -1017,6 +1044,7 @@ DEFAULT_GENERAL_CONF = {
         CONF_TRACK_FROM_BASE_ZONE_USED: True,
         CONF_TRACK_FROM_BASE_ZONE: HOME,
         CONF_TRACK_FROM_HOME_ZONE: True,
+        CONF_RECREATE_MAIN_DASHBOARD: False,
 
         # inZone Configuration Parameters
         CONF_CENTER_IN_ZONE: False,
@@ -1117,6 +1145,7 @@ DEFAULT_DATA_CONF =  {
         CF_TRACKING: DEFAULT_TRACKING_CONF,
         CF_GENERAL: DEFAULT_GENERAL_CONF,
         CF_SENSORS: DEFAULT_SENSORS_CONF,
+        CF_DEVICE_SENSORS: [],
 }
 
 CF_DEFAULT_IC3_CONF_FILE = {
@@ -1125,6 +1154,7 @@ CF_DEFAULT_IC3_CONF_FILE = {
                 CF_TRACKING: DEFAULT_TRACKING_CONF,
                 CF_GENERAL: DEFAULT_GENERAL_CONF,
                 CF_SENSORS: DEFAULT_SENSORS_CONF,
+                CF_DEVICE_SENSORS: [],
         }
 }
 
@@ -1164,7 +1194,7 @@ RESTORE_STATE_FILE = {
         'profile': {
                 CONF_VERSION: 0,
                 LAST_UPDATE: DATETIME_ZERO, },
-        'devices': {}
+        'devices': {},
 }
 
 # Initialize the Device sensors[xxx] value from the restore_state file if
@@ -1187,6 +1217,7 @@ TRACE_ATTRS_BASE = {
         INTO_ZONE_DATETIME: '',
         LATITUDE: 0,
         LONGITUDE: 0,
+        POSITION_TYPE: '',
         TRIGGER: '',
         TIMESTAMP: DATETIME_ZERO,
         ZONE_DISTANCE: 0,
@@ -1213,21 +1244,22 @@ TRACE_ICLOUD_ATTRS_BASE = {
         ICLOUD_DEVICE_STATUS: '',
         LATITUDE: 0,
         LONGITUDE: 0,
+        ICLOUD_POSITION_TYPE: '',
         ICLOUD_TIMESTAMP: 0,
         ICLOUD_HORIZONTAL_ACCURACY: 0,
         ICLOUD_VERTICAL_ACCURACY: 0,
-        'positionType': 'Wifi',
         }
 FAMSHR_LOCATION_FIELDS = [
         ALTITUDE,
         LATITUDE,
         LONGITUDE,
+        ICLOUD_POSITION_TYPE,
         TIMESTAMP,
         ICLOUD_HORIZONTAL_ACCURACY,
         ICLOUD_VERTICAL_ACCURACY,
         ICLOUD_BATTERY_STATUS, ]
 
-LOG_RAWDATA_FIELDS = [
+X_LOG_RAWDATA_FIELDS = [
         LATITUDE,  LONGITUDE, LOCATION_SOURCE, TRACKING_METHOD, DATA_SOURCE, NEAR_DEVICE_USED,
         ZONE, ZONE_DATETIME, INTO_ZONE_DATETIME, LAST_ZONE,
         TIMESTAMP, TIMESTAMP_SECS, TIMESTAMP_TIME, LOCATION_TIME, DATETIME, AGE,
@@ -1242,7 +1274,7 @@ LOG_RAWDATA_FIELDS = [
         ICLOUD3_VERSION,
         BADGE,
         DEVICE_ID, ID,
-        ICLOUD_HORIZONTAL_ACCURACY, ICLOUD_VERTICAL_ACCURACY,
+        ICLOUD_HORIZONTAL_ACCURACY, ICLOUD_VERTICAL_ACCURACY, ICLOUD_POSITION_TYPE,
         ICLOUD_BATTERY_LEVEL, ICLOUD_BATTERY_STATUS,
         ICLOUD_DEVICE_CLASS, ICLOUD_DEVICE_STATUS, ICLOUD_LOW_POWER_MODE, ICLOUD_TIMESTAMP,
         NAME, 'emails', 'firstName', 'laststName',

@@ -349,9 +349,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         await State.update(new_vars, func_args)
 
     async def hass_started(event: HAEvent) -> None:
-        _LOGGER.debug("adding state changed listener and starting global contexts")
+        _LOGGER.debug("starting global contexts")
         await State.get_service_params()
-        hass.data[DOMAIN][UNSUB_LISTENERS].append(hass.bus.async_listen(EVENT_STATE_CHANGED, state_changed))
         start_global_contexts()
 
     async def hass_stop(event: HAEvent) -> None:
@@ -367,6 +366,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         await Function.reaper_stop()
 
     # Store callbacks to event listeners so we can unsubscribe on unload
+    _LOGGER.debug("adding state_changed listener")
+    hass.data[DOMAIN][UNSUB_LISTENERS].append(hass.bus.async_listen(EVENT_STATE_CHANGED, state_changed))
     hass.data[DOMAIN][UNSUB_LISTENERS].append(
         hass.bus.async_listen(EVENT_HOMEASSISTANT_STARTED, hass_started)
     )
@@ -571,7 +572,7 @@ async def load_scripts(hass: HomeAssistant, config_data: Dict[str, Any], global_
         for global_ctx_name, global_ctx in ctx_all.items():
             if global_ctx_name not in ctx2files:
                 ctx_delete.add(global_ctx_name)
-        # delete all global_ctxs that have changeed source or mtime
+        # delete all global_ctxs that have changed source or mtime
         for global_ctx_name, src_info in ctx2files.items():
             if global_ctx_name in ctx_all:
                 ctx = ctx_all[global_ctx_name]

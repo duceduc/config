@@ -45,7 +45,7 @@ from ..const            import (RED_ALERT, LINK, RLINK, RARROW,
                                 CF_PROFILE,
                                 )
 
-from ..utils.utils      import (instr, isbetween, list_to_str, list_add, is_empty, isnot_empty,
+from ..utils.utils      import (instr, isbetween, list_to_str, list_add, list_del, is_empty, isnot_empty,
                                 zone_dname, decode_password, dict_value_to_list,
                                 six_item_list, six_item_dict, )
 from ..utils.messaging  import (log_exception, log_debug_msg, log_info_msg,
@@ -56,9 +56,9 @@ from ..utils.time_util  import (format_timer, )
 from .                  import utils_configure as utils
 from .                  import selection_lists as lists
 from .const_form_lists  import *
+from ..configure        import dashboard_builder as dbb
 from ..mobile_app       import mobapp_interface
 from ..startup          import config_file
-
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #             USER - INITIAL ADD INTEGRATION
@@ -88,7 +88,12 @@ def form_config_option_user(self):
 def form_menu(self):
     menu_title = MENU_PAGE_TITLE[self.menu_page_no]
     menu_action_items = MENU_ACTION_ITEMS.copy()
-    _log(f"IN form_menu  {self.step_id=} {self=} {self.menu_page_no=}")
+    if self.rebuild_ic3db_dashboards:
+        dbb.load_ic3db_dashboards_from_ha_data(self)
+
+        if isnot_empty(self.ic3db_Dashboards_by_dbname):
+            list_del(menu_action_items, MENU_KEY_TEXT['exit'])
+            list_add(menu_action_items, MENU_KEY_TEXT['exit_update_dashboards'])
 
     if self.menu_page_no == 0:
         menu_key_text  = MENU_KEY_TEXT_PAGE_0
@@ -317,9 +322,21 @@ def form_update_apple_acct(self):
     else:
         password_selector = selector.TextSelector(selector.TextSelectorConfig(type='password'))
 
-    if (self.add_apple_acct_flag is False
-            and username not in Gb.PyiCloud_by_username):
-        self.errors['base'] = 'apple_acct_not_logged_into'
+    if Gb.internet_error:
+            self.errors['base'] = 'internet_error_no_change'
+
+    if username in self.apple_acct_items_by_username:
+        apple_acct_info = self.apple_acct_items_by_username[username].lower()
+        if CONF_USERNAME in self.errors:
+            pass
+        elif instr(apple_acct_info, 'invalid username/password'):
+            self.errors[CONF_USERNAME] = 'apple_acct_invalid_upw'
+        elif instr(apple_acct_info, 'not logged in'):
+            self.errors[CONF_USERNAME] = 'apple_acct_not_logged_into'
+        elif instr(apple_acct_info, 'authentication needed'):
+            self.errors[CONF_USERNAME] = 'verification_code_needed'
+        self.errors.pop('account_selected', None)
+        self.header_nsg = ''
 
     if self.add_apple_acct_flag:
         acct_info = '➤ ADD A NEW APPLE ACCOUNT'
@@ -413,6 +430,7 @@ def form_reauth(self, reauth_username=None):
         else:
             action_list_default = 'send_verification_code'
 
+
         # account_selected = account_selected if acount_selected is not None else None
 
         lists.build_apple_accounts_list(self)
@@ -439,7 +457,6 @@ def form_reauth(self, reauth_username=None):
             self.conf_apple_acct, self.aa_idx = \
                             config_file.conf_apple_acct(reauth_username)
 
-
         elif isnot_empty(self.conf_apple_acct):
             self.apple_acct_reauth_username = self.conf_apple_acct[CONF_USERNAME]
 
@@ -456,13 +473,16 @@ def form_reauth(self, reauth_username=None):
         elif is_empty(self.apple_acct_items_by_username):
             default_acct_selected = 'No Apple Accounts have been set up'
             self.apple_acct_items_by_username = {'.noacctssetup': default_acct_selected}
-            self.errors['base'] = 'apple_acct_not_set_up'
+            self.errors[CONF_USERNAME] = 'apple_acct_not_set_up'
             action_list_default = 'goto_previous'
+
+        # elif instr(self.apple_acct_items_by_username[self.apple_acct_reauth_username], 'AUTHENTICATION'):
+        #     self.errors[CONF_USERNAME] = 'verification_code_needed'
 
         else:
             # Apple accts but the selected one is not logged into
-            default_acct_selected = self.apple_acct_items_by_username[self.apple_acct_reauth_username]
-            self.errors['base'] = 'apple_acct_not_logged_into'
+            # default_acct_selected = self.apple_acct_items_by_username[self.apple_acct_reauth_username]
+            # self.errors[CONF_USERNAME] = 'apple_acct_not_logged_into'
             action_list_default = 'goto_previous'
 
         otp_code = ' '
@@ -794,27 +814,39 @@ def form_update_other_device_parameters(self):
 #           DASHBOARD BUILDER FORM
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def form_dashboard_builder(self):
+    dbname = self.ui_selected_dbname
     self.actions_list = []
-    action_default = 'update_dashboard'
-    if isnot_empty(self.dbf_dashboard_key_text):
-        self.actions_list.append(ACTION_LIST_OPTIONS['update_dashboard'])
+    action_default = 'create_dashboard'
     self.actions_list.append(ACTION_LIST_OPTIONS['create_dashboard'])
     self.actions_list.append(ACTION_LIST_OPTIONS['cancel_goto_menu'])
 
     # Set default dashboard to current dashboard, the previous dashboard or 'add'
-    default_dbname = self.dbf_dashboard_key_text[self.selected_dbname]
+    default_dbname = self.dbf_dashboard_key_text[dbname]
+
+    default_main_view_style = DASHBOARD_MAIN_VIEW_STYLE_OPTIONS[RESULT_SUMMARY]
 
     self.dbf_main_view_devices_key_text = {}
-    self.dbf_main_view_devices_key_text.update(DASHBOARD_MAIN_VIEW_STYLE_BASE)
+    self.dbf_main_view_devices_key_text.update(DASHBOARD_MAIN_VIEW_DEVICES_BASE)
     self.dbf_main_view_devices_key_text.update(lists.devices_selection_list())
+    # main_view_devices = self.main_view_info_dnames_by_dbname.get(dbname, ALL_DEVICES)
+
+    # if is_empty(self.ui_main_view_dnames):
+    self.ui_main_view_dnames = [ALL_DEVICES]
 
     return vol.Schema({
         vol.Required('selected_dashboard',
                     default=default_dbname):
                     selector.SelectSelector(selector.SelectSelectorConfig(
                         options=dict_value_to_list(self.dbf_dashboard_key_text), mode='list')),
+        # vol.Optional('main_view_desc',
+        #             default=False):
+        #             selector.BooleanSelector(),
+        vol.Required('main_view_style',
+                    default=default_main_view_style):
+                    selector.SelectSelector(selector.SelectSelectorConfig(
+                        options=dict_value_to_list(DASHBOARD_MAIN_VIEW_STYLE_OPTIONS), mode='dropdown')),
         vol.Required('main_view_devices',
-                    default=self.main_view_devices):
+                    default=self.ui_main_view_dnames):
                     cv.multi_select(six_item_dict(self.dbf_main_view_devices_key_text)),
 
         vol.Required('action_items',
@@ -857,7 +889,7 @@ def form_actions(self):
         debug_OPTIONS.pop('debug_start')
     else:
         debug_OPTIONS.pop('debug_stop')
-    if Gb.log_data_flag:
+    if Gb.log_rawdata_flag:
         debug_OPTIONS.pop('rawdata_start')
     else:
         debug_OPTIONS.pop('rawdata_stop')
