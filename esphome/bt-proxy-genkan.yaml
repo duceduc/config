@@ -6,7 +6,7 @@ substitutions:
 <<: !include .base.sensors.yaml 
 
 packages:
-  esphome.bluetooth-proxy: github://esphome/firmware/bluetooth-proxy/esp32-generic.yaml@main
+  esphome.bluetooth-proxy: github://esphome/bluetooth-proxies/esp32-generic/esp32-generic.yaml@main
 
 esphome:
   name: $name

@@ -14,9 +14,9 @@ substitutions:
   interval4: "60"
   interval5: "120"
   # Plunger Pulse Duration. Range: 55-100, 3v at 210
-  squirt_pulse: "160ms"
+  squirt_pulse: "190ms"
   # Cannister Squirt Capacity
-  maxSquirts: "300" #max 280
+  maxSquirts: "320" #max 280
 
 packages:
   ld2410: !include components/ld2410-v2.yaml
@@ -50,7 +50,7 @@ esp32:
   board: esp32-c3-devkitm-1
   variant: esp32c3
   framework:
-    type: esp-idf
+    type: arduino
 #    type: arduino # esp-idf (need to use cable when switching between types)
 
 globals:

@@ -48,7 +48,7 @@ esp32:
   variant: esp32c3
   framework:
     type: arduino # May need to change to esp-idf
-    platform_version: 5.4.0
+#    platform_version: 5.4.0
 
 globals:
   # Store the Cannister Percentage
