@@ -36,7 +36,7 @@
         type: module
       - url: /webrtc/webrtc-camera.js
         type: module
-      - url: /local/custom_ui/simple-inventory-card.js?v=5
+      - url: /local/custom_ui/simple-inventory-card.js?v=7
         type: module
 
       - url: /local/custom_ui/button-card.js
