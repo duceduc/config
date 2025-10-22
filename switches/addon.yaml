@@ -38,7 +38,7 @@
             data:
               addon: 15d21743_samba_backup
 
-      portainer:
+      portainer: ###
         value_template: "{{ is_state('binary_sensor.portainer_running', 'on') }}"
         turn_on:
           - service: hassio.addon_start
@@ -60,7 +60,7 @@
             data:
               addon: core_mosquitto
 
-      zigbee2mqtt:
+      zigbee2mqtt: ####
         value_template: "{{ is_state('binary_sensor.zigbee2mqtt_running', 'on') }}"
         turn_on:
           - service: hassio.addon_start
@@ -104,7 +104,7 @@
             data:
               addon: a0d7b954_ssh
 
-      appdaemon:
+      appdaemon: ####
         value_template: "{{ is_state('binary_sensor.appdaemon_4_running', 'on') }}"
         turn_on:
           - service: hassio.addon_start
