@@ -29,6 +29,7 @@
     switches:
       sambabackup:
         value_template: "{{ is_state('binary_sensor.samba_backup_running', 'on') }}"
+        unique_id: sambabackup
         turn_on:
           - service: hassio.addon_start
             data:
@@ -40,6 +41,7 @@
 
       portainer: ###
         value_template: "{{ is_state('binary_sensor.portainer_running', 'on') }}"
+        unique_id: portainer
         turn_on:
           - service: hassio.addon_start
             data:
@@ -51,6 +53,7 @@
 
       mosquitto:
         value_template: "{{ is_state('binary_sensor.mosquitto_broker_running', 'on') }}"
+        unique_id: mosquitto
         turn_on:
           - service: hassio.addon_start
             data:
@@ -62,6 +65,7 @@
 
       zigbee2mqtt: ####
         value_template: "{{ is_state('binary_sensor.zigbee2mqtt_running', 'on') }}"
+        unique_id: zigbee2mqtt
         turn_on:
           - service: hassio.addon_start
             data:
@@ -73,6 +77,7 @@
 
       samba:
         value_template: "{{ is_state('binary_sensor.samba_share_running', 'on') }}"
+        unique_id: samba
         turn_on:
           - service: hassio.addon_start
             data:
@@ -84,6 +89,7 @@
 
       sambanas:
         value_template: "{{ is_state('binary_sensor.samba_nas_running', 'on') }}"
+        unique_id: sambanas
         turn_on:
           - service: hassio.addon_start
             data:
@@ -95,6 +101,7 @@
 
       ssh:
         value_template: "{{ is_state('binary_sensor.ssh_web_terminal_running', 'on') }}"
+        unique_id: ssh
         turn_on:
           - service: hassio.addon_start
             data:
@@ -106,6 +113,7 @@
 
       appdaemon: ####
         value_template: "{{ is_state('binary_sensor.appdaemon_4_running', 'on') }}"
+        unique_id: appdaemon
         turn_on:
           - service: hassio.addon_start
             data:
@@ -117,6 +125,7 @@
 
       esphome:
         value_template: "{{ is_state('binary_sensor.esphome_running', 'on') }}"
+        unique_id: esphome
         turn_on:
           - service: hassio.addon_start
             data:

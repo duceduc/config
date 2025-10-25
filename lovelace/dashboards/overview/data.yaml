@@ -458,13 +458,13 @@ cards:
                   - entity: switch.sambabackup
                     name: Samba Backup
                     icon: mdi:server-plus
-                  - entity: switch.portainer
+                  - entity: switch.portainer_2
                     name: Portainer
                     icon: mdi:server-plus
                   - entity: switch.mosquitto
                     name: Mosquitto MQTT
                     icon: mdi:server-plus
-                  - entity: switch.zigbee2mqtt
+                  - entity: switch.zigbee2mqtt_2
                     name: Zigbee2MQTT
                     icon: mdi:server-plus
                   - entity: switch.sambanas
@@ -473,7 +473,7 @@ cards:
                   - entity: switch.ssh
                     name: SSH
                     icon: mdi:server-plus
-                  - entity: switch.appdaemon
+                  - entity: switch.appdaemon_2
                     name: AppDaemon
                     icon: mdi:server-plus
                   - entity: switch.esphome
