@@ -118,7 +118,7 @@
   mode: single
   triggers:
     - trigger: state
-      entity_id: binary_sensor.kitchen_occupied
+      entity_id: binary_sensor.kitchen_occupied, group.motion_kitchen_occupancy
       id: 'pre'
       from: 'off'
       to: 'on'
