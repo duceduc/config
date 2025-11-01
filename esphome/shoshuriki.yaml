@@ -13,7 +13,7 @@ substitutions:
   # Plunger Pulse Duration. Range: 55-180
   squirt_pulse: "190ms"
   # Cannister Squirt Capacity
-  maxSquirts: "1450" #max 1450
+  maxSquirts: "1460" #max 1450
 
 packages:
   aht10: !include components/aht10.yaml
