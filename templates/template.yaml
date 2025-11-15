@@ -83,10 +83,11 @@
 
 #########################################################
 #
-#             Calendar JCB
+#             Calendar JCB Arriving Units
 #
 #########################################################
 
+# offset start count from tomorrow and onward. To test, set offset time + 15 mins after.
   - trigger:
       - platform: calendar
         event: start

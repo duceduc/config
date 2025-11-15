@@ -58,6 +58,14 @@
     platform: telegram
     chat_id: !secret telegram_chatid
 
+# free plan limits to 3 chats (group or private)
+  - name: greenapi
+    platform: greenapi
+    instance_id: 7107381470
+    token: !secret whatsapp_greenapi
+#    target: '' see secret for sample
+
+
 
 #########################################################
 #

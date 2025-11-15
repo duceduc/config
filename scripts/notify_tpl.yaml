@@ -33,6 +33,35 @@
               title: '{{ title }}'
               message: '{{ message }}'
               
+
+
+
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "whatsapp_duc"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.greenapi
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              target: !secret whatsapp_duc
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "whatsapp_jcbauto"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.greenapi
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              target: !secret whatsapp_jcbauto
+
+
         - conditions:
           - condition: template
             value_template: '{{ who == "amber"}}'
@@ -46,24 +75,12 @@
               message: '{{ message }}'
         - conditions:
           - condition: template
-            value_template: '{{ who == "viber"}}'
-          - condition: state
-            entity_id: input_boolean.text_notify_duc
-            state: 'on'
-          sequence:
-          - service: notify.notify_events
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-        - conditions:
-          - condition: template
             value_template: '{{ who == "desktop"}}'
           sequence:
           - service: notify.desktop_fddl8i4
             data:
               title: '{{ title }}'
               message: '{{ message }}'
-
         - conditions:
           - condition: template
             value_template: '{{ who == "discord_eta"}}'
@@ -73,6 +90,21 @@
               target:
               - "1093135539277942784"            
               message: '{{ message }}'
+
+# can be deleted
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "viber"}}'
+          - condition: state
+            entity_id: input_boolean.text_notify_duc
+            state: 'on'
+          sequence:
+          - service: notify.notify_events
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+
+
 
   text_notify_image:
     sequence:

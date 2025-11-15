@@ -48,8 +48,9 @@
         - sensor.motion_c1_battery
       below: 46
   actions:
-    - action: notify.notify_events
+    - action: script.text_notify
       data:
+        who: whatsapp_duc
         message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 46 percent."
 
 
@@ -173,8 +174,9 @@
     - condition: template
       value_template: "{{ trigger.from_state.state != 'unavailable' }}"
   actions:
-    - action: notify.notify_events #Viber
+    - action: script.text_notify
       data:
+        who: whatsapp_duc
         message: "Home Assistant Version {{ states.sensor.hassio_version.state }} is available!"
 
 

@@ -101,7 +101,7 @@
     can_acknowledge: true
     repeat: 720
     notifiers:
-      - 'notify_events'
+      - 'greenapi'
 
 
   lockdown_issue:
@@ -113,7 +113,7 @@
     can_acknowledge: false
     skip_first: false
     notifiers:
-      - notify_events
+      - greenapi
 
 
 #########################################################
@@ -132,7 +132,7 @@
 #    repeat: 720
 #    notifiers:
 #      - 'amberthebot'
-#      - 'notify_events'
+#      - 'greenapi'
 
 #########################################################
 #                                                                                                              
@@ -164,7 +164,7 @@
     can_acknowledge: false
     skip_first: false
     notifiers:
-      - notify_events
+      - greenapi
 #     - amberthebot
 
 

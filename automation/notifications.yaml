@@ -129,12 +129,23 @@
 
           **Today is {{ now().strftime( '%B %d, %Y') }}**
 
-          List of Containers | Roro Arriving on {{ today }}.
+          List of Containers | Roro arriving on {{ today }}.
 
           Please make arrangements to have BL docs send to customers.
 
           ---
 
+          {{ state_attr('sensor.units_arriving', 'description') }}
+
+    - action: script.text_notify
+      data:
+        who: whatsapp_jcbauto
+        title: Today is {{ now().strftime( '%B %d, %Y') }}
+        message: >
+          {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
+           List of Containers | Roro arriving on {{ today }}.
+           Please make arrangements to have BL docs send to customers.
+           ---
           {{ state_attr('sensor.units_arriving', 'description') }}
 #          {{ states('sensor.units_arriving') }}
 #          {{ trigger.calendar_event.description }}
