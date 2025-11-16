@@ -11,8 +11,8 @@
   actions:
     - action: script.text_notify
       data:
-        who: whatsapp_duc
-        title: '*Information*'
+        who: whatsapp_hass
+        title: Information
         message: "Today's energy use was {{ states('sensor.total_energy') }} kWh."
     - action: input_number.set_value
       data:
@@ -23,6 +23,7 @@
         entity_id: notify.energy_log
       data:
         message: "{{ states('sensor.date') }},{{ states('sensor.energy_t31_light_and_power_day') }},{{ states('sensor.energy_t31_light_and_power_night') }},{{ states('sensor.energy_t31_light_and_power_total') }},{{ states('sensor.energy_t41_heating_day') }},{{ states('sensor.energy_t41_heating_night') }},{{ states('sensor.energy_t41_heating_total') }},{{ states('sensor.total_energy_day') }},{{ states('sensor.total_energy_night') }},{{ states('sensor.total_energy') }},{{ state_attr('sensor.power_stats','age_coverage_ratio') }},{{ state_attr('sensor.power_stats','buffer_usage_ratio') }},{{ states('sensor.power_stats') }},{{ states('sensor.total_cost_today') }}"
+
 
 - alias: 'Monthly Fridge Energy Use Message'
   triggers:

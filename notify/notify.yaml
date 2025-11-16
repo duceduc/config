@@ -50,7 +50,7 @@
 #
 #########################################################
 
-# Free Basic 300 msg/ month
+# Free Basic 300 msg/ month CAN DELETE
   - name: notify-events # viber
     platform: notify_events
 
@@ -58,10 +58,10 @@
     platform: telegram
     chat_id: !secret telegram_chatid
 
-# free plan limits to 3 chats (group or private)
+# free plan limits to 3 chats /month (group or private)
   - name: greenapi
     platform: greenapi
-    instance_id: 7107381470
+    instance_id: 7103382163
     token: !secret whatsapp_greenapi
 #    target: '' see secret for sample
 

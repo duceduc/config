@@ -50,7 +50,7 @@
   actions:
     - action: script.text_notify
       data:
-        who: whatsapp_duc
+        who: whatsapp_hass
         message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 46 percent."
 
 
@@ -176,7 +176,7 @@
   actions:
     - action: script.text_notify
       data:
-        who: whatsapp_duc
+        who: whatsapp_hass
         message: "Home Assistant Version {{ states.sensor.hassio_version.state }} is available!"
 
 

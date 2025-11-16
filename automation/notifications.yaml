@@ -139,7 +139,7 @@
 
     - action: script.text_notify
       data:
-        who: whatsapp_jcbauto
+        who: whatsapp_jcb
         title: Today is {{ now().strftime( '%B %d, %Y') }}
         message: >
           {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}

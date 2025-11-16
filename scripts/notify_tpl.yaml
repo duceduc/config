@@ -38,7 +38,7 @@
 
         - conditions:
           - condition: template
-            value_template: '{{ who == "whatsapp_duc"}}'
+            value_template: '{{ who == "whatsapp_hass"}}'
           - condition: state
             entity_id: input_boolean.text_notify_duc
             state: 'on'
@@ -47,10 +47,10 @@
             data:
               title: '{{ title }}'
               message: '{{ message }}'
-              target: !secret whatsapp_duc
+              target: !secret whatsapp_hass
         - conditions:
           - condition: template
-            value_template: '{{ who == "whatsapp_jcbauto"}}'
+            value_template: '{{ who == "whatsapp_jcb"}}'
           - condition: state
             entity_id: input_boolean.text_notify_duc
             state: 'on'
@@ -59,7 +59,7 @@
             data:
               title: '{{ title }}'
               message: '{{ message }}'
-              target: !secret whatsapp_jcbauto
+              target: !secret whatsapp_jcb
 
 
         - conditions:
