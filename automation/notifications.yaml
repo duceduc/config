@@ -243,7 +243,7 @@
   actions:
     - action: script.text_notify
       data:
-        who: viber
+        who: whatsapp_hass
         title: 'Payday'
         message: >-
           {{ [
@@ -564,7 +564,7 @@
         message: Water Detected around the washing machine area.
     - action: script.text_notify
       data:
-        who: viber
+        who: whatsapp_hass
         title: Water Leak Detected
         message: Water Detected around the washing machine area.
     - action: script.email_notify

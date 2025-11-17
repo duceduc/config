@@ -63,7 +63,7 @@
     platform: greenapi
     instance_id: 7103382163
     token: !secret whatsapp_greenapi
-#    target: '' see secret for sample
+    target: !secret whatsapp_hass
 
 
 

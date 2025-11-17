@@ -737,7 +737,7 @@ script:
         entity_id: input_boolean.security_alarm
       - action: script.text_notify
         data:
-          who: viber
+          who: whatsapp_hass
           message: >-
             {{ [
               "My security protocols have been overridden. I am sounding the alarm for the interloper. #itsloudinhere #securityalarm",
