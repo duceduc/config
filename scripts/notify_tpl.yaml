@@ -73,6 +73,9 @@
             data:
               title: '{{ title }}'
               message: '{{ message }}'
+
+
+
         - conditions:
           - condition: template
             value_template: '{{ who == "desktop"}}'

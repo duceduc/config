@@ -165,7 +165,7 @@
     skip_first: false
     notifiers:
       - greenapi
-#     - amberthebot
+#     - telegram_bot_1730593885_591654584 # ha chat via telegram
 
 
 #########################################################

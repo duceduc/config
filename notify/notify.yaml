@@ -54,6 +54,7 @@
   - name: notify-events # viber
     platform: notify_events
 
+#migrate to ui. can be disable once check it working
   - name: amberthebot
     platform: telegram
     chat_id: !secret telegram_chatid

@@ -28,12 +28,6 @@ template:
           icon: mdi:airplane
 
 
-
-
-
-
-
-
 automation:
   - alias: 'Flight entry notification'
     triggers:

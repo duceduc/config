@@ -25,12 +25,13 @@
             - condition: trigger
               id: msg
           sequence:
-            - action: notify.amberthebot
+            - action: notify.amberthebot # notify.send_message or notify.amberthebot
               data:
                 message: "The PC was left {{ states('binary_sensor.desktop_status') }} and there are {{ states('sensor.n_people_home') }} person at home."
                 data:
                   inline_keyboard:
                     - 'Turn off pc:/turn_off_pc, Leave it:/donothing' # donothing is global automation.  telegram.yaml
+
 
         - conditions:
             - condition: trigger
@@ -76,12 +77,13 @@
             - condition: trigger
               id: mail
           sequence:
-            - action: notify.amberthebot
+            - action: notify.amberthebot # notify.send_message or notify.amberthebot
               data:
                 message: "You've got mail!"
                 data:
                   inline_keyboard:
                   - 'Received:/received, Mute:/donothing' # donothing is global automation.  telegram.yaml
+
         - conditions:
             - condition: trigger
               id: bat
