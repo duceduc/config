@@ -80,10 +80,6 @@
     - action: script.update_critical_battery_group
 
 
-
-
-
-
 - alias: Refresh special event sensors # daily at midnight
   initial_state: true
   triggers:

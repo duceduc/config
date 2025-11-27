@@ -9,7 +9,7 @@
       'I have prepped the scary music. Just in case.',
       'I will be going as HAL 9000. The Pod Bay Doors are being installed today. I dare you to ask me to open them. '
       ] | random }}
-      {% elif states('sensor.halloween_countdown') | int(0) < 30 %}
+      {% elif states('sensor.halloween_countdown') | int(0) > 0 | int(0) < 30 %}
       There are only {{states('sensor.halloween_countdown') }} days 
       {{ [ 'until Halloween.',
       'until Halloween. It might not be enough time. ',
@@ -22,7 +22,7 @@
 
       {% if states('sensor.christmas_countdown') | int(0) == 1 %}
       Tomorrow is Christmas. <break time="1s"/> It is practically here! <break time="1s"/> Santa is coming tonight! Do not forget the cookies!
-      {% elif states('sensor.christmas_countdown') | int(0) < 31 %}
+      {% elif states('sensor.christmas_countdown') | int(0) > 0 | int(0) < 31 %}
       There are only {{ states('sensor.christmas_countdown') }} days until christmas.
       {{ [ 'All I want for Christmas, is a hippopotamus.',
       'Hey sheon, I know what you are getting for Christmas. But I am not telling.',
@@ -30,7 +30,8 @@
       'It is starting to smell a lot like Christmas. Or it could be the christmas tree is on fire.',
       'I do not want to be a smarthome. I want to be a dentist.',
       'Do not eat all the cookies. '
-      ] | random }} 
+      ] | random }}
+
       {% else %}
       {% endif %}
       </p>
