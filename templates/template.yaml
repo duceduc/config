@@ -56,6 +56,24 @@
         state: >
           {{ ((as_timestamp(now().replace(month=10, day=31)) - as_timestamp(now()) | int) / 86400) | round(0) +1 }}  
 
+      - name: Line Dry Time
+        unique_id: line_dry_time
+        unit_of_measurement: Mins
+        state: >
+          {% set weather_entity = 'weather.my_weather' %}
+          {% set sunshine_percent = 1-(states.sensor.lr_radar_illuminance.state | float) %}
+          {% set temp = (state_attr(weather_entity, 'temperature') | int)+273 %}
+          {% set wind = (state_attr(weather_entity, 'wind_speed') | float)/2.237 %}
+          {% set humidity = state_attr(weather_entity, 'humidity') | float/100 %}
+          {% set pressure = state_attr(weather_entity, 'pressure') | float*33.86389/10 %}
+          {% set rn = 2.4*sunshine_percent %}
+          {% set delta = ((5336/temp)**(21.07-(5336/temp))) %}
+          {% set lamda = 2.501-0.002361*(temp-273) %}
+          {% set y = (0.0016286*pressure)/lamda %}
+          {% set ea = 1**(21.07-(5336/temp)) %}
+          {% set d = (1-humidity)*ea %}
+          {% set e = (delta*rn+y*(6.43*(1+0.536*wind)*d))/(lamda*(delta+y)) %}
+          {{((0.2/(e))*1440)|round(2)}}
 
 
 #########################################################
