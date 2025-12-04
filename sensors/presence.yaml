@@ -1,5 +1,85 @@
 ####################################################
 #                                                                                                    
+#            PRESENCE - MIN/MAX                                                           
+#                                                                                                    
+####################################################
+
+  - platform: min_max
+    name: 'iD Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.id_genkan
+      - sensor.id_shionroom
+      - sensor.id_masterroom
+      - sensor.id_livingroom
+
+  - platform: min_max
+    name: 'iE Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.ie_genkan
+      - sensor.ie_shionroom
+      - sensor.ie_masterroom
+      - sensor.ie_livingroom
+
+  - platform: min_max
+    name: 'tms Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+      - sensor.tms_genkan
+      - sensor.tms_shionroom
+      - sensor.tms_livingroom
+      - sensor.tms_masterroom
+
+  - platform: min_max
+    name: 'iS Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+#     - sensor.is_genkan
+     - sensor.is_shionroom
+     - sensor.is_livingroom
+     - sensor.is_masterroom
+
+  - platform: min_max
+    name: 'iSp Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+#      - sensor.isp_genkan
+      - sensor.isp_shionroom
+      - sensor.isp_livingroom
+      - sensor.isp_masterroom
+
+# Guests
+  - platform: min_max
+    name: 'Sachiko Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+#      - sensor.sachiko_genkan
+      - sensor.sachiko_shionroom
+      - sensor.sachiko_livingroom
+      - sensor.sachiko_masterroom
+
+  - platform: min_max
+    name: 'Tomokun Presence'
+    type: max
+    round_digits: 0
+    entity_ids:
+#      - sensor.tomokun_genkan
+      - sensor.tomokun_shionroom
+      - sensor.tomokun_livingroom
+      - sensor.tomokun_masterroom
+
+
+
+
+####################################################
+#                                                                                                    
 #            PRESENCE/RSSI - GENKAN                                                      
 #                                                                                                    
 ####################################################
@@ -253,82 +333,7 @@
 #    icon: mdi:account
 
 
-####################################################
-#                                                                                                    
-#            PRESENCE - MIN/MAX                                                           
-#                                                                                                    
-####################################################
 
-  - platform: min_max
-    name: 'iD Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-      - sensor.id_genkan
-      - sensor.id_shionroom
-      - sensor.id_masterroom
-      - sensor.id_livingroom
-
-  - platform: min_max
-    name: 'iE Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-      - sensor.ie_genkan
-      - sensor.ie_shionroom
-      - sensor.ie_masterroom
-      - sensor.ie_livingroom
-
-  - platform: min_max
-    name: 'tms Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-      - sensor.tms_genkan
-      - sensor.tms_shionroom
-      - sensor.tms_livingroom
-      - sensor.tms_masterroom
-
-  - platform: min_max
-    name: 'iS Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-#     - sensor.is_genkan
-     - sensor.is_shionroom
-     - sensor.is_livingroom
-     - sensor.is_masterroom
-
-  - platform: min_max
-    name: 'iSp Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-#      - sensor.isp_genkan
-      - sensor.isp_shionroom
-      - sensor.isp_livingroom
-      - sensor.isp_masterroom
-
-# Guests
-  - platform: min_max
-    name: 'Sachiko Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-#      - sensor.sachiko_genkan
-      - sensor.sachiko_shionroom
-      - sensor.sachiko_livingroom
-      - sensor.sachiko_masterroom
-
-  - platform: min_max
-    name: 'Tomokun Presence'
-    type: max
-    round_digits: 0
-    entity_ids:
-#      - sensor.tomokun_genkan
-      - sensor.tomokun_shionroom
-      - sensor.tomokun_livingroom
-      - sensor.tomokun_masterroom
       
 
 ####################################################
@@ -337,21 +342,22 @@
 #                                                                                                    
 ####################################################
 
-  - platform: template
-    sensors:
-      n_people_home:
-        friendly_name: Number of People Home
-        unique_id: d93d6133-9221-4a12-bd40-b32fa1a2244e
-        value_template: >-
-          {{ expand('group.family_presence')|selectattr('state','equalto','on')|list|length +
-                (1 if is_state('input_boolean.guest_mode','on') else 0) }}
+#  - platform: template
+#    sensors:
+#      n_people_home:
+#        friendly_name: Number of People Home
+#        unique_id: d93d6133-9221-4a12-bd40-b32fa1a2244e
+#        value_template: >-
+#          {{ expand('group.family_presence')|selectattr('state','equalto','on')|list|length +
+#                (1 if is_state('input_boolean.guest_mode','on') else 0) }}
+#
+#        icon_template: >-
+#         {% if is_state("sensor.n_people_home", "0") %} mdi:account-off
+#         {% elif is_state("sensor.n_people_home", "1") %} mdi:account
+#         {% elif is_state("sensor.n_people_home", "2") %} mdi:account-multiple
+#         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group         
+#         {% else %} mdi:account-plus {% endif %}
 
-        icon_template: >-
-         {% if is_state("sensor.n_people_home", "0") %} mdi:account-off
-         {% elif is_state("sensor.n_people_home", "1") %} mdi:account
-         {% elif is_state("sensor.n_people_home", "2") %} mdi:account-multiple
-         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group         
-         {% else %} mdi:account-plus {% endif %}
 
 #          {{ states|selectattr('entity_id','in',
 #               state_attr('group.family_presence','entity_id'))
@@ -364,83 +370,84 @@
 #                                                                                                    
 ####################################################
 
-  - platform: template
-    sensors:
-      guest_mode:
-        unique_id: 3b4f7df4-e04f-4e24-8fd2-fdad59be21c2
-        value_template: >-
-         {% if is_state("input_boolean.guest_mode", "off") %}No{% else %}Yes{% endif %}
-        icon_template: >-
-         {% if is_state("input_boolean.guest_mode", "off") %}mdi:account-off{% else %}mdi:account-plus{% endif %}
+#  - platform: template
+#    sensors:
+#      guest_mode:
+#        unique_id: 3b4f7df4-e04f-4e24-8fd2-fdad59be21c2
+#        value_template: >-
+#         {% if is_state("input_boolean.guest_mode", "off") %}No{% else %}Yes{% endif %}
+#        icon_template: >-
+#         {% if is_state("input_boolean.guest_mode", "off") %}mdi:account-off{% else %}mdi:account-plus{% endif %}
 
-  - platform: template
-    sensors:
-      duc_location:
-        friendly_name: 'Duc Location'
-        unique_id: 58db274e-0bf3-494b-b656-5095e35595ca
-        value_template: >-
-          {% set person = states('person.duc') %}
-          {% if person in ['iida','tobu','matsumoto'] %}
-            grocery store
-          {% elif person in ['ario','aeon','lalaport'] %}
-            mall            
-          {% elif person in ['mcdonalds','kfc','mos'] %}
-            lunch takeout
-          {% elif person in ['parents','yuri'] %}
-            relatives
-          {% else %}
-            {% if person in ['not_home'] %}
-              away
-            {% else %}
-              {{ states('person.duc') }}
-            {%- endif %}
-          {%- endif %}
+#  - platform: template
+#    sensors:
+#      duc_location:
+#        friendly_name: 'Duc Location'
+#        unique_id: 58db274e-0bf3-494b-b656-5095e35595ca
+#        value_template: >-
+#          {% set person = states('person.duc') %}
+#          {% if person in ['iida','tobu','matsumoto'] %}
+#            grocery store
+#          {% elif person in ['ario','aeon','lalaport'] %}
+#            mall            
+#          {% elif person in ['mcdonalds','kfc','mos'] %}
+#            lunch takeout
+#          {% elif person in ['parents','yuri'] %}
+#            relatives
+#          {% else %}
+#            {% if person in ['not_home'] %}
+#              away
+#            {% else %}
+#              {{ states('person.duc') }}
+#            {%- endif %}
+#          {%- endif %}
 
-  - platform: template
-    sensors:
-      eri_location:
-        friendly_name: 'Eri Location'
-        unique_id: 7b8f7013-f06a-4237-9081-62bb3e362836
-        value_template: >-
-          {% set person = states('person.eri') %}
-          {% if person in ['iida','tobu','matsumoto'] %}
-            grocery store
-          {% elif person in ['ario','aeon','lalaport'] %}
-            mall            
-          {% elif person in ['mcdonalds','kfc','mos'] %}
-            lunch takeout
-          {% elif person in ['parents','yuri'] %}
-            relatives
-          {% else %}
-            {% if person in ['not_home'] %}
-              away
-            {% else %}
-              {{ states('person.eri') }}
-            {%- endif %}
-          {%- endif %}
+#  - platform: template
+#    sensors:
+#      eri_location:
+#        friendly_name: 'Eri Location'
+#        unique_id: 7b8f7013-f06a-4237-9081-62bb3e362836
+#        value_template: >-
+#          {% set person = states('person.eri') %}
+#          {% if person in ['iida','tobu','matsumoto'] %}
+#            grocery store
+#          {% elif person in ['ario','aeon','lalaport'] %}
+#            mall            
+#          {% elif person in ['mcdonalds','kfc','mos'] %}
+#            lunch takeout
+#          {% elif person in ['parents','yuri'] %}
+#            relatives
+#          {% else %}
+#            {% if person in ['not_home'] %}
+#              away
+#            {% else %}
+#              {{ states('person.eri') }}
+#            {%- endif %}
+#          {%- endif %}
 
-  - platform: template
-    sensors:
-      shion_location:
-        friendly_name: 'Shion Location'
-        unique_id: 16af89b0-255e-4052-9e24-fd5471e856ac
-        value_template: >-
-          {% set person = states('person.shion') %}
-          {% if person in ['iida','tobu','matsumoto'] %}
-            grocery store
-          {% elif person in ['ario','aeon','lalaport'] %}
-            mall            
-          {% elif person in ['mcdonalds','kfc','mos'] %}
-            lunch takeout
-          {% elif person in ['parents','yuri'] %}
-            relatives
-          {% else %}
-            {% if person in ['not_home'] %}
-              away
-            {% else %}
-              {{ states('person.shion') }}
-            {%- endif %}
-          {%- endif %}
+#  - platform: template
+#    sensors:
+#      shion_location:
+#        friendly_name: 'Shion Location'
+#        unique_id: 16af89b0-255e-4052-9e24-fd5471e856ac
+#        value_template: >-
+#          {% set person = states('person.shion') %}
+#          {% if person in ['iida','tobu','matsumoto'] %}
+#            grocery store
+#          {% elif person in ['ario','aeon','lalaport'] %}
+#            mall            
+#          {% elif person in ['mcdonalds','kfc','mos'] %}
+#            lunch takeout
+#          {% elif person in ['parents','yuri'] %}
+#            relatives
+#          {% else %}
+#            {% if person in ['not_home'] %}
+#              away
+#            {% else %}
+#              {{ states('person.shion') }}
+#            {%- endif %}
+#          {%- endif %}
+
 
 
 ####################################################

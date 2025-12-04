@@ -24,16 +24,16 @@
 #        arg: /
 
 # Converted to GB using HASS.Agent Integration
-  - platform: template
-    sensors:
-      desktop_3l5pa48_storage_c_gb:
-        value_template: >-
-          {% if state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')| int(0) < 1024 %}
-            {{state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB') }}
-          {% else %}
-            {{ '%.1f'|format(state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')|float / 1024) }}
-          {% endif %}
-        unit_of_measurement: "GB"
+#  - platform: template
+#    sensors:
+#      desktop_3l5pa48_storage_c_gb:
+#        value_template: >-
+#          {% if state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')| int(0) < 1024 %}
+#            {{state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB') }}
+#          {% else %}
+#            {{ '%.1f'|format(state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')|float / 1024) }}
+#          {% endif %}
+#        unit_of_measurement: "GB"
 
 
 ####################################################

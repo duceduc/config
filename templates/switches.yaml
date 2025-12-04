@@ -1,0 +1,179 @@
+
+
+
+####################################################
+#
+#                    Customize Switches
+#
+####################################################
+
+  - switch:
+      - name: Christmas Lights
+        state: "{{ is_state('input_boolean.christmas_lights', 'on') }}"
+        turn_on:
+          - action: switch.turn_on
+            entity_id: group.christmas_lights
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.christmas_lights
+        turn_off:
+          - action: switch.turn_off
+            entity_id: group.christmas_lights
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.christmas_lights
+
+      - name: Ser8 Mini
+        state: "{{ states('switch.ser8') }}"
+        turn_on:
+          - action: switch.turn_on
+            entity_id: switch.ser8
+          - action: switch.turn_on
+            entity_id: switch.hdmi_selector
+        turn_off:
+          - action: switch.turn_off
+            entity_id: switch.ser8
+          - action: switch.turn_off
+            entity_id: switch.hdmi_selector
+
+
+####################################################
+#                                                                                                    
+#                    Convert to Switch                                                        
+#                                                                                                    
+####################################################
+
+      - name: Ceiling Fan Light
+        state: "{{ states('input_boolean.ceiling_fan_lights') }}"
+        turn_on:
+          - service: script.dining_lights_mode_on
+            data:
+              entity: remote.rm4_remote
+              device: Ceiling Fan
+        turn_off:
+          - action: script.dining_lights_mode_off
+            data:
+              entity: remote.rm4_remote
+              device: Ceiling Fan
+
+
+#########################################################
+#
+#             Emulated Aircon Switches
+#
+#########################################################
+
+# Living Room Aircon
+      - name: AC LR Unit
+        state: "{{ states('input_boolean.ac_lr_unit') }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.ac_lr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.lr_ac_mode
+            data:
+              option: Normal Cool
+        turn_off:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.ac_lr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.lr_ac_mode
+            data:
+              option: 'Off'
+
+      - name: Heater LR Unit
+        state: "{{ states('input_boolean.heater_lr_unit') }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.heater_lr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.lr_ac_mode
+            data:
+              option: Normal Heat
+        turn_off:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.heater_lr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.lr_ac_mode
+            data:
+              option: 'Off'
+
+# Master Room Aircon
+      - name: AC MR Unit
+        state: "{{ states('input_boolean.ac_mr_unit') }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.ac_mr_unit
+          - action: input_select.select_option
+            target:
+              entity_id: input_select.mr_ac_mode
+            data:
+              option: Normal Cool 
+        turn_off:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.ac_mr_unit
+          - action: input_select.select_option
+            target:
+              entity_id: input_select.mr_ac_mode
+            data:
+              option: 'Off'
+
+      - name: Heater MR Unit
+        state: "{{ states('input_boolean.heater_mr_unit') }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.heater_mr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.mr_ac_mode
+            data:
+              option: Normal Heat
+        turn_off:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.heater_mr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.mr_ac_mode
+            data:
+              option: 'Off'
+
+# Shion Aircon
+      - name: AC SR Unit
+        state: "{{ states('input_boolean.ac_sr_unit') }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.ac_sr_unit
+          - action: input_select.select_option
+            target:
+              entity_id: input_select.sr_ac_mode
+            data:
+              option: Normal Cool 
+        turn_off:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.ac_sr_unit
+          - action: input_select.select_option
+            target:
+              entity_id: input_select.sr_ac_mode
+            data:
+              option: 'Off'
+
+      - name: Heater SR Unit
+        state: "{{ states('input_boolean.heater_sr_unit') }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            entity_id: input_boolean.heater_sr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.sr_ac_mode
+            data:
+              option: Normal Heat
+        turn_off:
+          - action: input_boolean.turn_off
+            entity_id: input_boolean.heater_sr_unit
+          - action:  input_select.select_option
+            target:
+              entity_id: input_select.sr_ac_mode
+            data:
+              option: 'Off'

@@ -1,0 +1,41 @@
+####################################################
+#                                                                                                    
+#                      SSL Cert Expiry                                                          
+#                                                                                                    
+####################################################
+
+  - sensor:
+      - name: lions ssl cert expiry
+        unit_of_measurement: Days
+        state: >
+          {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
+          {% set str=states('sensor.lions_ssl_cert_issued') %}
+          {% set Y=(str|regex_findall_index('[0-9]{4}',0)) %}
+          {% set mt=(str|regex_findall_index('[a-zA-Z]{3}',0)) %}
+          {% set m=alias.get(mt) %}
+          {% set d=(str|regex_findall_index('[0-9]{1,2}',0)) %}
+          {% set date=Y + '-' + m + '-' + d %}
+          {{ 365 - (( as_timestamp(now()) - as_timestamp(strptime(date, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}
+
+      - name: sm ssl cert expiry
+        unit_of_measurement: Days
+        state: '{{ (states("sensor.sm_cert_sslmate")|as_datetime|as_local - now()).days }}'
+
+      - name: mqtt ssl cert expiry
+        unit_of_measurement: Days
+        state: >
+          {% set alias={"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"} %}
+          {% set str=states('sensor.mqtt_ssl_cert_issued') %}
+          {% set Y=(str|regex_findall_index('[0-9]{4}')).replace('','') %}
+          {% set mt=(str|regex_findall_index('[a-zA-Z]{3}')).replace('','') %}
+          {% set m=alias.get(mt) %}
+          {% set d=(str|regex_findall_index('[0-9]{1,2}')).replace('','') %}
+          {% set date=Y + '-' + m + '-' + d %}
+          {{ 10950 - (( as_timestamp(now()) - as_timestamp(strptime(date, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

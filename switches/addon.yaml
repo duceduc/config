@@ -25,116 +25,116 @@
 #                                                                                                    
 ####################################################
 
-  - platform: template
-    switches:
-      sambabackup:
-        value_template: "{{ is_state('binary_sensor.samba_backup_running', 'on') }}"
-        unique_id: sambabackup
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: 15d21743_samba_backup
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: 15d21743_samba_backup
+#  - platform: template
+#    switches:
+#      sambabackup:
+#        value_template: "{{ is_state('binary_sensor.samba_backup_running', 'on') }}"
+#        unique_id: sambabackup
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: 15d21743_samba_backup
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: 15d21743_samba_backup
 
-      portainer: ###
-        value_template: "{{ is_state('binary_sensor.portainer_running', 'on') }}"
-        unique_id: portainer
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: db21ed7f_portainer
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: db21ed7f_portainer
+#      portainer: ###
+#        value_template: "{{ is_state('binary_sensor.portainer_running', 'on') }}"
+#        unique_id: portainer
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: db21ed7f_portainer
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: db21ed7f_portainer
 
-      mosquitto:
-        value_template: "{{ is_state('binary_sensor.mosquitto_broker_running', 'on') }}"
-        unique_id: mosquitto
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: core_mosquitto
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: core_mosquitto
+#      mosquitto:
+#        value_template: "{{ is_state('binary_sensor.mosquitto_broker_running', 'on') }}"
+#        unique_id: mosquitto
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: core_mosquitto
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: core_mosquitto
 
-      zigbee2mqtt: ####
-        value_template: "{{ is_state('binary_sensor.zigbee2mqtt_running', 'on') }}"
-        unique_id: zigbee2mqtt
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: 45df7312_zigbee2mqtt
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: 45df7312_zigbee2mqtt
+#      zigbee2mqtt: ####
+#        value_template: "{{ is_state('binary_sensor.zigbee2mqtt_running', 'on') }}"
+#        unique_id: zigbee2mqtt
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: 45df7312_zigbee2mqtt
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: 45df7312_zigbee2mqtt
 
-      samba:
-        value_template: "{{ is_state('binary_sensor.samba_share_running', 'on') }}"
-        unique_id: samba
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: core_samba
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: core_samba
+#      samba:
+#        value_template: "{{ is_state('binary_sensor.samba_share_running', 'on') }}"
+#        unique_id: samba
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: core_samba
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: core_samba
 
-      sambanas:
-        value_template: "{{ is_state('binary_sensor.samba_nas_running', 'on') }}"
-        unique_id: sambanas
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: 1a32f091_sambanas
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: 1a32f091_sambanas
+#      sambanas:
+#        value_template: "{{ is_state('binary_sensor.samba_nas_running', 'on') }}"
+#        unique_id: sambanas
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: 1a32f091_sambanas
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: 1a32f091_sambanas
 
-      ssh:
-        value_template: "{{ is_state('binary_sensor.ssh_web_terminal_running', 'on') }}"
-        unique_id: ssh
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: a0d7b954_ssh
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: a0d7b954_ssh
+#      ssh:
+#        value_template: "{{ is_state('binary_sensor.ssh_web_terminal_running', 'on') }}"
+#        unique_id: ssh
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: a0d7b954_ssh
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: a0d7b954_ssh
 
-      appdaemon: ####
-        value_template: "{{ is_state('binary_sensor.appdaemon_4_running', 'on') }}"
-        unique_id: appdaemon
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: a0d7b954_appdaemon
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: a0d7b954_appdaemon
+#      appdaemon: ####
+#        value_template: "{{ is_state('binary_sensor.appdaemon_4_running', 'on') }}"
+#        unique_id: appdaemon
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: a0d7b954_appdaemon
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: a0d7b954_appdaemon
 
-      esphome:
-        value_template: "{{ is_state('binary_sensor.esphome_running', 'on') }}"
-        unique_id: esphome
-        turn_on:
-          - service: hassio.addon_start
-            data:
-              addon: 5c53de3b_esphome
-        turn_off:
-          - service: hassio.addon_stop
-            data:
-              addon: 5c53de3b_esphome
-
+#      esphome:
+#        value_template: "{{ is_state('binary_sensor.esphome_running', 'on') }}"
+#        unique_id: esphome
+#        turn_on:
+#          - service: hassio.addon_start
+#            data:
+#              addon: 5c53de3b_esphome
+#        turn_off:
+#          - service: hassio.addon_stop
+#            data:
+#              addon: 5c53de3b_esphome
+#
 
 ####################################################
 #                                                                                                    

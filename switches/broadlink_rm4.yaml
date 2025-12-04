@@ -168,44 +168,45 @@
 
 
 ####################################################
-#                                                                                                    #
-#                    Convert to Switch                                                        #
-#                                                                                                    #
+#                                                                                                    
+#                    Convert to Switch                                                        
+#                                                                                                    
 ####################################################
 
+#   migrated to templates not working
+#  - platform: template
+#    switches:
+#     ceiling_fan_light:
+#       friendly_name: 'Ceiling Fan Light'
+#       value_template: "{{ states('input_boolean.ceiling_fan_lights') }}"
+#       turn_on:
+#         - service: script.dining_lights_mode_on
+#           data:
+#             entity: remote.rm4_remote
+#             device: Ceiling Fan           
+#       turn_off:
+#         - service: script.dining_lights_mode_off
+#           data:
+#             entity: remote.rm4_remote
+#             device: Ceiling Fan         
+#       icon_template: >-
+#         {% if is_state('input_boolean.ceiling_fan_lights', 'on') %}
+#            mdi:lightbulb-on
+#         {% else %}
+#            mdi:lightbulb
+#         {% endif %}
 
-  - platform: template
-    switches:
-     ceiling_fan_light:
-       friendly_name: 'Ceiling Fan Light'
-       value_template: "{{ states('input_boolean.ceiling_fan_lights') }}"
-       turn_on:
-         - service: script.dining_lights_mode_on
-           data:
-             entity: remote.rm4_remote
-             device: Ceiling Fan           
-       turn_off:
-         - service: script.dining_lights_mode_off
-           data:
-             entity: remote.rm4_remote
-             device: Ceiling Fan         
-       icon_template: >-
-         {% if is_state('input_boolean.ceiling_fan_lights', 'on') %}
-            mdi:lightbulb-on
-         {% else %}
-            mdi:lightbulb
-         {% endif %}
 
-# CAN DELETE USING FAN INTEGRATION. not use, but must leave or error in log.
-  - platform: template
-    switches:
-     ceiling_fan_summer:
-       friendly_name: 'Ceiling Fan Summer'
-       turn_on:
-         - service: script.toggle_cool_fan
-       turn_off:
-         - service: script.turn_off_all_fans
 
+## CAN DELETE USING FAN INTEGRATION. not use, but must leave or error in log.
+#  - platform: template
+#    switches:
+#     ceiling_fan_summer:
+#       friendly_name: 'Ceiling Fan Summer'
+#       turn_on:
+#         - service: script.toggle_cool_fan
+#       turn_off:
+#         - service: script.turn_off_all_fans
 
 
 

@@ -82,15 +82,10 @@ input_boolean:
 #            false
 #          {% endif %}
 
-
-
-
 mqtt:
   sensor:
     - name: "Room Presence"
       state_topic: "house/alerts/presence/current_room"
-
-
 
 
 ## NEW FORMAT 

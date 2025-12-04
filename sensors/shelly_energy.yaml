@@ -24,6 +24,16 @@
     scan_interval: 300
     unit_of_measurement: kWh
 
+  - platform: statistics
+    name: 'Power Stats'
+    entity_id: sensor.total_power
+    sampling_size: 10000
+    state_characteristic : mean
+    max_age:
+      hours: 24
+    precision: 1
+
+
 #  - platform: mqtt
 #    name: "Tariff 31 Power"
 #    state_topic: "shellies/shellyem-06209A/emeter/0/power"
@@ -48,109 +58,106 @@
 #    icon: mdi:flash
 
 
-  - platform: statistics
-    name: 'Power Stats'
-    entity_id: sensor.total_power
-    sampling_size: 10000
-    state_characteristic : mean
-    max_age:
-      hours: 24
-    precision: 1
 
-  - platform: template
-    sensors:
-      energy_t31_light_and_power_total:
-        friendly_name: 'Light and Power Total'
-        value_template: "{{ (states('sensor.energy_t31_light_and_power_day')|float + states('sensor.energy_t31_light_and_power_night')|float)|round(3) }}"
-        unit_of_measurement: "kWh"
 
-  - platform: template
-    sensors:
-      energy_t41_heating_total:
-        friendly_name: 'Heating and Hot Water Total'
-        value_template: "{{ (states('sensor.energy_t41_heating_day')|float + states('sensor.energy_t41_heating_night')|float)|round(3) }}"
-        unit_of_measurement: "kWh"
+#  - platform: template
+#    sensors:
+#      energy_t31_light_and_power_total:
+#        friendly_name: 'Light and Power Total'
+#        value_template: "{{ (states('sensor.energy_t31_light_and_power_day')|float + states('sensor.energy_t31_light_and_power_night')|float)|round(3) }}"
+#        unit_of_measurement: "kWh"
 
-  - platform: template
-    sensors:
-      total_energy_day:
-        friendly_name: 'Total Energy Day'
-        value_template: "{{ (states('sensor.energy_t31_light_and_power_day')|float + states('sensor.energy_t41_heating_day')|float)|round(3) }}"
-        unit_of_measurement: "kWh"
+#  - platform: template
+#    sensors:
+#      energy_t41_heating_total:
+#        friendly_name: 'Heating and Hot Water Total'
+#        value_template: "{{ (states('sensor.energy_t41_heating_day')|float + states('sensor.energy_t41_heating_night')|float)|round(3) }}"
+#        unit_of_measurement: "kWh"
 
-  - platform: template
-    sensors:
-      total_energy_night:
-        friendly_name: 'Total Energy Night'
-        value_template: "{{ (states('sensor.energy_t31_light_and_power_night')|float + states('sensor.energy_t41_heating_night')|float)|round(3) }}"
-        unit_of_measurement: "kWh"
+#  - platform: template
+#    sensors:
+#      total_energy_day:
+#        friendly_name: 'Total Energy Day'
+#        value_template: "{{ (states('sensor.energy_t31_light_and_power_day')|float + states('sensor.energy_t41_heating_day')|float)|round(3) }}"
+#        unit_of_measurement: "kWh"
 
-  - platform: template
-    sensors:
-      total_energy:
-        friendly_name: 'Total Energy Used Today'
-        value_template: "{{ (states('sensor.total_energy_day')|float + states('sensor.total_energy_night')|float)|round(3) }}"
-        unit_of_measurement: "kWh"
+#  - platform: template
+#    sensors:
+#      total_energy_night:
+#        friendly_name: 'Total Energy Night'
+#        value_template: "{{ (states('sensor.energy_t31_light_and_power_night')|float + states('sensor.energy_t41_heating_night')|float)|round(3) }}"
+#        unit_of_measurement: "kWh"
 
-  - platform: template
-    sensors:
-      total_power:
-        friendly_name: 'Total Power'
-        value_template: "{{ (states('sensor.tariff_31_power')|float(0) + states('sensor.tariff_41_power')|float(0))|round(1) }}"
-        unit_of_measurement: "W"
+#  - platform: template
+#    sensors:
+#      total_energy:
+#        friendly_name: 'Total Energy Used Today'
+#        value_template: "{{ (states('sensor.total_energy_day')|float + states('sensor.total_energy_night')|float)|round(3) }}"
+#        unit_of_measurement: "kWh"
+#
+#  - platform: template
+#    sensors:
+#      total_power:
+#        friendly_name: 'Total Power'
+#        value_template: "{{ (states('sensor.tariff_31_power')|float(0) + states('sensor.tariff_41_power')|float(0))|round(1) }}"
+#        unit_of_measurement: "W"
 
-  - platform: template
-    sensors:
-      t31_amperage:
-        friendly_name: 'T31 Current Amperage'
-        value_template: >
-          {% if states('sensor.mains_voltage')|float(0) > 0 %}
-            {{ (states('sensor.tariff_31_power')|float(0) / states('sensor.mains_voltage')|float(0))|round(1) }}
-          {% else %}
-            unknown
-          {% endif %}
-        unit_of_measurement: "A"
+#  - platform: template
+#    sensors:
+#      t31_amperage:
+#        friendly_name: 'T31 Current Amperage'
+#        value_template: >
+#          {% if states('sensor.mains_voltage')|float(0) > 0 %}
+#            {{ (states('sensor.tariff_31_power')|float(0) / states('sensor.mains_voltage')|float(0))|round(1) }}
+#          {% else %}
+#            unknown
+#          {% endif %}
+#        unit_of_measurement: "A"
 
-  - platform: template
-    sensors:
-      t31_cost_today:
-        friendly_name: 'T31 Cost Today'
-        value_template: >-
-          {% if states('sensor.energy_t31_light_and_power_monthly')| int <= 120 %}
-             {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_1_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
-          {% elif states('sensor.energy_t31_light_and_power_monthly')| int <= 300 %}
-            {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_2_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
-          {% else %}
-            {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_3_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
-          {% endif %}
-        unit_of_measurement: "¥"
+#  - platform: template
+#    sensors:
+#      t31_cost_today:
+#        friendly_name: 'T31 Cost Today'
+#        value_template: >-
+#          {% if states('sensor.energy_t31_light_and_power_monthly')| int <= 120 %}
+#             {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_1_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
+#          {% elif states('sensor.energy_t31_light_and_power_monthly')| int <= 300 %}
+#            {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_2_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
+#          {% else %}
+#            {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_3_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
+#          {% endif %}
+#        unit_of_measurement: "¥"
 
-  - platform: template
-    sensors:
-      t41_cost_today:
-        friendly_name: 'T41 Cost Today'
-        value_template: "{{ (states('sensor.energy_t41_heating_total')|float * states('input_number.t41_energy_cost')|float + states('input_number.t41_daily_cost')|float)|round(2) }}"
-        unit_of_measurement: "¥"
+#  - platform: template
+#    sensors:
+#      t41_cost_today:
+#        friendly_name: 'T41 Cost Today'
+#        value_template: "{{ (states('sensor.energy_t41_heating_total')|float * states('input_number.t41_energy_cost')|float + states('input_number.t41_daily_cost')|float)|round(2) }}"
+#        unit_of_measurement: "¥"
 
-  - platform: template
-    sensors:
-      total_cost_today:
-        friendly_name: 'Total Cost Today'
-        value_template: "{{ ( states('sensor.t31_cost_today')|float + states('sensor.t41_cost_today')|float )|round(2) }}"
-        unit_of_measurement: "¥"
+#  - platform: template
+#    sensors:
+#      total_cost_today:
+#        friendly_name: 'Total Cost Today'
+#        value_template: "{{ ( states('sensor.t31_cost_today')|float + states('sensor.t41_cost_today')|float )|round(2) }}"
+#        unit_of_measurement: "¥"
 
-  - platform: template
-    sensors:
-      cumulative_energy_cost:
-        friendly_name: 'Cumulative Energy Cost' #### for Lovelace display only. Calculations use the input_number.
-        value_template: "{{ states('input_number.cumulative_energy_cost')|float|round(2) }}"
-        unit_of_measurement: "¥"
+#  - platform: template
+#    sensors:
+#      cumulative_energy_cost:
+#        friendly_name: 'Cumulative Energy Cost' #### for Lovelace display only. Calculations use the input_number.
+#        value_template: "{{ states('input_number.cumulative_energy_cost')|float|round(2) }}"
+#        unit_of_measurement: "¥"
 
-  - platform: template
-    sensors:
-      last_reset:
-        friendly_name: 'Last Reset' # Date the cumulative total cost was reset.
-        value_template: "{{ states('input_datetime.last_reset') }}"
+#  - platform: template
+#    sensors:
+#      last_reset:
+#        friendly_name: 'Last Reset' # Date the cumulative total cost was reset.
+#        value_template: "{{ states('input_datetime.last_reset') }}"
+
+
+
+
 
 
 ####################################################

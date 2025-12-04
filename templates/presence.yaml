@@ -1,0 +1,92 @@
+####################################################
+#                                                                                                    
+#            Number of People Home                                                         
+#                                                                                                    
+####################################################
+
+
+  - sensor:
+      - name: n people home
+        state: >
+          {{ expand('group.family_presence')|selectattr('state','equalto','on')|list|length +
+            (1 if is_state('input_boolean.guest_mode','on') else 0) }}
+        icon: >
+         {% if is_state("sensor.n_people_home", "0") %} mdi:account-off
+         {% elif is_state("sensor.n_people_home", "1") %} mdi:account
+         {% elif is_state("sensor.n_people_home", "2") %} mdi:account-multiple
+         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group         
+         {% else %} mdi:account-plus {% endif %}
+
+      - name: Guest Mode
+        state: >
+          {% if is_state("input_boolean.guest_mode", "off") %}No{% else %}Yes{% endif %}
+        icon: >
+          {% if is_state("input_boolean.guest_mode", "off") %}mdi:account-off{% else %}mdi:account-plus{% endif %}
+
+      - name: duc location
+        state: >
+          {% set person = states('person.duc') %}
+          {% if person in ['iida','tobu','matsumoto'] %}
+            grocery store
+          {% elif person in ['ario','aeon','lalaport'] %}
+            mall            
+          {% elif person in ['mcdonalds','kfc','mos'] %}
+            lunch takeout
+          {% elif person in ['parents','yuri'] %}
+            relatives
+          {% else %}
+            {% if person in ['not_home'] %}
+              away
+            {% else %}
+              {{ states('person.duc') }}
+            {%- endif %}
+          {%- endif %}
+
+      - name: eri location
+        state: >
+          {% set person = states('person.eri') %}
+          {% if person in ['iida','tobu','matsumoto'] %}
+            grocery store
+          {% elif person in ['ario','aeon','lalaport'] %}
+            mall            
+          {% elif person in ['mcdonalds','kfc','mos'] %}
+            lunch takeout
+          {% elif person in ['parents','yuri'] %}
+            relatives
+          {% else %}
+            {% if person in ['not_home'] %}
+              away
+            {% else %}
+              {{ states('person.eri') }}
+            {%- endif %}
+          {%- endif %}
+
+      - name: shion location
+        state: >
+          {% set person = states('person.shion') %}
+          {% if person in ['iida','tobu','matsumoto'] %}
+            grocery store
+          {% elif person in ['ario','aeon','lalaport'] %}
+            mall            
+          {% elif person in ['mcdonalds','kfc','mos'] %}
+            lunch takeout
+          {% elif person in ['parents','yuri'] %}
+            relatives
+          {% else %}
+            {% if person in ['not_home'] %}
+              away
+            {% else %}
+              {{ states('person.shion') }}
+            {%- endif %}
+          {%- endif %}
+
+
+
+
+
+
+####################################################
+#                                                                                                    
+#            END OF CONFIGURATION FILE                                                 
+#                                                                                                    
+####################################################

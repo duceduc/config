@@ -43,7 +43,6 @@
           {{ expand('group.echos') | selectattr('attributes.last_called','eq',True) | first is defined }}
 
 
-  - sensor:
       - name: Christmas Countdown
         unique_id: 2735664c-1798-4ec7-a421-a87208f75ee8
         unit_of_measurement: Days
@@ -58,10 +57,14 @@
 
       - name: Line Dry Time
         unique_id: line_dry_time
-        unit_of_measurement: Mins
+#        unit_of_measurement: Mins
         state: >
           {% set weather_entity = 'weather.my_weather' %}
-          {% set sunshine_percent = 1-(states.sensor.lr_radar_illuminance.state | float) %}
+          {% if states('sensor.lr_radar_illuminance') | float(0) <= 0.80 %}
+            {% set sunshine_percent = 1-(states.sensor.lr_radar_illuminance.state | float) %}
+          {% else %}
+            {% set sunshine_percent = 1-( 0.73 | float) %}
+          {% endif %}
           {% set temp = (state_attr(weather_entity, 'temperature') | int)+273 %}
           {% set wind = (state_attr(weather_entity, 'wind_speed') | float)/2.237 %}
           {% set humidity = state_attr(weather_entity, 'humidity') | float/100 %}
@@ -74,6 +77,83 @@
           {% set d = (1-humidity)*ea %}
           {% set e = (delta*rn+y*(6.43*(1+0.536*wind)*d))/(lamda*(delta+y)) %}
           {{((0.2/(e))*1440)|round(2)}}
+
+
+
+      - name: wakeup alarm time
+        state: '{% if states.input_number.wakeup_hour.state|length == 3 %}0{% endif %}{{ states.input_number.wakeup_hour.state | int }}:{% if states.input_number.wakeup_minutes.state|length == 3 %}0{% endif %}{{ states.input_number.wakeup_minutes.state | int }}'
+
+      - name: wakeup start time lights
+        state: >
+          {% if states.sensor.wakeup_alarm_time and states.input_number.wakeup_duration %}
+          {% set alarmtime = states.sensor.wakeup_alarm_time.state %}
+          {% set alarm_hour = alarmtime.split(":")[0] | int %}
+          {% set alarm_min = alarmtime.split(":")[1] | int %}
+          {% set light_dur = states.input_number.wakeup_duration.state | int %}
+          {% set alarm_min_light = alarm_min - light_dur %}
+          {% if alarm_min_light  < 0 %}
+          {% set alarm_min_light = alarm_min_light + 60 %}
+          {% set alarm_hour_light = alarm_hour - 1 %}
+          {% if alarm_hour_light < 0 %}{% set alarm_hour_light = 23 %}{% endif %}
+          {% if alarm_hour_light < 10 %}0{% endif %}{{ alarm_hour_light}}:{% if alarm_min_light < 10 %}0{% endif %}{{ alarm_min_light }}
+          {% else %}
+          {% if alarm_hour < 10 %}0{% endif %}{{ alarm_hour }}:{% if alarm_min_light < 10 %}0{% endif %}{{ alarm_min_light }}
+          {% endif %}
+          {% endif %}
+
+      - name: wakeup fadein duration
+        unit_of_measurement: "min"
+        state: '{{ states.input_number.wakeup_duration.state | int }}'
+
+      - name: wakeup map
+        state: >
+          {% set mapper =
+            { 'Shion Room':'light.shion',
+              'Computer Room':'light.computer',
+              'Master Room':'light.master',
+              'Living Room':'light.living',
+              'Kitchen':'light.kitchen',
+              'Hallway':'light.hallway' } %}
+          {% set state = states('input_select.wakeup_select') %}
+          {% set id = mapper[state] if state in mapper %}
+          {{ id }}
+
+      - name: sensor count
+        state: '{{ states.sensor | count }}'
+
+      - name: automation count
+        state: '{{ states.automation | count }}'
+
+      - name: script count
+        state: '{{ states.script | count }}'
+
+      - name: switch count
+        state: '{{ states.switch | count }}'
+
+      - name: binar sensor count
+        state: '{{ states.binary_sensor | count }}'
+
+      - name: light count
+        state: '{{ states.light | count }}' 
+
+      - name: tracker count
+        state: '{{ states.device_tracker | count }}'
+
+      - name: nextsunrise
+        state: >
+          {{ as_timestamp(states.sun.sun.attributes.next_rising) | timestamp_custom(' %I:%M%p') | replace(" 0", "") }}
+
+      - name: nextsunset
+        state: >
+          {{ as_timestamp(states.sun.sun.attributes.next_setting) | timestamp_custom(' %I:%M%p') | replace(" 0", "") }}
+
+      - name: hoursdaylight
+        state: "{% set nr = as_timestamp(state_attr('sun.sun','next_rising')) %} {% set ns = as_timestamp(state_attr('sun.sun','next_setting')) %} {% if nr > ns %} {% set nr = nr - 60*60*24 %} {% endif %} {{ (ns - nr)|timestamp_custom('%H:%M',false) }}"
+
+
+
+
+
 
 
 #########################################################
@@ -97,6 +177,7 @@
           {{ trigger.event.data.action }} -
           {{ trigger.event.data.side }} frm
           {{ trigger.event.data.last_side }}
+
 
 
 #########################################################

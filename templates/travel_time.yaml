@@ -1,0 +1,44 @@
+
+
+  - sensor:
+      - name: duc destination waze
+        state: >
+          {%- if is_state("input_select.duc_destination_waze", "home") -%}
+            35.81842918238185, 139.70377984736893
+          {%- elif is_state("input_select.duc_destination_waze", "school") -%}
+            35.81214930237013, 139.71171706362946
+          {%- elif is_state("input_select.duc_destination_waze", "jcb") -%}
+            35.70841730186669, 139.89219249812402
+          {%- elif is_state("input_select.duc_destination_waze", "others") -%}
+            34.099464909521245, -118.29027264732748
+          {%- else -%}
+            Unknown
+          {%- endif %}
+
+      - name: eri destination waze
+        state: >
+          {%- if is_state("input_select.eri_destination_waze", "home") -%}
+            35.81842918238185, 139.70377984736893
+          {%- elif is_state("input_select.eri_destination_waze", "school") -%}
+            35.81214930237013, 139.71171706362946              
+          {%- elif is_state("input_select.eri_destination_waze", "costcokawa") -%}
+            35.52270052783271, 139.7320772738939
+          {%- elif is_state("input_select.eri_destination_waze", "costcokisa") -%}
+            35.42783812409385, 139.91527104035856
+          {%- elif is_state("input_select.eri_destination_waze", "others") -%}
+            34.099464909521245, -118.29027264732748
+          {%- else -%}
+            Unknown
+          {%- endif %}
+
+      - name: shion destination waze
+        state: >
+          {%- if is_state("input_select.shion_destination_waze", "home") -%}
+            35.81842918238185, 139.70377984736893
+          {%- elif is_state("input_select.shion_destination_waze", "school") -%}
+            35.81214930237013, 139.71171706362946
+          {%- elif is_state("input_select.shion_destination_waze", "others") -%}
+            35.455399803928515, 139.63117593861773           
+          {%- else -%}
+            Unknown
+          {%- endif %}

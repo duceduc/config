@@ -209,6 +209,12 @@ sensor:
         value_template: >
           {{ state_attr('weather.my_weather', 'wind_speed') }}
 
+
+
+
+
+
+
   - platform: average
     name: "average_house_temperature"
 #    start: '{{ 0 }}'
@@ -367,7 +373,6 @@ template:
         # If you have issues with the history sensor doubling after restarting HA, add the line below (@BigG)
         #availability: "{{ (states('sensor.rainsensor_flips') not in ('unknown', 'unavailable')) }}"
 
-  - sensor:
       - name: "Rain intensity"
         unit_of_measurement: 'mm/h'
         state_class: measurement

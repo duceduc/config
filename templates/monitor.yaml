@@ -1,35 +1,5 @@
 ####################################################
 #                                                                                                    
-#                      BATTERY MONITOR                                                     
-#                                                                                                    
-####################################################
-
-# replace with critical battery area method
-#  - sensor:
-#      - name: Devices with low battery
-#        unique_id: 7ff69423-5bab-47bc-b2e5-67f5eff57829
-#        unit_of_measurement: devices
-#        state: >-
-#          {% set ignore_entities = ['sensor.ie_watch_battery','sensor.id_watch_battery','sensor.hdmi_selector_battery','sensor.cr_curtain_lt_battery','sensor.lr_curtain_rt_battery','sensor.cr_curtain_rt_battery','sensor.id_battery_level','sensor.ie_battery_level', 'sensor.devices_with_low_battery'] %}
-#          {{ states.sensor
-#            | selectattr('attributes.device_class', 'defined')
-#            | selectattr('attributes.device_class', 'eq', 'battery')
-#            | rejectattr('entity_id', 'in', ignore_entities)
-#            | map(attribute='state')
-#            | reject('in', ['unknown', 'unavailable'])
-#            | map('int', -1) | select('le', 46)
-#            |select('ge', 0)
-#            | list | count
-#          }}
-#        icon: >-
-#          {% if is_state('sensor.devices_with_low_battery', '0') %}
-#            mdi:check-circle
-#          {% else %}
-#            mdi:battery-alert
-#          {% endif %}
-
-####################################################
-#                                                                                                    
 #                      SERVER MONITOR                                                     
 #                                                                                                    
 ####################################################
@@ -51,6 +21,23 @@
             mdi:server-network
           {% else %}
             mdi:server-network-off
+          {% endif %}
+
+
+
+####################################################
+#                                                                                                    
+#                      SYSTEM MONITOR                                                      
+#                                                                                                    
+####################################################
+
+      - name: desktop 3l5pa48 storage c gb
+        unit_of_measurement: 'GB'
+        state: >
+          {% if state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')| int(0) < 1024 %}
+            {{state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB') }}
+          {% else %}
+            {{ '%.1f'|format(state_attr('sensor.desktop_3l5pa48_storage_c', 'UsedSpaceMB')|float / 1024) }}
           {% endif %}
 
 

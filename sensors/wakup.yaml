@@ -4,49 +4,49 @@
 #                                                                                                    
 ####################################################
 
-  - platform: template
-    sensors:
-      wakeup_alarm_time:
-        friendly_name: 'Alarm time'
-        value_template: '{% if states.input_number.wakeup_hour.state|length == 3 %}0{% endif %}{{ states.input_number.wakeup_hour.state | int }}:{% if states.input_number.wakeup_minutes.state|length == 3 %}0{% endif %}{{ states.input_number.wakeup_minutes.state | int }}'
+#  - platform: template
+#    sensors:
+#      wakeup_alarm_time:
+#        friendly_name: 'Alarm time'
+#        value_template: '{% if states.input_number.wakeup_hour.state|length == 3 %}0{% endif %}{{ states.input_number.wakeup_hour.state | int }}:{% if states.input_number.wakeup_minutes.state|length == 3 %}0{% endif %}{{ states.input_number.wakeup_minutes.state | int }}'
 
-      wakeup_start_time_lights:
-        friendly_name: 'Fade-in start time'
-        value_template: >
-          {% if states.sensor.wakeup_alarm_time and states.input_number.wakeup_duration %}
-          {% set alarmtime = states.sensor.wakeup_alarm_time.state %}
-          {% set alarm_hour = alarmtime.split(":")[0] | int %}
-          {% set alarm_min = alarmtime.split(":")[1] | int %}
-          {% set light_dur = states.input_number.wakeup_duration.state | int %}
-          {% set alarm_min_light = alarm_min - light_dur %}
-          {% if alarm_min_light  < 0 %}
-          {% set alarm_min_light = alarm_min_light + 60 %}
-          {% set alarm_hour_light = alarm_hour - 1 %}
-          {% if alarm_hour_light < 0 %}{% set alarm_hour_light = 23 %}{% endif %}
-          {% if alarm_hour_light < 10 %}0{% endif %}{{ alarm_hour_light}}:{% if alarm_min_light < 10 %}0{% endif %}{{ alarm_min_light }}
-          {% else %}
-          {% if alarm_hour < 10 %}0{% endif %}{{ alarm_hour }}:{% if alarm_min_light < 10 %}0{% endif %}{{ alarm_min_light }}
-          {% endif %}
-          {% endif %}
-
-      wakeup_fadein_duration:
-        friendly_name: 'Fade-in duration'
-        value_template: '{{ states.input_number.wakeup_duration.state | int }}'
-        unit_of_measurement: 'min'
+#      wakeup_start_time_lights:
+#        friendly_name: 'Fade-in start time'
+#        value_template: >
+#          {% if states.sensor.wakeup_alarm_time and states.input_number.wakeup_duration %}
+#          {% set alarmtime = states.sensor.wakeup_alarm_time.state %}
+#          {% set alarm_hour = alarmtime.split(":")[0] | int %}
+#          {% set alarm_min = alarmtime.split(":")[1] | int %}
+#          {% set light_dur = states.input_number.wakeup_duration.state | int %}
+#          {% set alarm_min_light = alarm_min - light_dur %}
+#          {% if alarm_min_light  < 0 %}
+#          {% set alarm_min_light = alarm_min_light + 60 %}
+#          {% set alarm_hour_light = alarm_hour - 1 %}
+#          {% if alarm_hour_light < 0 %}{% set alarm_hour_light = 23 %}{% endif %}
+#          {% if alarm_hour_light < 10 %}0{% endif %}{{ alarm_hour_light}}:{% if alarm_min_light < 10 %}0{% endif %}{{ alarm_min_light }}
+#          {% else %}
+#          {% if alarm_hour < 10 %}0{% endif %}{{ alarm_hour }}:{% if alarm_min_light < 10 %}0{% endif %}{{ alarm_min_light }}
+#          {% endif %}
+#          {% endif %}
+#
+#      wakeup_fadein_duration:
+#        friendly_name: 'Fade-in duration'
+#        value_template: '{{ states.input_number.wakeup_duration.state | int }}'
+#        unit_of_measurement: 'min'
 
 # https://community.home-assistant.io/t/map-values-for-an-input-select/94354/5
-      wakeup_map:
-        value_template: >
-          {% set mapper =
-            { 'Shion Room':'light.shion',
-              'Computer Room':'light.computer',
-              'Master Room':'light.master',
-              'Living Room':'light.living',
-              'Kitchen':'light.kitchen',
-              'Hallway':'light.hallway' } %}
-          {% set state = states('input_select.wakeup_select') %}
-          {% set id = mapper[state] if state in mapper %}
-          {{ id }}
+#      wakeup_map:
+#        value_template: >
+#          {% set mapper =
+#            { 'Shion Room':'light.shion',
+#              'Computer Room':'light.computer',
+#              'Master Room':'light.master',
+#              'Living Room':'light.living',
+#              'Kitchen':'light.kitchen',
+#              'Hallway':'light.hallway' } %}
+#          {% set state = states('input_select.wakeup_select') %}
+#          {% set id = mapper[state] if state in mapper %}
+#          {{ id }}
 
 
 ####################################################

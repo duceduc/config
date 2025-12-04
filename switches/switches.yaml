@@ -57,51 +57,52 @@
 ####################################################
 
 # Christmas Light Switch
-  - platform: template
-    switches:
-     christmas_lights:
-       friendly_name: 'Christmas Lights'
-       value_template: "{{ is_state('input_boolean.christmas_lights', 'on') }}"
-       turn_on:
-         - service: switch.turn_on
-           entity_id: group.christmas_lights
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.christmas_lights
-       turn_off:
-         - service: switch.turn_off
-           entity_id: group.christmas_lights
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.christmas_lights
-       icon_template: >-
-         {% if is_state('group.christmas_lights', 'on') %}
-            mdi:string-lights
-         {% else %}
-            mdi:string-lights-off
-         {% endif %}
+#  - platform: template
+#    switches:
+#     christmas_lights:
+#       friendly_name: 'Christmas Lights'
+#       value_template: "{{ is_state('input_boolean.christmas_lights', 'on') }}"
+#       turn_on:
+#         - service: switch.turn_on
+#           entity_id: group.christmas_lights
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.christmas_lights
+#       turn_off:
+#         - service: switch.turn_off
+#           entity_id: group.christmas_lights
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.christmas_lights
+#       icon_template: >-
+#         {% if is_state('group.christmas_lights', 'on') %}
+#            mdi:string-lights
+#         {% else %}
+#            mdi:string-lights-off
+#         {% endif %}
 
 
 # Ser8 Mini Switch
-  - platform: template
-    switches:
-     ser8_mini:
-       friendly_name: 'Ser8 Mini' # desktop-g8i0hbj.local 
-       value_template: "{{ states('switch.ser8') }}"
-       turn_on:
-         - service: switch.turn_on
-           entity_id: switch.ser8
-         - service: switch.turn_on
-           entity_id: switch.hdmi_selector
-       turn_off:
-         - service: switch.turn_off
-           entity_id: switch.ser8
-         - service: switch.turn_off
-           entity_id: switch.hdmi_selector
-       icon_template: >-
-         {% if is_state('switch.ser8', 'on') %}
-            mdi:monitor-dashboard
-         {% else %}
-            mdi:monitor-off
-         {% endif %}
+#  - platform: template
+#    switches:
+#     ser8_mini:
+#       friendly_name: 'Ser8 Mini' # desktop-g8i0hbj.local 
+#       value_template: "{{ states('switch.ser8') }}"
+#       turn_on:
+#         - service: switch.turn_on
+#           entity_id: switch.ser8
+#         - service: switch.turn_on
+#           entity_id: switch.hdmi_selector
+#       turn_off:
+#         - service: switch.turn_off
+#           entity_id: switch.ser8
+#         - service: switch.turn_off
+#           entity_id: switch.hdmi_selector
+#       icon_template: >-
+#         {% if is_state('switch.ser8', 'on') %}
+#            mdi:monitor-dashboard
+#         {% else %}
+#            mdi:monitor-off
+#         {% endif %}
+
 
   - platform: wake_on_lan
     name: Ser8
@@ -125,166 +126,168 @@
 #
 #########################################################
 
-  - platform: template
-    switches:
-# Living Room Aircon
-     ac_lr_unit:
-       friendly_name: 'AC LR Unit'
-       value_template: "{{ states('input_boolean.ac_lr_unit') }}"
-       turn_on:
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.ac_lr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.lr_ac_mode
-           data:
-             option: Normal Cool
-       turn_off:
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.ac_lr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.lr_ac_mode
-           data:
-             option: 'Off'
-       icon_template: >-
-         {% if is_state('input_boolean.ac_lr_unit', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
+#  - platform: template
+#    switches:
+## Living Room Aircon
+#     ac_lr_unit:
+#       friendly_name: 'AC LR Unit'
+#       value_template: "{{ states('input_boolean.ac_lr_unit') }}"
+#       turn_on:
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.ac_lr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.lr_ac_mode
+#           data:
+#             option: Normal Cool
+#       turn_off:
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.ac_lr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.lr_ac_mode
+#           data:
+#             option: 'Off'
+#       icon_template: >-
+#         {% if is_state('input_boolean.ac_lr_unit', 'on') %}
+#            mdi:fan
+#         {% else %}
+#            mdi:fan-off
+#         {% endif %}
 
-     heater_lr_unit:
-       friendly_name: 'Heater LR Unit'
-       value_template: "{{ states('input_boolean.heater_lr_unit') }}"
-       turn_on:
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.heater_lr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.lr_ac_mode
-           data:
-             option: Normal Heat
-       turn_off:
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.heater_lr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.lr_ac_mode
-           data:
-             option: 'Off'
-       icon_template: >-
-         {% if is_state('input_boolean.heater_lr_unit', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
+#     heater_lr_unit:
+#       friendly_name: 'Heater LR Unit'
+#       value_template: "{{ states('input_boolean.heater_lr_unit') }}"
+#       turn_on:
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.heater_lr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.lr_ac_mode
+#           data:
+#             option: Normal Heat
+#       turn_off:
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.heater_lr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.lr_ac_mode
+#           data:
+#             option: 'Off'
+#       icon_template: >-
+#         {% if is_state('input_boolean.heater_lr_unit', 'on') %}
+#            mdi:fan
+#         {% else %}
+#            mdi:fan-off
+#         {% endif %}
+
 
 # Master Room Aircon
-     ac_mr_unit:
-       friendly_name: 'AC MR Unit'
-       value_template: "{{ states('input_boolean.ac_mr_unit') }}"
-       turn_on:
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.ac_mr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.mr_ac_mode
-           data:
-             option: Normal Cool
-       turn_off:
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.ac_mr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.mr_ac_mode
-           data:
-             option: 'Off'
-       icon_template: >-
-         {% if is_state('input_boolean.ac_mr_unit', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
+#     ac_mr_unit:
+#       friendly_name: 'AC MR Unit'
+#       value_template: "{{ states('input_boolean.ac_mr_unit') }}"
+#       turn_on:
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.ac_mr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.mr_ac_mode
+#           data:
+#             option: Normal Cool
+#       turn_off:
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.ac_mr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.mr_ac_mode
+#           data:
+#             option: 'Off'
+#       icon_template: >-
+#         {% if is_state('input_boolean.ac_mr_unit', 'on') %}
+#            mdi:fan
+#         {% else %}
+#            mdi:fan-off
+#         {% endif %}
 
-     heater_mr_unit:
-       friendly_name: 'Heater MR Unit'
-       value_template: "{{ states('input_boolean.heater_mr_unit') }}"
-       turn_on:
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.heater_mr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.mr_ac_mode
-           data:
-             option: Normal Heat
-       turn_off:
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.heater_mr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.mr_ac_mode
-           data:
-             option: 'Off'
-       icon_template: >-
-         {% if is_state('input_boolean.heater_mr_unit', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
+#     heater_mr_unit:
+#       friendly_name: 'Heater MR Unit'
+#       value_template: "{{ states('input_boolean.heater_mr_unit') }}"
+#       turn_on:
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.heater_mr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.mr_ac_mode
+#           data:
+#             option: Normal Heat
+#       turn_off:
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.heater_mr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.mr_ac_mode
+#           data:
+#             option: 'Off'
+#       icon_template: >-
+#         {% if is_state('input_boolean.heater_mr_unit', 'on') %}
+#            mdi:fan
+#         {% else %}
+#            mdi:fan-off
+#         {% endif %}
 
 # Shion Aircon
-     ac_sr_unit:
-       friendly_name: 'AC SR Unit'
-       value_template: "{{ states('input_boolean.ac_sr_unit') }}"
-       turn_on:
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.ac_sr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.sr_ac_mode
-           data:
-             option: Normal Cool
-       turn_off:
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.ac_sr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.sr_ac_mode
-           data:
-             option: 'Off'
-       icon_template: >-
-         {% if is_state('input_boolean.ac_sr_unit', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
+#     ac_sr_unit:
+#       friendly_name: 'AC SR Unit'
+#       value_template: "{{ states('input_boolean.ac_sr_unit') }}"
+#       turn_on:
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.ac_sr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.sr_ac_mode
+#           data:
+#             option: Normal Cool
+#       turn_off:
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.ac_sr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.sr_ac_mode
+#           data:
+#             option: 'Off'
+#       icon_template: >-
+#         {% if is_state('input_boolean.ac_sr_unit', 'on') %}
+#            mdi:fan
+#         {% else %}
+#            mdi:fan-off
+#         {% endif %}
 
-     heater_sr_unit:
-       friendly_name: 'Heater SR Unit'
-       value_template: "{{ states('input_boolean.heater_sr_unit') }}"
-       turn_on:
-         - service: input_boolean.turn_on
-           entity_id: input_boolean.heater_sr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.sr_ac_mode
-           data:
-             option: Normal Heat
-       turn_off:
-         - service: input_boolean.turn_off
-           entity_id: input_boolean.heater_sr_unit
-         - service: input_select.select_option
-           target:
-             entity_id: input_select.sr_ac_mode
-           data:
-             option: 'Off'
-       icon_template: >-
-         {% if is_state('input_boolean.heater_sr_unit', 'on') %}
-            mdi:fan
-         {% else %}
-            mdi:fan-off
-         {% endif %}
+#     heater_sr_unit:
+#       friendly_name: 'Heater SR Unit'
+#       value_template: "{{ states('input_boolean.heater_sr_unit') }}"
+#       turn_on:
+#         - service: input_boolean.turn_on
+#           entity_id: input_boolean.heater_sr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.sr_ac_mode
+#           data:
+#             option: Normal Heat
+#       turn_off:
+#         - service: input_boolean.turn_off
+#           entity_id: input_boolean.heater_sr_unit
+#         - service: input_select.select_option
+#           target:
+#             entity_id: input_select.sr_ac_mode
+#           data:
+#             option: 'Off'
+#       icon_template: >-
+#         {% if is_state('input_boolean.heater_sr_unit', 'on') %}
+#            mdi:fan
+#         {% else %}
+#            mdi:fan-off
+#         {% endif %}
+
 
 
 ####################################################

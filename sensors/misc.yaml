@@ -1,32 +1,3 @@
-####################################################
-#
-#            Amazon Polly Voice Speed
-#
-####################################################
-
-  - platform: template
-    sensors:
-      jarvis_voice_speed:
-        value_template: > # brain= fast or 115%
-          {% if is_state('input_select.jarvis_voice', 'Brian') %} 
-             fast
-          {% else %}
-             medium
-          {% endif %}
-
-
-####################################################
-#
-#            Last Alexa
-#
-####################################################
-
-#moved to template.yaml
-#  - platform: template
-#    sensors:
-#      last_alexa:
-#        value_template: >
-#          {{ expand('group.echos') | selectattr('attributes.last_called','eq',true) | map(attribute='entity_id') | first }}
 
 ####################################################
 #
@@ -37,151 +8,6 @@
   - platform: folder
     folder: '/media/music'
 
-####################################################
-#
-#            Icon Tpl
-#
-####################################################
-# Hallway
-  - platform: template
-    sensors:
-
-# PORTED OVER TO NEW TEMPLATE CODE
-#      security_genkan:
-#        value_template: >-
-#         {% if is_state("binary_sensor.motion_security_occupancy", "off") %}Off{% else %}On{% endif %}
-#        icon_template: >-
-#         {% if is_state("binary_sensor.motion_security_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
-
-      genkan:
-        value_template: >-
-         {% if is_state("binary_sensor.genkan_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.genkan_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-      hallway:
-        value_template: >-
-         {% if is_state("binary_sensor.hallway_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.hallway_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-      toilet:
-        value_template: >-
-         {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-# Kitchen
-      kitchen:
-        value_template: >-
-         {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
-        icon_template: >-
-         {% if is_state("group.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
-      storageroom:
-        value_template: >-
-         {% if is_state("binary_sensor.storage_door_contact", "off") %}Close{% else %}Open{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.storage_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
-      washroom:
-        value_template: >-
-         {% if is_state("group.motion_showerroom_occupancy", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("group.motion_showerroom_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-# Rooms
-      masterroom:
-        value_template: >-
-         {% if is_state("binary_sensor.mr_human_sensor_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.mr_human_sensor_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-      shionroom:
-        value_template: >-
-         {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
-      livingroom:
-        value_template: >-
-         {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
-         
-# binary_sensor.cr_has_moving_target        
-      computerroom:
-        value_template: >-
-         {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}Off{% else %}On{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
-      closet:
-        value_template: >-
-         {% if is_state("binary_sensor.master_clo_door_contact", "off") %}Close{% else %}Open{% endif %}
-        icon_template: >-
-         {% if is_state("binary_sensor.master_clo_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
-# Misc
-      sleeping:
-        value_template: >-
-         {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}
-        icon_template: >-
-         {% if is_state("group.bed_sensors", "on") %}mdi:bed{% else %}mdi:bed-outline{% endif %}
-      24hr_fan:
-        value_template: >-
-         {% if is_state("input_boolean.washroom_fan", "off") %}off{% else %}on{% endif %}
-        icon_template: >-
-         {% if is_state("input_boolean.washroom_fan", "off") %}mdi:fan-off{% else %}mdi:fan{% endif %}
-      mailbox:
-        value_template: >-
-         {% if is_state("sensor.lora_mailbox", "0xA2B2") %}Yes{% else %}No{% endif %}
-        icon_template: >-
-         {% if is_state("sensor.lora_mailbox", "0xA2B2") %}mdi:email-alert{% else %}mdi:email{% endif %}
-
-####################################################
-#
-#            Day of Week
-#
-####################################################
-
-  - platform: template
-    sensors:
-      date_dayoftheweek:
-        value_template: >
-          {% set ct = states('sensor.date_time') %}
-          {% set ct = as_timestamp(strptime(ct,'%Y-%m-%d, %H:%M')) %}
-          {{ ct | timestamp_custom("%A") }}
-
-      date_weekend:
-        value_template: >
-          {% if is_state('sensor.date_dayoftheweek', 'Saturday') %} weekend
-          {% elif is_state('sensor.date_dayoftheweek', 'Sunday') %} weekend
-          {% else %} weekday
-          {% endif %}
-
-      date_weekday:
-        value_template: >
-          {% if is_state('sensor.date_weekend', 'weekday') %} on
-          {% else %} off
-          {% endif %}
-
-
-####################################################
-#
-#            Custom Illuminance
-#
-####################################################
-
-  - platform: template
-    sensors:
-      kt_illuminance:
-        value_template: >
-          {% if states.sensor.lr_radar_illuminance.state | float(0) == 0.10 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.20 %}
-            on            
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.45 %}
-            on            
-          {% else %}
-            off
-          {% endif %}
 
 
 ####################################################
@@ -203,16 +29,204 @@
     value_template: "{{ value_json[0].ctt }}"
     scan_interval: 300
 
-  - platform: template
-    sensors:
-      earthquake_observed:
-        value_template: "{{ state_attr('sensor.earthquake_alert', 'at') }}"
-      earthquake_epicenter:
-        value_template: "{{ state_attr('sensor.earthquake_alert', 'en_anm') }}"
-      earthquake_magnitude:
-        value_template: "{{ state_attr('sensor.earthquake_alert', 'mag') }}"
-      earthquake_intensity:
-        value_template: "{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
+
+
+
+####################################################
+#
+#            Amazon Polly Voice Speed
+#
+####################################################
+
+#  - platform: template
+#    sensors:
+#      jarvis_voice_speed:
+#        value_template: > # brain= fast or 115%
+#          {% if is_state('input_select.jarvis_voice', 'Brian') %} 
+#             fast
+#          {% else %}
+#             medium
+#          {% endif %}
+
+
+####################################################
+#
+#            Last Alexa
+#
+####################################################
+
+#moved to template.yaml
+#  - platform: template
+#    sensors:
+#      last_alexa:
+#        value_template: >
+#          {{ expand('group.echos') | selectattr('attributes.last_called','eq',true) | map(attribute='entity_id') | first }}
+
+
+####################################################
+#
+#            Icon Tpl
+#
+####################################################
+# Hallway
+#  - platform: template
+#    sensors:
+
+# PORTED OVER TO NEW TEMPLATE CODE
+#      security_genkan:
+#        value_template: >-
+#         {% if is_state("binary_sensor.motion_security_occupancy", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.motion_security_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+
+#      genkan:
+#        value_template: >-
+#         {% if is_state("binary_sensor.genkan_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.genkan_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+#      hallway:
+#        value_template: >-
+#         {% if is_state("binary_sensor.hallway_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.hallway_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+#      toilet:
+#        value_template: >-
+#         {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+
+
+
+# Kitchen
+#      kitchen:
+#        value_template: >-
+#         {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
+#        icon_template: >-
+#         {% if is_state("group.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
+#      storageroom:
+#        value_template: >-
+#         {% if is_state("binary_sensor.storage_door_contact", "off") %}Close{% else %}Open{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.storage_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
+#      washroom:
+#        value_template: >-
+#         {% if is_state("group.motion_showerroom_occupancy", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("group.motion_showerroom_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+
+# Rooms
+#      masterroom:
+#        value_template: >-
+#         {% if is_state("binary_sensor.mr_human_sensor_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.mr_human_sensor_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+#      shionroom:
+#        value_template: >-
+#         {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+#      livingroom:
+#        value_template: >-
+#         {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+#      computerroom:
+#        value_template: >-
+#         {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}Off{% else %}On{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+#      closet:
+#        value_template: >-
+#         {% if is_state("binary_sensor.master_clo_door_contact", "off") %}Close{% else %}Open{% endif %}
+#        icon_template: >-
+#         {% if is_state("binary_sensor.master_clo_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
+
+# Misc
+#      sleeping:
+#        value_template: >-
+#         {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}
+#        icon_template: >-
+#         {% if is_state("group.bed_sensors", "on") %}mdi:bed{% else %}mdi:bed-outline{% endif %}
+#      24hr_fan:
+#        value_template: >-
+#         {% if is_state("input_boolean.washroom_fan", "off") %}off{% else %}on{% endif %}
+#        icon_template: >-
+#         {% if is_state("input_boolean.washroom_fan", "off") %}mdi:fan-off{% else %}mdi:fan{% endif %}
+#      mailbox:
+#        value_template: >-
+#         {% if is_state("sensor.lora_mailbox", "0xA2B2") %}Yes{% else %}No{% endif %}
+#        icon_template: >-
+#         {% if is_state("sensor.lora_mailbox", "0xA2B2") %}mdi:email-alert{% else %}mdi:email{% endif %}
+
+
+
+####################################################
+#
+#            Day of Week
+#
+####################################################
+
+#  - platform: template
+#    sensors:
+#      date_dayoftheweek:
+#        value_template: >
+#          {% set ct = states('sensor.date_time') %}
+#          {% set ct = as_timestamp(strptime(ct,'%Y-%m-%d, %H:%M')) %}
+#          {{ ct | timestamp_custom("%A") }}
+
+#      date_weekend:
+#        value_template: >
+#          {% if is_state('sensor.date_dayoftheweek', 'Saturday') %} weekend
+#          {% elif is_state('sensor.date_dayoftheweek', 'Sunday') %} weekend
+#          {% else %} weekday
+#          {% endif %}
+
+#      date_weekday:
+#        value_template: >
+#          {% if is_state('sensor.date_weekend', 'weekday') %} on
+#          {% else %} off
+#          {% endif %}
+
+
+####################################################
+#
+#            Custom Illuminance
+#
+####################################################
+
+#  - platform: template
+#    sensors:
+#      kt_illuminance:
+#        value_template: >
+#          {% if states.sensor.lr_radar_illuminance.state | float(0) == 0.10 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.20 %}
+#            on            
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.45 %}
+#            on            
+#          {% else %}
+#            off
+#          {% endif %}
+
+
+
+
+#  - platform: template
+#    sensors:
+#      earthquake_observed:
+#        value_template: "{{ state_attr('sensor.earthquake_alert', 'at') }}"
+#      earthquake_epicenter:
+#        value_template: "{{ state_attr('sensor.earthquake_alert', 'en_anm') }}"
+#      earthquake_magnitude:
+#        value_template: "{{ state_attr('sensor.earthquake_alert', 'mag') }}"
+#      earthquake_intensity:
+#        value_template: "{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
 
 ####################################################
@@ -221,63 +235,64 @@
 #
 ####################################################
 
-  - platform: template
-    sensors:
-      lr_aircon_target:
-        icon_template: mdi:target
-        value_template: >-
-          {% if is_state('input_select.lr_ac_mode', 'Powerful Heat') %} 31
-          {% elif is_state('input_select.lr_ac_mode', 'Normal Heat') %} 26
-          {% elif is_state('input_select.lr_ac_mode', 'Silent Heat') %} 22
-          {% elif is_state('input_select.lr_ac_mode', 'Powerful Cool') %} 16
-          {% elif is_state('input_select.lr_ac_mode', 'Normal Cool') %} 23
-          {% elif is_state('input_select.lr_ac_mode', 'Silent Cool') %} 28
-          {% elif is_state('input_select.lr_ac_mode', 'Normal Humidifier') %} 70
-          {% elif is_state('input_select.lr_ac_mode', 'Man Auto') %} --
-          {% elif states('input_number.lr_ac_temp_set_cool')| int != 0 and 'Cool' in states.input_select.lr_ac_mode.state %}
-            {{ states('input_number.lr_ac_temp_set_cool')|int(0) }}
-          {% elif states('input_number.lr_ac_temp_set_heat')| int != 0 and 'Heat' in states.input_select.lr_ac_mode.state %}
-            {{ states('input_number.lr_ac_temp_set_heat')|int(0) }}
-          {% else %}
-             --
-          {% endif %}
+#  - platform: template
+#    sensors:
+#      lr_aircon_target:
+#        icon_template: mdi:target
+#        value_template: >-
+#          {% if is_state('input_select.lr_ac_mode', 'Powerful Heat') %} 31
+#          {% elif is_state('input_select.lr_ac_mode', 'Normal Heat') %} 26
+#          {% elif is_state('input_select.lr_ac_mode', 'Silent Heat') %} 22
+#          {% elif is_state('input_select.lr_ac_mode', 'Powerful Cool') %} 16
+#          {% elif is_state('input_select.lr_ac_mode', 'Normal Cool') %} 23
+#          {% elif is_state('input_select.lr_ac_mode', 'Silent Cool') %} 28
+#          {% elif is_state('input_select.lr_ac_mode', 'Normal Humidifier') %} 70
+#          {% elif is_state('input_select.lr_ac_mode', 'Man Auto') %} --
+#          {% elif states('input_number.lr_ac_temp_set_cool')| int != 0 and 'Cool' in states.input_select.lr_ac_mode.state %}
+#            {{ states('input_number.lr_ac_temp_set_cool')|int(0) }}
+#          {% elif states('input_number.lr_ac_temp_set_heat')| int != 0 and 'Heat' in states.input_select.lr_ac_mode.state %}
+#            {{ states('input_number.lr_ac_temp_set_heat')|int(0) }}
+#          {% else %}
+#             --
+#          {% endif %}
 
-      sr_aircon_target:
-        icon_template: mdi:target
-        value_template: >-
-          {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} 31
-          {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} 26
-          {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} 22
-          {% elif is_state('input_select.sr_ac_mode', 'Powerful Cool') %} 16
-          {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} 23
-          {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} 28
-          {% elif is_state('input_select.sr_ac_mode', 'Normal Humidifier') %} 70
-          {% elif states('input_number.sr_ac_temp_set_cool')| int != 0 and 'Cool' in states.input_select.sr_ac_mode.state %}
-            {{ states('input_number.sr_ac_temp_set_cool')|int(0) }}
-          {% elif states('input_number.sr_ac_temp_set_heat')| int != 0 and 'Heat' in states.input_select.sr_ac_mode.state %}
-            {{ states('input_number.sr_ac_temp_set_heat')|int(0) }}
-          {% else %}
-             --
-          {% endif %}
+#      sr_aircon_target:
+#        icon_template: mdi:target
+#        value_template: >-
+#          {% if is_state('input_select.sr_ac_mode', 'Powerful Heat') %} 31
+#          {% elif is_state('input_select.sr_ac_mode', 'Normal Heat') %} 26
+#          {% elif is_state('input_select.sr_ac_mode', 'Silent Heat') %} 22
+#          {% elif is_state('input_select.sr_ac_mode', 'Powerful Cool') %} 16
+#          {% elif is_state('input_select.sr_ac_mode', 'Normal Cool') %} 23
+#          {% elif is_state('input_select.sr_ac_mode', 'Silent Cool') %} 28
+#          {% elif is_state('input_select.sr_ac_mode', 'Normal Humidifier') %} 70
+#          {% elif states('input_number.sr_ac_temp_set_cool')| int != 0 and 'Cool' in states.input_select.sr_ac_mode.state %}
+#            {{ states('input_number.sr_ac_temp_set_cool')|int(0) }}
+#          {% elif states('input_number.sr_ac_temp_set_heat')| int != 0 and 'Heat' in states.input_select.sr_ac_mode.state %}
+#            {{ states('input_number.sr_ac_temp_set_heat')|int(0) }}
+#          {% else %}
+#             --
+#          {% endif %}
 
-      mr_aircon_target:
-        icon_template: mdi:target
-        value_template: >-
-          {% if is_state('input_select.mr_ac_mode', 'Powerful Heat') %} 31
-          {% elif is_state('input_select.mr_ac_mode', 'Normal Heat') %} 26
-          {% elif is_state('input_select.mr_ac_mode', 'Silent Heat') %} 22
-          {% elif is_state('input_select.mr_ac_mode', 'Powerful Cool') %} 16
-          {% elif is_state('input_select.mr_ac_mode', 'Normal Cool') %} 23
-          {% elif is_state('input_select.mr_ac_mode', 'Silent Cool') %} 28
-          {% elif is_state('input_select.mr_ac_mode', 'Normal Humidifier') %} 70
-          {% elif is_state('input_select.mr_ac_mode', 'Man Auto') %} --
-          {% elif states('input_number.mr_ac_temp_set_cool')| int != 0 and 'Cool' in states.input_select.mr_ac_mode.state %}
-            {{ states('input_number.mr_ac_temp_set_cool')|int(0) }}
-          {% elif states('input_number.mr_ac_temp_set_heat')| int != 0 and 'Heat' in states.input_select.mr_ac_mode.state %}
-            {{ states('input_number.mr_ac_temp_set_heat')|int(0) }}
-          {% else %}
-             --
-          {% endif %}
+#      mr_aircon_target:
+#        icon_template: mdi:target
+#        value_template: >-
+#          {% if is_state('input_select.mr_ac_mode', 'Powerful Heat') %} 31
+#          {% elif is_state('input_select.mr_ac_mode', 'Normal Heat') %} 26
+#          {% elif is_state('input_select.mr_ac_mode', 'Silent Heat') %} 22
+#          {% elif is_state('input_select.mr_ac_mode', 'Powerful Cool') %} 16
+#          {% elif is_state('input_select.mr_ac_mode', 'Normal Cool') %} 23
+#          {% elif is_state('input_select.mr_ac_mode', 'Silent Cool') %} 28
+#          {% elif is_state('input_select.mr_ac_mode', 'Normal Humidifier') %} 70
+#          {% elif is_state('input_select.mr_ac_mode', 'Man Auto') %} --
+#          {% elif states('input_number.mr_ac_temp_set_cool')| int != 0 and 'Cool' in states.input_select.mr_ac_mode.state %}
+#            {{ states('input_number.mr_ac_temp_set_cool')|int(0) }}
+#          {% elif states('input_number.mr_ac_temp_set_heat')| int != 0 and 'Heat' in states.input_select.mr_ac_mode.state %}
+#            {{ states('input_number.mr_ac_temp_set_heat')|int(0) }}
+#          {% else %}
+#             --
+#          {% endif %}
+
 
 ####################################################
 #

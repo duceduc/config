@@ -1,0 +1,65 @@
+####################################################
+#                                                                                                    
+#                      SHELLY EM                                                               
+#                                                                                                    
+####################################################
+
+  - sensor:
+      - name: energy t31 light and power total
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.energy_t31_light_and_power_day')|float + states('sensor.energy_t31_light_and_power_night')|float)|round(3) }}"
+
+      - name: energy t41 heating total
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.energy_t41_heating_day')|float + states('sensor.energy_t41_heating_night')|float)|round(3) }}"
+
+      - name: total energy day
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.energy_t31_light_and_power_day')|float + states('sensor.energy_t41_heating_day')|float)|round(3) }}"
+
+      - name: total energy night
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.energy_t31_light_and_power_night')|float + states('sensor.energy_t41_heating_night')|float)|round(3) }}"
+
+      - name: total energy
+        unit_of_measurement: "kWh"
+        state: "{{ (states('sensor.total_energy_day')|float + states('sensor.total_energy_night')|float)|round(3) }}"
+
+      - name: total power
+        unit_of_measurement: "W"
+        state: "{{ (states('sensor.tariff_31_power')|float(0) + states('sensor.tariff_41_power')|float(0))|round(1) }}"
+
+      - name: t31 amperage
+        unit_of_measurement: "A"
+        state: >
+          {% if states('sensor.mains_voltage')|float(0) > 0 %}
+            {{ (states('sensor.tariff_31_power')|float(0) / states('sensor.mains_voltage')|float(0))|round(1) }}
+          {% else %}
+            unknown
+          {% endif %}
+
+      - name: t31 cost today
+        unit_of_measurement: "¥"
+        state: >
+          {% if states('sensor.energy_t31_light_and_power_monthly')| int <= 120 %}
+             {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_1_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
+          {% elif states('sensor.energy_t31_light_and_power_monthly')| int <= 300 %}
+            {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_2_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
+          {% else %}
+            {{ (states('sensor.energy_t31_light_and_power_total')|float * states('input_number.t31_3_energy_cost')|float + states('input_number.t31_daily_cost')|float)|round(2) }}
+          {% endif %}
+
+      - name: t41 cost today
+        unit_of_measurement: "¥"
+        state: "{{ (states('sensor.energy_t41_heating_total')|float * states('input_number.t41_energy_cost')|float + states('input_number.t41_daily_cost')|float)|round(2) }}"
+
+      - name: total cost today
+        unit_of_measurement: "¥"
+        state: "{{ ( states('sensor.t31_cost_today')|float + states('sensor.t41_cost_today')|float )|round(2) }}"
+
+      - name: cumulative energy cost
+        unit_of_measurement: "¥"
+        state: "{{ states('input_number.cumulative_energy_cost')|float|round(2) }}"
+
+      - name: last reset
+        state: "{{ states('input_datetime.last_reset') }}"
