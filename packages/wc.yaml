@@ -21,12 +21,10 @@ template:
          {% else %} off {% endif %}
         icon: mdi:calendar-multiple-check
 
-switch:
-  - platform: template
-    switches:
-      wc_auto_flush:
-        friendly_name: 'WC Auto Flush'
-        value_template: "{{ is_state('input_boolean.wc_auto_flush', 'on') }}"
+
+  - switch:
+      - name: wc auto flush
+        state: "{{ is_state('input_boolean.wc_auto_flush', 'on') }}"
         turn_on:
           - service: input_boolean.turn_on
             entity_id: input_boolean.wc_auto_flush
@@ -43,6 +41,31 @@ switch:
               entity_id: remote.rm32_remote
               device: Toilet
               command: auto flush disable
+
+
+
+#switch:
+#  - platform: template
+#    switches:
+#      wc_auto_flush:
+#        friendly_name: 'WC Auto Flush'
+#        value_template: "{{ is_state('input_boolean.wc_auto_flush', 'on') }}"
+#        turn_on:
+#          - service: input_boolean.turn_on
+#            entity_id: input_boolean.wc_auto_flush
+#          - service: remote.send_command
+#            data:
+#              entity_id: remote.rm32_remote
+#              device: Toilet
+#              command: auto flush enable
+#        turn_off:
+#          - service: input_boolean.turn_off
+#            entity_id: input_boolean.wc_auto_flush
+#          - service: remote.send_command
+#            data:
+#              entity_id: remote.rm32_remote
+#              device: Toilet
+#              command: auto flush disable
 #       icon_template: 
 
 

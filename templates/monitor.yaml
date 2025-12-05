@@ -24,6 +24,20 @@
           {% endif %}
 
 
+      - name: monitor rpi zero
+        state: >
+          {% if is_state("sensor.ms1_wifi_strength", "unavailable") or
+                     is_state("sensor.ms2_wifi_strength", "unavailable") or
+                     is_state("sensor.ms3_wifi_strength", "unavailable") %} on
+          {% else %} off {% endif %}
+
+      - name: monitor broadlink
+        state: >
+          {% if is_state("remote.rm31_remote", "unavailable") or
+                     is_state("remote.rm32_remote", "unavailable") or
+                     is_state("remote.rm4_remote", "unavailable") %} on
+          {% else %} off {% endif %}
+
 
 ####################################################
 #                                                                                                    

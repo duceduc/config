@@ -52,11 +52,12 @@ mqtt:
     - name: front_door_motion_away_count
       state_topic: "house/alerts/front_door_motion/away_count"
 
-binary_sensor:
-  - platform: template
-    sensors:
-      computerroom_window_triggered:
-        value_template: >
+
+
+template:
+  - binary_sensor:
+      - name: computerroom window triggered
+        state: >
           {% set sentry_mode = states('input_boolean.sentry_mode') %}
           {% if is_state("binary_sensor.computerroom_window", "on") and sentry_mode == "on" %}
             true
@@ -64,8 +65,9 @@ binary_sensor:
             false
           {% endif %}
 
-      livingroom_window_triggered:
-        value_template: >
+
+      - name: livingroom window triggered
+        state: >
           {% set sentry_mode = states('input_boolean.sentry_mode') %}
           {% if is_state("binary_sensor.livingroom_window", "on") and sentry_mode == "on" %}
             true
@@ -73,14 +75,48 @@ binary_sensor:
             false
           {% endif %}
 
-      genkan_door_triggered:
-        value_template: >
+      - name: genkan door triggered
+        state: >
           {% set sentry_mode = states('input_boolean.sentry_mode') %}
           {% if is_state("binary_sensor.genkan_door_contact", "on") and sentry_mode == "on" %}
             true
           {% else %}
             false
           {% endif %}
+
+
+
+
+#binary_sensor:
+#  - platform: template
+#    sensors:
+#      computerroom_window_triggered:
+#        value_template: >
+#          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+#          {% if is_state("binary_sensor.computerroom_window", "on") and sentry_mode == "on" %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+
+#      livingroom_window_triggered:
+#        value_template: >
+#          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+#          {% if is_state("binary_sensor.livingroom_window", "on") and sentry_mode == "on" %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+
+#      genkan_door_triggered:
+#        value_template: >
+#          {% set sentry_mode = states('input_boolean.sentry_mode') %}
+#          {% if is_state("binary_sensor.genkan_door_contact", "on") and sentry_mode == "on" %}
+#            true
+#          {% else %}
+#            false
+#          {% endif %}
+
 
 
 automation:

@@ -17,197 +17,198 @@ input_number:
     step: 1
 
 sensor:
-  - platform: template
-    sensors:
-      clothing_forecast:
-        friendly_name: "Clothing Forecast"
-        value_template: >-
-          {% if is_state('binary_sensor.overnight', 'off') %}
-            {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
-          {% else %}
-            {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|round(0) %}
-          {% endif %}
-          {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
-            {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
-              Nice
-            {% elif states('sensor.wbio_daytime_temperature')|int(0) > 33 %}
-              Hot
-            {% else %}
-              Toasty
-            {%- endif %}
-          {% elif states('sensor.wbio_daytime_temperature')|int(0) <= 17 %}
-            {%- if states('sensor.wbio_daytime_temperature')|int(0) < 0 %}
-              Freezing
-            {% elif states('sensor.wbio_daytime_temperature')|int(0) > 10 %}
-              Chilly
-            {% else %}
-              Cold
-            {%- endif %}
-          {% else %}
-            Unknown
-          {%- endif %}
+#  - platform: template
+#    sensors:
+#      clothing_forecast:
+#        friendly_name: "Clothing Forecast"
+#        value_template: >-
+#          {% if is_state('binary_sensor.overnight', 'off') %}
+#            {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
+#          {% else %}
+#            {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|round(0) %}
+#          {% endif %}
+#          {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
+#            {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
+#              Nice
+#            {% elif states('sensor.wbio_daytime_temperature')|int(0) > 33 %}
+#              Hot
+#            {% else %}
+#              Toasty
+#            {%- endif %}
+#          {% elif states('sensor.wbio_daytime_temperature')|int(0) <= 17 %}
+#            {%- if states('sensor.wbio_daytime_temperature')|int(0) < 0 %}
+#              Freezing
+#            {% elif states('sensor.wbio_daytime_temperature')|int(0) > 10 %}
+#              Chilly
+#            {% else %}
+#              Cold
+#            {%- endif %}
+#          {% else %}
+#            Unknown
+#          {%- endif %}
 
-      clothing_forecast_detail:
-        friendly_name: "Clothing Forecast Detail"
-        value_template: >-
-            {% if is_state('binary_sensor.morning','on') %}
-              Based on the forecasted high temperature,
-              {% if is_state('sensor.clothing_forecast', 'Freezing') %}
-                It is going to be freezing today. so I suggest wearing long pants and a heavy coat.
-              {% elif is_state('sensor.clothing_forecast','Cold') %}
-                It is going to be cold today. so I suggest wearing long pants and a light jacket.
-              {% elif is_state('sensor.clothing_forecast', 'Chilly') %}
-                It is going to be chilly today. so I suggest wearing at least long pants.
-              {% elif is_state('sensor.clothing_forecast', 'Nice') %}
-                It is going to be
-                {{ [ 'nice outside. ',
-                  'pretty nice outside. ',
-                  'a good day to be outside. ',
-                  'rather enjoyable outside. ',
-                ] | random }}
-                So I suggest wearing shorts.
-              {% elif is_state('sensor.clothing_forecast', 'Toasty') %}
-                It is going to be
-                {{ [ 'bit warm ',
-                  ' rather warm outside ',
-                  ' almost too hot outside ',
-                  ' a little warm ',
-                ] | random }}
-                today. So I suggest wearing shorts.
-              {% elif is_state('sensor.clothing_forecast', 'Hot') %}
-                It is going to be
-                {{ [ 'hot',
-                  'hotter than the sun ',
-                  'hotter than hot. but in a lot of bad ways ',
-                  'hotter than the sun outside ',
-                  'super hot ',
-                  'hotter than the inside of a volcano '
-                ] | random }}
-                today. So I suggest wearing shorts.
-              {% else %}
-                It is going to be {{ states('sensor.clothing_forecast') }} today so I suggest wearing shorts.
-              {% endif %}
-            {% else %}
-              Based on the current temperature,
-              {% if is_state('sensor.clothing_forecast', 'Freezing') %}
-                It is freezing. so I suggest wearing long pants and a heavy coat if you are going out.
-              {% elif is_state('sensor.clothing_forecast','Cold') %}
-                It is cold outside. so I suggest wearing long pants and a light jacket.
-              {% elif is_state('sensor.clothing_forecast', 'Chilly') %}
-                It is chilly right now. so I suggest wearing at least long pants
-                if you are going to venture outside.
-              {% elif is_state('sensor.clothing_forecast', 'Nice') %}
-                It is
-                {{ [ 'nice outside. ',
-                  'pretty nice outside. ',
-                  'a good day to be outside. ',
-                  'rather enjoyable outside. ',
-                ] | random }}
-                So I suggest wearing shorts.
-              {% elif is_state('sensor.clothing_forecast', 'Toasty') %}
-                It is
-                {{ [ 'bit warm ',
-                  ' rather warm outside ',
-                  ' almost too hot outside ',
-                  ' a little warm ',
-                ] | random }}
-                outside. So I suggest wearing shorts.
-              {% elif is_state('sensor.clothing_forecast', 'Hot') %}
-                It is
-                {{ [ 'hot',
-                  'hotter than the sun ',
-                  'hotter than hot. but in a lot of bad ways ',
-                  'hotter than the sun outside ',
-                  'super hot ',
-                  'hotter than the inside of a volcano '
-                ] | random }}
-                outside. So I suggest wearing shorts.
-              {% else %}
-                It is {{ states('sensor.clothing_forecast') }} right now so I suggest wearing shorts.
-              {% endif %}
-            {% endif %}
+#      clothing_forecast_detail:
+#        friendly_name: "Clothing Forecast Detail"
+#        value_template: >-
+#            {% if is_state('binary_sensor.morning','on') %}
+#              Based on the forecasted high temperature,
+#              {% if is_state('sensor.clothing_forecast', 'Freezing') %}
+#                It is going to be freezing today. so I suggest wearing long pants and a heavy coat.
+#              {% elif is_state('sensor.clothing_forecast','Cold') %}
+#                It is going to be cold today. so I suggest wearing long pants and a light jacket.
+#              {% elif is_state('sensor.clothing_forecast', 'Chilly') %}
+#                It is going to be chilly today. so I suggest wearing at least long pants.
+#              {% elif is_state('sensor.clothing_forecast', 'Nice') %}
+#                It is going to be
+#                {{ [ 'nice outside. ',
+#                  'pretty nice outside. ',
+#                  'a good day to be outside. ',
+#                  'rather enjoyable outside. ',
+#                ] | random }}
+#                So I suggest wearing shorts.
+#              {% elif is_state('sensor.clothing_forecast', 'Toasty') %}
+#                It is going to be
+#                {{ [ 'bit warm ',
+#                  ' rather warm outside ',
+#                  ' almost too hot outside ',
+#                  ' a little warm ',
+#                ] | random }}
+#                today. So I suggest wearing shorts.
+#              {% elif is_state('sensor.clothing_forecast', 'Hot') %}
+#                It is going to be
+#                {{ [ 'hot',
+#                  'hotter than the sun ',
+#                  'hotter than hot. but in a lot of bad ways ',
+#                  'hotter than the sun outside ',
+#                  'super hot ',
+#                  'hotter than the inside of a volcano '
+#                ] | random }}
+#                today. So I suggest wearing shorts.
+#              {% else %}
+#                It is going to be {{ states('sensor.clothing_forecast') }} today so I suggest wearing shorts.
+#              {% endif %}
+#            {% else %}
+#              Based on the current temperature,
+#              {% if is_state('sensor.clothing_forecast', 'Freezing') %}
+#                It is freezing. so I suggest wearing long pants and a heavy coat if you are going out.
+#              {% elif is_state('sensor.clothing_forecast','Cold') %}
+#                It is cold outside. so I suggest wearing long pants and a light jacket.
+#              {% elif is_state('sensor.clothing_forecast', 'Chilly') %}
+#                It is chilly right now. so I suggest wearing at least long pants
+#                if you are going to venture outside.
+#              {% elif is_state('sensor.clothing_forecast', 'Nice') %}
+#                It is
+#                {{ [ 'nice outside. ',
+#                  'pretty nice outside. ',
+#                  'a good day to be outside. ',
+#                  'rather enjoyable outside. ',
+#                ] | random }}
+#                So I suggest wearing shorts.
+#              {% elif is_state('sensor.clothing_forecast', 'Toasty') %}
+#                It is
+#                {{ [ 'bit warm ',
+#                  ' rather warm outside ',
+#                  ' almost too hot outside ',
+#                  ' a little warm ',
+#                ] | random }}
+#                outside. So I suggest wearing shorts.
+#              {% elif is_state('sensor.clothing_forecast', 'Hot') %}
+#                It is
+#                {{ [ 'hot',
+#                  'hotter than the sun ',
+#                  'hotter than hot. but in a lot of bad ways ',
+#                  'hotter than the sun outside ',
+#                  'super hot ',
+#                  'hotter than the inside of a volcano '
+#                ] | random }}
+#                outside. So I suggest wearing shorts.
+#              {% else %}
+#                It is {{ states('sensor.clothing_forecast') }} right now so I suggest wearing shorts.
+#              {% endif %}
+#            {% endif %}
 
-      wbio_current_forecast:
-        friendly_name: 'Current Forecast'
-        value_template: "{{states('sensor.my_weather_weather_description') }}"
-      wbio_current_rain_forecast:
-        friendly_name: 'Current Rain Chance'
-        value_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation_probability }}"
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
-        unit_of_measurement: '%'
+#      wbio_current_forecast:
+#        friendly_name: 'Current Forecast'
+#        value_template: "{{states('sensor.my_weather_weather_description') }}"
+#      wbio_current_rain_forecast:
+#        friendly_name: 'Current Rain Chance'
+#        value_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation_probability }}"
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#        unit_of_measurement: '%'
 
-      wbio_current_temperature:
-        friendly_name: 'Current Temperature'
-        value_template: "{{ states('sensor.aio_human_sensor_entrance_temperature') }}"
-        device_class: temperature
-      wbio_daytime_temperature:
-        friendly_name: 'Daytime Temperature'
-        value_template: >-
-          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].temperature }}
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      wbio_current_temperature:
+#        friendly_name: 'Current Temperature'
+#        value_template: "{{ states('sensor.aio_human_sensor_entrance_temperature') }}"
+#        device_class: temperature
+#      wbio_daytime_temperature:
+#        friendly_name: 'Daytime Temperature'
+#        value_template: >-
+#          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].temperature }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
 
 
-      wbio_current_condition:
-        friendly_name: 'Current Condition'
-        value_template: "{{states('weather.my_weather') }}"
-      wbio_current_humidity:
-        friendly_name: "Current Humidity"
-        value_template: "{{ state_attr('weather.my_weather', 'humidity') }}"
-      wbio_current_visibility:
-        friendly_name: "Current Visibility"
-        value_template: "{{ state_attr('weather.my_weather', 'visibility') }}"
-      wbio_current_windspeed:
-        friendly_name: "Current Windspeed"
-        value_template: "{{ state_attr('weather.my_weather', 'wind_speed') }}"
-      wbio_overnight_low:
-        friendly_name: "Overnight Low"
-        unit_of_measurement: '°C'
-        value_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].templow }}"
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      wbio_current_condition:
+#        friendly_name: 'Current Condition'
+#        value_template: "{{states('weather.my_weather') }}"
+#      wbio_current_humidity:
+#        friendly_name: "Current Humidity"
+#        value_template: "{{ state_attr('weather.my_weather', 'humidity') }}"
+#      wbio_current_visibility:
+#        friendly_name: "Current Visibility"
+#        value_template: "{{ state_attr('weather.my_weather', 'visibility') }}"
+#      wbio_current_windspeed:
+#        friendly_name: "Current Windspeed"
+#        value_template: "{{ state_attr('weather.my_weather', 'wind_speed') }}"
+#      wbio_overnight_low:
+#        friendly_name: "Overnight Low"
+#        unit_of_measurement: '°C'
+#        value_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].templow }}"
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
 
-      nws_overnight_forecast:
-        friendly_name: "Overnight Forecast"
-        value_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].condition }}"
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      nws_overnight_forecast:
+#        friendly_name: "Overnight Forecast"
+#        value_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].condition }}"
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
 
-      wbio_forecast_tomorrow:
-        friendly_name: "Forecast Tomorrow"
-        unit_of_measurement: '°C'
-        value_template: >-
-          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].temperature }}
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
-      wbio_forecast_rain_tomorrow:
-        friendly_name: "Rain Chance Tomorrow"
-        unit_of_measurement: '%'
-        value_template: >-
-          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].precipitation_probability }}
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
-      wbio_forecast_tomorrow_night:
-        friendly_name: "Forecast Tomorrow Night"
-        unit_of_measurement: '°C'
-        value_template: >-
-          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].templow }}
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
-      wbio_forecast_rain_tomorrow_night:
-        friendly_name: "Rain Chance Tomorrow Night"
-        unit_of_measurement: '%'
-        value_template: >-
-          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[2].precipitation_probability }}
-        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      wbio_forecast_tomorrow:
+#        friendly_name: "Forecast Tomorrow"
+#        unit_of_measurement: '°C'
+#        value_template: >-
+#          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].temperature }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      wbio_forecast_rain_tomorrow:
+#        friendly_name: "Rain Chance Tomorrow"
+#        unit_of_measurement: '%'
+#        value_template: >-
+#          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].precipitation_probability }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      wbio_forecast_tomorrow_night:
+#        friendly_name: "Forecast Tomorrow Night"
+#        unit_of_measurement: '°C'
+#        value_template: >-
+#          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].templow }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+#      wbio_forecast_rain_tomorrow_night:
+#        friendly_name: "Rain Chance Tomorrow Night"
+#        unit_of_measurement: '%'
+#        value_template: >-
+#          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[2].precipitation_probability }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
 
-      oa_feels_like:
-        friendly_name: 'Outside Feels Like'
-        unit_of_measurement: "°C"
-        value_template: >
-          {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|float(0) %}
-          {% set humidity = states('sensor.aio_human_sensor_entrance_humidity')|float(0) %}
-          {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
+#      oa_feels_like:
+#        friendly_name: 'Outside Feels Like'
+#        unit_of_measurement: "°C"
+#        value_template: >
+#          {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|float(0) %}
+#          {% set humidity = states('sensor.aio_human_sensor_entrance_humidity')|float(0) %}
+#          {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
 
-      home_windspeed:
-        friendly_name: 'Home Wind Speed'
-        unit_of_measurement: "m/s"
-        value_template: >
-          {{ state_attr('weather.my_weather', 'wind_speed') }}
+#      home_windspeed:
+#        friendly_name: 'Home Wind Speed'
+#        unit_of_measurement: "m/s"
+#        value_template: >
+#          {{ state_attr('weather.my_weather', 'wind_speed') }}
+
 
 
 
@@ -360,6 +361,197 @@ template:
 # Rain Guage
 # Battery replaced on 8/30/2024
   - sensor:
+      - name: clothing forecast
+        state: >
+          {% if is_state('binary_sensor.overnight', 'off') %}
+            {% set temp = states('sensor.wbio_daytime_temperature')|int(0) %}
+          {% else %}
+            {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|round(0) %}
+          {% endif %}
+          {%- if states('sensor.wbio_daytime_temperature')|int(0) > 17 %}
+            {%- if states('sensor.wbio_daytime_temperature')|int(0) < 26 %}
+              Nice
+            {% elif states('sensor.wbio_daytime_temperature')|int(0) > 33 %}
+              Hot
+            {% else %}
+              Toasty
+            {%- endif %}
+          {% elif states('sensor.wbio_daytime_temperature')|int(0) <= 17 %}
+            {%- if states('sensor.wbio_daytime_temperature')|int(0) < 0 %}
+              Freezing
+            {% elif states('sensor.wbio_daytime_temperature')|int(0) > 10 %}
+              Chilly
+            {% else %}
+              Cold
+            {%- endif %}
+          {% else %}
+            Unknown
+          {%- endif %}
+
+      - name: clothing forecast detail
+        state: >
+          {% if is_state('binary_sensor.morning','on') %}
+            Based on the forecasted high temperature,
+            {% if is_state('sensor.clothing_forecast', 'Freezing') %}
+              It is going to be freezing today. so I suggest wearing long pants and a heavy coat.
+            {% elif is_state('sensor.clothing_forecast','Cold') %}
+              It is going to be cold today. so I suggest wearing long pants and a light jacket.
+            {% elif is_state('sensor.clothing_forecast', 'Chilly') %}
+              It is going to be chilly today. so I suggest wearing at least long pants.
+            {% elif is_state('sensor.clothing_forecast', 'Nice') %}
+              It is going to be
+              {{ [ 'nice outside. ',
+                'pretty nice outside. ',
+                'a good day to be outside. ',
+                'rather enjoyable outside. ',
+              ] | random }}
+              So I suggest wearing shorts.
+            {% elif is_state('sensor.clothing_forecast', 'Toasty') %}
+              It is going to be
+              {{ [ 'bit warm ',
+                ' rather warm outside ',
+                ' almost too hot outside ',
+                ' a little warm ',
+              ] | random }}
+              today. So I suggest wearing shorts.
+            {% elif is_state('sensor.clothing_forecast', 'Hot') %}
+              It is going to be
+              {{ [ 'hot',
+                'hotter than the sun ',
+                'hotter than hot. but in a lot of bad ways ',
+                'hotter than the sun outside ',
+                'super hot ',
+                'hotter than the inside of a volcano '
+              ] | random }}
+              today. So I suggest wearing shorts.
+            {% else %}
+              It is going to be {{ states('sensor.clothing_forecast') }} today so I suggest wearing shorts.
+            {% endif %}
+          {% else %}
+            Based on the current temperature,
+            {% if is_state('sensor.clothing_forecast', 'Freezing') %}
+              It is freezing. so I suggest wearing long pants and a heavy coat if you are going out.
+            {% elif is_state('sensor.clothing_forecast','Cold') %}
+              It is cold outside. so I suggest wearing long pants and a light jacket.
+            {% elif is_state('sensor.clothing_forecast', 'Chilly') %}
+              It is chilly right now. so I suggest wearing at least long pants
+              if you are going to venture outside.
+            {% elif is_state('sensor.clothing_forecast', 'Nice') %}
+              It is
+              {{ [ 'nice outside. ',
+                'pretty nice outside. ',
+                'a good day to be outside. ',
+                'rather enjoyable outside. ',
+              ] | random }}
+              So I suggest wearing shorts.
+            {% elif is_state('sensor.clothing_forecast', 'Toasty') %}
+              It is
+              {{ [ 'bit warm ',
+                ' rather warm outside ',
+                ' almost too hot outside ',
+                ' a little warm ',
+              ] | random }}
+              outside. So I suggest wearing shorts.
+            {% elif is_state('sensor.clothing_forecast', 'Hot') %}
+              It is
+              {{ [ 'hot',
+                'hotter than the sun ',
+                'hotter than hot. but in a lot of bad ways ',
+                'hotter than the sun outside ',
+                'super hot ',
+                'hotter than the inside of a volcano '
+              ] | random }}
+              outside. So I suggest wearing shorts.
+            {% else %}
+              It is {{ states('sensor.clothing_forecast') }} right now so I suggest wearing shorts.
+            {% endif %}
+          {% endif %}
+
+
+
+      - name: wbio current forecast
+        state: "{{states('sensor.my_weather_weather_description') }}" 
+
+      - name: wbio current rain forecast
+        unit_of_measurement: '%'
+        state: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation_probability }}"
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+      - name: wbio current temperature
+        state: "{{ states('sensor.aio_human_sensor_entrance_temperature') }}"
+        device_class: temperature
+
+      - name: wbio daytime temperature
+        state: >
+          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].temperature }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+
+      - name: wbio current condition
+        state: "{{states('weather.my_weather') }}"
+
+      - name: wbio current humidity
+        state: "{{ state_attr('weather.my_weather', 'humidity') }}"
+
+
+      - name: wbio current visibility
+        state: "{{ state_attr('weather.my_weather', 'visibility') }}"
+
+      - name: wbio current windspeed
+        state: "{{ state_attr('weather.my_weather', 'wind_speed') }}" 
+
+      - name: wbio overnight low
+        unit_of_measurement: '°C'
+        state: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].templow }}"
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+      - name: nws overnight forecast
+        state: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].condition }}"
+ #       availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+      - name: wbio forecast tomorrow
+        unit_of_measurement: '°C'
+        state: >
+          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].temperature }}
+ #       availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+
+      - name: wbio forecast rain tomorrow
+        unit_of_measurement: '%'
+        state: >
+          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].precipitation_probability }}
+ #       availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+
+      - name: wbio forecast tomorrow night
+        unit_of_measurement: '°C'
+        state: >
+          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[1].templow }}
+ #       availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+
+      - name: wbio forecast rain tomorrow night
+        unit_of_measurement: '%'
+        state: >
+          {{ state_attr('sensor.my_weather_forecast_daily', 'forecast')[2].precipitation_probability }}
+#        availability_template: "{{ state_attr('sensor.my_weather_forecast_daily', 'forecast') is not none }}"
+
+
+      - name: oa feels like
+        unit_of_measurement: "°C"
+        state: >
+          {% set temp = states('sensor.aio_human_sensor_entrance_temperature')|float(0) %}
+          {% set humidity = states('sensor.aio_human_sensor_entrance_humidity')|float(0) %}
+          {{(0.567 * temp + 0.393 * (humidity/ 100 * 6.105 * e ** (17.27 * temp / (237.7 + temp ) )) + 3.94) | round(1) }}
+
+
+      - name: home windspeed
+        unit_of_measurement: "m/s"
+        state: >
+          {{ state_attr('weather.my_weather', 'wind_speed') }}
+
+
+
       - name: Rainfall today
         unit_of_measurement: 'mm'
         state_class: total_increasing

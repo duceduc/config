@@ -81,8 +81,61 @@
           {%- endif %}
 
 
+#########################################################
+#
+#            PRESENCE DETECTION [GEO/BLE], ROOM HUMAN PRESENCE
+#
+#########################################################
+
+  - binary_sensor:
+      - name: duc presence
+        state: "{{ is_state('input_boolean.duc_presence', 'on') }}"
+
+      - name: duc presence alone
+        state: "{{ is_state('binary_sensor.eri_presence', 'off') and is_state('binary_sensor.shion_presence', 'off') and is_state('device_tracker.id', 'home' ) }}"
+
+      - name: eri presence
+        state: "{{ is_state('input_boolean.eri_presence', 'on') }}"
+
+      - name: shion presence
+        state: "{{ is_state('input_boolean.shion_presence', 'on') }}"
+
+      - name: sachiko presence
+        state: "{{ is_state('input_boolean.sachiko_presence', 'on') }}"
+
+      - name: tomokun presence
+        state: "{{ is_state('input_boolean.tomokun_presence', 'on') }}"
 
 
+      - name: mr occupancy lights
+        state: >
+          {% if is_state('binary_sensor.mr_still_target', 'on') and
+                 is_state('input_boolean.masterroom_mcl', 'off') %} on
+          {% elif is_state('input_boolean.masterroom_mcl', 'on') %} on
+          {% else %} off
+          {% endif %}
+
+      - name: sr occupancy lights
+        state: >
+          {% if is_state('binary_sensor.sr_still_target', 'on') or 
+                   is_state('binary_sensor.sr_has_still_target', 'on') and
+                   is_state('input_boolean.shionroom_mcl', 'off') %} on
+          {% elif is_state('input_boolean.shionroom_mcl', 'on') %} on
+          {% elif is_state('binary_sensor.sr_study_occupancy', 'on') %} on
+          {% else %} off
+          {% endif %}
+
+
+      - name: motion sr auto on
+        state: >
+          {% set w = states('sensor.date_weekday') %}
+          {% set h = states('calendar.holidays_in_japan') %}
+          {% set end = '19:59:00' %}
+          {% if w == 'on' and h == 'off' %} 
+            {{ '06:59:00' < states('sensor.time') < end }}
+          {% else %}
+            {{ '09:29:00' < states('sensor.time') < end }}
+          {% endif %}
 
 
 ####################################################

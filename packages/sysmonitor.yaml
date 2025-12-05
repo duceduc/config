@@ -13,22 +13,44 @@ mqtt:
       json_attributes_template: "{{ value_json.attributes | tojson }}"
       value_template: "{{ value_json.state }}"
 
+
+template:
+  - sensor:
+      - name: speedtest download
+        state: "{{ state_attr('sensor.speedtest_result', 'download') }}"
+
+      - name: speedtest upload
+        state: "{{ state_attr('sensor.speedtest_result', 'upload') }}"
+ 
+      - name: speedtest ping
+        state: "{{ state_attr('sensor.speedtest_result', 'ping') }}"
+
+      - name: speedtest lastrun
+        state: "{{ state_attr('sensor.speedtest_result', 'time_run') }}"
+
+
+
+
 sensor:
-  - platform: template
-    sensors:
-# Speedtest Results
-      speedtest_download:
-        value_template: "{{ state_attr('sensor.speedtest_result', 'download') }}"
-        unique_id: speeddown
-      speedtest_upload:
-        value_template: "{{ state_attr('sensor.speedtest_result', 'upload') }}"
-        unique_id: speedup
-      speedtest_ping:
-        value_template: "{{ state_attr('sensor.speedtest_result', 'ping') }}"
-        unique_id: speedping
-      speedtest_lastrun:
-        value_template: "{{ state_attr('sensor.speedtest_result', 'time_run') }}"
-        unique_id: speedtimerun
+
+#  - platform: template
+#    sensors:
+## Speedtest Results
+#      speedtest_download:
+#        value_template: "{{ state_attr('sensor.speedtest_result', 'download') }}"
+#        unique_id: speeddown
+#      speedtest_upload:
+#        value_template: "{{ state_attr('sensor.speedtest_result', 'upload') }}"
+#        unique_id: speedup
+#      speedtest_ping:
+#        value_template: "{{ state_attr('sensor.speedtest_result', 'ping') }}"
+#        unique_id: speedping
+#      speedtest_lastrun:
+#        value_template: "{{ state_attr('sensor.speedtest_result', 'time_run') }}"
+#        unique_id: speedtimerun
+
+
+
 
 # Speedtest Average custom component
 # {{ now().replace(hour=0).replace(minute=0).replace(second=0) }}
