@@ -1,0 +1,129 @@
+####################################################
+#                                                                                                    
+#                    HOME ASSISTANT ADD-ON                                            
+#                                                                                                    
+####################################################
+
+
+  - switch:
+      - name: sambabackup
+        unique_id: sambabackup
+        state: "{{ is_state('binary_sensor.samba_backup_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: 15d21743_samba_backup
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: 15d21743_samba_backup
+
+      - name: portainer
+        unique_id: "{{ is_state('binary_sensor.portainer_running', 'on') }}"
+        state: "{{ is_state('binary_sensor.portainer_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: db21ed7f_portainer
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: db21ed7f_portainer
+
+      - name: mosquitto
+        unique_id: mosquitto
+        state: "{{ is_state('binary_sensor.mosquitto_broker_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: core_mosquitto
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: core_mosquitto
+
+      - name: zigbee2mqtt
+        unique_id: zigbee2mqtt
+        state: "{{ is_state('binary_sensor.zigbee2mqtt_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: 45df7312_zigbee2mqtt
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: 45df7312_zigbee2mqtt
+
+      - name: samba
+        unique_id: samba
+        state: "{{ is_state('binary_sensor.samba_share_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: core_samba
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: core_samba
+
+      - name: sambanas
+        unique_id: sambanas
+        state: "{{ is_state('binary_sensor.samba_nas_running', 'on') }}" 
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: 1a32f091_sambanas
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: 1a32f091_sambanas
+
+      - name: ssh
+        unique_id: ssh
+        state: "{{ is_state('binary_sensor.ssh_web_terminal_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: a0d7b954_ssh
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: a0d7b954_ssh
+
+      - name: appdaemon
+        unique_id: appdaemon
+        state: "{{ is_state('binary_sensor.appdaemon_4_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: a0d7b954_appdaemon
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: a0d7b954_appdaemon
+
+      - name: esphome
+        unique_id: esphome
+        state: "{{ is_state('binary_sensor.esphome_running', 'on') }}"
+        turn_on:
+          - service: hassio.addon_start
+            data:
+              addon: 5c53de3b_esphome
+        turn_off:
+          - service: hassio.addon_stop
+            data:
+              addon: 5c53de3b_esphome
+
+
+
+
+
+
+
+
+
+####################################################
+#                                                                                                    
+#          END OF CONFIGURATION FILE                                                   
+#                                                                                                    
+####################################################

@@ -130,7 +130,7 @@
       - name: switch count
         state: '{{ states.switch | count }}'
 
-      - name: binar sensor count
+      - name: binary sensor count
         state: '{{ states.binary_sensor | count }}'
 
       - name: light count

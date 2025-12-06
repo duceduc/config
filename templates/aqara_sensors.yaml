@@ -1,0 +1,48 @@
+####################################################
+#                                                                                                    
+#                      SHELLY DOOR SENSORS                                               
+#                                                                                                    
+####################################################
+## upate firmware manually
+## http://archive.shelly-tools.de/ ##
+
+# genkan door sensor [D8BFC01A8C6A] - 192.168.1.82 [batt installed on 6/5/2021]
+# hallway door sensor [D8BFC01A8C33] - 192.168.1.83 [batt installed on 3/3/2022. died 6 months first doc. second replaced on 9/2/2022]
+# shion door sensor [483FDA81F69D] - 192.168.1.92  [batt installed on 3/3/2022]
+# master door sensor [483FDA81F97F] - 192.168.1.93
+# shellyem sensor [8CAAB506209A] - 192.168.1.87
+# smart plug sensor [FCF5C4AAF6E1] - 192.168.1.91
+
+
+####################################################
+#                                                                                                    
+#                      AQARA DOOR SENSORS                                               
+#                                                                                                    
+####################################################
+# (3) Aqara door sensor set up on 3/7/2023 
+
+
+  - sensor:
+      - name: genkan door
+        state: >-
+         {% if is_state("binary_sensor.genkan_door", "off") %}Close{% else %}Open{% endif %}
+        icon: >-
+         {% if is_state("binary_sensor.genkan_door", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
+
+      - name: hallway door
+        state: >-
+         {% if is_state("binary_sensor.hallway_door_contact", "off") %}Close{% else %}Open{% endif %}
+        icon: >-
+         {% if is_state("binary_sensor.hallway_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
+
+      - name: master door
+        state: >-
+         {% if is_state("binary_sensor.master_door_contact", "off") %}Close{% else %}Open{% endif %}
+        icon: >-
+         {% if is_state("binary_sensor.master_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
+
+      - name: shion door
+        state: >-
+         {% if is_state("binary_sensor.shion_door_contact", "off") %}Close{% else %}Open{% endif %}
+        icon: >-
+         {% if is_state("binary_sensor.shion_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
