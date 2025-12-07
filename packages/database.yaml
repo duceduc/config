@@ -82,7 +82,7 @@ history:
 
 influxdb:
   api_version: 2
-  host: 192.168.1.55
+  host: 192.168.1.197
   port: 8015
   ssl: false
   verify_ssl: false

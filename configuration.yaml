@@ -139,16 +139,6 @@ rest:
 #
 #########################################################
 
-#influxdb:
-#  host: a0d7b954-influxdb
-#  port: 8086
-#  database: homeassistant
-#  username: !secret influx_user
-#  password: !secret influx_pass
-#  max_retries: 3
-#  default_measurement: state
-
-
 spotcast:  
   sp_dc: !secret duc_sp_dc
   sp_key: !secret duc_sp_key

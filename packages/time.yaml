@@ -18,14 +18,14 @@ sensor:
 
 template:
   - sensor:
-      - name: "Period of the day"  # dawn-day-dusk-night
+      - name: 'Period of the day'
         unique_id: period_of_the_day
-        state: >
+        state: >-
           {% set elevation = state_attr('sun.sun', 'elevation') %}
           {% set rising = state_attr('sun.sun', 'rising') %}
-          {%- if elevation <= -4.1 -%}
+          {%- if elevation <= -7 -%}
             night
-          {%- elif -4.1 < elevation <= +3.5 -%}
+          {%- elif -7 < elevation <= -1 -%}
             {{ 'dawn' if rising else 'dusk' }}
           {%- else -%}
             day
@@ -33,13 +33,13 @@ template:
         icon: >-
           {% set elevation = state_attr('sun.sun', 'elevation') %}
           {% set rising = state_attr('sun.sun', 'rising') %}
-          {%- if elevation <= -4.1 -%}
+          {%- if elevation <= -7 -%}
             mdi:weather-night
-          {%- elif -4.1 < elevation <= +3.5 -%}
+          {%- elif -7 < elevation <= -1 -%}
             mdi:weather-sunset-{{ 'up' if rising else 'down' }}
-          {%- else -%}
+          {% else %}
             mdi:weather-sunny
-          {%- endif -%}
+          {% endif %}
 
 
       - name: 'Today is'
