@@ -62,9 +62,15 @@ cards:
              cycle_days: 60
 
 
+
       - type: custom:simple-inventory-card
         entity: sensor.home_inventory
 
+
+
+      - type: custom:parcels-app-card
+        title: Parcels App Packages
+        max_height: 400px
 
 
 

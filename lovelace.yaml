@@ -38,6 +38,8 @@
         type: module
       - url: /local/custom_ui/simple-inventory-card.js?v=7
         type: module
+      - url: /local/custom_ui/parcels-app-card.js?v=5
+        type: module
 
       - url: /local/custom_ui/button-card.js
         type: module

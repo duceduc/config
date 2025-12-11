@@ -40,6 +40,12 @@ binary_sensor.master_clo_door_contact:
   friendly_name: master_closet
 binary_sensor.storage_door_contact:
   friendly_name: storage
+binary_sensor.duc_presence:
+  friendly_name: Duc
+binary_sensor.eri_presence:
+  friendly_name: Eri
+binary_sensor.shion_presence:
+  friendly_name: Shion
 
 sensor.desktop_3l5pa48_cputemperature:
   unit_of_measurement: '°C'
