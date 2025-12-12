@@ -3,7 +3,7 @@ from ..global_variables         import GlobalVariables as Gb
 from ..const                    import (HIGH_INTEGER, HHMMSS_ZERO, HHMM_ZERO, DATETIME_ZERO,
                                         DATETIME_FORMAT, WAZE_USED, )
 
-from .messaging                 import (_evlog, _log, post_event, log_exception, internal_error_msg, )
+from .messaging                 import (_evlog, _log, post_event, post_alert, log_exception, internal_error_msg, )
 from .utils                     import instr
 
 import homeassistant.util.dt    as dt_util
@@ -164,6 +164,7 @@ def secs_to_hhmm(secs_utc):
 
         hhmmss = time_to_12hrtime(time_local(secs_utc+30))
         hhmm = hhmmss[:-4] + hhmmss[-1:]
+        hhmm += secs_to_days(secs_utc, '-d')
 
         return hhmm
 
@@ -187,6 +188,39 @@ def secs_to(secs):
 
 def mins_to(secs):
     return round(secs_since(secs)/60)
+
+
+#--------------------------------------------------------------------
+def secs_to_days(secs, days_text):
+    ''' Return the number of days old as a text field '''
+
+    days = secs_since(secs)/86400
+    if days < 1:
+        return ''
+
+    if days_text.startswith('-'):
+        return f"-{days:.0f}{days_text[:1]}"
+    else:
+        return f"{days:.0f}{days_text}"
+
+#--------------------------------------------------------------------
+def next_min_mark_secs(mark_mins, plus_mins=0):
+    '''
+    now to next mins mark in secs 
+        10:23:23 --> 10:23:25 (5)
+        10:23:23 --> 10:23:35 (5, 10)
+        10:23:23 --> 10:23:30 (10)
+        10:23:23 --> 10:23:40 (10, 10)
+    '''
+
+    now_secs  = time_now_secs()
+    mark_secs = mark_mins * 60
+
+    secs_since_last_mins_mark = now_secs % mark_secs
+    secs_to_next_mins_mark    = mark_secs - secs_since_last_mins_mark
+    next_mark_secs            = now_secs + secs_to_next_mins_mark + (plus_mins * 60)
+
+    return next_mark_secs
 
 #--------------------------------------------------------------------
 def time_to_12hrtime(hhmmss, ampm=True):

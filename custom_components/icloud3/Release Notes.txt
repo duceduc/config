@@ -15,6 +15,107 @@ Gary
 <img src="https://gcobb321.github.io/icloud3_v3_docs/images/buymeacoffee-docs-button-icon.png" width="150" height="50"></a>
 
 
+## 🍎 iCloud3 v3.3.4.1 ()
+- Reverted to an unobscured Apple account on the _Update Apple Account_ and _Authenticate Apple Account Signon_ screens.
+
+
+
+## 🍎 iCloud3 v3.3.4 ()
+### 🍎 Improved Apple Accounts Handling
+- Errors occurring when validating a username/password or authenticating Apple account have been enhanced to provide more information.
+- Updated the PasswordSRP Authentication method to display more information messages if an error occurred.
+- Updated the PasswordSRP Authentication method to try to detecd accounts that could not be verified and needing a password change.
+- Enhanced the internal procedures for adding a new Apple account, relogging into an existing account and authenticating it.
+- Many other under the cover changes to improve error handling, messages and interaction with Apple servers.
+### 🗺️ Waze
+- Updated the Waze Route Time/Distance process to use Google's new data request URLs.
+
+### 🐞 Bug Fixes
+- If adding an Apple account on the _Update Apple Account screen_ was unsuccessful, an error would occur rebuilding the Apple accounts list.
+- If the username or password did not change and the Apple account was not logged into, nothing would happen when trying to log in again. Now, the login will be retried.
+- If a login was successful, the _NOT LOGGED INTO_ error message was not cleared on a successful login.
+
+
+
+
+## 🍎 iCloud3 v3.3.3 (11/22/2025)
+### Account Reauthentication
+- Fixed a `Config flow could not be loaded: 500 Internal Server Error Server got itself in trouble` error when trying to reauthenticate the Apple account after selecting the Orange Reauthentication button on _Devices & settings > iCloud3_. It did not occur when selecting the _Authenticate Apple Account Sign-In_ screen.
+### Startup
+- The results of the Internet Connection Test done during Startup, Stage 2 are now displayed in the Event Log and icloud3.log file.
+
+
+## 🍎 iCloud3 v3.3.2 (11/21/2025)
+### Apple account Error 503/Password SRP handling
+- Fixed several issues in the PasswordSRP handler dealing with verifying the password. This was creating the Server Not Available 503 error resulting in password authentication failures and login delays.
+### Update Apple Account screen
+- When the Apple account password is changed, it needs to also be changed on this screen, otherwise the account will not be logged into on the next iCloud3 restart. Fixed a problem verifying the new password, relogging into the account and requesting an authentication code.
+- *Multiple Apple accounts* - Fixed a problem when going from this screen to the *Authenticate Apple Account Sign-in screen. The selected account was not being reselected.
+### Authenticate Apple Account Sign-in screen
+- *Multiple Apple accounts* - When several accounts need to be authenticated, the correct one was not being reselected after requesting new code.
+- Improved handling of logging into the Apple account
+- The Apple account login attempt would only be retried when the username and password was changed even though the account was not logged into. This as been fixed.
+### Hardware Security Keys (YubiKey)
+- Removed the security key selection fields from the *Authenticate Apple Account Sign-in* screen until I get it working.
+
+
+
+### iCloud3 ➤ v3.3.1
+### 🚩 Updates to iCloud3 v3.3
+- Fixed the _TypeError: iCloudSession.request() got an unexpected keyword argument 'retry_cnt'_ error
+- Reverted displaying Security Key messages on the Authenticate Apple Account Sign-in screen
+- Changed the way Apple cookie files were handled to see if it helped cure the 'Server Not Available 503' error. It didn't.
+- The Apple Cookies are now being logged in the _icloud3.log_ file when the Apple account is logged into.
+
+### iCloud3 ➤ v3.3
+### 📢🚩✨💥🚀🎁 iCloud3 works again, you can log into your Apple Account
+- **Comments**
+    - I believe Apple reimplemented the authentication process they introduced last November that caused the same errors. This time, however, the native Python PyiCloud interface had already incorporated the changes that solved the problem. Thanks go to the PyiCloud team headed by @timlaing. It also helped that I was home and not on a cruise ship off the western coast of Africa like last time.
+- **Some Notes about the 503 Error you may still see**:
+    - Condition 1 - This is a new login, the iCloud session files with the Trust Tokens and Cookies are being created.
+    - Condition 2 - You are using multiple Apple Accounts.
+    - What happens - One account may login in fine (usually the first one), the other will fail with a _Server/PW-503_ error. This is displayed in the Event Log, Stage 4, the greenbar at the top of the Event Log and in the _iCloud3 Alerts_ sensor (sensor.icloud3_alerts).
+    - What to do: Wait about 5-minutes, then restart iCloud3 using _Event Log > Actions > Restart iCloud3_ option. Do it again later if it gave you the 503 Error again.
+
+- **Thanks for the Coffee**
+    - For those who encouraged me with the comments and coffee, thank you. I appreciate it.
+
+<a href="https://www.buymeacoffee.com/gcobb321" target="_blank">
+<img src="https://gcobb321.github.io/icloud3_v3_docs/images/buymeacoffee-docs-button-icon.png" width="150" height="50"></a>
+
+
+### ✨ New and Improved Features
+- **Apple Account**
+    - Added support for accepting updates to Apple's 'Terms of Use' documents.
+    - Added _Update Display/Run-Time Parameters_ screen to the _Update Apple Account_ screen
+- **Password SRP**
+    - Added support for using the PasswordSRP (Secure Remote Password Verification protocol) for verifying the password when logging into the Apple Account. Instead of sending the actual password over the internet, a 256-bit encrypted one-time key is sent to Apple.
+    - Special Notes:
+      - This may reduce the need for the 6-digit verification code entry (under long term review).
+      - There are times when Apple will issue the Verification code popup and iCloud3 has not detected that the code is needed. I have ignored it and have not seen any problems. I have entered it and it was accepted.
+    - Added option to enable/disable it on the _Update Apple Account > Update Display/Runtime Parameters_ screen. There may be times when a lot of logins to an Apple account will generate a 503 error and the Password will fail to be validated. Apple is refusing to handle it thinking it is a fraudulent transaction. After 20-30 (?) minutes, restart iCloud3 from the Event Log and it will usually validate and log into the account correctly.
+- **Internet Errors**
+    - Improved the operation of internet error detection and handling
+    - Improved the status messages displayed while monitoring the internet
+- **Security Keys (Yubikey) Support** (Incomplete and Currently Disabled)
+    - Changed error and status messages in the _Configure_ screens to support Verification Code and Security Key handling
+    - Added the ability to show the Security Key Names in the _Configure > Authenticate Apple Account Sign-in_ screen
+    - ToDo - Tie into HA to detect the Security Key Name used to authenticate the Apple Account sign-in
+- **iCloud Account I/O**
+    - *HA Event Loop Errors* - Moved the Internet Connection Error handler and the Apple Account Username/Password validate handler from the HA Event Loop to the iCloud3 thread that runs outside of the Event Loop. This simplified requesting data from the Apple Account, handling internet errors and avoids problems related to doing I/O outside of the Event Loop.
+    - *Docker Container* - iCloud3 should no longer have I/O issues related to running in a Docker container (hopefully).
+    - *Common icloud.com I/O handler* - Consolidated all internet data request calls through a central point for improved reliability, control and monitoring
+- **Startup**
+    - Logging into and verifying Apple accounts is now done in _Event Log/Stage 4_ to improve status monitoring
+    - Added status messages to the Event Log that show the Apple Account the results of each event during the authentication process
+- **Other Changes**
+    - Internal changes, module name changes, code cleanup and reorganization
+
+
+### 🐞 Bug Fixes
+- Fixed several 'NoneType' and unknown variable errors associated with verifying Apple username-password and Internet Errors.
+
+
 ### iCloud3 ➤ v3.2.4.2 (9/20/2025)
 ### 🐞 Bug Fixes
 - **Away Time Zone** - Fixed a problem where the time zone adjustment was reset to the Home zone server time zone when iCloud3 was restarted

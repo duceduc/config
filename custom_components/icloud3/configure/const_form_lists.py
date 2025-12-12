@@ -18,6 +18,7 @@ TITLE          = 'title'
 PATH           = 'path'
 ADD            = 'add'
 IC3DB          = 'ic3db-'
+NOT_LOGGED_IN  = 'NOT LOGGED IN'
 
 DATA_ENTRY_ALERT_CHAR = '⛔'
 DATA_ENTRY_ALERT      = f"      {DATA_ENTRY_ALERT_CHAR} "
@@ -31,11 +32,12 @@ MENU_PAGE_TITLE = [
 MENU_KEY_TEXT = {
         'data_source':          'APPLE ACCOUNTS & MOBILE APP > Add, Change and Delete Apple Accounts, Enable Monitoring the Mobile App ',
         'device_list':          'ICLOUD3 DEVICES  > Add, Change and Delete Tracked and Monitored Devices',
-        'verification_code':    'ENTER/REQUEST AN APPLE ACCOUNT VERIFICATION CODE > Enter or Request the 6-digit Apple Account Verification Code',
+        'verification_code':    'AUTHENTICATE APPLE ACCT SIGN-IN > Send the 6-digit Verification Code to Apple for account access verification',
+        'SK-verification_code':    'AUTHENTICATE APPLE ACCT SIGN-IN > Send the 6-digit Verification Code/Security Key Name to Apple for verification. Refresh expired codes/Security Key approval requests',
         'change_device_order':  'CHANGE DEVICE ORDER > Change the Event Log Device display and tracking update sequence',
         'sensors':              'SENSORS > Set Sensors created by iCloud3, Exclude Specific Sensors from being created',
         'dashboard_builder':    'DASHBOARD BUILDER > Build a Lovelace Dashboard to display device tracking information',
-        'tools':                'TOOLS > Log Level, Delete Apple Acct & Device Assignment, Delete Apple Acct Cookie & iCloud3 Config files, Repair sensor ‘_2’ entity name errors, Restart HA/Reload iCloud3',
+        'tools':                'TOOLS > Log Level, Delete Apple Acct & Device Assignment, Delete Apple Acct Cookie & iCloud3 Config files, Repair sensor ‘_2’ entity name errors, Restart HA & iCloud3',
 
         'away_time_zone':       'AWAY TIME ZONE > Select the displayed time zone for devices away from Home',
         'tracking_parameters':  'TRACKING PARAMETERS > Nearby Device Info, Accuracy Thresholds & Other Location Request Intervals',
@@ -84,15 +86,23 @@ ACTION_LIST_OPTIONS = {
         'select_form':              'SELECT > Select the parameter update form',
 
         'update_apple_acct':        'SELECT APPLE ACCOUNT > Update the Username/Password of the selected Apple Account, Add a new Apple Account, Remove the Apple Account',
-        'save_log_into_apple_acct': 'SAVE CHANGES, LOG INTO APPLE ACCT > Save any configuration changes, Log into the Apple Account',
+        'save_log_into_apple_acct': 'SAVE & LOG INTO APPLE ACCT > Save any configuration changes, Log into the Apple Account',
         'log_into_apple_acct':      'LOG INTO APPLE ACCT > Log into the Apple Account, Save any configuration changes',
         'stop_using_apple_acct':    'STOP USING AN APPLE ACCOUNT > Stop using an Apple Account, Remove it from the Apple Accounts list and all devices using it',
-        'verification_code':        'ENTER/REQUEST AN APPLE ACCOUNT VERIFICATION CODE > Enter (or Request) the 6-digit Apple Account Verification Code',
+        'verification_code':        'AUTHENTICATE APPLE ACCT SIGN-IN > Send/Request the 6-digit Verification Code',
         'delete_apple_acct':        'DELETE APPLE ACCOUNT > Delete the selected Apple Account. Delete or reassign iCloud3 devices using it',
+        'stop_login_retry':         'STOP RETRYING LOGIN > Stop retrying to log into the Apple Account',
+        'data_source_parameters':   'OTHER APPLE ACCOUNT PARAMETERS > Set run time or other config parameters (China Apple Server Location)',
 
-        'send_verification_code':   'SEND THE VERIFICATION CODE TO APPLE > Send the 6-digit Apple Account Verification Code back to Apple to approve access to Apple Account',
-        "request_verification_code":'REQUEST A NEW APPLE ACCOUNT VERIFICATION CODE > Reset Apple Account Interface and request a new Apple Account Verification Code',
+        'send_verification_code':   'SEND CODE TO APPLE TO AUTHENTICATE SIGN-IN > Send the Verification Code back to Apple to confirm access to the Apple Account',
+        'SK-send_verification_code':   'SEND CODE/KEY TO APPLE TO AUTHENTICATE SIGN-IN > Send the Verification Code or Security Key being used back to Apple to confirm access to the Apple Account',
+        'request_verification_code':'REQUEST NEW CODE > Display `Apple Acct Sign-in is Requested` window on a Trusted Device to get a new Code',
+        'SK-request_verification_code':'REQUEST NEW CODE/REFRESH SECURITY KEY LIST > Display `Apple Acct Sign-in is Requested` window on a Trusted Device to get a new Code or to confirm using a Security Key',
+
+        'X-send_verification_code':   'SEND VERIFICATION CODE > Send the Verification Code back to Apple to approve access to Apple Account',
+        'X-request_verification_code':'REQUEST A VERIFICATION CODE > Reset Apple Account Interface and request a new Verification Code on a Trusted Device',
         'cancel_verification_entry':'CANCEL > Cancel the Verification Code Entry and Close this screen',
+        'accept_terms_of_use':      'ACCEPT `TERMS OF USE` > Send `I Agree` to Apple updates to the `Terms of Use`',
 
         'update_device':            'SELECT THE DEVICE > Update the selected device, Add a new device to be tracked by iCloud3, Display more Devices on the next page',
         'add_device':               'ADD DEVICE > Continue to the `‘Update Devices`’ screen to finish setting up the new device',
@@ -103,7 +113,7 @@ ACTION_LIST_OPTIONS = {
         'inactive_to_track':        'TRACK ALL OR SELECTED > Change the `Tracking Mode‘ of all of the devices (or the selected devices) from `Inactive‘ to `Tracked‘',
         'inactive_keep_inactive':   'DO NOT TRACK, KEEP INACTIVE > None of these devices should be `Tracked‘ and should remain `Inactive‘',
 
-        'restart_ha':               'RESTART HOME ASSISTANT > Restart HA, Restart iCloud3',
+        'restart_ha':               'RESTART HOME ASSISTANT > Restart HA & iCloud3',
         'restart_icloud3':          'RESTART ICLOUD3 > Restart iCloud3 (Does not restart Home Assistant)',
         'restart_ic3_now':          'RESTART NOW > Restart iCloud3 now to load the updated configuration',
         'reload_icloud3':           'RELOAD ICLOUD3 ᐳ Reload & Restart iCloud3 (This does not load a new version)',
@@ -161,7 +171,8 @@ ADD = UNSELECTED = -1
 # Action List Items for all screens
 APPLE_ACCOUNT_ACTIONS = [
         ACTION_LIST_OPTIONS['update_apple_acct'],
-        ACTION_LIST_OPTIONS['delete_apple_acct']]
+        ACTION_LIST_OPTIONS['delete_apple_acct'],
+        ACTION_LIST_OPTIONS['data_source_parameters']]
 APPLE_ACCOUNT_DELETE_ACTIONS = [
         ACTION_LIST_OPTIONS['delete_apple_acct'],
         ACTION_LIST_OPTIONS['cancel_goto_previous']]
@@ -211,11 +222,12 @@ DASHBOARD_BUILDER_ACTIONS = [
         ACTION_LIST_OPTIONS['cancel_goto_menu']]
 TOOL_LIST = {
         'reset_data_source':      'CLEAR DEVICE`S DATA SOURCE SELECTIONS > Erase the `Apple Acct Device` and `Mobile App Device` selection fields for all iCloud3 devices (Update iCloud3 Device screen)',
-        'reset_tracking':         'REMOVE ALL APPLE ACCTS & DEVICES > Erase all Apple Accts (Data Sources - Apple Acct and Mobile App screen) and Erase all Devices (iCloud3 Devices screen)',
+        'reset_tracking':         'REMOVE ALL APPLE ACCTS & DEVICES > Erase all Apple Accts (Apple Acct and Mobile App screen) and Erase all Devices (iCloud3 Devices screen)',
         'reset_general':          'RESET GENERAL CONFIGURATION PARAMETERS > Set the `General Parameters` to their default value (Other Parameter Menu screens). Sensors are reset on the Sensors screen.',
         'del_apple_acct_cookies': 'DELETE ALL APPLE/ICLOUD COOKIE FILES > Delete Apple Acct Cookie & Session files in the ‘.storage/icloud3.apple_acct’ directory, Restart HA',
         'del_icloud3_config_files': 'DELETE ALL ICLOUD3 CONFIGURATION FILES > Delete the iCloud3  Configuration files in the ‘.storage/icloud3’ directory. Apple Accts will be reverified.',
-        'restart_ha_reload_icloud3': 'RESTART HA OR RELOAD ICLOUD3 > Restart Home Assistant, Reload current version of iCloud3',
+        'restart_ha_reload_icloud3': 'RESTART HA > Restart Home Assistant and iCloud3',
+        'X-restart_ha_reload_icloud3': 'RESTART HA OR RELOAD ICLOUD3 > Restart Home Assistant, Reload current version of iCloud3',
         'fix_entity_name_error':  'REPAIR ‘_2’ SENSOR ENTITY NAME ERRORS > Rename ‘_2’ sensor entities back to the correct name without the ‘_2’ extension',
         'goto_menu':                 'MENU > Return to the Menu screen',
 }
@@ -237,7 +249,7 @@ DATA_SOURCE_OPTIONS = {
         'MobApp':   'HA MOBILE APP - Location data and zone enter/exit triggers from devices with the Mobile App'
         }
 
-# Apple Server Endpoint value - Add onto the Server URL in PyiCloud_ic3 if this starts with a period ('.')
+# Apple Server Endpoint value - Add onto the Server URL in AppleAcct_ic3 if this starts with a period ('.')
 APPLE_SERVER_LOCATION_OPTIONS = {
         'usa':       'USA/OTHER - The Apple Server is not located in China',
         '.cn':       'CHINA - The Apple Server is located in China (GCJ02)',
@@ -435,7 +447,7 @@ ACTIONS_OTHER_ITEMS = {
         "wazehist_track":   "WAZE HIST MAP TRACK > Load route locations for map display",
         }
 ACTIONS_ACTION_ITEMS = {
-        "restart_ha":       "RESTART HA, RELOAD ICLOUD3 > Restart HA or Reload iCloud3",
+        "restart_ha":       "RESTART HA AND ICLOUD3 > Restart HA and iCloud3",
         "return":           "MAIN MENU > Return to the Main Menu"
         }
 

@@ -1,15 +1,14 @@
-import datetime as dt
 from typing import TYPE_CHECKING, override
 
 from homeassistant.components.climate import const as hacc
 
 from ...calendar import MtsSchedule
 from ...helpers import reverse_lookup
+from ...merossclient import merge_dicts
 from ...number import MLConfigNumber
 from ...sensor import MLEnumSensor
 from ...switch import MLEmulatedSwitch
 from .mtsthermostat import (
-    MtsCommonTemperatureNumber,
     MtsThermostatClimate,
     mc,
     mn_t,
@@ -19,7 +18,7 @@ if TYPE_CHECKING:
     from typing import ClassVar, Final
 
     from ...helpers.device import Device
-    from ...merossclient.protocol.types import thermostat as mt_t
+    from ...merossclient.protocol.types import MerossPayloadType, thermostat as mt_t
 
     """
     "Appliance.System.Ability",
@@ -123,7 +122,6 @@ class Mts300Climate(MtsThermostatClimate):
         mc.MTS300_WORK_MANUAL: MtsThermostatClimate.Preset.CUSTOM,
         mc.MTS300_WORK_SCHEDULE: MtsThermostatClimate.Preset.AUTO,
     }
-    MTS_MODE_TO_TEMPERATUREKEY_MAP = mc.MTS300_MODE_TO_TARGETTEMP_MAP
 
     # Mts300Climate class attributes
     HVAC_MODE_TO_MODE_MAP = {
@@ -257,45 +255,34 @@ class Mts300Climate(MtsThermostatClimate):
 
     @override
     async def async_set_temperature(self, **kwargs):
-        try:
-            temperature = kwargs[self.ATTR_TEMPERATURE]
-            try:
-                # check if maybe the service also sets hvac_mode
-                mode = self.HVAC_MODE_TO_MODE_MAP[kwargs[self.ATTR_HVAC_MODE]]
-            except KeyError:
-                mode = self._mts_mode
-            key = self.MTS_MODE_TO_TEMPERATUREKEY_MAP[mode]
-            if key:
-                # this is supposed to work when mts is in HEAT or COOL mode
-                await self._async_request_modeC(
-                    {
-                        "mode": mode,
-                        "work": mc.MTS300_WORK_MANUAL,
-                        "targetTemp": {key: round(temperature * self.device_scale)},
-                    }
-                )
-            else:
-                raise ValueError(
-                    f"set_temperature unsupported in this mode ({self.hvac_mode})"
-                )
+        format_temp = lambda t: round(t * self.device_scale)
 
-        except KeyError:
-            # missing ATTR_TEMPERATURE in service call
-            # it should be for RANGE mode
-            await self._async_request_modeC(
-                {
-                    "mode": mc.MTS300_MODE_AUTO,
-                    "work": mc.MTS300_WORK_MANUAL,
-                    "targetTemp": {
-                        "heat": round(
-                            kwargs[self.ATTR_TARGET_TEMP_LOW] * self.device_scale
-                        ),
-                        "cold": round(
-                            kwargs[self.ATTR_TARGET_TEMP_HIGH] * self.device_scale
-                        ),
-                    },
-                }
-            )
+        mode = self.HVAC_MODE_TO_MODE_MAP.get(kwargs.get(self.ATTR_HVAC_MODE), self._mts_mode)
+        target_temp = kwargs.get(self.ATTR_TEMPERATURE)
+        target_temp_low = kwargs.get(self.ATTR_TARGET_TEMP_LOW)
+        target_temp_high = kwargs.get(self.ATTR_TARGET_TEMP_HIGH)
+
+        # Make sure the combination of arguments passed is sane
+        if target_temp and mode == MtsThermostatClimate.HVACMode.HEAT_COOL:
+            raise ValueError("set_temperature cannot accept a single temperature parameter in 'heat_cool' mode")
+
+        modeC_args = {
+            "mode": mode,
+            "work": mc.MTS300_WORK_MANUAL,
+            "targetTemp": {}
+        }
+
+        if mode == mc.MTS300_MODE_HEAT:
+            target_temp_low = target_temp_low or target_temp
+        if mode == mc.MTS300_MODE_COOL:
+            target_temp_high = target_temp_high or target_temp
+
+        if target_temp_high:
+            modeC_args["targetTemp"]["cold"] = format_temp(target_temp_high)
+        if target_temp_low:
+            modeC_args["targetTemp"]["heat"] = format_temp(target_temp_low)
+
+        await self._async_request_modeC(modeC_args)
 
     @override
     async def async_set_fan_mode(self, fan_mode: str):
@@ -330,7 +317,7 @@ class Mts300Climate(MtsThermostatClimate):
         return self._mts_onoff and self._mts_work == mc.MTS300_WORK_SCHEDULE
 
     # interface: self
-    async def _async_request_modeC(self, payload: dict):
+    async def _async_request_modeC(self, payload: "MerossPayloadType", /):
         ns = self.ns
         payload |= {"channel": self.channel}
         if response := await self.manager.async_request_ack(
@@ -342,7 +329,7 @@ class Mts300Climate(MtsThermostatClimate):
                 payload = response[mc.KEY_PAYLOAD][ns.key][0]
             except (KeyError, IndexError):
                 # optimistic update
-                payload = self._mts_payload | payload
+                payload = merge_dicts(self._mts_payload, payload)  # type: ignore
             self._parse_modeC(payload)  # type: ignore
 
     # message handlers

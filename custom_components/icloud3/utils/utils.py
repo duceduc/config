@@ -44,8 +44,7 @@ def list_to_str(list_value, separator=None):
     if list_value == [] or list_value is None: return ''
 
     separator_str = separator if separator else ', '
-    if None in list_value or '' in list_value:
-        list_value = [lv for lv in list_value if lv is not None and lv != '']
+    list_value = [lv.strip() for lv in list_value if lv is not None and lv != '']
 
     list_str = separator_str.join(list_value) if list_value else 'None'
 
@@ -127,7 +126,6 @@ def dict_value_to_list(key_value_dict):
     return value_list
 
 
-
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #
 #   DATA VERIFICATION FUNCTIONS
@@ -175,6 +173,13 @@ def is_number(string):
         return False
 
 #--------------------------------------------------------------------
+def yes_no(true_false):
+    if true_false:
+        return 'Yes'
+    else:
+        return 'No'
+
+#--------------------------------------------------------------------
 def isbetween(number, min_value, max_value):
     '''
     Return True if the the number is between the other two numbers
@@ -192,6 +197,8 @@ def inlist(string, list_items):
 
 #--------------------------------------------------------------------
 def is_empty(list_dict_str):
+    if list_dict_str is None:
+        return True
     return not list_dict_str
 
 def isnot_empty(list_dict_str):
@@ -207,8 +214,6 @@ def round_to_zero(number):
         return 0.0
 
     return int_number/100000000
-    # if abs(value) < .00001: value = 0.0
-    # return round(value, 8)
 
 #--------------------------------------------------------------------
 def is_zone(zone):
@@ -331,12 +336,18 @@ def strip_lead_comma(text):
 
 #--------------------------------------------------------------------
 def username_id(username):
-    username_base = f"{username}@".split('@')[0]
+    _username_base = f"{username}@".split('@')[0]
+    _username_base = username_base(username)
 
-    if username_base in Gb.upw_filter_items:
-        return Gb.upw_filter_items[username_base]
+    if _username_base in Gb.upw_filter_items:
+        return Gb.upw_filter_items[_username_base]
     else:
-        return f"{username_base}@"
+        return f"{_username_base}@"
+
+#--------------------------------------------------------------------
+def username_base(username):
+    _username_base = f"{username}@".split('@')[0]
+    return f"{_username_base}@"
 
 #--------------------------------------------------------------------
 def format_cnt(desc, n):
@@ -418,14 +429,24 @@ def base64_decode(string):
     """
     Decode the string via base64 decoder
     """
-    # padding = 4 - (len(string) % 4)
-    # string = string + ("=" * padding)
-    # return base64.urlsafe_b64decode(string)
 
     base64_bytes = string.encode('ascii')
     string_bytes = base64.b64decode(base64_bytes)
     return string_bytes.decode('ascii')
 
+#--------------------------------------------------------------------
+def is_running_in_event_loop():
+    """
+    Checks if the current function is being executed within an asyncio event loop.
+    """
+    import asyncio
+    try:
+        asyncio.get_running_loop()
+        return True
+    except: # RuntimeError:
+        return False
+
+    return False
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #
