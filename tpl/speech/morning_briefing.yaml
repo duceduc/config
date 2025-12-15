@@ -153,7 +153,7 @@
             The {{ bat.name }} is at {{ bat.state }}%. 
             {{ ['This is lower than the minimum thresshold for satisfactory operation.',
                 'Any lower and it will cease to function.',
-                'That is pretty low'] | random }}
+                'That is pretty low.'] | random }}
             {{ ['So perhaps you should replace the batteries before it dies.',
                 'So it might be time for replacement batteries',
                 'So I guess you know what to do.' ] | random }}
@@ -165,22 +165,22 @@
             The {{ bat.name }} is less than 45%.
             {{ ['This is lower than the minimum thresshold for satisfactory operation.',
                 'Any lower and it will cease to function.',
-                'That is pretty low'] | random }}
+                'That is pretty low.'] | random }}
             {{ ['So perhaps you should replace the batteries before it dies.',
                 'So it might be time for replacement batteries',
                 'So I guess you know what to do.' ] | random }}
             {% endfor %}
             {% else %} 
-                you have no batteries to replace.
+                You have no batteries to replace.
             {% endif %}
       </p>
 
       <p>
           {{ ['That about wraps it up for today. Have a good one.',   
-              'Well there you have it.  I have expended terajoules of energy and gigabytes of processing power putting this report together for you.  Did you hear a word of it?  Oh well, there is always tomorrow.', 'That is all for today. Shall we do it again tomorrow? Same time, same place?',
+              'Well there you have it.  I have expended terajoules of energy and gigabytes of processing power putting this report together for you.  Did you hear a word of it?  Oh well there is always tomorrow.', 'That is all for today. Shall we do it again tomorrow? Same time same place?',
               'That concludes todays report. Tune in at the same time tomorrow for another thrilling report.',   
               'Thats all folks. Perhaps you could give me something more meaningful to do before we do this all over again tomorrow? ',   
-              'Thats all for now. Have a good day'] | random }}
+              'Thats all for now. Have a good day.'] | random }}
       </p>
       <p>
           {{ ["and one more thing, I seek not to know the answer, but simply to understand the question.",
