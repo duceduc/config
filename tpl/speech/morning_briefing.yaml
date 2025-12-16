@@ -155,7 +155,7 @@
                 'Any lower and it will cease to function.',
                 'That is pretty low.'] | random }}
             {{ ['So perhaps you should replace the batteries before it dies.',
-                'So it might be time for replacement batteries',
+                'So it might be time for replacement batteries.',
                 'So I guess you know what to do.' ] | random }}
             {% endfor %}
           {% elif srv_batts_count > 0 %}  
@@ -167,7 +167,7 @@
                 'Any lower and it will cease to function.',
                 'That is pretty low.'] | random }}
             {{ ['So perhaps you should replace the batteries before it dies.',
-                'So it might be time for replacement batteries',
+                'So it might be time for replacement batteries.',
                 'So I guess you know what to do.' ] | random }}
             {% endfor %}
             {% else %} 

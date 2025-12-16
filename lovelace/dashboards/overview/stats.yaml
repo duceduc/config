@@ -13,7 +13,9 @@ cards:
 
 
   - type: iframe
-    url: 'https://www.flightradar24.com/simple?lat=35.51&lon=139.75&z=13&label1=reg&size=small'
+    url: 'https://globe.adsb.fi/?enableLabels&trackLabels&zoom=12&hideSideBar&SiteLat=35.51&SiteLon=139.75'
+
+#    url: 'https://www.flightradar24.com/simple?lat=35.51&lon=139.75&z=13&label1=reg&size=small'
 #    url: 'https://graf.snailmsg.com/d/o3kbHKqSz/iot-dashboard?orgId=1&kiosk=tv&fullscreen&kiosk=1&refresh=30s'
     aspect_ratio: 100%
 
