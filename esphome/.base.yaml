@@ -1,6 +1,7 @@
   
 wifi:
   ssid: !secret ssid
+  min_auth_mode: WPA2
   password: !secret ssid_pwd
 
 
@@ -17,4 +18,4 @@ ota:
   - platform: esphome
     password: !secret ota_pass
 
-captive_portal:
+#captive_portal:
