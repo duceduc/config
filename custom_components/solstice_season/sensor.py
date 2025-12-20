@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -30,6 +32,7 @@ from .const import (
     ICON_SPRING,
     ICON_SUMMER,
     ICON_WINTER,
+    MODE_ASTRONOMICAL,
     SEASON_ICONS,
     SENSOR_AUTUMN_EQUINOX,
     SENSOR_CURRENT_SEASON,
@@ -42,6 +45,10 @@ from .const import (
     TREND_ICONS,
 )
 from .coordinator import SolsticeSeasonCoordinator
+
+# Load version from manifest.json
+MANIFEST = json.loads((Path(__file__).parent / "manifest.json").read_text())
+VERSION = MANIFEST["version"]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -73,6 +80,7 @@ SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
         extra_state_attributes_fn=lambda data: {
             "mode": data.get("mode", "astronomical"),
             "hemisphere": data.get("hemisphere", "northern"),
+            "season_age": data["season_age"],
             "spring_start": data["spring_start"],
             "summer_start": data["summer_start"],
             "autumn_start": data["autumn_start"],
@@ -207,12 +215,19 @@ class SolsticeSeasonSensor(
 
         All sensors are grouped under a single device with the user's chosen name.
         """
+        mode = self._config_entry.data[CONF_MODE]
+        model = (
+            "Astronomical Calculator"
+            if mode == MODE_ASTRONOMICAL
+            else "Meteorological Calculator"
+        )
+
         return DeviceInfo(
             identifiers={(DOMAIN, self._config_entry.entry_id)},
             name=self._config_entry.data[CONF_NAME],
             manufacturer="Solstice Season",
-            model="Astronomical Calculator",
-            sw_version="1.0.0",
+            model=model,
+            sw_version=VERSION,
         )
 
     @property

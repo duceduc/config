@@ -39,6 +39,7 @@ class SeasonData(TypedDict):
     """Type definition for season calculation results."""
 
     current_season: str
+    season_age: int
     spring_start: str
     summer_start: str
     autumn_start: str
@@ -391,6 +392,42 @@ def get_next_season_change(
     return next_change, next_season
 
 
+def get_current_season_start(
+    current_season: str,
+    hemisphere: str,
+    current_year_events: AstronomicalEvents,
+    previous_year_events: AstronomicalEvents,
+    now: datetime,
+) -> datetime:
+    """Get the start date of the currently running season.
+
+    This returns the actual start date of the current season, even if it
+    started in the previous year (e.g., winter starting in December).
+
+    Args:
+        current_season: The current season (spring, summer, autumn, winter).
+        hemisphere: Either 'northern' or 'southern'.
+        current_year_events: Events for the current year.
+        previous_year_events: Events for the previous year.
+        now: Current datetime.
+
+    Returns:
+        The datetime when the current season started.
+    """
+    mapping = SEASON_MAPPING[hemisphere]
+    event_name = mapping[current_season]
+
+    # Get the event from current year
+    current_year_start = current_year_events[event_name]
+
+    # If we're past this year's event, current season started this year
+    if now >= current_year_start:
+        return current_year_start
+
+    # Otherwise, the current season started last year
+    return previous_year_events[event_name]
+
+
 def calculate_season_data(hemisphere: str, mode: str, now: datetime) -> SeasonData:
     """Calculate all season-related data.
 
@@ -407,14 +444,20 @@ def calculate_season_data(hemisphere: str, mode: str, now: datetime) -> SeasonDa
     """
     year = now.year
 
-    # Get events based on calculation mode
+    # Always get astronomical events (needed for daylight trend calculation)
+    astronomical_events = get_astronomical_events(year)
+    astronomical_events_next = get_astronomical_events(year + 1)
+
+    # Get events based on calculation mode for season determination
     if mode == MODE_ASTRONOMICAL:
-        current_events = get_astronomical_events(year)
-        next_events = get_astronomical_events(year + 1)
+        previous_events = get_astronomical_events(year - 1)
+        current_events = astronomical_events
+        next_events = astronomical_events_next
         current_season = determine_current_season_astronomical(
             hemisphere, now, current_events
         )
     else:
+        previous_events = get_meteorological_events(year - 1, hemisphere)
         current_events = get_meteorological_events(year, hemisphere)
         next_events = get_meteorological_events(year + 1, hemisphere)
         current_season = determine_current_season_meteorological(hemisphere, now)
@@ -445,14 +488,15 @@ def calculate_season_data(hemisphere: str, mode: str, now: datetime) -> SeasonDa
     autumn_start_event = current_events[mapping[SEASON_AUTUMN]]
     winter_start_event = current_events[mapping[SEASON_WINTER]]
 
+    # Daylight trend is always based on astronomical solstices (physical reality)
     daylight_trend = calculate_daylight_trend(
         now,
-        current_events["june_solstice"],
-        current_events["december_solstice"],
+        astronomical_events["june_solstice"],
+        astronomical_events["december_solstice"],
     )
 
     next_trend_change, next_trend_event_type = get_next_solstice(
-        hemisphere, now, current_events, next_events
+        hemisphere, now, astronomical_events, astronomical_events_next
     )
     days_until_trend_change = calculate_days_until(next_trend_change.date(), today)
 
@@ -461,8 +505,14 @@ def calculate_season_data(hemisphere: str, mode: str, now: datetime) -> SeasonDa
     )
     days_until_season_change = calculate_days_until(next_season_change.date(), today)
 
+    current_season_start = get_current_season_start(
+        current_season, hemisphere, current_events, previous_events, now
+    )
+    season_age = (today - current_season_start.date()).days
+
     return SeasonData(
         current_season=current_season,
+        season_age=season_age,
         spring_start=spring_start_event.date().isoformat(),
         summer_start=summer_start_event.date().isoformat(),
         autumn_start=autumn_start_event.date().isoformat(),
