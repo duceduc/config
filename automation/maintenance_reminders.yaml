@@ -4,6 +4,8 @@
 #                                                                                                              
 #########################################################
 
+
+## NOT TO REDO THIS AUTOMATION. SENSOR WAS DELETE FROM UPDATE VERSION
 - alias: Notify about expiring inventory items
   trigger:
     - platform: numeric_state
@@ -35,15 +37,31 @@
 
 
 
-
-
-
-
 #########################################################
 #                                                                                                              
 #             Maintenance Reminders                                                                  
 #                                                                                                              
 #########################################################
+
+
+- alias: 'Clean Nozzle Filters Notification'
+  triggers:
+    - trigger: template
+      value_template: "{{ state_attr('sensor.home_next_season_change', 'days_until') | int(0) == 0 }}"
+      id: 'on'
+    - trigger: template
+      value_template: "{{ state_attr('sensor.home_next_season_change', 'days_until') | int(0) >= 1 }}"
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'on'
+          sequence:
+            - action: input_boolean.turn_on
+              entity_id: input_boolean.home_next_season_change # triggers an alert start
+      default:
+        - action: input_boolean.turn_off
+          entity_id: input_boolean.home_next_season_change # triggers an alert to stop
 
 
 # Clean Aircon Filters Start of Season
@@ -59,6 +77,13 @@
     - action: switch.toggle # Aircon Filters
       entity_id: group.clean_aircon_filter
     - action: script.toilet_nozzle_cleaning
+
+
+
+
+
+
+
 
 
 #########################################################

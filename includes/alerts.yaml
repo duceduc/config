@@ -3,7 +3,7 @@
 #             Traval Time Monitor Alerts                                                 
 #                                                                                                              
 #########################################################
-
+# For testing, turn on their respective input_boolean entity
 
   eri_heading_home:
     name: Eri is headed home
@@ -180,6 +180,29 @@
     notifiers:
       - greenapi
 #     - telegram_bot_1730593885_591654584 # ha chat via telegram
+
+
+
+  clean_nozzle_filters_notification:
+    name: Clean Nozzle Filters Notification
+    message: "The next season changes to {{ state_attr('sensor.home_next_season_change', 'event_type') }} will happen in {{ ((states('sensor.home_next_season_change')|as_timestamp(default=0) - utcnow()|as_timestamp)/3600)|round }} hours."
+    entity_id: input_boolean.home_next_season_change
+    state: 'on'
+    repeat:
+      - 15
+      - 360 # 6 hrs
+      - 660 # 11 hrs
+    can_acknowledge: false
+    skip_first: false
+    notifiers:
+      - greenapi
+      - amberthebot
+#      - telegram_bot_1730593885_591654584 # ha chat via telegram
+
+
+
+
+
 
 
 #########################################################

@@ -177,6 +177,8 @@
 #
 #########################################################
 
+  home_next_season_change:
+
   good_morning_report:
     name: Good Morning Report
     icon: mdi:newspaper
@@ -201,6 +203,7 @@
 
   text_notify_isp:
     name: Text Notify Isp
+
 
 
  #########################################################

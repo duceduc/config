@@ -59,6 +59,7 @@
     platform: telegram
     chat_id: !secret telegram_chatid
 
+# https://console.green-api.com/
 # free plan limits to 3 chats /month (group or private)
   - name: greenapi
     platform: greenapi
