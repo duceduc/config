@@ -43,7 +43,7 @@
 #                                                                                                              
 #########################################################
 
-
+# solstice season integration - sensors update 32mins pass the hour.
 - alias: 'Clean Nozzle Filters Notification'
   triggers:
     - trigger: template

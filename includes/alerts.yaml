@@ -190,7 +190,7 @@
     state: 'on'
     repeat:
       - 15
-      - 360 # 6 hrs
+      - 300 # 5 hrs
       - 660 # 11 hrs
     can_acknowledge: false
     skip_first: false
@@ -200,7 +200,26 @@
 #      - telegram_bot_1730593885_591654584 # ha chat via telegram
 
 
-
+#        The next season changes to {{ state_attr('sensor.home_next_season_change', 'event_type') }} will happen in 
+#
+#        {%- set hours =  ((states('sensor.home_next_season_change')|as_timestamp(default=0) - utcnow()|as_timestamp)/3600)|round -%}
+#        {%- set mins = hours * 60 -%}
+#        {%- set days = hours * 60 / 1440 -%}
+#
+#        {%- if days == 1 -%}
+#          one day.
+#        {% elif days | int > 1 and hours | int > 1 %}
+#          {{ days | int }} days.
+#
+#        {%- elif hours == 1 -%}
+#          one hour.
+#        {% elif hours | int > 1 and mins | int > 1 %}
+#          {{ hours | int }} hours.
+#
+#        {% elif mins == 1 %} one minute.
+#        {% else %}
+#          {{ mins | int }} minutes.
+#        {% endif %}
 
 
 
