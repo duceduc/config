@@ -324,14 +324,23 @@ automation:
       - action: script.washer_running
       - action: script.washer_monitor
 
+
+
   - alias: Washer Complete
     initial_state: true
     triggers:
-      - trigger: numeric_state
-        entity_id: sensor.gosund_washer_power
-        below: 7
-        for: 36
+#      - trigger: numeric_state
+#        entity_id: sensor.gosund_washer_power
+#        below: 7
+#        for: 36
+#        id: 'done'
+
+      - trigger: state
+        entity_id: binary_sensor.hitachi_washer_running
+        from: 'on'
+        to: 'off'
         id: 'done'
+
       - trigger: template
 #        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"      
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 or states('sensor.gosund_washer_power')| int(0) == 6 }}"
