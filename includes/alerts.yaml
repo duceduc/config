@@ -152,7 +152,7 @@
         {% elif seconds == 0 %} seconds ago. {% else %} {{ (seconds // 60) | int }} minutes ago. {% endif %}
         {% if (states.sensor.line_dry_time.state|int/60)|int < ((as_timestamp(state_attr('sun.sun','next_setting'))-as_timestamp(now()))/60/60)|int and states.sensor.line_dry_time.state|int+1 > 0 %} You have time to line dry before sunset. Estimated Time to dry is {{(states.sensor.line_dry_time.state|int/60)|round(1)}} hours.
         {%- for cat in states.sensor.my_weather_forecast_hourly.attributes.forecast -%}
-        {%- if cat.precipitation_probability >0 and loop.index < (states.sensor.line_dry_time.state|int/60)|int+1%} There is a {{cat.precipitation_probability}}% chance of rain in {{loop.index}} hours from now.
+        {%- if cat.precipitation_probability >0 and loop.index < (states.sensor.line_dry_time.state|int/60)|int+1%} There is a {{cat.precipitation_probability}}% chance of rain in {{loop.index}} hours from now. *
         {%- endif %}{%- endfor %}{%- endif %}
 
     entity_id: input_boolean.washer_finished
