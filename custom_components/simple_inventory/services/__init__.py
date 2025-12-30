@@ -1,8 +1,10 @@
 """Service handlers for Simple Inventory integration."""
 
 import logging
+from typing import Any
 
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.util.json import JsonObjectType
 
 from ..coordinator import SimpleInventoryCoordinator
 from ..todo_manager import TodoManager
@@ -47,6 +49,14 @@ class ServiceHandler:
     async def async_decrement_item(self, call: ServiceCall) -> None:
         """Decrement item quantity."""
         await self.quantity_service.async_decrement_item(call)
+
+    async def async_get_items(self, call: ServiceCall) -> JsonObjectType:
+        """Return full item list for an inventory."""
+        return await self.inventory_service.async_get_items(call)
+
+    async def async_get_items_from_all_inventories(self, call: ServiceCall) -> JsonObjectType:
+        """Return grouped items for all inventories."""
+        return await self.inventory_service.async_get_items_from_all_inventories(call)
 
 
 __all__ = ["ServiceHandler", "InventoryService", "QuantityService"]

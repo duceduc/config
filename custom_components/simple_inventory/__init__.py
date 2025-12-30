@@ -2,12 +2,14 @@ import logging
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, SupportsResponse
 
 from .const import (
     DOMAIN,
     SERVICE_ADD_ITEM,
     SERVICE_DECREMENT_ITEM,
+    SERVICE_GET_ALL_ITEMS,
+    SERVICE_GET_ITEMS,
     SERVICE_INCREMENT_ITEM,
     SERVICE_REMOVE_ITEM,
     SERVICE_UPDATE_ITEM,
@@ -15,6 +17,8 @@ from .const import (
 from .coordinator import SimpleInventoryCoordinator
 from .schemas.service_schemas import (
     ADD_ITEM_SCHEMA,
+    GET_ALL_ITEMS_SCHEMA,
+    GET_ITEMS_SCHEMA,
     QUANTITY_UPDATE_SCHEMA,
     REMOVE_ITEM_SCHEMA,
     UPDATE_ITEM_SCHEMA,
@@ -70,6 +74,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             SERVICE_DECREMENT_ITEM,
             service_handler.async_decrement_item,
             schema=QUANTITY_UPDATE_SCHEMA,
+        )
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_GET_ITEMS,
+            service_handler.async_get_items,
+            schema=GET_ITEMS_SCHEMA,
+            supports_response=SupportsResponse.ONLY,
+        )
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_GET_ALL_ITEMS,
+            service_handler.async_get_items_from_all_inventories,
+            schema=GET_ALL_ITEMS_SCHEMA,
+            supports_response=SupportsResponse.ONLY,
         )
 
         hass.data[DOMAIN]["coordinator"] = coordinator

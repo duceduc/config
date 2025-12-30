@@ -3,7 +3,7 @@ add_item:
   fields:
     inventory_id:
       description: ID of the inventory to add to
-      example: "kitchen_freezer"
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
       required: true
     name:
       description: Name of the item
@@ -54,13 +54,23 @@ add_item:
       example: Basement Refrigerator
       required: false
       default: ""
+    description:
+      description: Item description
+      example: "Junk food"
+      required: false
+      default: ""
+    auto_add_id_to_description_enabled:
+      description: Appends the inventory ID to the description
+      example: 1
+      required: false
+      default: 0
 
 remove_item:
   description: Remove an item from an inventory
   fields:
     inventory_id:
       description: ID of the inventory to remove from
-      example: "kitchen_freezer"
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
       required: true
     name:
       description: Name of the item to remove
@@ -72,7 +82,7 @@ increment_item:
   fields:
     inventory_id:
       description: ID of the inventory
-      example: "kitchen_freezer"
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
       required: true
     name:
       description: Name of the item
@@ -89,7 +99,7 @@ decrement_item:
   fields:
     inventory_id:
       description: ID of the inventory
-      example: "kitchen_freezer"
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
       required: true
     name:
       description: Name of the item
@@ -106,7 +116,7 @@ update_item:
   fields:
     inventory_id:
       description: ID of the inventory
-      example: "kitchen_freezer"
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
       required: true
     old_name:
       description: Current name of the item
@@ -153,3 +163,29 @@ update_item:
       example: Basement Refrigerator
       required: false
       default: ""
+    description:
+      description: Item description
+      example: "Junk food"
+      required: false
+      default: ""
+    auto_add_id_to_description_enabled:
+      description: Appends the inventory ID to the description
+      example: 1
+      required: false
+      default: 0
+
+get_items:
+  description: Return the full list of items for an inventory. Use return_response. Can specify either inventory_id or inventory_name (but not both).
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: false
+    inventory_name:
+      description: Name of the inventory (case-insensitive)
+      example: "Kitchen Freezer"
+      required: false
+
+get_items_from_all_inventories:
+  description: Return the full list of items grouped by inventory. Use return_response.
+  fields: {}
