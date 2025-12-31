@@ -51,6 +51,7 @@ from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.loader import async_get_integration
 from homeassistant.util import dt, slugify
 import voluptuous as vol
 
@@ -79,7 +80,7 @@ from .const import (
     MIN_TIME_BETWEEN_FORCED_SCANS,
     MIN_TIME_BETWEEN_SCANS,
     SCAN_INTERVAL,
-    STARTUP,
+    STARTUP_MESSAGE,
 )
 from .exceptions import TimeoutException
 from .helpers import (
@@ -87,6 +88,7 @@ from .helpers import (
     _existing_serials,
     alarm_just_dismissed,
     calculate_uuid,
+    safe_get,
 )
 from .notify import async_unload_entry as notify_async_unload_entry
 from .services import AlexaMediaServices
@@ -132,9 +134,19 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 
-async def async_setup(hass, config, discovery_info=None):
-    # pylint: disable=unused-argument
+async def async_setup(hass, config):
     """Set up the Alexa domain."""
+    integration = await async_get_integration(hass, DOMAIN)
+    integration_name = integration.name or "<not available>"
+    _LOGGER.info(
+        STARTUP_MESSAGE.format(
+            name=integration_name,
+            ISSUE_URL=ISSUE_URL,
+            DOMAIN=DOMAIN,
+            version=integration.version,
+            alexapy_version=alexapy_version,
+        )
+    )
     if DOMAIN not in config:
         _LOGGER.debug(
             "Nothing to import from configuration.yaml, loading from Integrations",
@@ -237,8 +249,8 @@ async def async_setup_entry(hass, config_entry):
     async def close_alexa_media(event=None) -> None:
         """Clean up Alexa connections."""
         _LOGGER.debug("Received shutdown request: %s", event)
-        if hass.data.get(DATA_ALEXAMEDIA, {}).get("accounts"):
-            for email, _ in hass.data[DATA_ALEXAMEDIA]["accounts"].items():
+        if accounts := safe_get(hass.data, [DATA_ALEXAMEDIA, "accounts"], {}):
+            for email, _ in accounts.items():
                 await close_connections(hass, email)
 
     async def complete_startup(event=None) -> None:
@@ -288,9 +300,6 @@ async def async_setup_entry(hass, config_entry):
             )
             await setup_alexa(hass, config_entry, login_obj)
 
-    if not hass.data.get(DATA_ALEXAMEDIA):
-        _LOGGER.debug(STARTUP)
-        _LOGGER.debug("Loaded alexapy==%s", alexapy_version)
     hass.data.setdefault(
         DATA_ALEXAMEDIA, {"accounts": {}, "config_flows": {}, "notify_service": None}
     )
@@ -695,9 +704,13 @@ async def setup_alexa(hass, config_entry, login_obj: AlexaLogin):
                 .get(serial)
                 .enabled
             ):
-                await hass.data[DATA_ALEXAMEDIA]["accounts"][email]["entities"][
-                    "media_player"
-                ].get(serial).refresh(device, skip_api=True)
+                await (
+                    hass.data[DATA_ALEXAMEDIA]["accounts"][email]["entities"][
+                        "media_player"
+                    ]
+                    .get(serial)
+                    .refresh(device, skip_api=True)
+                )
         _LOGGER.debug(
             "%s: Existing: %s New: %s;"
             " Filtered out by not being in include: %s "
@@ -818,9 +831,7 @@ async def setup_alexa(hass, config_entry, login_obj: AlexaLogin):
                     notification["date_time"] = (
                         f"{n_date} {n_time}" if n_date and n_time else None
                     )
-                    previous_alarm = (
-                        previous.get(n_dev_id, {}).get("Alarm", {}).get(n_id)
-                    )
+                    previous_alarm = safe_get(previous, [n_dev_id, "Alarm", n_id], {})
                     if previous_alarm and alarm_just_dismissed(
                         notification,
                         previous_alarm.get("status"),
@@ -1577,7 +1588,7 @@ async def async_unload_entry(hass, entry) -> bool:
             else:
                 _LOGGER.debug("Forwarding unload entry to %s", component)
                 await hass.config_entries.async_forward_entry_unload(entry, component)
-        except Exception as ex:
+        except Exception:
             _LOGGER.error("Error unloading: %s", component)
     await close_connections(hass, email)
     for listener in hass.data[DATA_ALEXAMEDIA]["accounts"][email][DATA_LISTENER]:
