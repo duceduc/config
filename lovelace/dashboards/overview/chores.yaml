@@ -61,16 +61,33 @@ cards:
              warning_before: 1
              cycle_days: 60
 
+      - type: custom:parcels-app-card
+        title: Parcels App Packages
+        max_height: 400px
 
 
       - type: custom:simple-inventory-card
         entity: sensor.home_inventory
 
 
+# TESTING
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: sensor.homeft24_current_in_area
+            above: 0
+        card:
+          type: markdown
+          content: >-
+            {% set data =
+            state_attr('sensor.homeft24_current_in_area','flights') %} {% for
+            flight in data %}
+              <pre>  {%if flight.airline_iata %}<img src="https://images.daisycon.io/airline/?width=140&height=27&iata={{ flight.airline_iata }}" /> {% endif %}  {%if flight.airport_origin_city %}<img src="https://flagsapi.com/{{ flight.airport_origin_country_code }}/flat/64.png" height="30"/>{% endif %}   {%if flight.airport_destination_country_code %}<img src="https://flagsapi.com/{{ flight.airport_destination_country_code }}/flat/64.png" height="30" />{% endif %}
+              {{ flight.flight_number }} {{ flight.airport_origin_code_iata }}-{{ flight.airport_destination_code_iata }} / {{ flight.aircraft_model }}
+              Altitude {{(flight.altitude * 0.3048)| round(0)}}m / Speed {{(flight.ground_speed * 1.852)| round(0)}}km/h / {{ flight.aircraft_registration }} </pre>
+              {% endfor %}
 
-      - type: custom:parcels-app-card
-        title: Parcels App Packages
-        max_height: 400px
+
 
 
 

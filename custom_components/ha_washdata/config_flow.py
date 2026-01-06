@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import time
 from typing import Any
 
 import voluptuous as vol
@@ -21,10 +23,13 @@ from .const import (
     CONF_NOTIFY_EVENTS,
     CONF_NO_UPDATE_ACTIVE_TIMEOUT,
     CONF_SMOOTHING_WINDOW,
+    CONF_START_DURATION_THRESHOLD,
+    CONF_DEVICE_TYPE,
     CONF_PROFILE_DURATION_TOLERANCE,
     CONF_AUTO_MERGE_LOOKBACK_HOURS,
     CONF_AUTO_MERGE_GAP_SECONDS,
     CONF_APPLY_SUGGESTIONS,
+    CONF_SHOW_ADVANCED,
     CONF_INTERRUPTED_MIN_SECONDS,
     CONF_ABRUPT_DROP_WATTS,
     CONF_ABRUPT_DROP_RATIO,
@@ -44,6 +49,9 @@ from .const import (
     CONF_AUTO_TUNE_NOISE_EVENTS_THRESHOLD,
     CONF_COMPLETION_MIN_SECONDS,
     CONF_NOTIFY_BEFORE_END_MINUTES,
+    CONF_RUNNING_DEAD_ZONE,
+    CONF_END_REPEAT_COUNT,
+    CONF_SMART_EXTENSION_THRESHOLD,
     NOTIFY_EVENT_START,
     NOTIFY_EVENT_FINISH,
     DEFAULT_NAME,
@@ -51,7 +59,10 @@ from .const import (
     DEFAULT_OFF_DELAY,
     DEFAULT_NO_UPDATE_ACTIVE_TIMEOUT,
     DEFAULT_SMOOTHING_WINDOW,
+    DEFAULT_START_DURATION_THRESHOLD,
+    DEFAULT_DEVICE_TYPE,
     DEFAULT_PROFILE_DURATION_TOLERANCE,
+    DEVICE_TYPES,
     DEFAULT_AUTO_MERGE_LOOKBACK_HOURS,
     DEFAULT_AUTO_MERGE_GAP_SECONDS,
     DEFAULT_INTERRUPTED_MIN_SECONDS,
@@ -73,6 +84,9 @@ from .const import (
     DEFAULT_AUTO_TUNE_NOISE_EVENTS_THRESHOLD,
     DEFAULT_COMPLETION_MIN_SECONDS,
     DEFAULT_NOTIFY_BEFORE_END_MINUTES,
+    DEFAULT_RUNNING_DEAD_ZONE,
+    DEFAULT_END_REPEAT_COUNT,
+    DEFAULT_SMART_EXTENSION_THRESHOLD,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -80,6 +94,15 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
+        vol.Required(CONF_DEVICE_TYPE, default=DEFAULT_DEVICE_TYPE): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[
+                    selector.SelectOptionDict(value=k, label=v)
+                    for k, v in DEVICE_TYPES.items()
+                ],
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            )
+        ),
         vol.Required(CONF_POWER_SENSOR): selector.EntitySelector(
             selector.EntitySelectorConfig(domain="sensor"),
         ),
@@ -109,6 +132,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         options.setdefault(CONF_DURATION_TOLERANCE, DEFAULT_DURATION_TOLERANCE)
         options.setdefault(CONF_AUTO_LABEL_CONFIDENCE, DEFAULT_AUTO_LABEL_CONFIDENCE)
         options.setdefault(CONF_AUTO_MAINTENANCE, DEFAULT_AUTO_MAINTENANCE)
+        
+        # New Feature Defaults (Migration)
+        options.setdefault(CONF_DEVICE_TYPE, data.get(CONF_DEVICE_TYPE, DEFAULT_DEVICE_TYPE))
+        options.setdefault(CONF_START_DURATION_THRESHOLD, DEFAULT_START_DURATION_THRESHOLD)
+
         # Seed detector settings if missing
         options.setdefault(CONF_SMOOTHING_WINDOW, DEFAULT_SMOOTHING_WINDOW)
         options.setdefault(CONF_NO_UPDATE_ACTIVE_TIMEOUT, DEFAULT_NO_UPDATE_ACTIVE_TIMEOUT)
@@ -130,6 +158,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         options.setdefault(CONF_AUTO_TUNE_NOISE_EVENTS_THRESHOLD, DEFAULT_AUTO_TUNE_NOISE_EVENTS_THRESHOLD)
         options.setdefault(CONF_COMPLETION_MIN_SECONDS, DEFAULT_COMPLETION_MIN_SECONDS)
         options.setdefault(CONF_NOTIFY_BEFORE_END_MINUTES, DEFAULT_NOTIFY_BEFORE_END_MINUTES)
+        # New dead zone and end repeat count defaults
+        options.setdefault(CONF_RUNNING_DEAD_ZONE, DEFAULT_RUNNING_DEAD_ZONE)
+        options.setdefault(CONF_END_REPEAT_COUNT, DEFAULT_END_REPEAT_COUNT)
+        options.setdefault(CONF_SMART_EXTENSION_THRESHOLD, DEFAULT_SMART_EXTENSION_THRESHOLD)
 
         # Bump version and save
         self.hass.config_entries.async_update_entry(
@@ -141,18 +173,76 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         _LOGGER.info("Migrated HA WashData entry to version %s", self.VERSION)
         return True
 
+    def _get_schema(self, user_input: dict[str, Any] | None = None) -> vol.Schema:
+        """Get the configuration schema."""
+        return STEP_USER_DATA_SCHEMA
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
+        if user_input is None:
+            return self.async_show_form(
+                step_id="user", data_schema=self._get_schema(), errors=errors
+            )
+
+        # Validate input
+        try:
+            # Basic validation
+            if user_input[CONF_MIN_POWER] <= 0:
+                errors[CONF_MIN_POWER] = "invalid_power"
+        except Exception:
+            _LOGGER.exception("Unexpected exception")
+            errors["base"] = "unknown"
+
+        if errors:
+            return self.async_show_form(
+                step_id="user", data_schema=self._get_schema(user_input), errors=errors
+            )
+
+        # Store user input and proceed to profile creation
+        self._user_input = user_input
+        return await self.async_step_first_profile()
+
+    async def async_step_first_profile(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Step to optionally create the first profile."""
+        
         if user_input is not None:
-            return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+            # Check if user wants to create a profile (if name is provided)
+            profile_name = user_input.get("profile_name", "").strip()
+            
+            # Combine initial setup data with profile data if present
+            data = dict(self._user_input)
+            
+            if profile_name:
+                duration_mins = user_input.get("manual_duration")
+                duration_sec = (duration_mins * 60.0) if duration_mins else None
+                
+                # Pass as special key to be handled in async_setup_entry
+                data["initial_profile"] = {
+                    "name": profile_name,
+                    "avg_duration": duration_sec
+                }
+
+            return self.async_create_entry(title=data[CONF_NAME], data=data)
+
+        # Schema for first profile
+        schema = vol.Schema({
+            vol.Optional("profile_name"): str,
+            vol.Optional("manual_duration", default=120): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0, max=480, unit_of_measurement="min", mode=selector.NumberSelectorMode.BOX
+                )
+            )
+        })
 
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="first_profile",
+            data_schema=schema
         )
-
     @staticmethod
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
@@ -176,62 +266,31 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Manage the options."""
         return self.async_show_menu(
             step_id="init",
-            menu_options=["settings", "manage_data", "diagnostics"]
+            menu_options=["settings", "manage_cycles", "manage_profiles", "diagnostics"]
         )
 
 
     async def async_step_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Manage configuration settings."""
-        manager = self.hass.data[DOMAIN][self._config_entry.entry_id]
-        suggestions = manager.suggestions if manager else {}
+        """Manage configuration settings (Basic Step)."""
+        # Initialize or clear stored basic options
+        if not hasattr(self, "_basic_options"):
+            self._basic_options = {}
 
         if user_input is not None:
-            # If "Apply Suggestions" checkbox was checked, merge suggested values into the input
-            if user_input.get(CONF_APPLY_SUGGESTIONS):
-                keys_to_apply = [
-                    CONF_MIN_POWER,
-                    CONF_OFF_DELAY,
-                    CONF_WATCHDOG_INTERVAL,
-                    CONF_NO_UPDATE_ACTIVE_TIMEOUT,
-                    CONF_PROFILE_MATCH_INTERVAL,
-                    CONF_AUTO_LABEL_CONFIDENCE,
-                    CONF_DURATION_TOLERANCE,
-                    CONF_PROFILE_DURATION_TOLERANCE,
-                    CONF_PROFILE_MATCH_MIN_DURATION_RATIO,
-                    CONF_PROFILE_MATCH_MAX_DURATION_RATIO,
-                    CONF_AUTO_MERGE_GAP_SECONDS,
-                ]
-                
-                # Create a copy of current options/input to work with
-                updated_input = {**user_input}
-                # Uncheck it so it doesn't stay checked in the next form render
-                updated_input[CONF_APPLY_SUGGESTIONS] = False
-                
-                applied_count = 0
-                for key in keys_to_apply:
-                    entry = suggestions.get(key) if isinstance(suggestions, dict) else None
-                    if isinstance(entry, dict) and "value" in entry:
-                        val = entry.get("value")
-                        # Coerce types
-                        if key in (CONF_OFF_DELAY, CONF_WATCHDOG_INTERVAL, CONF_NO_UPDATE_ACTIVE_TIMEOUT, 
-                                   CONF_PROFILE_MATCH_INTERVAL, CONF_AUTO_MERGE_GAP_SECONDS):
-                            updated_input[key] = int(float(val))
-                        else:
-                            updated_input[key] = float(val)
-                        applied_count += 1
-                
-                if applied_count > 0:
-                    # Store suggested values to repopulate form
-                    self._suggested_values = updated_input
-                    # Show form again with updated values instead of saving immediately
-                    return await self.async_step_settings(user_input=None)
+             # Check if user wants to edit advanced settings
+            if user_input.get(CONF_SHOW_ADVANCED):
+                # Store basic input to merge later
+                self._basic_options = user_input
+                # Remove the navigation flag from data storage
+                self._basic_options.pop(CONF_SHOW_ADVANCED, None)
+                return await self.async_step_advanced_settings()
 
+            # Save Basic Settings Only
             # Merge with existing options to preserve settings not shown in this form
+            user_input.pop(CONF_SHOW_ADVANCED, None)
             merged_options = {**self._config_entry.options, **user_input}
-            # Remove the apply_suggestions flag before saving
-            merged_options.pop(CONF_APPLY_SUGGESTIONS, None)
             return self.async_create_entry(title="", data=merged_options)
 
         # Populate notify services
@@ -249,16 +308,159 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if current_notify and current_notify not in notify_services:
             notify_services.append(current_notify)
 
-        # Load suggestion placeholders (suggestions are informational only)
+        current_sensor = self._config_entry.options.get(
+            CONF_POWER_SENSOR,
+            self._config_entry.data.get(CONF_POWER_SENSOR, "")
+        )
+
+        def get_val(key, default):
+            return self._config_entry.options.get(key, self._config_entry.data.get(key, default))
+
+        # Base schema with essential options
+        schema = {
+            # --- Device Configuration (Top Priority) ---
+            vol.Required(
+                CONF_DEVICE_TYPE,
+                default=get_val(CONF_DEVICE_TYPE, DEFAULT_DEVICE_TYPE),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        selector.SelectOptionDict(value=k, label=v)
+                        for k, v in DEVICE_TYPES.items()
+                    ],
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Optional(
+                CONF_POWER_SENSOR,
+                default=current_sensor,
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="sensor")
+            ),
+            
+            vol.Optional(
+                CONF_MIN_POWER,
+                default=get_val(CONF_MIN_POWER, DEFAULT_MIN_POWER),
+            ): vol.Coerce(float),
+            vol.Optional(
+                CONF_OFF_DELAY,
+                default=get_val(CONF_OFF_DELAY, DEFAULT_OFF_DELAY),
+            ): vol.Coerce(int),
+
+            # --- Notification Settings ---
+            vol.Optional(
+                CONF_NOTIFY_SERVICE,
+                default=get_val(CONF_NOTIFY_SERVICE, ""),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=notify_services,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                    custom_value=True,
+                )
+            ),
+            vol.Optional(
+                CONF_NOTIFY_EVENTS,
+                default=list(get_val(CONF_NOTIFY_EVENTS, [])),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        selector.SelectOptionDict(value=NOTIFY_EVENT_START, label="Cycle Start"),
+                        selector.SelectOptionDict(value=NOTIFY_EVENT_FINISH, label="Cycle Finish"),
+                    ],
+                    multiple=True,
+                    mode=selector.SelectSelectorMode.LIST,
+                )
+            ),
+            vol.Optional(
+                CONF_NOTIFY_BEFORE_END_MINUTES,
+                default=get_val(CONF_NOTIFY_BEFORE_END_MINUTES, DEFAULT_NOTIFY_BEFORE_END_MINUTES),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0, max=60, mode=selector.NumberSelectorMode.BOX)
+            ),
+
+            vol.Optional(CONF_SHOW_ADVANCED, default=False): bool,
+        }
+            
+        return self.async_show_form(
+            step_id="settings",
+            data_schema=vol.Schema(schema),
+            description_placeholders={
+                "error": "",
+            },
+        )
+
+    async def async_step_advanced_settings(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage advanced configuration settings (Step 2)."""
         manager = self.hass.data[DOMAIN][self._config_entry.entry_id]
         suggestions = manager.suggestions if manager else {}
 
+        if user_input is not None:
+             # If "Apply Suggestions" checkbox was checked, merge suggested values into the input
+            if user_input.get(CONF_APPLY_SUGGESTIONS):
+                keys_to_apply = [
+                    CONF_MIN_POWER,
+                    CONF_OFF_DELAY,
+                    CONF_WATCHDOG_INTERVAL,
+                    CONF_NO_UPDATE_ACTIVE_TIMEOUT,
+                    CONF_PROFILE_MATCH_INTERVAL,
+                    CONF_AUTO_LABEL_CONFIDENCE,
+                    CONF_DURATION_TOLERANCE,
+                    CONF_PROFILE_DURATION_TOLERANCE,
+                    CONF_PROFILE_MATCH_MIN_DURATION_RATIO,
+                    CONF_PROFILE_MATCH_MAX_DURATION_RATIO,
+                    CONF_AUTO_MERGE_GAP_SECONDS,
+                ]
+                
+                # Create a copy of current options/input to work with
+                updated_input = {**user_input}
+                # Uncheck it so it doesn't stay checked via recursion (Use recursion only for apply suggestion visual confirmation if needed, but here we can just save)
+                # Actually, standard behavior for 'Apply Suggestions' is usually to populate the form and let user review. 
+                # But to keep it simple as requested ("moved to advanced options"), we can just apply and save?
+                # The user probably expects to SEE the values. 
+                # For a wizard, we can reload this step with values filled.
+                
+                updated_input[CONF_APPLY_SUGGESTIONS] = False
+                
+                applied_count = 0
+                for key in keys_to_apply:
+                    entry = suggestions.get(key) if isinstance(suggestions, dict) else None
+                    if isinstance(entry, dict) and "value" in entry:
+                        val = entry.get("value")
+                        if key in (CONF_OFF_DELAY, CONF_WATCHDOG_INTERVAL, CONF_NO_UPDATE_ACTIVE_TIMEOUT, 
+                                   CONF_PROFILE_MATCH_INTERVAL, CONF_AUTO_MERGE_GAP_SECONDS):
+                            updated_input[key] = int(float(val))
+                        else:
+                            updated_input[key] = float(val)
+                        applied_count += 1
+                
+                if applied_count > 0:
+                    self._suggested_values = updated_input
+                    return await self.async_step_advanced_settings(user_input=None)
+
+            # Final Save
+            final_options = {**self._config_entry.options, **self._basic_options, **user_input}
+            final_options.pop(CONF_APPLY_SUGGESTIONS, None)
+            return self.async_create_entry(title="", data=final_options)
+
+        # Helper to get current value
+        def get_val(key, default):
+            # Prioritize suggested values (if "Apply Suggestions" triggered a reload)
+            if self._suggested_values and key in self._suggested_values:
+                return self._suggested_values[key]
+            # Fallback to basic options (if coming from basic step)
+            if key in self._basic_options:
+                return self._basic_options[key]
+            # Fallback to config options
+            return self._config_entry.options.get(key, self._config_entry.data.get(key, default))
+        
+        # Format suggestions for description
         def _fmt_suggested(key: str) -> str:
             val = (suggestions.get(key) or {}).get("value") if isinstance(suggestions, dict) else None
             if val is None:
                 return "—"
             try:
-                # Keep ints neat; keep floats readable
                 return str(int(val)) if float(val).is_integer() else f"{float(val):.2f}"
             except Exception:
                 return str(val)
@@ -277,173 +479,148 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 reason_lines.append(f"- {key}: {entry['reason']}")
         suggested_reason = "\n".join(reason_lines) if reason_lines else ""
 
-        # Helper to get current value (from suggestions or config)
-        def get_val(key, default):
-            if self._suggested_values and key in self._suggested_values:
-                return self._suggested_values[key]
-            return self._config_entry.options.get(key, self._config_entry.data.get(key, default))
+        schema = {
+             vol.Optional(CONF_APPLY_SUGGESTIONS, default=False): bool,
+
+             # --- Detection Settings ---
+            vol.Optional(
+                CONF_START_DURATION_THRESHOLD,
+                default=get_val(CONF_START_DURATION_THRESHOLD, DEFAULT_START_DURATION_THRESHOLD),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.0, max=60.0, step=0.5, unit_of_measurement="s", mode=selector.NumberSelectorMode.BOX)
+            ),
+           
+            vol.Optional(
+                CONF_INTERRUPTED_MIN_SECONDS,
+                default=get_val(CONF_INTERRUPTED_MIN_SECONDS, DEFAULT_INTERRUPTED_MIN_SECONDS),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0, max=900, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_COMPLETION_MIN_SECONDS,
+                default=get_val(CONF_COMPLETION_MIN_SECONDS, DEFAULT_COMPLETION_MIN_SECONDS),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0, max=3600, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_RUNNING_DEAD_ZONE,
+                default=get_val(CONF_RUNNING_DEAD_ZONE, DEFAULT_RUNNING_DEAD_ZONE),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0, max=600, step=10, unit_of_measurement="s", mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_END_REPEAT_COUNT,
+                default=get_val(CONF_END_REPEAT_COUNT, DEFAULT_END_REPEAT_COUNT),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=1, max=10, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_SMART_EXTENSION_THRESHOLD,
+                default=get_val(CONF_SMART_EXTENSION_THRESHOLD, DEFAULT_SMART_EXTENSION_THRESHOLD),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.05, mode=selector.NumberSelectorMode.BOX)
+            ),
+            # --- Learning & Profiles ---
+            vol.Optional(
+                CONF_LEARNING_CONFIDENCE,
+                default=get_val(CONF_LEARNING_CONFIDENCE, DEFAULT_LEARNING_CONFIDENCE),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.01, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_AUTO_LABEL_CONFIDENCE,
+                default=get_val(CONF_AUTO_LABEL_CONFIDENCE, DEFAULT_AUTO_LABEL_CONFIDENCE),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.01, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_PROFILE_MATCH_INTERVAL,
+                default=get_val(CONF_PROFILE_MATCH_INTERVAL, DEFAULT_PROFILE_MATCH_INTERVAL),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_PROFILE_MATCH_MIN_DURATION_RATIO,
+                default=get_val(CONF_PROFILE_MATCH_MIN_DURATION_RATIO, DEFAULT_PROFILE_MATCH_MIN_DURATION_RATIO),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.1, max=1.0, step=0.05, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_PROFILE_MATCH_MAX_DURATION_RATIO,
+                default=get_val(CONF_PROFILE_MATCH_MAX_DURATION_RATIO, DEFAULT_PROFILE_MATCH_MAX_DURATION_RATIO),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=1.0, max=3.0, step=0.1, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_DURATION_TOLERANCE,
+                default=get_val(CONF_DURATION_TOLERANCE, DEFAULT_DURATION_TOLERANCE),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.0, max=0.5, step=0.01, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_SMOOTHING_WINDOW,
+                default=get_val(CONF_SMOOTHING_WINDOW, DEFAULT_SMOOTHING_WINDOW),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_PROFILE_DURATION_TOLERANCE,
+                default=get_val(CONF_PROFILE_DURATION_TOLERANCE, DEFAULT_PROFILE_DURATION_TOLERANCE),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0.0, max=0.5, step=0.01, mode=selector.NumberSelectorMode.BOX)
+            ),
+            vol.Optional(
+                CONF_AUTO_MERGE_LOOKBACK_HOURS,
+                default=get_val(CONF_AUTO_MERGE_LOOKBACK_HOURS, DEFAULT_AUTO_MERGE_LOOKBACK_HOURS),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_AUTO_MERGE_GAP_SECONDS,
+                default=get_val(CONF_AUTO_MERGE_GAP_SECONDS, DEFAULT_AUTO_MERGE_GAP_SECONDS),
+            ): vol.Coerce(int),
+
+            vol.Optional(
+                CONF_ABRUPT_DROP_WATTS,
+                default=get_val(CONF_ABRUPT_DROP_WATTS, DEFAULT_ABRUPT_DROP_WATTS),
+            ): vol.Coerce(float),
+            vol.Optional(
+                CONF_ABRUPT_DROP_RATIO,
+                default=get_val(CONF_ABRUPT_DROP_RATIO, DEFAULT_ABRUPT_DROP_RATIO),
+            ): vol.Coerce(float),
+            vol.Optional(
+                CONF_ABRUPT_HIGH_LOAD_FACTOR,
+                default=get_val(CONF_ABRUPT_HIGH_LOAD_FACTOR, DEFAULT_ABRUPT_HIGH_LOAD_FACTOR),
+            ): vol.Coerce(float),
+
+            vol.Optional(
+                CONF_MAX_PAST_CYCLES,
+                default=get_val(CONF_MAX_PAST_CYCLES, DEFAULT_MAX_PAST_CYCLES),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_MAX_FULL_TRACES_PER_PROFILE,
+                default=get_val(CONF_MAX_FULL_TRACES_PER_PROFILE, DEFAULT_MAX_FULL_TRACES_PER_PROFILE),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_MAX_FULL_TRACES_UNLABELED,
+                default=get_val(CONF_MAX_FULL_TRACES_UNLABELED, DEFAULT_MAX_FULL_TRACES_UNLABELED),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_WATCHDOG_INTERVAL,
+                default=get_val(CONF_WATCHDOG_INTERVAL, DEFAULT_WATCHDOG_INTERVAL),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_AUTO_TUNE_NOISE_EVENTS_THRESHOLD,
+                default=get_val(CONF_AUTO_TUNE_NOISE_EVENTS_THRESHOLD, DEFAULT_AUTO_TUNE_NOISE_EVENTS_THRESHOLD),
+            ): vol.Coerce(int),
+            vol.Optional(
+                CONF_PROGRESS_RESET_DELAY,
+                default=get_val(CONF_PROGRESS_RESET_DELAY, DEFAULT_PROGRESS_RESET_DELAY),
+            ): vol.Coerce(int),
+            
+            vol.Optional(CONF_AUTO_MAINTENANCE, default=get_val(CONF_AUTO_MAINTENANCE, DEFAULT_AUTO_MAINTENANCE)): bool,
+        }
 
         return self.async_show_form(
-            step_id="settings",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(CONF_APPLY_SUGGESTIONS, default=False): bool,
-
-                    # --- Detection Settings ---
-                    vol.Optional(
-                        CONF_MIN_POWER,
-                        default=get_val(CONF_MIN_POWER, DEFAULT_MIN_POWER),
-                    ): vol.Coerce(float),
-                    vol.Optional(
-                        CONF_OFF_DELAY,
-                        default=get_val(CONF_OFF_DELAY, DEFAULT_OFF_DELAY),
-                    ): vol.Coerce(int),
-                    vol.Optional(
-                        CONF_INTERRUPTED_MIN_SECONDS,
-                        default=get_val(CONF_INTERRUPTED_MIN_SECONDS, DEFAULT_INTERRUPTED_MIN_SECONDS),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0, max=900, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_COMPLETION_MIN_SECONDS,
-                        default=get_val(CONF_COMPLETION_MIN_SECONDS, DEFAULT_COMPLETION_MIN_SECONDS),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0, max=3600, mode=selector.NumberSelectorMode.BOX)
-                    ),
-
-                    # --- Notification Settings ---
-                    vol.Optional(
-                        CONF_NOTIFY_SERVICE,
-                        default=get_val(CONF_NOTIFY_SERVICE, ""),
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=notify_services,
-                            mode=selector.SelectSelectorMode.DROPDOWN,
-                            custom_value=True,
-                        )
-                    ),
-                    vol.Optional(
-                        CONF_NOTIFY_EVENTS,
-                        default=list(get_val(CONF_NOTIFY_EVENTS, [])),
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=[
-                                selector.SelectOptionDict(value=NOTIFY_EVENT_START, label="Cycle Start"),
-                                selector.SelectOptionDict(value=NOTIFY_EVENT_FINISH, label="Cycle Finish"),
-                            ],
-                            multiple=True,
-                            mode=selector.SelectSelectorMode.LIST,
-                        )
-                    ),
-                    vol.Optional(
-                        CONF_NOTIFY_BEFORE_END_MINUTES,
-                        default=get_val(CONF_NOTIFY_BEFORE_END_MINUTES, DEFAULT_NOTIFY_BEFORE_END_MINUTES),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0, max=60, mode=selector.NumberSelectorMode.BOX)
-                    ),
-
-                    # --- Learning & Profiles ---
-                    vol.Optional(
-                        CONF_LEARNING_CONFIDENCE,
-                        default=get_val(CONF_LEARNING_CONFIDENCE, DEFAULT_LEARNING_CONFIDENCE),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.01, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_AUTO_LABEL_CONFIDENCE,
-                        default=get_val(CONF_AUTO_LABEL_CONFIDENCE, DEFAULT_AUTO_LABEL_CONFIDENCE),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.01, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_PROFILE_MATCH_INTERVAL,
-                        default=get_val(CONF_PROFILE_MATCH_INTERVAL, DEFAULT_PROFILE_MATCH_INTERVAL),
-                    ): vol.Coerce(int),
-                    vol.Optional(
-                        CONF_PROFILE_MATCH_MIN_DURATION_RATIO,
-                        default=get_val(CONF_PROFILE_MATCH_MIN_DURATION_RATIO, DEFAULT_PROFILE_MATCH_MIN_DURATION_RATIO),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.1, max=1.0, step=0.05, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_PROFILE_MATCH_MAX_DURATION_RATIO,
-                        default=get_val(CONF_PROFILE_MATCH_MAX_DURATION_RATIO, DEFAULT_PROFILE_MATCH_MAX_DURATION_RATIO),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=1.0, max=3.0, step=0.1, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_DURATION_TOLERANCE,
-                        default=get_val(CONF_DURATION_TOLERANCE, DEFAULT_DURATION_TOLERANCE),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.0, max=0.5, step=0.01, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_PROFILE_DURATION_TOLERANCE,
-                        default=get_val(CONF_PROFILE_DURATION_TOLERANCE, DEFAULT_PROFILE_DURATION_TOLERANCE),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.0, max=0.5, step=0.01, mode=selector.NumberSelectorMode.BOX)
-                    ),
-
-                    # --- Advanced & Thresholds ---
-                    vol.Optional(
-                        CONF_WATCHDOG_INTERVAL,
-                        default=get_val(CONF_WATCHDOG_INTERVAL, DEFAULT_WATCHDOG_INTERVAL),
-                    ): vol.Coerce(int),
-                    vol.Optional(
-                        CONF_SMOOTHING_WINDOW,
-                        default=get_val(CONF_SMOOTHING_WINDOW, DEFAULT_SMOOTHING_WINDOW),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=1, max=20, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_ABRUPT_DROP_WATTS,
-                        default=get_val(CONF_ABRUPT_DROP_WATTS, DEFAULT_ABRUPT_DROP_WATTS),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.0, max=5000.0, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_ABRUPT_DROP_RATIO,
-                        default=get_val(CONF_ABRUPT_DROP_RATIO, DEFAULT_ABRUPT_DROP_RATIO),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.01, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_ABRUPT_HIGH_LOAD_FACTOR,
-                        default=get_val(CONF_ABRUPT_HIGH_LOAD_FACTOR, DEFAULT_ABRUPT_HIGH_LOAD_FACTOR),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=1.0, max=20.0, step=0.1, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_NO_UPDATE_ACTIVE_TIMEOUT,
-                        default=get_val(CONF_NO_UPDATE_ACTIVE_TIMEOUT, DEFAULT_NO_UPDATE_ACTIVE_TIMEOUT),
-                    ): vol.Coerce(int),
-                    vol.Optional(
-                        CONF_PROGRESS_RESET_DELAY,
-                        default=get_val(CONF_PROGRESS_RESET_DELAY, DEFAULT_PROGRESS_RESET_DELAY),
-                    ): vol.Coerce(int),
-                    vol.Optional(
-                        CONF_AUTO_MAINTENANCE,
-                        default=get_val(CONF_AUTO_MAINTENANCE, DEFAULT_AUTO_MAINTENANCE),
-                    ): bool,
-                    vol.Optional(
-                        CONF_AUTO_TUNE_NOISE_EVENTS_THRESHOLD,
-                        default=get_val(CONF_AUTO_TUNE_NOISE_EVENTS_THRESHOLD, DEFAULT_AUTO_TUNE_NOISE_EVENTS_THRESHOLD),
-                    ): vol.Coerce(int),
-                    vol.Optional(
-                        CONF_AUTO_MERGE_LOOKBACK_HOURS,
-                        default=get_val(CONF_AUTO_MERGE_LOOKBACK_HOURS, DEFAULT_AUTO_MERGE_LOOKBACK_HOURS),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=0, max=168, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                    vol.Optional(
-                        CONF_AUTO_MERGE_GAP_SECONDS,
-                        default=get_val(CONF_AUTO_MERGE_GAP_SECONDS, DEFAULT_AUTO_MERGE_GAP_SECONDS),
-                    ): selector.NumberSelector(
-                        selector.NumberSelectorConfig(min=60, max=7200, mode=selector.NumberSelectorMode.BOX)
-                    ),
-                }
-            ),
+            step_id="advanced_settings",
+            data_schema=vol.Schema(schema),
             description_placeholders={
+                "error": "",
+                "suggested": suggested_reason or "No suggestions available yet.",
                 "suggested_min_power": _fmt_suggested(CONF_MIN_POWER),
                 "suggested_off_delay": _fmt_suggested(CONF_OFF_DELAY),
                 "suggested_watchdog_interval": _fmt_suggested(CONF_WATCHDOG_INTERVAL),
@@ -459,14 +636,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             },
         )
 
+
     async def async_step_diagnostics(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Diagnostics submenu for maintenance actions."""
         if user_input is not None:
             choice = user_input["action"]
-            if choice == "post_process":
-                return await self.async_step_post_process()
             if choice == "migrate_data":
                 return await self.async_step_migrate_data()
             if choice == "wipe_history":
@@ -478,7 +654,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             step_id="diagnostics",
             data_schema=vol.Schema({
                 vol.Required("action"): vol.In({
-                    "post_process": "Merge fragmented cycles (configure lookback/gap in Settings)",
                     "migrate_data": "Migrate/compress stored data to latest format",
                     "wipe_history": "Wipe ALL data for this device (irreversible)",
                     "export_import": "Export/Import JSON with settings (copy/paste)"
@@ -578,15 +753,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             }),
         )
 
-    async def async_step_manage_data(
+    async def async_step_manage_cycles(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Main menu for profile, cycle, and suggestions management."""
+        """Manage cycles submenu."""
         manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
         store = manager.profile_store
         
-        # Build a quick reference list of recent cycles
-        recent_cycles = store._data.get("past_cycles", [])[-5:]
+        # Build recent cycles list
+        recent_cycles = store._data.get("past_cycles", [])[-8:]
         recent_lines = []
         for c in reversed(recent_cycles):
             start = c["start_time"].split(".")[0].replace("T", " ")
@@ -596,7 +771,47 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             status_icon = "✓" if status in ("completed", "force_stopped") else "⚠" if status == "resumed" else "✗"
             recent_lines.append(f"{status_icon} {start} - {duration_min}m - {prof}")
         recent_text = "\n".join(recent_lines) if recent_lines else "No cycles recorded yet."
+
+        if user_input is not None:
+            action = user_input["action"]
+            if action == "label_cycle":
+                return await self.async_step_select_cycle_to_label()
+            elif action == "auto_label":
+                return await self.async_step_auto_label_cycles()
+            elif action == "delete_cycle":
+                return await self.async_step_select_cycle_to_delete()
+            elif action == "post_process":
+                return await self.async_step_post_process()
+
+        return self.async_show_form(
+            step_id="manage_cycles",
+            data_schema=vol.Schema({
+                vol.Required("action"): vol.In({
+                    "label_cycle": "🏷️ Label a Cycle",
+                    "auto_label": "🤖 Auto-Label History",
+                    "delete_cycle": "❌ Delete a Cycle",
+                    "post_process": "🧹 Post-Process / Merge",
+                })
+            }),
+            description_placeholders={"recent_cycles": recent_text}
+        )
+
+    async def async_step_manage_profiles(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage profiles submenu."""
+        manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
+        store = manager.profile_store
+        profiles = store.list_profiles()
         
+        # Build profile summary
+        summary_lines = []
+        for p in profiles:
+            count = p["cycle_count"]
+            avg = int(p["avg_duration"]/60) if p["avg_duration"] else 0
+            summary_lines.append(f"- **{p['name']}**: {count} cycles, {avg}m avg")
+        summary_text = "\n".join(summary_lines) if summary_lines else "No profiles created yet."
+
         if user_input is not None:
             action = user_input["action"]
             if action == "create_profile":
@@ -605,26 +820,104 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return await self.async_step_edit_profile()
             elif action == "delete_profile":
                 return await self.async_step_delete_profile_select()
-            elif action == "label_cycle":
-                return await self.async_step_select_cycle_to_label()
-            elif action == "auto_label":
-                return await self.async_step_auto_label_cycles()
-            elif action == "delete_cycle":
-                return await self.async_step_select_cycle_to_delete()
+            elif action == "profile_stats":
+                return await self.async_step_profile_stats()
 
         return self.async_show_form(
-            step_id="manage_data",
+            step_id="manage_profiles",
             data_schema=vol.Schema({
                 vol.Required("action"): vol.In({
                     "create_profile": "➕ Create New Profile",
                     "edit_profile": "✏️ Edit/Rename Profile",
                     "delete_profile": "🗑️ Delete Profile",
-                    "label_cycle": "🏷️ Label a Cycle",
-                    "auto_label": "🤖 Auto-Label Old Cycles",
-                    "delete_cycle": "❌ Delete a Cycle",
+                    "profile_stats": "📊 Profile Statistics",
                 })
             }),
-            description_placeholders={"recent_cycles": recent_text}
+            description_placeholders={"profile_summary": summary_text}
+        )
+
+    async def async_step_profile_stats(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Show detailed profile statistics with graphs."""
+        if user_input is not None:
+             # Back to manage profiles
+             return await self.async_step_manage_profiles()
+
+        manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
+        store = manager.profile_store
+        
+        # Ensure stats directory exists
+        stats_dir = self.hass.config.path("www", "ha_washdata", "profiles")
+        await self.hass.async_add_executor_job(
+            lambda: os.makedirs(stats_dir, exist_ok=True)
+        )
+        
+        from homeassistant.util import slugify
+        
+        profiles = store.list_profiles()
+        sections = []
+        ts = int(time.time())
+        
+        # Get all cycles to find last run
+        cycles = store._data.get("past_cycles", [])
+        
+        for p in profiles:
+            name = p["name"]
+            
+            # FORCE REFRESH: Rebuild envelope to ensure data is fresh
+            # This calculates energy, consistency, etc.
+            store.rebuild_envelope(name)
+            
+            safe_name = slugify(name)
+            count = p["cycle_count"]
+            avg = int(p["avg_duration"]/60) if p["avg_duration"] else 0
+            mn = int(p["min_duration"]/60) if p.get("min_duration") else 0
+            mx = int(p["max_duration"]/60) if p.get("max_duration") else 0
+            
+            # Get envelope for advanced stats
+            envelope = store.get_envelope(name)
+            kwh = f"{envelope.get('avg_energy', 0):.2f}" if envelope else "-"
+            std_dev = envelope.get('duration_std_dev', 0) if envelope else 0
+            consistency = f"±{int(std_dev/60)}m" if std_dev > 0 else "-"
+            
+            # Find last run
+            last_run = "-"
+            p_cycles = [c for c in cycles if c.get("profile_name") == name]
+            if p_cycles:
+                last_c = max(p_cycles, key=lambda x: x["start_time"])
+                dt = last_c["start_time"].split("T")[0]
+                last_run = dt
+            
+            # Generate and Write SVG
+            svg_content = store.generate_profile_svg(name)
+            graph_markdown = ""
+            if svg_content:
+                file_path = f"{stats_dir}/profile_{safe_name}.svg"
+                def write_svg():
+                    with open(file_path, "w") as f:
+                        f.write(svg_content)
+                await self.hass.async_add_executor_job(write_svg)
+                graph_markdown = f"![{name}](/local/ha_washdata/profiles/profile_{safe_name}.svg?v={ts})"
+
+            # Build Per-Profile Section
+            # Headers: Count | Avg | Min | Max | Energy | Consistency | Last Run
+            table_header = "| Count | Avg | Min | Max | Energy | Consist. | Last Run |"
+            table_sep = "| --- | --- | --- | --- | --- | --- | --- |"
+            table_row = f"| {count} | {avg}m | {mn}m | {mx}m | {kwh} kWh | {consistency} | {last_run} |"
+            
+            legend = "> **Graph Legend**: The blue band represents the minimum and maximum power draw range observed. The line shows the average power curve."
+            
+            section = f"## {name}\n{table_header}\n{table_sep}\n{table_row}\n\n{graph_markdown}\n\n{legend}"
+            sections.append(section)
+            
+        content = "\n\n---\n\n".join(sections) if sections else "No profiles found."
+
+        return self.async_show_form(
+            step_id="profile_stats",
+            data_schema=vol.Schema({}),
+            # Key 'stats_table' must match the key in translations/strings (description)
+            description_placeholders={"stats_table": content}
         )
 
     async def async_step_create_profile(
@@ -641,10 +934,16 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 errors["profile_name"] = "empty_name"
             else:
                 manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
+                manual_duration_mins = user_input.get("manual_duration")
+                avg_duration = None
+                if manual_duration_mins and float(manual_duration_mins) > 0:
+                    avg_duration = float(manual_duration_mins) * 60.0
+
                 try:
                     await manager.profile_store.create_profile_standalone(
                         name, 
-                        reference_cycle if reference_cycle != "none" else None
+                        reference_cycle if reference_cycle != "none" else None,
+                        avg_duration=avg_duration
                     )
                     manager._notify_update()
                     return self.async_create_entry(title="", data=dict(self._config_entry.options))
@@ -673,12 +972,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         options=cycle_options,
                         mode=selector.SelectSelectorMode.DROPDOWN
                     )
+                ),
+                vol.Optional("manual_duration"): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0, 
+                        max=480, 
+                        mode=selector.NumberSelectorMode.BOX,
+                        unit_of_measurement="min"
+                    )
                 )
             }),
-            errors=errors,
-            description_placeholders={
-                "info": "Profile name examples: 'Delicates', 'Heavy Duty', 'Quick Wash'"
-            }
+            errors=errors
         )
 
     async def async_step_edit_profile(
@@ -719,23 +1023,32 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_rename_profile(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Rename the selected profile."""
+        """Edit profile settings (Name and Duration)."""
+        manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
         errors = {}
+        
+        # Get current profile data
+        profiles = manager.profile_store.list_profiles()
+        current_data = next((p for p in profiles if p["name"] == self._selected_profile), None)
+        current_duration_mins = int(current_data["avg_duration"] / 60) if current_data and current_data["avg_duration"] else 0
         
         if user_input is not None:
             new_name = user_input["new_name"].strip()
+            manual_duration_mins = user_input.get("manual_duration")
             
             if not new_name:
                 errors["new_name"] = "empty_name"
             else:
-                manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
-                
-                # If name didn't change, just return to entry creation (preserving options)
-                if new_name == self._selected_profile:
-                    return self.async_create_entry(title="", data=dict(self._config_entry.options))
-                    
+                avg_duration = None
+                if manual_duration_mins is not None and manual_duration_mins > 0:
+                    avg_duration = float(manual_duration_mins) * 60.0
+
                 try:
-                    count = await manager.profile_store.rename_profile(self._selected_profile, new_name)
+                    await manager.profile_store.update_profile(
+                        self._selected_profile, 
+                        new_name,
+                        avg_duration=avg_duration
+                    )
                     manager._notify_update()
                     return self.async_create_entry(title="", data=dict(self._config_entry.options))
                 except ValueError as e:
@@ -744,7 +1057,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="rename_profile",
             data_schema=vol.Schema({
-                vol.Required("new_name", default=self._selected_profile): str
+                vol.Required("new_name", default=self._selected_profile): str,
+                vol.Optional("manual_duration", default=current_duration_mins): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0, max=480, unit_of_measurement="min", mode=selector.NumberSelectorMode.BOX
+                    )
+                )
             }),
             errors=errors,
             description_placeholders={
@@ -920,8 +1238,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input is not None:
             cycle_id = user_input["cycle_id"]
-            manager.profile_store.delete_cycle(cycle_id)
-            await manager.profile_store.async_save()
+            await manager.profile_store.delete_cycle(cycle_id)
+            # await manager.profile_store.async_save() # Handled inside delete_cycle now
             manager._notify_update()
             return self.async_create_entry(title="", data=dict(self._config_entry.options))
 
@@ -1025,15 +1343,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
              choice = user_input["time_range"]
              manager = self.hass.data[DOMAIN][self.config_entry.entry_id]
              
-             if choice == "all":
-                 # Merge all cycles (no time limit)
-                 count = manager.profile_store.merge_cycles(hours=999999)
-             else:
-                 hours = int(choice)
-                 count = manager.profile_store.merge_cycles(hours=hours)
+             gap_seconds = self.config_entry.options.get(
+                 CONF_AUTO_MERGE_GAP_SECONDS, DEFAULT_AUTO_MERGE_GAP_SECONDS
+             )
              
-             if count > 0:
-                 await manager.profile_store.async_save()
+             hours = 999999 if choice >= 999999 else int(choice)
+             
+             # Use async_run_maintenance to ensure envelopes are rebuilt after merging
+             stats = await manager.profile_store.async_run_maintenance(
+                 lookback_hours=hours, 
+                 gap_seconds=gap_seconds
+             )
+             count = stats.get("merged_cycles", 0)
                  
              return self.async_create_entry(
                  title="",
@@ -1044,14 +1365,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="post_process",
             data_schema=vol.Schema({
-                vol.Required("time_range", default="24"): vol.In({
-                    "12": "Last 12 Hours",
-                    "24": "Last 24 Hours",
-                    "48": "Last 48 Hours",
-                    "168": "Last 7 Days",
-                    "all": "All Data"
-                })
-            })
+                vol.Required("time_range", default=24): selector.NumberSelector(
+                    selector.NumberSelectorConfig(min=1, max=9999, unit_of_measurement="h", mode=selector.NumberSelectorMode.BOX)
+                )
+            }),
+            description_placeholders={"info": "Enter number of past hours to process (or use 999999 for all)"}
         )
 
     async def async_step_migrate_data(

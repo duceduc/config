@@ -47,7 +47,6 @@ cards:
             service_data:
               entity_id: camera.balcony
 
-
       - type: custom:hui-element
         card_type: weather-forecast
         entity: weather.my_weather
@@ -63,7 +62,31 @@ cards:
 #            left: 50%
 
 
-
+      - type: custom:lunar-phase-card
+        card_mod:
+#          style: |
+#            .compact-view {
+#              display: none !important;
+#            }
+        entity: ""
+        use_default: true
+        use_custom: false
+        use_entity: false
+        show_background: true
+        selected_language: en
+        compact_view: true
+        12hr_format: false
+        font_customize:
+          header_font_size: x-large
+          header_font_style: capitalize
+          header_font_color: ""
+          label_font_size: auto
+          label_font_style: none
+          label_font_color: ""
+          hide_label: false
+        latitude: 35.81842918238185
+        longitude: 139.70377984736893
+        custom_background: /api/image/serve/37e5649ba58033402674d62bf78bcd5e/original
 
 
       - type: entities
@@ -87,7 +110,6 @@ cards:
           - entity: sensor.earthquake_daily_count
             icon: mdi:home-flood
             name: Daily Earthquakes
-
 
 
       - type: vertical-stack
@@ -166,11 +188,12 @@ cards:
                 padding: 0
                 type: 'custom:fold-entity-row'
 
-
             show_header_toggle: false
             style: |
               ha-card {
               }
+
+
 
 ####################################################
 #                                                                                                    
