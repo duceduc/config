@@ -344,7 +344,7 @@ automation:
       - trigger: template
 #        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 or states('sensor.gosund_washer_power')| int(0) == 6 }}"
-        for: 30 #16 - 40. use 28
+        for: 32 #16 - 40. use 32
         id: 'filter'
     conditions: []
     actions:
