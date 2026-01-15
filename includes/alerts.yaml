@@ -16,8 +16,8 @@
     data:
       type: tts
     notifiers:
-     - amberthebot
-     - alexa_media_ai_4
+      - amberthebot
+      - alexa_media_ai_4
 
   duc_heading_home:
     name: Duc is headed home
@@ -30,8 +30,8 @@
     data:
       type: tts
     notifiers:
-     - amberthebot
-     - alexa_media_ai_4
+      - amberthebot
+      - alexa_media_ai_4
 
 
 #########################################################
@@ -52,10 +52,10 @@
       ms2: {{ states('sensor.ms2_wifi_strength') }}.
       ms3: {{ states('sensor.ms3_wifi_strength') }}.
     repeat:
-     - 20
-     - 45
+      - 20
+      - 45
     notifiers:
-     - 'amberthebot'
+      - 'amberthebot'
 
   monitor_broadlink:
     name: Monitor Broadlink Devices
@@ -69,10 +69,10 @@
       rm32: {{ states('remote.rm32_remote') }}.
       rm4: {{ states('remote.rm4_remote') }}.
     repeat:
-     - 20
-     - 45
+      - 20
+      - 45
     notifiers:
-     - 'amberthebot'
+      - 'amberthebot'
 
 #########################################################
 #                                                                                                              
@@ -101,7 +101,7 @@
     can_acknowledge: true
     repeat: 720
     notifiers:
-      - 'greenapi'
+      - greenapi
 
 
   lockdown_issue:
@@ -121,7 +121,7 @@
 #             Low Battery Alert                                    
 #                                                                                                              
 #########################################################
-# replace with critical battery area method
+# replaced with critical battery area method. utilities package
 #  low_battery_alert:
 #    name: Replace Battery Alert
 #    entity_id: binary_sensor.devices_with_low_battery

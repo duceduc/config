@@ -4,7 +4,7 @@
 #                                                                                                    
 ####################################################
 
-# MOVED TO TEMPLATE FOLDER  
+# delted. not using
 #  - platform: template
 #    sensors:
 #      devices_with_low_battery:

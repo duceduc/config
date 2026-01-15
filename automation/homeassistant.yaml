@@ -25,7 +25,6 @@
   triggers:
     - trigger: numeric_state
       entity_id:
-        - sensor.motion_security_battery
         - sensor.aio_controller_battery
         - sensor.shion_room_battery
         - sensor.computer_room_battery
@@ -40,12 +39,8 @@
 
         - sensor.master_dimmer_battery
         - sensor.shion_dimmer_battery
-        - sensor.lr_curtains_battery
-        - sensor.cr_curtains_battery
         - sensor.shower_room_battery
 
-        - sensor.motion_s1_battery
-        - sensor.motion_c1_battery
       below: 46
   actions:
     - action: script.text_notify
