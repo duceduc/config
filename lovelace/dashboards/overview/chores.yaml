@@ -66,10 +66,6 @@ cards:
         max_height: 400px
 
 
-      - type: custom:simple-inventory-card
-        entity: sensor.home_inventory
-
-
 # TESTING
       - type: conditional
         conditions:
