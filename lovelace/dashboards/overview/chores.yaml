@@ -61,10 +61,6 @@ cards:
              warning_before: 1
              cycle_days: 60
 
-      - type: custom:parcels-app-card
-        title: Parcels App Packages
-        max_height: 400px
-
 
 # TESTING
       - type: conditional
