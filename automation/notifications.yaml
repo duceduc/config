@@ -31,12 +31,28 @@
     - condition: template # there is school today
       value_template: "{{ is_state('input_boolean.school_today', 'on') }}"
   actions:
-    - action: script.text_notify_image
+    - action: script.text_notify
       data:
         who: 'desktop'
         title: 'School Time'
         message: "Time for Shion to go to school."
         image: "http://homeassistant.local:8123/local/img/misc/school-bell.png"
+
+
+- alias: lightroom backup notification
+  triggers:
+    - trigger: time
+      at: '18:55:00'
+  conditions:
+    - condition: template # pc is on
+      value_template: "{{ is_state('binary_sensor.desktop_status', 'on') }}"
+  actions:
+    - action: script.text_notify
+      data:
+        who: 'desktop'
+        title: 'Lightroom Backup'
+        message: "Lightroom backup will begin at 7pm. Shutdown Lightroom app."
+        image: "http://homeassistant.local:8123/local/img/misc/backup-logo.png"
 
 #- alias: bed time notification
 #  triggers:

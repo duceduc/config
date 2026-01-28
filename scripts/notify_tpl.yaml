@@ -80,7 +80,7 @@
           - condition: template
             value_template: '{{ who == "desktop"}}'
           sequence:
-          - service: notify.desktop_fddl8i4
+          - service: notify.desktop_3l5pa48
             data:
               title: '{{ title }}'
               message: '{{ message }}'
@@ -122,7 +122,7 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.desktop_fddl8i4
+          - service: notify.desktop_fddl8i4 # image no longer works.
             data:
               title: '{{ title }}'
               message: '{{ message }}'
