@@ -114,7 +114,7 @@
   - platform: wake_on_lan
     name: Desktop
     mac: 9C-6B-00-59-D2-6D
-    host: 192.168.1.112 # desktop-3l5pa48.local 
+    host: 192.168.1.112 # desktop-gq666dk.local 
     turn_off:
       - service: script.desktop_wol_off
 
