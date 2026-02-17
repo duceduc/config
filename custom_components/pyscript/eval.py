@@ -722,6 +722,7 @@ class EvalFunc:
         except Exception as err:
             if ast_ctx.exception_long is None:
                 ast_ctx.exception_long = ast_ctx.format_exc(err, arg.lineno, arg.col_offset)
+            raise err
 
     async def call(self, ast_ctx, *args, **kwargs):
         """Call the function with the given context and arguments."""
@@ -1342,6 +1343,10 @@ class AstEval:
                 val = await self.aeval(arg1)
                 if isinstance(val, EvalStopFlow):
                     return val  # pylint: disable=lost-exception,return-in-finally
+        self.exception = None
+        self.exception_obj = None
+        self.exception_long = None
+        self.exception_curr = None
         return None
 
     async def ast_raise(self, arg):

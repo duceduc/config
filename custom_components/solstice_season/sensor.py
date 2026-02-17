@@ -1,4 +1,12 @@
-"""Sensor platform for Solstice Season integration."""
+"""Sensor platform for Solstice Season integration.
+
+This module serves as the entry point for all sensor entities.
+It routes sensor creation based on device type:
+- Base Data: solar_longitude, daylight_trend, next_trend_change
+- Four Seasons: current_season, equinox/solstice timestamps, etc.
+- Cross-Quarter: current_period, next_period_change
+- Chinese Solar Terms: current_term, next_term_change
+"""
 
 from __future__ import annotations
 
@@ -20,15 +28,24 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .base_data_coordinator import BaseDataCoordinator
+from .base_sensor import BASE_SENSOR_DESCRIPTIONS, BaseDataSensor
 from .calculations import SeasonData
+from .chinese_coordinator import ChineseSolarTermsCoordinator
+from .chinese_sensor import ChineseSolarTermsSensor, get_chinese_sensor_descriptions
 from .const import (
+    CONF_DEVICE_TYPE,
     CONF_HEMISPHERE,
     CONF_MODE,
     CONF_NAME,
+    CONF_SCOPE,
+    DEVICE_BASE_DATA,
+    DEVICE_CHINESE,
+    DEVICE_CROSS_QUARTER,
+    DEVICE_FOUR_SEASONS,
     DOMAIN,
     ICON_AUTUMN,
     ICON_NEXT_SEASON_CHANGE,
-    ICON_NEXT_TREND_CHANGE,
     ICON_SPRING,
     ICON_SUMMER,
     ICON_WINTER,
@@ -36,15 +53,14 @@ from .const import (
     SEASON_ICONS,
     SENSOR_AUTUMN_EQUINOX,
     SENSOR_CURRENT_SEASON,
-    SENSOR_DAYLIGHT_TREND,
     SENSOR_NEXT_SEASON_CHANGE,
-    SENSOR_NEXT_TREND_CHANGE,
     SENSOR_SPRING_EQUINOX,
     SENSOR_SUMMER_SOLSTICE,
     SENSOR_WINTER_SOLSTICE,
-    TREND_ICONS,
 )
 from .coordinator import SolsticeSeasonCoordinator
+from .cross_quarter_coordinator import CrossQuarterCoordinator
+from .cross_quarter_sensor import CROSS_QUARTER_SENSOR_DESCRIPTIONS, CrossQuarterSensor
 
 # Load version from manifest.json
 MANIFEST = json.loads((Path(__file__).parent / "manifest.json").read_text())
@@ -65,12 +81,8 @@ def get_current_season_icon(data: SeasonData) -> str:
     return SEASON_ICONS.get(data["current_season"], "mdi:calendar")
 
 
-def get_daylight_trend_icon(data: SeasonData) -> str:
-    """Get icon for daylight trend."""
-    return TREND_ICONS.get(data["daylight_trend"], "mdi:arrow-left-right")
-
-
-SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
+# Four Seasons sensor descriptions
+FOUR_SEASONS_SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
     SolsticeSeasonSensorEntityDescription(
         key=SENSOR_CURRENT_SEASON,
         translation_key=SENSOR_CURRENT_SEASON,
@@ -78,13 +90,8 @@ SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
         options=["spring", "summer", "autumn", "winter"],
         value_fn=lambda data: data["current_season"],
         extra_state_attributes_fn=lambda data: {
-            "mode": data.get("mode", "astronomical"),
-            "hemisphere": data.get("hemisphere", "northern"),
             "season_age": data["season_age"],
-            "spring_start": data["spring_start"],
-            "summer_start": data["summer_start"],
-            "autumn_start": data["autumn_start"],
-            "winter_start": data["winter_start"],
+            "season_progress": data["season_progress"],
         },
         icon_fn=get_current_season_icon,
     ),
@@ -96,6 +103,7 @@ SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
         value_fn=lambda data: data["spring_equinox"],
         extra_state_attributes_fn=lambda data: {
             "days_until": data["days_until_spring"],
+            "last_start": data["previous_spring_equinox"].date().isoformat(),
         },
     ),
     SolsticeSeasonSensorEntityDescription(
@@ -106,6 +114,7 @@ SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
         value_fn=lambda data: data["summer_solstice"],
         extra_state_attributes_fn=lambda data: {
             "days_until": data["days_until_summer"],
+            "last_start": data["previous_summer_solstice"].date().isoformat(),
         },
     ),
     SolsticeSeasonSensorEntityDescription(
@@ -116,6 +125,7 @@ SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
         value_fn=lambda data: data["autumn_equinox"],
         extra_state_attributes_fn=lambda data: {
             "days_until": data["days_until_autumn"],
+            "last_start": data["previous_autumn_equinox"].date().isoformat(),
         },
     ),
     SolsticeSeasonSensorEntityDescription(
@@ -126,25 +136,7 @@ SENSOR_DESCRIPTIONS: tuple[SolsticeSeasonSensorEntityDescription, ...] = (
         value_fn=lambda data: data["winter_solstice"],
         extra_state_attributes_fn=lambda data: {
             "days_until": data["days_until_winter"],
-        },
-    ),
-    SolsticeSeasonSensorEntityDescription(
-        key=SENSOR_DAYLIGHT_TREND,
-        translation_key=SENSOR_DAYLIGHT_TREND,
-        device_class=SensorDeviceClass.ENUM,
-        options=["days_getting_longer", "days_getting_shorter", "solstice_today"],
-        value_fn=lambda data: data["daylight_trend"],
-        icon_fn=get_daylight_trend_icon,
-    ),
-    SolsticeSeasonSensorEntityDescription(
-        key=SENSOR_NEXT_TREND_CHANGE,
-        translation_key=SENSOR_NEXT_TREND_CHANGE,
-        device_class=SensorDeviceClass.TIMESTAMP,
-        icon=ICON_NEXT_TREND_CHANGE,
-        value_fn=lambda data: data["next_trend_change"],
-        extra_state_attributes_fn=lambda data: {
-            "days_until": data["days_until_trend_change"],
-            "event_type": data["next_trend_event_type"],
+            "last_start": data["previous_winter_solstice"].date().isoformat(),
         },
     ),
     SolsticeSeasonSensorEntityDescription(
@@ -168,23 +160,54 @@ async def async_setup_entry(
 ) -> None:
     """Set up Solstice Season sensors from a config entry.
 
+    This routes sensor creation based on the device type configured
+    in the config entry.
+
     Args:
         hass: Home Assistant instance.
         config_entry: The config entry for this integration instance.
         async_add_entities: Callback to add entities.
     """
-    coordinator: SolsticeSeasonCoordinator = hass.data[DOMAIN][config_entry.entry_id]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = entry_data["coordinator"]
+    device_type = entry_data["device_type"]
 
-    async_add_entities(
-        SolsticeSeasonSensor(coordinator, description, config_entry)
-        for description in SENSOR_DESCRIPTIONS
-    )
+    entities: list[SensorEntity] = []
+
+    if device_type == DEVICE_BASE_DATA:
+        # Base Data sensors
+        entities.extend(
+            BaseDataSensor(coordinator, description, config_entry)
+            for description in BASE_SENSOR_DESCRIPTIONS
+        )
+    elif device_type == DEVICE_CROSS_QUARTER:
+        # Cross-Quarter sensors
+        entities.extend(
+            CrossQuarterSensor(coordinator, description, config_entry)
+            for description in CROSS_QUARTER_SENSOR_DESCRIPTIONS
+        )
+    elif device_type == DEVICE_CHINESE:
+        # Chinese Solar Terms sensors
+        scope = config_entry.data.get(CONF_SCOPE, "all_24")
+        descriptions = get_chinese_sensor_descriptions(scope)
+        entities.extend(
+            ChineseSolarTermsSensor(coordinator, description, config_entry)
+            for description in descriptions
+        )
+    else:
+        # Four Seasons sensors (default)
+        entities.extend(
+            FourSeasonsSensor(coordinator, description, config_entry)
+            for description in FOUR_SEASONS_SENSOR_DESCRIPTIONS
+        )
+
+    async_add_entities(entities)
 
 
-class SolsticeSeasonSensor(
+class FourSeasonsSensor(
     CoordinatorEntity[SolsticeSeasonCoordinator], SensorEntity
 ):
-    """Representation of a Solstice Season sensor."""
+    """Representation of a Four Seasons sensor."""
 
     entity_description: SolsticeSeasonSensorEntityDescription
     _attr_has_entity_name = True
@@ -217,9 +240,9 @@ class SolsticeSeasonSensor(
         """
         mode = self._config_entry.data[CONF_MODE]
         model = (
-            "Astronomical Calculator"
+            "Four Seasons (Astronomical)"
             if mode == MODE_ASTRONOMICAL
-            else "Meteorological Calculator"
+            else "Four Seasons (Meteorological)"
         )
 
         return DeviceInfo(

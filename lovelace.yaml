@@ -36,7 +36,7 @@
         type: module
       - url: /webrtc/webrtc-camera.js
         type: module
-      - url: /local/custom_ui/lunar-phase-card.js?v=1
+      - url: /local/custom_ui/lunar-phase-card.js?v=2
         type: module
       - url: /local/custom_ui/button-card.js
         type: module

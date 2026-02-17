@@ -22,6 +22,7 @@ from .const import (
     STATE_UNKNOWN,
     DEVICE_TYPE_WASHING_MACHINE,
     DEFAULT_MAX_DEFERRAL_SECONDS,
+    DEFAULT_DEFER_FINISH_CONFIDENCE,
 )
 from .signal_processing import integrate_wh
 
@@ -690,6 +691,18 @@ class CycleDetector:
         # If matched profile, enforce min duration ratio
         ratio = self._config.min_duration_ratio
 
+        # --- STRICTER DEFERRAL ---
+        # If we are NOT in a verified pause, but power has been low for a long time (ENDING state),
+        # we only defer if we are VERY confident this profile is correct.
+        # This prevents hanging on too-long profiles that matched early but are now diverging.
+        if self._last_match_confidence < DEFAULT_DEFER_FINISH_CONFIDENCE:
+            _LOGGER.debug(
+                "Not deferring finish: confidence %.2f too low for unverified pause (profile: %s)",
+                self._last_match_confidence,
+                self._matched_profile,
+            )
+            return False
+
         # Also use profile tolerance to handle variable cycle lengths (e.g. long drying)
         # Allow deferral up to Expected * (1 + tolerance)
         upper_threshold = self._expected_duration * (
@@ -699,11 +712,12 @@ class CycleDetector:
         # Primary check: Is duration significantly below expectation?
         if duration < (self._expected_duration * ratio):
             _LOGGER.debug(
-                "Deferring cycle finish: duration %.0fs < %.0f%% of expected %.0fs (profile: %s)",
+                "Deferring cycle finish: duration %.0fs < %.0f%% of expected %.0fs (profile: %s, confidence %.2f)",
                 duration,
                 ratio * 100,
                 self._expected_duration,
                 self._matched_profile,
+                self._last_match_confidence,
             )
             return True
 
@@ -763,6 +777,14 @@ class CycleDetector:
             trim_end=not keep_tail,
         )
 
+        # Ensure power_data covers the full duration until end_time
+        # (especially important for manual recordings or drying phases with no sensor updates)
+        final_readings = list(trimmed_readings)
+        if final_readings:
+            last_t, last_p = final_readings[-1]
+            if last_t < end_time:
+                final_readings.append((end_time, last_p))
+
         cycle_data = {
             "start_time": self._current_cycle_start.isoformat(),
             "end_time": end_time.isoformat(),
@@ -770,7 +792,7 @@ class CycleDetector:
             "max_power": self._cycle_max_power,
             "status": status,
             "termination_reason": termination_reason,
-            "power_data": [(t.isoformat(), p) for t, p in trimmed_readings],
+            "power_data": [(t.isoformat(), p) for t, p in final_readings],
         }
 
         _LOGGER.info("Cycle Finished: %s, %.1f min", status, duration / 60)
