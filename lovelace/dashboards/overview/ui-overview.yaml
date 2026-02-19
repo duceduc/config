@@ -1,0 +1,422 @@
+####################################################
+#
+#                    LOVELACE CONFIG
+#
+####################################################
+
+custom_header:
+  compact_mode: true
+  button_text:
+    options: '{{ hours12LZ }}:{{ minutesLZ }}'
+  hide_help: true
+  hide_config: true
+  shadow: on
+  chevrons: false
+
+#title: DS
+#icon: mdi:home
+background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+views:
+  - !include data.yaml
+  - !include climate.yaml
+  - !include switches.yaml
+  - !include rooms.yaml
+  - !include floorplan.yaml
+  - !include weather.yaml
+  - !include automations.yaml
+  - !include energy.yaml
+  - !include chores.yaml
+  - !include signals.yaml
+  - !include stats.yaml
+
+####################################################
+#
+#                    STREAMLINE TPL
+#
+####################################################
+
+
+# climate.yaml
+streamline_templates:
+  climate_tpl:
+    card:
+        type: entities
+        title: '[[title]]'
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity: '[[entity_3]]'
+          detail: 2
+        entities:
+          - entity: '[[entity_1]]'
+            name: '[[name_1]]'
+            icon: mdi:[[icon]]
+          - entity: '[[entity_2]]'
+            name: '[[name_2]]'
+            icon: mdi:water-percent
+          - type: divider
+          - entity: '[[entity_3]]'
+            name: '[[name_3]]'
+            icon: mdi:thermometer-lines
+
+# rooms.yaml
+  three_sensors_tpl:
+    card:
+        type: vertical-stack
+        cards:
+          - type: glance
+            title: '[[title]]'
+            state_color: false
+            entities:
+              - entity: '[[entity_1]]'
+                name: '[[name_1]]'
+              - entity: '[[entity_2]]'
+                name: '[[name_2]]'
+              - entity: '[[entity_3]]'
+                name: '[[name_3]]'
+
+  aircon_tpl:
+    card:
+      type: 'custom:vertical-stack-in-card'
+      cards:
+        - type: glance
+          title: '[[title]]'
+          state_color: false
+          show_name: false
+          entities:
+            - entity: '[[entity_1]]'
+              name: Aircon
+            - entity: '[[entity_2]]'
+              name: Target
+            - entity: '[[entity_3]]'
+              name: Temperature
+            - entity: '[[entity_4]]'
+              name: Humidity
+#            - entity: '[[entity_5]]'
+#              name: Condensation
+        - entities:
+            - head:
+                label: Automation
+                type: section
+              items:
+                - input_datetime.[[room]]_ac_am_on_time
+                - input_datetime.[[room]]_ac_am_off_time
+                - input_datetime.[[room]]_ac_pm_on_time
+                - input_datetime.[[room]]_ac_pm_off_time
+                - input_number.[[room]]_ac_cool_temp_set
+                - input_number.[[room]]_heater_heat_temp_set
+                - input_number.[[room]]_ac_temp_set_cool
+                - input_number.[[room]]_ac_temp_set_heat
+                - input_number.[[room]]_humidity_set
+              type: 'custom:fold-entity-row'
+          show_header_toggle: false
+          type: entities
+
+
+  humidifier_tpl:
+    card:
+      type: 'custom:vertical-stack-in-card'
+      cards:
+        - type: glance
+          title: '[[title]]'
+          state_color: false
+          show_name: false
+          entities:
+            - entity: '[[entity_1]]'
+              name: Humidifier
+            - entity: '[[entity_2]]'
+              name: Temperature
+            - entity: '[[entity_3]]'
+              name: Humidity
+            - entity: '[[entity_4]]'
+              name: Efficiency
+        - entities:
+            - head:
+                label: Automation
+                type: section
+              items:
+                - input_boolean.[[room]]_humidifier_automation_enable
+                - input_datetime.[[room]]_ac_am_on_time
+                - input_datetime.[[room]]_ac_am_off_time
+                - input_datetime.[[room]]_ac_pm_on_time
+                - input_datetime.[[room]]_ac_pm_off_time
+                - input_number.[[room]]_humidity_low_set
+                - input_number.[[room]]_humidity_high_set
+                - input_number.[[room]]_humidity_intensity_set
+              type: 'custom:fold-entity-row'
+          show_header_toggle: false
+          type: entities
+
+
+# data.yaml
+  four_sensors_tpl:
+    card:
+        type: vertical-stack
+        cards:
+          - type: glance
+            title: '[[title]]'
+            state_color: true
+            entities:
+              - entity: '[[entity_1]]'
+                name: '[[name_1]]'
+              - entity: '[[entity_2]]'
+                name: '[[name_2]]'
+              - entity: '[[entity_3]]'
+                name: '[[name_3]]'
+              - entity: '[[entity_4]]'
+                name: '[[name_4]]'
+
+# data.yaml
+  five_sensors_tpl:
+    card:
+        type: vertical-stack
+        cards:
+          - type: glance
+            title: '[[title]]'
+            state_color: true
+            entities:
+              - entity: '[[entity_1]]'
+                name: '[[name_1]]'
+              - entity: '[[entity_2]]'
+                name: '[[name_2]]'
+              - entity: '[[entity_3]]'
+                name: '[[name_3]]'
+              - entity: '[[entity_4]]'
+                name: '[[name_4]]'
+              - entity: '[[entity_5]]'
+                name: '[[name_5]]'
+
+# data.yaml
+  server_tpl:
+    card:
+        type: entities
+        title: '[[title]]'
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity: '[[entity_4]]'
+          detail: 3
+        entities:
+          - entity: '[[entity_1]]'
+            name: Memory Use
+            icon: mdi:memory
+          - entity: '[[entity_2]]'
+            name: Disk Use
+            icon: mdi:harddisk
+          - entity: '[[entity_3]]'
+            name: Processor Use
+            icon: mdi:memory
+          - type: divider
+          - entity: '[[entity_4]]'
+            name: CPU Temperature
+            icon: mdi:thermometer
+
+# data.yaml
+  server_exc_tpl:
+    card:
+        type: entities
+        title_javascript: "states['[[entity_1]]'].state === 'unavailable' ? 'rear sate' : 'desktop';"
+        show_header_toggle: false
+        footer:
+          type: graph
+          entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_44]]' : '[[entity_4]]';"
+          detail: 3
+        entities:
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_11]]' : '[[entity_1]]';"
+            name: Memory Use
+            icon: mdi:memory
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_22]]' : '[[entity_2]]';"
+            name: Disk Use
+            icon: mdi:harddisk
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_33]]' : '[[entity_3]]';"
+            name: Processor Use
+            icon: mdi:memory
+          - type: divider
+          - entity_javascript: "states['[[entity_1]]'].state === 'unavailable' ? '[[entity_44]]' : '[[entity_4]]';"
+            name: CPU Temperature
+            icon: mdi:thermometer
+
+
+
+
+
+
+
+
+# data.yaml
+  person_card:
+    default:
+      - size: 60%
+      - color: auto
+      - background_color: var(--primary-background-color)
+      - variable: spin
+      - spin: false
+      - show_name: false
+      - show_state: true
+      - show_label: false
+      - show_icon: true
+      - show_last_changed: false
+      - show_entity_picture: false
+      - tap_action:
+          action: more-info
+          haptic: light
+      - aspect_ratio: 2/1
+      - margin-right: 20px
+      - label: '&nbsp;'
+      - off_icon_color: gray
+      - off_name_color: gray
+      - off_state_color: gray
+    card:
+      type: custom:button-card
+      battery_level: '[[battery_level]]'
+      battery_state: '[[battery_state]]'
+
+      home_sensor: '[[home_sensor]]'
+      work_sensor: '[[work_sensor]]'
+      work_icon: '[[work_icon]]'
+      name: '[[name]]'
+      icon: 'mdi:[[icon]]'
+      size: '[[size]]'
+      color: '[[color]]'
+      aspect_ratio: '[[aspect_ratio]]'
+      entity: '[[entity]]'
+      label: '[[label]]'
+      show_name: '[[show_name]]'
+      show_icon: '[[show_icon]]'
+      show_state: '[[show_state]]'
+      show_label: '[[show_label]]'
+      show_last_changed: '[[show_last_changed]]'
+      tap_action: '[[tap_action]]'
+      hold_action: '[[hold_action]]'
+      entity_picture: '[[entity_picture]]'
+      show_entity_picture: '[[show_entity_picture]]'
+      styles:
+        card:
+#          - border-radius: 12px
+          - --card-background-color: '[[background_color]]'
+        icon:
+          - grid-column: 1
+          - grid-row: 1 / 4
+        label:
+          - color: gray
+          - font-size: 11px
+  #        - font-family: Helvetica
+          - padding: 0px 10px
+          - justify-self: start
+        state:
+          - font-size: 18px
+  #        - font-family: Helvetica
+          - padding: 0px 10px
+          - justify-self: start
+          - text-transform: capitalize
+#          - font-weight: bold
+          - padding-left: 10px
+          - color: var(--primary-text-color)
+        grid:
+          - grid-template-areas: '"i s" "i battery" "i home" "i work"'
+          - grid-template-columns: 50% 50%
+          - grid-template-rows: 25% 25% 25% 25%
+        img_cell:
+          - align-self: start
+          - text-align: start
+  #        - margin-right: '[[margin-right]]'
+        name:
+          - justify-self: start
+          - padding-left: 10px
+          - font-weight: bold
+  #        - font-family: Helvetica
+          - font-size: 13px
+        entity_picture:
+          - height: 100px
+          - width: 100px
+          - border-radius: 100%
+        custom_fields:
+          battery:
+            - align-self: start
+            - justify-self: start
+            - font-size: 14px
+          home:
+            - align-self: start
+            - justify-self: start
+            - font-size: 14px
+          work:
+            - align-self: start
+            - justify-self: start
+            - font-size: 14px
+      custom_fields:
+            battery: >
+                [[[
+                  if (states['[[battery_state]]'].state === 'Not Charging')
+                    return `<ha-icon
+                      icon="mdi:battery"
+                      style="; --mdc-icon-size: 24px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
+                      </ha-icon><span>${states['[[battery_level]]'].state} %</span>`
+                  else return `<ha-icon
+                    icon="mdi:battery-charging"
+                    style="; --mdc-icon-size: 24px; padding-left: 5px; padding-right: 5px; color: var(--primary-color);">
+                    </ha-icon><span>${states['[[battery_level]]'].state} %</span>`
+                ]]]
+            home: >
+                [[[
+                  return `<ha-icon
+                    icon="mdi:home-import-outline"
+                    style="; --mdc-icon-size: 24px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
+                    </ha-icon><span>${states['[[home_sensor]]'].state} mins</span>`
+                ]]]
+            work: >
+                [[[
+                  return `<ha-icon
+                    icon="[[work_icon]]"
+                    style="; --mdc-icon-size: 24px; padding-left: 6px; padding-right: 5px; color: var(--primary-color);">
+                    </ha-icon><span>${states['[[work_sensor]]'].state} mins</span>`
+                ]]]
+      state:
+        - value: 'away'
+          styles:
+            card:
+              - opacity: 0.6
+            entity_picture:
+              - border: 2px solid var(--severity-1)
+        - value: "home"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-5)
+        - value: "jcb"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-3)
+
+        - value: "costco hq"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-3)
+        - value: "school"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-3)
+
+        - value: "lunch takeout"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-2)
+
+        - value: "mall"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-8)
+
+        - value: "grocery store"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-6)
+        - value: "relatives"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-7)
+
+
+####################################################
+#
+#          END OF CONFIGURATION FILE
+#
+####################################################

@@ -7,7 +7,7 @@
 title: Data
 path: data
 icon:  mdi:home-analytics
-background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+#background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
 panel: true # setting this to true loses border & shadow. not sure how to fix this.
 cards:
 

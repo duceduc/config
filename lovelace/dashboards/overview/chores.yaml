@@ -7,7 +7,7 @@
 title: Chores
 path: chores
 icon: mdi:bookmark-check
-background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
+#background: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
 panel: true
 cards:
 

@@ -4,7 +4,8 @@
 #
 #########################################################
 
-    mode: yaml
+#    mode: yaml
+    resource_mode: yaml    
     resources:
       - url: /local/lovelace/css/styles.css?v=1.0.0
         type: css
@@ -76,6 +77,13 @@
 
 
     dashboards:
+      ui-overview: # url slug need to contain a hyphen
+        mode: yaml
+        title: Overview ui
+        icon: mdi:home-automation
+        show_in_sidebar: true
+        filename: lovelace/dashboards/overview/ui-overview.yaml
+    
       lovelace-floorplan: # url slug need to contain a hyphen
         mode: yaml
         title: Floorplan
@@ -96,5 +104,4 @@
         icon: mdi:cellphone
         show_in_sidebar: true
         filename: lovelace/dashboards/quick_look_mobile/qlm.yaml
-
 
