@@ -6,6 +6,9 @@
 # to reload theme using services 'frontend.reload_themes'
 
 midnight:
+# revert back to blue header after 2026.2 update changed it
+  app-header-background-color: "#1E88E5" 
+  app-header-text-color: "#FFFFFF"
 
   background-image: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
   ha-card-background: "rgba(128, 128, 128, 0.1)"
