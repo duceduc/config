@@ -79,7 +79,7 @@
     dashboards:
       ui-overview: # url slug need to contain a hyphen
         mode: yaml
-        title: Overview ui
+        title: Overview
         icon: mdi:home-automation
         show_in_sidebar: true
         filename: lovelace/dashboards/overview/ui-overview.yaml
