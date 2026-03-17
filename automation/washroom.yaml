@@ -78,7 +78,7 @@
 ##            - action: script.tradfri_transition
 ##              data:
 ##                entity_id: light.sink
-##                color_temp: 153 # white color
+##                color_temp_kelvin: 153 # white color
 ##                transition: 2
 ##                brightness: 254
 ##              entity_id: light.sink
@@ -89,7 +89,7 @@
 ##            - action: script.tradfri_transition
 ##              data:
 ##                entity_id: light.w_4
-##                color_temp: 370 # beige color
+##                color_temp_kelvin: 370 # beige color
 ##                transition: 2
 ##                brightness: 254
 ##              entity_id: light.w_4

@@ -11,29 +11,26 @@ from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import CONF_API_KEY, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers import (
-    config_validation as cv,
-    device_registry as dr,
-    entity_registry as er,
-)
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
 from .const import (
+    CONF_API_PROVIDER,
     CONF_API_VERSION,
     CONF_BASE_URL,
     CONF_ORGANIZATION,
     CONF_SKIP_AUTHENTICATION,
-    DEFAULT_SKIP_AUTHENTICATION,
-    CONF_API_PROVIDER,
     DEFAULT_API_PROVIDER,
+    DEFAULT_SKIP_AUTHENTICATION,
     DOMAIN,
 )
 from .helpers import get_authenticated_client
 from .services import async_setup_services
+from .template import async_setup_templates, async_unload_templates
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.CONVERSATION]
+PLATFORMS = [Platform.AI_TASK, Platform.CONVERSATION]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 type ExtendedOpenAIConfigEntry = ConfigEntry[AsyncClient]
@@ -73,11 +70,14 @@ async def async_setup_entry(
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(update_listener))
+
+    await async_setup_templates(hass)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload OpenAI."""
+    await async_unload_templates(hass)
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 

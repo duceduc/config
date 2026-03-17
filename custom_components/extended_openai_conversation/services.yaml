@@ -60,3 +60,16 @@ change_config:
             - openai
             - azure
           mode: dropdown
+download_skill:
+  name: Download skill
+  description: Download a skill from the GitHub repository and install it to the user skills directory. Available skills can be found at https://github.com/jekalmin/extended_openai_conversation/tree/develop/examples/skills
+  fields:
+    skill_name:
+      required: true
+      example: crypto
+      description: Name of the skill to download (e.g., crypto, weather, calendar)
+      selector:
+        text:
+reload_skills:
+  name: Reload skills
+  description: Reload all skills from the user skills directory to pick up changes or newly added skills

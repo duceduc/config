@@ -100,28 +100,28 @@
         data_template:
           entity_id: light.{{ entity }}
           brightness: 1
-          kelvin: 5000
+          color_temp_kelvin: 5000
       - delay:
           seconds: 1
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 64
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 128
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 151
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
 
   cr_lights_fadein_night:
@@ -131,37 +131,36 @@
         data_template:
           entity_id: light.{{ entity }}
           brightness: 1
-          kelvin: 5000
+          color_temp_kelvin: 5000
       - delay:
           seconds: 1
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 64
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 128
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 191
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: light.{{ entity }}
           brightness: 254
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-
 
 #########################################################
 #
@@ -251,7 +250,7 @@
       - service: light.turn_on
         data_template:
           entity_id: '{{ entity_id }}'
-          color_temp: '{{ color_temp | int }}'
+          color_temp_kelvin: '{{ color_temp_kelvin | int }}'
           transition: '{{ transition | int / 2 }}'
     mode: parallel # default 10
 
@@ -283,35 +282,35 @@
         data_template:
           entity_id: '{{ states("sensor.wakeup_map") }}'
           brightness: 1
-          kelvin: 1000
+          color_temp_kelvin: 1000
       - delay:
           seconds: 1
       - service: light.turn_on
         data_template:
           entity_id: '{{ states("sensor.wakeup_map") }}'
           brightness: 64
-          kelvin: 2000
+          color_temp_kelvin: 2000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: '{{ states("sensor.wakeup_map") }}'
           brightness: 128
-          kelvin: 3000
+          color_temp_kelvin: 3000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: '{{ states("sensor.wakeup_map") }}'
           brightness: 191
-          kelvin: 4000
+          color_temp_kelvin: 4000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
       - service: light.turn_on
         data_template:
           entity_id: '{{ states("sensor.wakeup_map") }}'
           brightness: 254
-          kelvin: 5000
+          color_temp_kelvin: 5000
           transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
 
 
@@ -525,109 +524,110 @@
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 25.5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0) }} {% endif %}'
       - delay: '00:02:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 25.5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0) }} {% endif %}'
       - delay: '00:02:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 25.5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0) }} {% endif %}'
       - delay: '00:02:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 25.5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0) }} {% endif %}'
       - delay: '00:02:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 25.5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0) }} {% endif %}'
       - delay: '00:02:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 25.5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 25.5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0) }} {% endif %}'
       - delay: '00:02:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 25.5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:01:00'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 10 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 10 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 10 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 10 | round(0) }} {% endif %}'
       - delay: '00:00:30'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 5| round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 5| round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 5 | round(0) }} {% endif %}'
       - delay: '00:00:30'
       - service: light.turn_on
         entity_id: light.computer
         data_template:
           brightness: '{% if (states.light.computer.attributes.brightness - 5 | round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.brightness - 5 | round(0) }} {% endif %}'
-          color_temp: '{% if (states.light.computer.attributes.color_temp - 5| round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp - 5 | round(0) }} {% endif %}'
+          color_temp_kelvin: '{% if (states.light.computer.attributes.color_temp_kelvin - 5| round(0)) <0 %} 0 {% else %} {{ states.light.computer.attributes.color_temp_kelvin - 5 | round(0) }} {% endif %}'
       - service: light.turn_on
         entity_id: light.computer
         data:
-          color_temp: 0
+          color_temp_kelvin: 0
       - service: light.turn_off
         entity_id: light.computer
+
 
 
 #########################################################

@@ -80,47 +80,49 @@ history:
       - scene
       - automation
 
-influxdb:
-  api_version: 2
-  host: 192.168.1.197
-  port: 8015
-  ssl: false
-  verify_ssl: false
-  token: !secret influx_token
-  organization: ngx
-  bucket: homeassistant
-  include:
-    domains:
-      - person
-      - utility_meter
-    entity_globs:
-      - sensor.*temperature
-      - sensor.*humidity
-      - sensor.*illuminance
-      - sensor.ram_use_pct*
-      - sensor.*cpu_usage
-      - sensor.energy*
-      - sensor.rainfall*
-      - sensor.sniffer*
-    entities:
-      - sensor.sniffer0_pm_2_5_aqi
-      - sensor.speedtest_download
-      - sensor.speedtest_upload
-      - sensor.home_assistant_v2_db_size_gb
-      - light.counter
-      - light.cabinet
-      - light.computer
-      - light.pc_desktop_led
-      - light.genkan
-      - light.hallway
-      - light.living
-      - light.master
-      - light.master_closet
-      - light.storage
-      - light.shower
-      - light.sink
-      - light.laundry
-      - light.vanity
-      - light.laundry
-      - media_player.mediaroomsatellite
-      - media_player.spotify_duc
+
+## DISABLED for now. but need to setup via the integration. 
+#influxdb:
+#  api_version: 2
+#  host: 192.168.1.197
+#  port: 8015
+#  ssl: false
+#  verify_ssl: false
+#  token: !secret influx_token
+#  organization: ngx
+#  bucket: homeassistant
+#  include:
+#    domains:
+#      - person
+#      - utility_meter
+#    entity_globs:
+#      - sensor.*temperature
+#      - sensor.*humidity
+#      - sensor.*illuminance
+#      - sensor.ram_use_pct*
+#      - sensor.*cpu_usage
+#      - sensor.energy*
+#      - sensor.rainfall*
+#      - sensor.sniffer*
+#    entities:
+#      - sensor.sniffer0_pm_2_5_aqi
+#      - sensor.speedtest_download
+#      - sensor.speedtest_upload
+#      - sensor.home_assistant_v2_db_size_gb
+#      - light.counter
+#      - light.cabinet
+#      - light.computer
+#      - light.pc_desktop_led
+#      - light.genkan
+#      - light.hallway
+#      - light.living
+#      - light.master
+#      - light.master_closet
+#      - light.storage
+#      - light.shower
+#      - light.sink
+#      - light.laundry
+#      - light.vanity
+#      - light.laundry
+#      - media_player.mediaroomsatellite
+#      - media_player.spotify_duc
