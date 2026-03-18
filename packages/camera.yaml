@@ -77,10 +77,5 @@ automation:
         data:
           entity_id: camera.security_balcony
           filename: '/config/www/img/security/balcony/{{ now().strftime("%Y%m%d_%H%M%S") }}security_balcony_camera.jpg'
-
-#      - action: telegram_bot.send_photo
-#        data:
-#          file: '/config/www/img/security/balcony/security_balcony_camera_last.jpg'
-#          caption: Balcony motion detected
       - action: shell_command.clean_balcony_images
 

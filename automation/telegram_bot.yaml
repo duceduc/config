@@ -178,7 +178,7 @@
           I'm sorry. I cannot find the device named {{device}} in the house.
           {%- endfor -%}
         title: ''
-        chat_id: '{{ trigger.event.data.chat_id }}' ### replace target: with chat_id
+        chat_id: '{{ trigger.event.data.chat_id }}'
     - condition: template
       value_template: >-
         {%- set device = trigger.event.data.text|lower|replace('turn on ','')|replace('turn off ','')|replace('switch on ','')|replace('switch off ','') -%}
