@@ -42,8 +42,9 @@ automation:
               - condition: template 
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
-              - action: notify.amberthebot
+              - action: script.text_notify
                 data:
+                  who: amber
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying in your neighborhood.
           - conditions:
@@ -54,8 +55,9 @@ automation:
               - condition: template 
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
             sequence:
-              - action: notify.amberthebot
+              - action: script.text_notify
                 data:
+                  who: amber                
                   message: >-
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
 
@@ -65,8 +67,9 @@ automation:
               - condition: template 
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
-              - action: notify.amberthebot
+              - action: script.text_notify
                 data:
+                  who: amber                
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying in your neighborhood.
           - conditions:
@@ -77,8 +80,9 @@ automation:
               - condition: template 
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
             sequence:
-              - action: notify.amberthebot
+              - action: script.text_notify
                 data:
+                  who: amber                
                   message: >-
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
 
@@ -86,16 +90,18 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
             sequence:
-              - action: notify.amberthebot
+              - action: script.text_notify
                 data:
+                  who: amber                
                   message: >-
                     📍The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}] at {{ "{:,.0f}".format(trigger.event.data.altitude) }} ft. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
             sequence:
-              - action: notify.amberthebot
+              - action: script.text_notify
                 data:
+                  who: amber                
                   message: >-
                     💼The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}] at {{ "{:,.0f}".format(trigger.event.data.altitude) }} ft. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
         default: []
@@ -105,8 +111,9 @@ automation:
       - trigger: event
         event_type: flightradar24_tracked_took_off
     actions:
-      - action: notify.amberthebot
+      - action: script.text_notify
         data:
+          who: amber
           message: >-
              The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It took off from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
 

@@ -28,6 +28,7 @@
 #      password: !secret amazon_eri_pass
 #      url: amazon.co.jp
 
+
 # now in ui
 #telegram_bot:
 #  - platform: polling

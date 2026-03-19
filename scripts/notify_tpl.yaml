@@ -61,7 +61,6 @@
               message: '{{ message }}'
               target: !secret whatsapp_jcb
 
-
         - conditions:
           - condition: template
             value_template: '{{ who == "amber"}}'
@@ -74,8 +73,6 @@
               title: '{{ title }}'
               message: '{{ message }}'
               entity_id: notify.telegram_bot_1730593885_591654584
-
-
 
         - conditions:
           - condition: template
@@ -136,25 +133,27 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.amberthebot # notify.amberthebot # telegram_bot.send_message #NOT WORKING UNDER NEW TB INTGRA
-            data_template:
-              message: >-
-                {{ message}} # optional
-              data:
-                photo: 
-                   - file: >-
-                        {{ image }}
-                     caption: >-
-                       {{ caption }}
+          - service: telegram_bot.send_photo # notify.amberthebot # telegram_bot.send_message 
+            data:
+              verify_ssl: true
+              entity_id: notify.telegram_bot_1730593885_591654584
+              file: >-
+                {{ image }}
+              caption: >-
+                {{ caption }}
 
-# new send photo codes
-#          - action: telegram_bot.send_photo
-#            data:
-#              verify_ssl: true
-#              entity_id: notify.telegram_bot_1730593885_591654584
-#              file: /config/www/img/misc/off-01.jpg
-#              caption: Good Night from Lions Mansion.
 
+# old way send photo codes
+#          - service: telegram_bot.send_photo # notify.amberthebot # telegram_bot.send_message 
+#            data_template:
+#              message: >-
+#                {{ message}} # optional
+#              data:
+#                photo: 
+#                   - file: >-
+#                        {{ image }}
+#                     caption: >-
+#                       {{ caption }}
 
 
 

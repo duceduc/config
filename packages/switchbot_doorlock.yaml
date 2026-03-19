@@ -31,12 +31,11 @@ automation:
               - condition: trigger
                 id: msg
             sequence:
-              - action: notify.amberthebot
+              - action: telegram_bot.send_message
                 data:
+                  entity_id: notify.telegram_bot_1730593885_591654584
                   message: "The {{ trigger.to_state.attributes.friendly_name }} door has been left {{ states('lock.lock_pro_8d0a') }}."
-                  data:
-                    inline_keyboard:
-                     - 'Lock Door:/lock_door, Leave it:/donothing' # donothing is global automation.  telegram.yaml
+                  inline_keyboard: Lock Door:/lock_door, Leave it:/donothing # donothing is global automation.  telegram.yaml
 
           - conditions:
               - condition: trigger
@@ -54,10 +53,6 @@ automation:
               - action: lock.lock
                 entity_id: lock.lock_pro_8d0a
         default: []
-
-
-
-
 
 
   - alias: Pre Auto Unlock Door
@@ -103,12 +98,11 @@ automation:
               - condition: trigger
                 id: msg
             sequence:
-              - action: notify.amberthebot
+              - action: telegram_bot.send_message
                 data:
+                  entity_id: notify.telegram_bot_1730593885_591654584
                   message: "Auto doorlock has been initialized by {{ trigger.to_state.attributes.friendly_name }}."
-                  data:
-                    inline_keyboard:
-                     - 'Disable Auto Lock:/disable_autolock, Leave it:/donothing' # donothing is global automation.  telegram.yaml
+                  inline_keyboard: Disable Auto Lock:/disable_autolock, Leave it:/donothing' # donothing is global automation.  telegram.yaml
 
           - conditions:
               - condition: trigger

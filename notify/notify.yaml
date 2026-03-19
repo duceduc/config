@@ -50,15 +50,6 @@
 #
 #########################################################
 
-# Free Basic 300 msg/ month CAN DELETE
-  - name: notify-events # viber
-    platform: notify_events
-
-#migrate to ui. can be disable once check it working
-  - name: amberthebot
-    platform: telegram
-    chat_id: !secret telegram_chatid
-
 # https://console.green-api.com/
 # free plan limits to 3 chats /month (group or private)
   - name: greenapi
@@ -67,6 +58,18 @@
     token: !secret whatsapp_greenapi
     target: !secret whatsapp_hass
 
+
+
+
+
+# Free Basic 300 msg/ month  ##CAN DELETE
+#  - name: notify-events # viber
+#    platform: notify_events
+
+#migrate to ui. can be disable once check it's working
+#  - name: amberthebot
+#    platform: telegram
+#    chat_id: !secret telegram_chatid
 
 
 #########################################################
