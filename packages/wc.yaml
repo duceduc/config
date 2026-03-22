@@ -119,13 +119,14 @@ automation:
     actions:
       - action: script.email_notify
         data:
-          title: "Replace WC Airfreshener"
+          title: "Replace {{ state_attr('switch.wc_airfreshener', 'friendly_name') }}"
           who: duc
           message: >-
-            <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-            <br>
-            The wc air freshener bottle needs to be replaced. It has about {{ states('sensor.wc_airfreshener_can') }}% left.<br>
-            <br>
+            Today is {{ now().strftime( '%B %d, %Y') }}
+            
+            
+            The {{ state_attr('switch.wc_airfreshener', 'friendly_name')|lower() }} canister needs to be replaced. It has about {{ states('sensor.wc_airfreshener_can') |round(1) }}% left.
+            
 
   - alias: 'motion wc room'
     triggers:
