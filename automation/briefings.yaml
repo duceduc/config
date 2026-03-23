@@ -12,7 +12,7 @@
        
       Today's Weather
       
-      The current temperature is {{ states('sensor.wbio_current_temperature') }}° ( {{states('sensor.oa_feels_like')}}° feel like) with a forecast of {{ states('sensor.nws_overnight_forecast') }}. Today's low is {{ states('sensor.wbio_overnight_low') }}° with a high of {{ states('sensor.wbio_daytime_temperature') }}°. The predicted precipitation today is{% if state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation == 0 %} 0mm. {% else %} {{ states.sensor.my_weather_forecast_daily.attributes.forecast[0].precipitation }}mm at a chance of {{ states('sensor.wbio_current_rain_forecast') }}%. {% endif %}
+      The current temperature is {{ states('sensor.wbio_current_temperature')| round(1) }}° ( {{states('sensor.oa_feels_like')}}° feel like) with a forecast of {{ states('sensor.nws_overnight_forecast') }}. Today's low is {{ states('sensor.wbio_overnight_low') }}° with a high of {{ states('sensor.wbio_daytime_temperature') }}°. The predicted precipitation today is{% if state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation == 0 %} 0mm. {% else %} {{ states.sensor.my_weather_forecast_daily.attributes.forecast[0].precipitation }}mm at a chance of {{ states('sensor.wbio_current_rain_forecast') }}%. {% endif %}
        
       Holidays & Birthdays
       

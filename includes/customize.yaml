@@ -7,6 +7,8 @@ sensor.last_alexa:
 sensor.home_assistant_v2_db_size_gb:
   icon: mdi:database
 
+
+# Rename Friendly Name
 sensor.lr_condensation_chance:
   friendly_name: Living Room Condensation
   icon: mdi:weather-rainy
@@ -23,17 +25,49 @@ sensor.genkan_condensation_chance:
   friendly_name: Genkan Condensation
   icon: mdi:weather-rainy
 
+switch.heater_ctrl_lr_unit:
+  friendly_name: Heater Living Room Ctrl
+switch.ceiling_fan_winter:
+  friendly_name: Ceiling Fan Winter
+switch.ceiling_fanlight:
+  friendly_name: Ceiling Fan & Lights
+switch.ceiling_fan_lights_only:
+  friendly_name: Ceiling Fan Lights Only
+switch.ceiling_fan_only:
+  friendly_name: Ceiling Fan Only
+switch.yuasa_fan:
+  friendly_name: Fan
+switch.yuasa_fan_spd:
+  friendly_name: Fan Speed
+switch.yuasa_fan_mde:
+  friendly_name: Fan Mode
+switch.yuasa_fan_timer:
+  friendly_name: Fan Timer
+switch.ac_lr_unit:
+  friendly_name: AC Living Room
+switch.ac_ctrl_lr_unit:
+  friendly_name: AC Living Room Ctrl
+
+sensor.lr_radar_illuminance:
+  friendly_name: Rear illuminance
+sensor.ikea_pm25:
+  friendly_name: Air Quality
+
+sensor.shion_room_battery:
+  friendly_name: Shion Room Light Controller
+sensor.cr_curtain_batteries:
+  friendly_name: Computer Room Curtains Battery
+sensor.lr_curtain_batteries:
+  friendly_name: Living Room Curtains Battery
+
+
+
 sensor.vj_ssl_cert_expiry:
   icon: mdi:file-certificate
 sensor.mqtt_ssl_cert_expiry:
   icon: mdi:file-certificate
 sensor.ha_ssl_cert_expiry:
   icon: mdi:file-certificate
-
-sensor.lr_radar_illuminance:
-  friendly_name: Rear illuminance
-sensor.ikea_pm25:
-  friendly_name: Air Quality
 
 # Don't change these names. it's using name as light entity
 binary_sensor.master_clo_door_contact:
@@ -56,35 +90,24 @@ group.wakeuplight:
 
 group.bed_sensors:
   device_class: problem
+
+  
+  
+
+  
 switch.ceiling_fan_summer:
   friendly_name: Ceiling Fan Summer
-  assumed_state: false
-switch.ceiling_fan_winter:
-  friendly_name: Ceiling Fan Winter
-switch.ceiling_fanlight:
-  friendly_name: Ceiling Fan & Lights
-switch.ceiling_fan_lights_only:
-  friendly_name: Ceiling Fan Lights Only
-switch.ceiling_fan_only:
-  friendly_name: Ceiling Fan Only
-switch.yuasa_fan:
-  friendly_name: Fan
-switch.yuasa_fan_spd:
-  friendly_name: Fan Speed
-switch.yuasa_fan_mde:
-  friendly_name: Fan Mode
-switch.yuasa_fan_timer:
-  friendly_name: Fan Timer
-switch.ac_lr_unit:
-  friendly_name: AC Living Room
-switch.ac_ctrl_lr_unit:
-  friendly_name: AC Living Room Ctrl
+  assumed_state: false  
+  
 switch.heater_lr_unit:
   friendly_name: Heater Living Room
   icon: mdi:power
   assumed_state: false
-switch.heater_ctrl_lr_unit:
-  friendly_name: Heater Living Room Ctrl
+  
+  
+  
+  
+
 switch.humidifier_lr_unit:
   friendly_name: Humidifier Living Room
   icon: mdi:power
