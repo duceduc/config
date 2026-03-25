@@ -40,7 +40,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - action: script.text_notify
                 data:
@@ -61,11 +61,26 @@ automation:
                   message: >-
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
 
+# TESTING
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
+              - condition: template 
+                value_template: "{{ trigger.event.data.airport_origin_city | lower | regex_search('blocked|none|n') }}"
+            sequence:
+              - action: script.text_notify
+                data:
+                  who: amber                
+                  message: >-
+                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood and has not filed a flight plan.
+
+
+
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - action: script.text_notify
                 data:
@@ -85,6 +100,23 @@ automation:
                   who: amber                
                   message: >-
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
+
+
+# TESTING
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'jcb') }}"
+              - condition: template 
+                value_template: "{{ trigger.event.data.airport_origin_city | lower | regex_search('blocked|none|n') }}"
+            sequence:
+              - action: script.text_notify
+                data:
+                  who: amber                
+                  message: >-
+                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood and has not filed a flight plan.
+
+
+
 
           - conditions:
               - condition: template

@@ -55,9 +55,9 @@ sensor.ikea_pm25:
 
 sensor.shion_room_battery:
   friendly_name: Shion Room Light Controller
-sensor.cr_curtain_batteries:
+sensor.cr_curtains_battery:
   friendly_name: Computer Room Curtains Battery
-sensor.lr_curtain_batteries:
+sensor.lr_curtains_battery:
   friendly_name: Living Room Curtains Battery
 
 
