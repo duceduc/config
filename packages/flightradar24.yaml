@@ -51,7 +51,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner|None') }}"
               - condition: template 
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
             sequence:
@@ -66,13 +66,14 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airport_origin_city | lower | regex_search('blocked|none|n') }}"
+                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
                   who: amber                
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying in your neighborhood and has not filed a flight plan.
+
 
 
 
@@ -91,7 +92,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner|None') }}"
               - condition: template 
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
             sequence:
@@ -107,7 +108,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airport_origin_city | lower | regex_search('blocked|none|n') }}"
+                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:

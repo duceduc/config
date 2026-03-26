@@ -57,9 +57,12 @@ sensor.shion_room_battery:
   friendly_name: Shion Room Light Controller
 sensor.cr_curtains_battery:
   friendly_name: Computer Room Curtains Battery
+sensor.cr_curtain_batteries:
+  friendly_name: Computer Room Curtains Batteries
 sensor.lr_curtains_battery:
   friendly_name: Living Room Curtains Battery
-
+sensor.lr_curtain_batteries:
+  friendly_name: Living Room Curtains Batteries
 
 
 sensor.vj_ssl_cert_expiry:
