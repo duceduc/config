@@ -46,14 +46,14 @@ automation:
                 data:
                   who: amber
                   message: >-
-                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood.
+                    🚁{{ trigger.event.data.airline }} is flying over Kawaguchi.
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner|None') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda airways|none') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
+                value_template: "{{ trigger.event.data.callsign | lower | regex_search('private owner|null|blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
@@ -66,13 +66,13 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('blocked|none|n') }}"
+                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('null|unknown|blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
                   who: amber                
                   message: >-
-                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood and has not filed a flight plan.
+                    🚁{{ trigger.event.data.airline }} is flying over Kawaguchi and has not filed a flight plan.
 
 
 
@@ -87,14 +87,14 @@ automation:
                 data:
                   who: amber                
                   message: >-
-                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood.
+                    🚁{{ trigger.event.data.airline }} is flying over Edogawa.
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('private owner|honda|none|Private owner|None') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda|none|Private owner|None') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.callsign | lower | regex_search('blocked|none|n') }}"
+                value_template: "{{ trigger.event.data.callsign | lower | regex_search('null|blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
@@ -108,13 +108,13 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template 
-                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('blocked|none|n') }}"
+                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('null|blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
                   who: amber                
                   message: >-
-                    🚁{{ trigger.event.data.airline }} is flying in your neighborhood and has not filed a flight plan.
+                    🚁{{ trigger.event.data.airline }} is flying over Edogawa and has not filed a flight plan.
 
 
 
@@ -139,6 +139,7 @@ automation:
                     💼The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}] at {{ "{:,.0f}".format(trigger.event.data.altitude) }} ft. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
         default: []
 
+
   - alias: 'Scheduled flight takes off'
     triggers:
       - trigger: event
@@ -148,5 +149,24 @@ automation:
         data:
           who: amber
           message: >-
-             The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It took off from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
+            An update for flight {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It took off from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_name }} in {{ trigger.event.data.airport_destination_city }}.
+            [Open FlightRadar](https://www.flightradar24.com/{{ trigger.event.data.callsign }})
 
+  - alias: 'Scheduled flight Landed'
+    triggers:
+      - trigger: event
+        event_type: flightradar24_tracked_landed
+    actions:
+      - action: script.text_notify
+        data:
+          who: amber
+          message: >-
+            An update for flight {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It landed at {{ trigger.event.data.airport_destination_name }} in {{ trigger.event.data.airport_destination_city }} on {{ as_timestamp(now(),0)|timestamp_custom("%Y-%m-%d %H:%M") }} local.
+
+# TEST
+      - action: script.email_notify
+        data:
+          who: renee
+          title: Flight Update
+          message: >-
+            An update for flight {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}]. It landed at {{ trigger.event.data.airport_destination_name }} in {{ trigger.event.data.airport_destination_city }} on {{ as_timestamp(now(),0)|timestamp_custom("%Y-%m-%d %H:%M" ) }} local.

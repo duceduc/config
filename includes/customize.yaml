@@ -63,6 +63,8 @@ sensor.lr_curtains_battery:
   friendly_name: Living Room Curtains Battery
 sensor.lr_curtain_batteries:
   friendly_name: Living Room Curtains Batteries
+sensor.computer_room_battery:
+  friendly_name: Computer Room Controller Battery
 
 
 sensor.vj_ssl_cert_expiry:

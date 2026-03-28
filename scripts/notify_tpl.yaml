@@ -92,20 +92,6 @@
               - "1093135539277942784"            
               message: '{{ message }}'
 
-# can be deleted
-        - conditions:
-          - condition: template
-            value_template: '{{ who == "viber"}}'
-          - condition: state
-            entity_id: input_boolean.text_notify_duc
-            state: 'on'
-          sequence:
-          - service: notify.notify_events
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-
-
 
   text_notify_image:
     sequence:
@@ -257,6 +243,16 @@
                 images: []
         - conditions:
           - condition: template
+            value_template: '{{ who == "renee"}}'
+          sequence:
+          - service: notify.renee
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: []                
+        - conditions:
+          - condition: template
             value_template: '{{ who == "jcb"}}'
           sequence:
           - service: notify.jcb
@@ -295,6 +291,16 @@
               message: '{{ message }}'
               data:
                 images: '{{ path }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "renee"}}'
+          sequence:
+          - service: notify.renee
+            data_template:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                images: '{{ path }}'                
         - conditions:
           - condition: template
             value_template: '{{ who == "jcb"}}'

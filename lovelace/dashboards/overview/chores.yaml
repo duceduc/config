@@ -62,6 +62,81 @@ cards:
              cycle_days: 60
 
 
+
+# TESTING
+      - type: vertical-stack
+        title: Tokyo Airport Arrivals
+        cards:
+         - type: entities
+           entities:
+             - entity: sensor.homeft24_airport_arrivals_canceled
+               name: Arrivals canceled
+             - entity: sensor.homeft24_airport_arrivals_delayed
+               name: Arrivals delayed
+             - entity: sensor.homeft24_airport_arrivals_on_time
+               name: Arrivals on time
+         - type: markdown
+           title: Arrivals
+           content: >
+                {% set flights =
+                state_attr('sensor.homeft24_airport_arrivals','flights') |
+                default([], true) %}
+                        | TIME | FROM | FLIGHT | REMARK |
+                        | --------- | ---- | ------ | ------ | {% for f in flights %}
+                        | {{ f.time_scheduled_arrival | timestamp_custom('%H:%M') if f.time_scheduled_departure else '--:--' }} | {{ f.airport_city |  default('---', true) }} | {{ f.flight_number |  default('---', true) }} | {{ f.status_text |  default('---', true) }} | {% endfor %}
+      - type: vertical-stack
+        title: Tokyo Airport Departures
+        cards:
+         - type: entities
+           entities:
+             - entity: sensor.homeft24_airport_departures_canceled
+               name: Departures canceled
+             - entity: sensor.homeft24_airport_departures_delayed
+               name: Departures delayed
+             - entity: sensor.homeft24_airport_departures_on_time
+               name: Departures on time
+         - type: markdown
+           title: Departures
+           content: >
+                {% set flights = state_attr('sensor.homeft24_airport_departures',
+                'flights') |  default([], true) %}
+                        | TIME | TO | FLIGHT | REMARK |
+                        | --------- | ---- | ------ | ------ | {% for f in flights %}
+                        | {{ f.time_scheduled_departure | timestamp_custom('%H:%M') if f.time_scheduled_departure else '--:--' }} | {{ f.airport_city |  default('---', true) }} | {{ f.flight_number |  default('---', true) }} | {{ f.status_text |  default('---', true) }} |{% endfor %}
+
+
+
+# TEST
+      - type: vertical-stack
+        cards:
+         - type: conditional
+           conditions:
+             - condition: numeric_state
+               entity: sensor.homeft24_most_tracked
+               above: 0
+           card:
+             type: markdown
+             content: >-
+               {% set data = state_attr('sensor.homeft24_most_tracked', 'flights')
+                %}
+               {% for flight in data %}
+                 <ha-icon icon="mdi:airplane"></ha-icon>{%if flight.get('flight_number') and flight.flight_number %}{{ flight.flight_number }} - {% endif %}{%if flight.get('airline_short') and flight.airline_short %}{{ flight.airline_short }} - {% endif %}{%if flight.get('aircraft_model') and flight.aircraft_model %}{{ flight.aircraft_model }} - {% endif %}{%if flight.get('callsign') and flight.callsign %}{{ flight.callsign }}{% endif %}
+                 {%if flight.get('airport_origin_city') and flight.get('airport_origin_country_code') and flight.airport_origin_city %}{{ flight.airport_origin_city }}<img src="https://flagsapi.com/{{ flight.airport_origin_country_code }}/shiny/16.png" title='{{ flight.airport_origin_country_name }}'/> -> {{ flight.airport_destination_city }}{% endif %}{%
+                 if flight.get('airport_destination_country_code') and flight.airport_destination_country_code %}<img src="https://flagsapi.com/{{ flight.airport_destination_country_code }}/shiny/16.png" title='{{ flight.airport_destination_country_name }}'/>{% endif %}
+                 {%if flight.get('time_scheduled_departure') and flight.time_scheduled_departure %}Departure - {{ flight.time_scheduled_departure | timestamp_custom('%H:%M') }}; {% endif %}{%if flight.get('time_scheduled_arrival') and flight.time_scheduled_arrival%}Arrival - {{ flight.time_scheduled_arrival | timestamp_custom('%H:%M') }}{% endif %}{%if flight.get('time_estimated_arrival') and flight.time_estimated_arrival%}; Estimated Arrival - {{ flight.time_estimated_arrival | timestamp_custom('%H:%M') }}{% endif %}
+                 {%if flight.get('altitude') and flight.altitude %}Altitude - {{ flight.altitude }} ft;{% endif%}{%if flight.get('altitude') and flight.altitude > 0 %} ({{(flight.altitude * 0.3048)| round(0)}} m){% endif%}{%if flight.get('ground_speed') and flight.ground_speed %} Gr. speed - {{ flight.ground_speed }} kts{%if flight.get('ground_speed') and flight.ground_speed > 0 %} ({{(flight.ground_speed * 1.852)| round(0)}} km/h){% endif%}{% endif%}
+                 [Open FlightRadar](https://www.flightradar24.com/{{ flight.callsign }})
+               {% endfor %}
+        view_layout:
+          position: sidebar
+
+
+
+
+
+
+
+
 # TESTING
       - type: conditional
         conditions:
@@ -78,6 +153,14 @@ cards:
               {{ flight.flight_number }} {{ flight.airport_origin_code_iata }}-{{ flight.airport_destination_code_iata }} / {{ flight.aircraft_model }}
               Altitude {{(flight.altitude * 0.3048)| round(0)}}m / Speed {{(flight.ground_speed * 1.852)| round(0)}}km/h / {{ flight.aircraft_registration }} </pre>
               {% endfor %}
+
+
+
+
+
+
+
+
 
 
 
