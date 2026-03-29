@@ -21,8 +21,8 @@ template:
           flights: >-
             {% set n = 5 %}
             {% set m = this.attributes.flights | count | default(0) %}
-            {{ [ trigger.event.data ] + 
-               ( [] if m == 0 else 
+            {{ [ trigger.event.data ] +
+               ( [] if m == 0 else
                  this.attributes.flights[0:n-1] )
             }}
           icon: mdi:airplane
@@ -39,7 +39,7 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
-              - condition: template 
+              - condition: template
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - action: script.text_notify
@@ -50,14 +50,14 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
-              - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda airways|none') }}"
-              - condition: template 
+              - condition: template
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('private owner|null|blocked|none|n') }}"
+              - condition: template
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda airways|none') }}"
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
 
@@ -65,12 +65,12 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
-              - condition: template 
+              - condition: template
                 value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('null|unknown|blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying over Kawaguchi and has not filed a flight plan.
 
@@ -80,25 +80,25 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
-              - condition: template 
+              - condition: template
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying over Edogawa.
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
-              - condition: template 
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda|none|Private owner|None') }}"
-              - condition: template 
+              - condition: template
                 value_template: "{{ trigger.event.data.callsign | lower | regex_search('null|blocked|none|n') }}"
+              - condition: template
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda|none|Private owner|None') }}"
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     ‼️ No flight plan. The aircraft is either private or goverment operated.
 
@@ -107,12 +107,12 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'jcb') }}"
-              - condition: template 
+              - condition: template
                 value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('null|blocked|none|n') }}"
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying over Edogawa and has not filed a flight plan.
 
@@ -125,7 +125,7 @@ automation:
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     📍The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}] at {{ "{:,.0f}".format(trigger.event.data.altitude) }} ft. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
           - conditions:
@@ -134,7 +134,7 @@ automation:
             sequence:
               - action: script.text_notify
                 data:
-                  who: amber                
+                  who: amber
                   message: >-
                     💼The plane you hear now is from {{ trigger.event.data.airline }}\[{{ trigger.event.data.callsign }}] at {{ "{:,.0f}".format(trigger.event.data.altitude) }} ft. It comes from {{ trigger.event.data.airport_origin_city }} in {{ trigger.event.data.airport_origin_country_name }} and is on its way to {{ trigger.event.data.airport_destination_city }}.
         default: []
