@@ -587,10 +587,11 @@
         who: duc
         title: "Water Leak Detected"
         message: >-
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          There may have been a water leak around the washing machine area. Action is require as soon as possible. <br>
-          <br>
+          Today is {{ now().strftime( '%B %d, %Y') }}
+          
+          
+          There may have been a water leak around the washing machine area. Action is require as soon as possible.
+          
   mode: single
 
 

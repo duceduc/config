@@ -35,14 +35,14 @@
         state: "{{ states('switch.ser8') }}"
         turn_on:
           - action: switch.turn_on
-            entity_id: switch.ser8
-          - action: switch.turn_on
-            entity_id: switch.hdmi_selector
+            entity_id: switch.ser8 # created from wol integration
+#          - action: switch.turn_on
+#            entity_id: switch.hdmi_selector
         turn_off:
           - action: switch.turn_off
-            entity_id: switch.ser8
-          - action: switch.turn_off
-            entity_id: switch.hdmi_selector
+            entity_id: switch.ser8 # created from wol integration
+#          - action: switch.turn_off
+#            entity_id: switch.hdmi_selector
 
 
 ####################################################

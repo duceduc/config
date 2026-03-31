@@ -168,7 +168,7 @@
       - parallel:
         - service: switch.turn_on
           data:
-            entity_id: switch.desktop_g8i0hbj_shutdown
+            entity_id: switch.desktop_seacm8d_shutdown
 
 
 #########################################################

@@ -40,7 +40,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('army|airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - action: script.text_notify
                 data:
@@ -81,7 +81,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('army|airx|maritime|police|fire|safety|operation|university|shizuoka|kawasaki|tohohu|teikyo|okayama|hiratagakuen|asahi') }}"
             sequence:
               - action: script.text_notify
                 data:
