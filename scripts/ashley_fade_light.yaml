@@ -33,7 +33,7 @@
         data:
           lampBrightnessScale: zeroToOneHundred
           easingTypeInput: auto
-          endBrightnessPercent: '{{ 50 if now().hour >= 5 and now().hour < 16 else 100 }}'
+          endBrightnessPercent: '{{ 50 if now().hour >= 5 and now().hour < 17 else 75 }}'
           autoCancelThreshold: 10
           endBrightnessEntityScale: zeroToOneHundred
           minimumStepDelayInMilliseconds: 1000

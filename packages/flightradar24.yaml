@@ -50,8 +50,8 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
-              - condition: template
-                value_template: "{{ trigger.event.data.callsign | lower | regex_search('private owner|null|blocked|none|n') }}"
+#              - condition: template
+#                value_template: "{{ trigger.event.data.callsign | lower | regex_search('private owner|null|blocked|none|n') }}"
               - condition: template
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda airways|none') }}"
             sequence:
@@ -91,8 +91,8 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
-              - condition: template
-                value_template: "{{ trigger.event.data.callsign | lower | regex_search('null|blocked|none|n') }}"
+#              - condition: template
+#                value_template: "{{ trigger.event.data.callsign | lower | regex_search('null|blocked|none|n') }}"
               - condition: template
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda|none|Private owner|None') }}"
             sequence:
