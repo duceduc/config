@@ -40,9 +40,9 @@
     round_digits: 0
     entity_ids:
 #     - sensor.is_genkan
-     - sensor.is_shionroom
-     - sensor.is_livingroom
-     - sensor.is_masterroom
+      - sensor.is_shionroom
+      - sensor.is_livingroom
+      - sensor.is_masterroom
 
   - platform: min_max
     name: 'iSp Presence'
