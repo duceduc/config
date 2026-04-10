@@ -107,14 +107,14 @@
   - platform: wake_on_lan
     name: Ser8
     mac: 70-70-FC-06-A9-E6
-    host: desktop-seacm8d # 192.168.1.113 # desktop-seacm8d
+    host: 192.168.1.113 # 192.168.1.113 # desktop-seacm8d
     turn_off:
       - service: script.ser8_wol_off
 
   - platform: wake_on_lan 
     name: Desktop
     mac: 9C-6B-00-59-D2-6D
-    host:  desktop-gq666dk # 192.168.1.112 # desktop-gq666dk
+    host: 192.168.1.112 # 192.168.1.112 # desktop-gq666dk
     turn_off:
       - service: script.desktop_wol_off
 
