@@ -50,8 +50,6 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
-#              - condition: template
-#                value_template: "{{ trigger.event.data.callsign | lower | regex_search('private owner|null|blocked|none|n') }}"
               - condition: template
                 value_template: "{{ trigger.event.data.airline | lower | regex_search('null|unknown|private owner|honda airways|none') }}"
             sequence:
@@ -65,14 +63,23 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
-              - condition: template
-                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('null|unknown|blocked|none|n') }}"
+#              - condition: template
+#                value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"                
+
+              - condition: or
+                conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"
+                  - condition: template
+                    value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_destination_city is undefined }}"
+                
             sequence:
               - action: script.text_notify
                 data:
                   who: amber
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying over Kawaguchi and has not filed a flight plan.
+
 
 
 
@@ -107,8 +114,16 @@ automation:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'jcb') }}"
-              - condition: template
-                value_template: "{{ trigger.event.data.airport_destination_city | lower | regex_search('null|blocked|none|n') }}"
+#              - condition: template
+#                value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"                
+
+              - condition: or
+                conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"
+                  - condition: template
+                    value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_destination_city is undefined }}"
+                
             sequence:
               - action: script.text_notify
                 data:
