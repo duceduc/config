@@ -41,12 +41,12 @@
         - sensor.shion_dimmer_battery
         - sensor.shower_room_battery
 
-      below: 46
+      below: 31
   actions:
     - action: script.text_notify
       data:
         who: whatsapp_hass
-        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 46 percent."
+        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 31 percent."
 
 
 #########################################################

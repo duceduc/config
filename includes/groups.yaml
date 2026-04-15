@@ -132,10 +132,6 @@
   server_status:
     all: true
     entities:  
-      - binary_sensor.ngx_status
-      - binary_sensor.ser_status
-      - binary_sensor.mrs_status
-      - binary_sensor.rrs_status
       - binary_sensor.ms1_status
       - binary_sensor.ms2_status
       - binary_sensor.ms3_status
