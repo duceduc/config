@@ -331,11 +331,6 @@ automation:
     triggers:
       - trigger: numeric_state
         entity_id: sensor.gosund_washer_power
-        below: 1
-        for: 10
-        id: 'done'    
-      - trigger: numeric_state
-        entity_id: sensor.gosund_washer_power
         below: 7
         for: 36
         id: 'done'
