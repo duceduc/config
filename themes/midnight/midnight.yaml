@@ -39,6 +39,28 @@ midnight:
   input-idle-line-color: 'var(--secondary-text-color)'
 
 
+# Core 2026.4 White over white background fix
+  ha-color-form-background: "rgba(128, 128, 128, 0.1)"
+  ha-color-form-background-hover: "rgba(255, 255, 255, 0.1)"
+  ha-color-form-background-disabled: "var(--disabled-text-color)"
+
+  ha-color-fill-primary-normal-resting: "var(--primary-background-color)"
+  ha-color-fill-primary-normal-hover: "rgba(255, 159, 9, 0.15)"
+  ha-color-fill-primary-normal-active: "rgba(255, 159, 9, 0.25)"
+  ha-color-fill-primary-normal-disabled: "var(--disabled-text-color)"
+  ha-color-fill-primary-quiet-resting: "var(--primary-background-color)"
+  ha-color-fill-primary-quiet-hover: "rgba(255, 159, 9, 0.1)"
+  ha-color-on-primary: "var(--primary-text-color)"
+
+  ha-color-on-neutral-normal: "#8f8f8f"
+  wa-color-neutral-fill-normal: "#474747"
+
+  # Web Awesome (wa-*) text colors
+#  wa-color-text-normal: var(--primary-text-color)
+#  wa-color-text-quiet: var(--secondary-text-color)
+
+
+
   # The items below are some of the default values from 
   # https://github.com/home-assistant/frontend/blob/master/src/resources/ha-style.ts 
   # Where the default value isn't changed, its noted.
