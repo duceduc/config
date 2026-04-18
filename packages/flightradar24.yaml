@@ -71,7 +71,7 @@ automation:
                   - condition: template
                     value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"
                   - condition: template
-                    value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_destination_city is undefined }}"
+                    value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_origin_city is undefined }}"
                 
             sequence:
               - action: script.text_notify
@@ -79,9 +79,6 @@ automation:
                   who: amber
                   message: >-
                     🚁{{ trigger.event.data.airline }} is flying over Kawaguchi and has not filed a flight plan.
-
-
-
 
 
           - conditions:
