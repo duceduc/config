@@ -297,6 +297,9 @@ async def async_get_fido2_key_names(AppleAcct=None):
     THIS IS RUNNING IN THE EVENT LOOP. CALL AppleAcct.get_fido2_key_names TO GET THE KEY NAMES
     SINCE IT IS NOT RUNNING IN THE EVENT LOOP AND CAN DO REQUEST CALLS
     '''
+
+    return None
+
     if Gb.fido2_security_keys_enabled is False:
         return None
 
@@ -328,6 +331,7 @@ async def async_confirm_fido2_security_key(AppleAcct, fido2_key_name):
     Use a AppleAcct non-Event Loop function to do the actual fido2 call to prevent
     running in Event Loop errors.
     '''
+    return
 
     try:
         # _log(f'{AppleAcct=} {fido2_key_name=}')
@@ -381,35 +385,6 @@ async def async_delete_icloud_session_file(AppleAcct, username):
                     f"{CRLF_DOT}Cookies ({cookies_filename})"
                     f"{CRLF_DOT}Session ({session_filename})")
 
-
-#--------------------------------------------------------------------
-# async def async_delete_all_pyicloud_cookies_session_files():
-#     '''
-#     Cycle through the Apple accounts and delete the cookie and session files
-#     '''
-
-#     post_alert(f"Configure All Apple Account Cookies and Session files are being deleted")
-
-#     for Device in Gb.Devices:
-#         Device.pause_tracking()
-
-#     start_dir = Gb.icloud_cookies_directory
-#     file_filter = []
-#     apple_acct_cookie_files = await Gb.hass.async_add_executor_job(
-#                                         file_io.get_filename_list,
-#                                         start_dir,
-#                                         file_filter)
-
-#     try:
-#         for apple_acct_cookie_file in apple_acct_cookie_files:
-#             await file_io.async_delete_file(f"{Gb.icloud_cookies_directory}/{apple_acct_cookie_file}")
-
-#         if isnot_empty(apple_acct_cookie_files):
-#             await file_io.async_delete_directory(Gb.icloud_cookies_directory)
-
-#     except Exception as err:
-#         log_exception(err)
-
 #--------------------------------------------------------------------
 def is_asp_password(ui_password):
     '''
@@ -445,7 +420,8 @@ def login_err_msg(AppleAcct, username):
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 async def async_step_reauth_handler(self,
                                     user_input=None, errors=None,
-                                    return_to_step_id=None, reauth_username=None):
+                                    return_to_step_id=None, reauth_username=None,
+                                    config_flow_reauth=False):
     '''
     Ask the verification code to the user.
 
@@ -482,40 +458,54 @@ async def async_step_reauth_handler(self,
 
     if user_input is None:
         # await async_get_fido2_key_names()
+        # reauth_username = self.apple_acct_reauth_username
+        return 'refresh_screen', self.apple_acct_reauth_username, user_input, errors
 
-        reauth_username = self.apple_acct_reauth_username
-        return 'refresh_screen', reauth_username, user_input, errors
+    # if reauth_username is None:
+    #     reauth_username = self.apple_acct_reauth_username
 
     try:
         user_input, action_item = utils.action_text_to_item(self, user_input)
-
         user_input = utils.strip_spaces(user_input, [CONF_AUTH_CODE])
         user_input = utils.option_text_to_parm(user_input, 'account_selected',
                                                 self.apple_acct_auth_items_by_username)
 
-        if action_item == 'manual_code_info':
-            return 'manual_code_info', reauth_username, user_input, errors
-
-        if Gb.fido2_security_keys_enabled:
-            user_input = utils.option_text_to_parm(user_input, 'fido2_key_name',
-                                                self.reauth_form_fido2_key_names_list)
-        else:
-            user_input['fido2_key_name'] = ['']
-
-        ui_account_selected   = user_input.get('account_selected')
+        # ui_account_selected   = reauth_username = self.apple_acct_reauth_username = user_input.get('account_selected')
+        ui_account_selected   = self.apple_acct_reauth_username = user_input.get('account_selected')
         ui_conf_auth_code     = user_input.get(CONF_AUTH_CODE, '')
-        ui_conf_fido_key_name = user_input['fido2_key_name']
+
+        # ui_conf_fido_key_name = user_input['fido2_key_name']
         if 'terms_of_use' not in user_input:
             user_input['terms_of_use'] = False
 
-        log_debug_msg(  f"⭐ REAUTH HANDLER (From={return_to_step_id}, "
-                        f"{action_item}) > UserInput-{user_input}, Errors-{errors}")
+        _log(f'{user_input=} {action_item=} {ui_account_selected=} {config_flow_reauth=}')
 
-        if (ui_account_selected is not None
-                and ui_account_selected.startswith('.')):
-            action_item = 'goto_previous'
 
-        elif (ui_conf_auth_code != ''
+        # if Gb.fido2_security_keys_enabled:
+        #     user_input = utils.option_text_to_parm(user_input, 'fido2_key_name',
+        #                                         self.reauth_form_fido2_key_names_list)
+        # else:
+        #     user_input['fido2_key_name'] = ['']
+
+
+        log_debug_msg(  f"⭐ REAUTH HANDLER ({action_item}) > "
+                        f"From-{return_to_step_id}, "
+                        f"UserInput-{user_input}, Errors-{errors}")
+
+        _log(f'{ui_account_selected=}')
+        if (ui_account_selected is None
+                or ui_account_selected.startswith('.')):
+            return 'goto_previous', '', None, errors
+
+        AppleAcct = self.AppleAcct = Gb.AppleAcct_by_username[ui_account_selected]
+
+        if action_item == 'auth_code_from_applecom_login':
+            return 'auth_code_from_applecom_login', ui_account_selected, user_input, errors
+
+        if action_item == 'change_auth_method':
+            return 'change_auth_method', ui_account_selected, user_input, errors
+
+        if (ui_conf_auth_code != ''
                 and len(ui_conf_auth_code) == 6
                 and is_number(ui_conf_auth_code)):
             action_item = 'send_auth_code'
@@ -525,9 +515,6 @@ async def async_step_reauth_handler(self,
             user_input = None
             return await self.async_step_reauth(
                                     user_input=user_input, errors=self.errors)
-
-        if action_item == 'goto_previous':
-            return 'goto_previous', '', None, errors
 
         ui_username = None
         if 'account_selected' in user_input:
@@ -550,7 +537,8 @@ async def async_step_reauth_handler(self,
         if (action_item != 'log_into_apple_acct'
                 and AppleAcct
                 and AppleAcct.login_successful is False):
-            return 'refresh_screen', reauth_username, user_input, errors
+            return 'refresh_screen', username, user_input, errors
+            # return 'refresh_screen', reauth_username, user_input, errors
 
         if (AppleAcct
                 and AppleAcct.terms_of_use_update_needed
@@ -570,8 +558,8 @@ async def async_step_reauth_handler(self,
                     self.errors['account_selected'] = 'apple_acct_terms_update_accepted'
 
         if (action_item == 'send_auth_code'
-                and ui_conf_auth_code == ''
-                and len(self.reauth_form_fido2_key_names_list) == 1):
+                and ui_conf_auth_code == ''):
+                # and len(self.reauth_form_fido2_key_names_list) == 1):
             action_item = 'refresh_screen'
 
         if action_item == 'goto_previous':
@@ -589,12 +577,12 @@ async def async_step_reauth_handler(self,
         #.......................................................................
         elif action_item == 'send_auth_code':
             if ui_conf_auth_code == '':
-                return
+                return 'refresh_screen', username, user_input, errors
 
-            valid_code_key = await send_auth_code_back_to_apple(self, AppleAcct, ui_conf_auth_code)
+            auth_successful = await send_auth_code_back_to_apple(self, AppleAcct, ui_conf_auth_code)
 
             # elif Gb.fido2_security_keys_enabled is False:
-            #     valid_code_key = False
+            #     valid_code = False
             #     pass
 
             # elif (AppleAcct.fido2_key_names is None
@@ -604,40 +592,44 @@ async def async_step_reauth_handler(self,
             # elif ui_conf_fido_key_name in AppleAcct.fido2_key_names:
             #         valid_code_key = await async_confirm_fido2_security_key(AppleAcct, user_input['fido2_key_name'])
 
-            if valid_code_key:
-                self.errors[CONF_AUTH_CODE] = ''
-                self.errors['account_selected'] = self.header_msg = 'auth_code_accepted'
-                if instr(str(self.apple_acct_auth_items_by_username), 'AUTH'):
-                    self.conf_apple_acct = ''
-                else:
-                    clear_AppleAcct_auth_alerts()
-                    post_greenbar_msg('')
-                    self.apple_acct_reauth_username = reauth_username
-                    if len(Gb.conf_apple_accounts) <= 1:
-                        return 'refresh_screen', reauth_username, None, errors
-
-            else:
+            if auth_successful is False:
                 self.errors[CONF_AUTH_CODE] = 'auth_code_invalid'
+                return 'refresh_screen', username, user_input, errors
 
+            self.errors[CONF_AUTH_CODE] = ''
+            self.errors['account_selected'] = self.header_msg = 'auth_code_accepted'
+            if instr(str(self.apple_acct_auth_items_by_username), 'AUTH'):
+                self.conf_apple_acct = ''
+            else:
+                clear_AppleAcct_auth_alerts()
+                post_greenbar_msg('')
+                self.apple_acct_reauth_username = username
+                # self.apple_acct_reauth_username = reauth_username
+                if len(Gb.conf_apple_accounts) <= 1:
+                    return 'refresh_screen', username, None, errors
+
+                    # return 'refresh_screen', reauth_username, None, errors
         #.......................................................................
         elif action_item.startswith('request_auth_code'):
-            auth_method = user_input[CONF_AUTH_METHODS] = action_item[-4:]
-            if self.conf_apple_acct[CONF_AUTH_METHODS][CONF_LAST_METHOD] != auth_method:
-                self.conf_apple_acct[CONF_AUTH_METHODS][CONF_LAST_METHOD] = auth_method
-                user_input[CONF_AUTH_METHODS] = self.conf_apple_acct[CONF_AUTH_METHODS]
-                Gb.OptionsFlowHandler._update_config_file_tracking(user_input,
-                        force_config_update=True)
+            auth_method = self.AppleAcct.auth_method
 
             self.errors['account_selected'] = 'auth_code_requested'
             post_event( f"{EVLOG_NOTICE}Apple Acct > {AppleAcct.account_owner}, "
-                        f"Requested a new Verification Code ({auth_method})")
+                        f"Requested a new Verification Code "
+                        f"({self.AppleAcct.auth_method.title()}-"
+                        f"({self.AppleAcct.auth_method_info}")
 
-            # comment out cookiew list
+            # comment out cookie list
             # AppleAcct.iCloudSession.cookies.list()
 
+            #REALCODE
             self.apple_acct_reauth_username = reauth_username = ui_username
-            await async_request_new_auth_code(self, AppleAcct, auth_method)
-                # await async_get_fido2_key_names(AppleAcct)
+            await async_request_new_auth_code(self, AppleAcct)
+
+            # from v3.3.4.3
+            # await async_v3_3_4_3_reset_session(self, username, password)
+
+            # await async_get_fido2_key_names(AppleAcct)
 
             return 'send_auth_code', reauth_username, user_input, errors
 
@@ -648,7 +640,38 @@ async def async_step_reauth_handler(self,
 
 
 #--------------------------------------------------------------------
-async def async_request_new_auth_code(self, AppleAcct, auth_method):
+async def async_send_applecom_login_auth_code(self, user_input=None, errors=None):
+
+    AppleAcct  = self.AppleAcct
+    user_input = utils.strip_spaces(user_input, [CONF_AUTH_CODE])
+    ui_conf_auth_code = user_input.get(CONF_AUTH_CODE, '')
+
+    log_debug_msg(f"⭐ {self.step_id.upper()} Handler > UserInput-{user_input}, Errors-{errors}")
+
+    if (ui_conf_auth_code == ''
+            or len(ui_conf_auth_code) != 6
+            or is_number(ui_conf_auth_code) is False):
+        return
+
+    await Gb.hass.async_add_executor_job(self.AppleAcct.untrust_session_and_authenticate)
+    auth_successful = await send_auth_code_back_to_apple(self, AppleAcct, ui_conf_auth_code, force_PUSH=True)
+
+    if auth_successful is False:
+        self.errors[CONF_AUTH_CODE] = 'auth_code_invalid'
+        return
+
+    self.errors[CONF_AUTH_CODE] = self.header_msg = 'auth_code_accepted'
+    if instr(str(self.apple_acct_auth_items_by_username), 'AUTH'):
+        self.conf_apple_acct = ''
+    else:
+        clear_AppleAcct_auth_alerts()
+        post_greenbar_msg('')
+        if len(Gb.conf_apple_accounts) <= 1:
+            return 'refresh_screen', self.apple_acct_reauth_username, None, errors
+
+
+#--------------------------------------------------------------------
+async def async_request_new_auth_code(self, AppleAcct):
     '''
     Reset the current session and authenticate to restart pyicloud_ic3
     and enter a new verification code
@@ -662,15 +685,21 @@ async def async_request_new_auth_code(self, AppleAcct, auth_method):
         if AppleAcct.is_auth_alert_displayed is False:
             AppleAcct.is_auth_alert_displayed = True
 
-        AppleAcct.iCloudSession.cookies.list()
+        # AppleAcct.iCloudSession.cookies.list()
+        auth_method = AppleAcct.auth_method
+        if auth_method not in AppleAcct.conf_apple_acct[CONF_AUTH_METHODS]:
+            auth_method = AppleAcct.conf_apple_acct[CONF_AUTH_METHODS][CONF_LAST_METHOD] = PUSH
 
-        if auth_method == PUSH:
+        if AppleAcct.auth_method_PUSH:
             AppleAcct.iCloudSession.cookies.list()
             await Gb.hass.async_add_executor_job(AppleAcct.untrust_session_and_authenticate)
 
         # Send a code via a text message
-        if auth_method == TEXT:
-            Gb.hass.async_add_executor_job(AppleAcct.request_auth_code_via_text_msg)
+        elif AppleAcct.auth_method_TEXT:
+            Gb.hass.async_add_executor_job(AppleAcct.request_auth_code_via_text_msg, auth_method)
+
+        elif AppleAcct.auth_method_HWKEY:
+            pass
 
         # await async_get_fido2_key_names(AppleAcct)
         # AppleAcct.auth_code = None
@@ -686,7 +715,7 @@ async def async_request_new_auth_code(self, AppleAcct, auth_method):
         log_exception(err)
 
 #--------------------------------------------------------------------
-async def send_auth_code_back_to_apple(caller_self, AppleAcct, auth_code):
+async def send_auth_code_back_to_apple(caller_self, AppleAcct, auth_code, force_PUSH=False):
     '''
     Handle the send_authentication_code action. This is called from the ConfigFlow and OptionFlow
     reauth steps in each Flow. This provides this function with the appropriate data and return objects.
@@ -703,20 +732,20 @@ async def send_auth_code_back_to_apple(caller_self, AppleAcct, auth_code):
         AppleAcct = caller_self.AppleAcct
         AppleAcct.was_ha_auth_code_alert_sent = False
 
-        if AppleAcct.conf_apple_acct[CONF_AUTH_METHODS][CONF_LAST_METHOD] == PUSH:
-            valid_code = await Gb.hass.async_add_executor_job(
+        if AppleAcct.auth_method_PUSH or force_PUSH:
+            auth_successful = await Gb.hass.async_add_executor_job(
                                     AppleAcct.validate_2fa_push_popup_window_code,
                                     auth_code)
 
-        else:
-            valid_code = await Gb.hass.async_add_executor_job(
+        elif AppleAcct.auth_method_TEXT:
+            auth_successful = await Gb.hass.async_add_executor_job(
                                     AppleAcct.validate_2fa_text_code,
                                     auth_code)
 
         # Do not restart iC3 right now if the username/password was changed on the
         # iCloud setup screen. If it was changed, another account is being logged into
         # and it will be restarted when exiting the configurator.
-        if valid_code is False:
+        if auth_successful is False:
             if auth_code != '':
                 AppleAcct.was_auth_code_requested = False
                 post_event( f"{EVLOG_NOTICE}Apple Acct > {AppleAcct.account_owner}, "
@@ -748,3 +777,101 @@ async def send_auth_code_back_to_apple(caller_self, AppleAcct, auth_code):
 
     except Exception as err:
         log_exception(err)
+
+        return False
+
+#--------------------------------------------------------------------
+async def async_v3_3_4_3_reset_session(self, username, password):
+    '''
+    Reset the current session and authenticate to restart pyicloud_ic3
+    and enter a new verification code
+
+    The username & password are specified in case the Apple acct is not logged
+    into because of an error
+    '''
+    try:
+        AppleAcct = self.AppleAcct
+        if AppleAcct:
+            aa_username = AppleAcct.username or self.username
+
+            post_event(f"{EVLOG_NOTICE}Apple Acct > {AppleAcct.username_id}, Authentication Needed")
+
+            await async_delete_icloud_session_requests_file(aa_username)
+
+            if AppleAcct.is_auth_alert_displayed is False:
+                AppleAcct.is_auth_alert_displayed = True
+
+            await Gb.hass.async_add_executor_job(AppleAcct.setup_new_apple_account_session)
+
+            # Initialize AppleAcct object to force a new one that will trigger the 2fa process
+            AppleAcct.verification_code = None
+
+        # The Apple acct is not logged into. There may have been some type Of error.
+        # Delete the session files for the username selected on the request form and
+        # try to login
+        elif username and password:
+            post_event(f"{EVLOG_NOTICE}Apple Acct > {username_id(username)}, Authentication Needed")
+
+            await async_delete_icloud_session_requests_file(username)
+
+            user_input = {}
+            user_input[CONF_USERNAME] = username
+            user_input[CONF_PASSWORD] = password
+
+            login_successful = await async_log_into_apple_account(self, user_input)
+
+            AppleAcct = self.AppleAcct
+
+        if AppleAcct:
+            post_event( f"{EVLOG_NOTICE}Configure Apple Acct > {AppleAcct.username_id}, "
+                        f"Waiting for the 6-digit Verification Code to be entered")
+            return
+
+    except AppleAcctFailedLoginException as err:
+        login_err = str(err)
+        login_err + ", Will retry logging into the Apple Account later"
+
+    except Exception as err:
+        login_err = str(err)
+        log_exception(err)
+
+    if instr(login_err, '-200') is False:
+        if AppleAcct and AppleAcct.response_code == 503:
+            Gb.AppleAcctLoggingInto.setup_error(503)
+            self.errors['base'] = 'apple_acct_login_error_503'
+
+            post_event( f"{EVLOG_ERROR}Configure Apple Acct > {username}, "
+                        f"Apple is delaying displaying a new Verification code to "
+                        f"prevent Suspicious Activity, probably due to too many requests. "
+                        f"It should be displayed in about 20-30 minutes. "
+                        f"{CRLF_DOT}The Apple Acct login will be retried within 15-mins. "
+                        f"The Verification Code will be displayed then if successful")
+        else:
+            post_event( f"{EVLOG_ERROR}Configure Apple Acct > {username}, "
+                        f"An Error was encountered requesting the 6-digit Verification Code, "
+                        f"{login_err}")
+
+
+#--------------------------------------------------------------------
+async def async_delete_icloud_session_requests_file(username=None):
+    '''
+    Delete the cookies and session files as part of the reset_session and request_verification_code
+    This is called from config_flow/setp_reauth and pyicloud_reset_session
+    '''
+
+    if username is None:
+        return
+
+    post_event(f"{EVLOG_NOTICE}Configure Apple Acct > Resetting Cookie/Session Files")
+    cookie_directory  = Gb.icloud_cookies_directory
+    cookie_filename   = "".join([c for c in username if match(r"\w", c)])
+
+    delete_msg =  f"Apple Acct > Deleting Session Files > ({cookie_directory})"
+
+    delete_msg += f"{CRLF_DOT}Session ({cookie_filename}.session)"
+    await file_io.async_delete_file_with_msg(
+                    'Apple Acct Session', cookie_directory, f"{cookie_filename}.session", delete_old_sv_file=True)
+    # delete_msg += f"{CRLF_DOT}Token Password ({cookie_filename}.tpw)"
+    # await file_io.async_delete_file_with_msg(
+    #                 'Apple Acct Tokenpw', cookie_directory, f"{cookie_filename}.tpw")
+    post_monitor_msg(delete_msg)
