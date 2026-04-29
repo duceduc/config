@@ -5,7 +5,7 @@
 ####################################################
 
   - platform: rest
-    resource: !secret sm_sslmate_url
+    resource: !secret sm_sslmate_url #snailmsg
     name: sm cert sslmate
     value_template: "{{ value_json[0].not_after }}"
     scan_interval: 14400

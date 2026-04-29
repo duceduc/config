@@ -17,7 +17,7 @@
           {% set date=Y + '-' + m + '-' + d %}
           {{ 365 - (( as_timestamp(now()) - as_timestamp(strptime(date, "%Y-%m-%d")) )/ (3600*24)) | round(0) }}
 
-      - name: sm ssl cert expiry
+      - name: sm ssl cert expiry # snailmsg
         unit_of_measurement: Days
         state: '{{ (states("sensor.sm_cert_sslmate")|as_datetime|as_local - now()).days }}'
 

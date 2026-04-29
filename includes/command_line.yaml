@@ -128,7 +128,7 @@
   - sensor:
       name: lions ssl cert issued
       scan_interval: 21600
-      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_traefik duc@192.168.1.180 python3 /srv/docker-compose/traefik/certs/ssl-gen/ssl/pem2json.py /srv/docker-compose/traefik/certs/ssl-gen/ssl/traefik-server-cert.pem"
+      command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/.ssh/id_traefik duc@192.168.1.180 python3 /usr/local/bin/ssl-gen/pem2json.py /srv/docker-compose/traefik/certs/traefik-server-cert.pem"
       value_template: '{{ value_json.notBefore }}'
 
 #  - sensor:

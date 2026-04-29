@@ -306,48 +306,25 @@
 
 
 #  CAN DELETE
-- alias: "VJ SSL Certificate Expiry Notification"
+- alias: "Lions SSL Certificate Expiry Notification"
   initial_state: true
   triggers:
     - trigger: numeric_state
-      entity_id: sensor.vj_ssl_cert_expiry
-      below: 3
+      entity_id: sensor.lions_ssl_cert_expiry
+      below: 20
   actions:
     - action: script.email_notify
       data:
         who: duc
-        title: "Certificate Expiring in {{ states('sensor.vj_ssl_cert_expiry') }} Days: {{ states.sensor.vj_cert_sslmate.attributes.dns_names[0] }}"
+        title: "lions.snailmsg.lan expires in {{ states('sensor.lions_ssl_cert_expiry') }} days"
         message: >-
-          {% set str = states.sensor.vj_cert_sslmate.attributes.issuer.name %}
-          {% set issuer = (str|regex_findall_index('[a-zA-Z]{8}')).replace('','') %}
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          This is to notify you that your certificate with the common name {{ states.sensor.vj_cert_sslmate.attributes.dns_names[0] }} will expire in {{ states.sensor.vj_ssl_cert_expiry.state }} days. <br>
-          To renew your certificate, please visit <a href="https://my.{{ issuer|lower }}.com/en/user/">{{ issuer }}</a>.<br>
-          <br>
+          Today is {{ now().strftime( '%B %d, %Y') }}
+         
+         
+          This is to notify you that lions.snailmsg.lan certificate will expire in {{ states('sensor.lions_ssl_cert_expiry') }} days.
+          
+          Renew the certificate via Traefik. 
 
-
-- alias: "HA SSL Certificate Expiry Notification"
-  initial_state: true
-  variables:
-    cn: >-
-     {% set str=states('sensor.ha_ssl_cert_cn') %}
-     {% set cn=(str|regex_findall_index('[a-zA-Z]{2,}?\.[a-zA-Z]{1,}',1)) %}
-     {{ cn }}
-  triggers:
-    - trigger: numeric_state
-      entity_id: sensor.ha_ssl_cert_expiry
-      below: 3
-  actions:
-    - action: script.email_notify
-      data:
-        who: duc
-        title: "Certificate Expiring in {{ states('sensor.ha_ssl_cert_expiry') }} Days: {{cn}}"
-        message: >-
-          <b>Today is {{ now().strftime( '%B %d, %Y') }} </b> <br>
-          <br>
-          This is to notify you that your certificate with the common name {{cn}} will expire in {{ states('sensor.ha_ssl_cert_expiry') }} days. <br>
-          <br>
 
 - alias: "Mqtt SSL Certificate Expiry Notification"
   initial_state: true
