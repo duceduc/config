@@ -3,6 +3,7 @@
 import asyncio
 import datetime as dt
 import functools
+import inspect
 import locale
 import logging
 import math
@@ -598,7 +599,7 @@ class TrigTime:
     @classmethod
     async def user_task_executor(cls, func, *args, **kwargs):
         """Implement task.executor()."""
-        if asyncio.iscoroutinefunction(func) or not callable(func):
+        if inspect.iscoroutinefunction(func) or not callable(func):
             raise TypeError(f"function {func} is not callable by task.executor")
         if isinstance(func, EvalFuncVar):
             raise TypeError(

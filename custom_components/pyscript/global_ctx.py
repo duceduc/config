@@ -4,6 +4,7 @@ import ast
 from collections.abc import Awaitable, Callable
 import logging
 import os
+from os.path import isfile as os_path_isfile
 from types import ModuleType
 from typing import Any, ClassVar
 
@@ -167,7 +168,7 @@ class GlobalContext:
         def find_first_file(file_paths: list[list[str]]) -> list[str] | None:
             for ctx_name, path, rel_path in file_paths:
                 abs_path = os.path.join(pyscript_dir, path)
-                if os.path.isfile(abs_path):
+                if os_path_isfile(abs_path):
                     return [ctx_name, abs_path, rel_path]
             return None
 

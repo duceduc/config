@@ -1132,7 +1132,7 @@ class AstEval:
 
             func = self.sym_table[arg.name]
             if dec_name == "pyscript_executor":
-                if not asyncio.iscoroutinefunction(func):
+                if not inspect.iscoroutinefunction(func):
 
                     def executor_wrap_factory(func):
                         async def executor_wrap(*args, **kwargs):
@@ -1903,7 +1903,7 @@ class AstEval:
                 #
                 await inst.__init__evalfunc_wrap__.call(self, *args, **kwargs)
             return inst
-        if asyncio.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             return await func(*args, **kwargs)
         if callable(func):
             if func == time.sleep:  # pylint: disable=comparison-with-callable

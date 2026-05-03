@@ -6,6 +6,8 @@ import glob
 import json
 import logging
 import os
+from os import makedirs as os_makedirs
+from os.path import isdir as os_path_isdir
 import shutil
 import time
 import traceback
@@ -279,9 +281,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     DecoratorRegistry.init(hass, config_entry)
 
     pyscript_folder = hass.config.path(FOLDER)
-    if not await hass.async_add_executor_job(os.path.isdir, pyscript_folder):
+    if not await hass.async_add_executor_job(os_path_isdir, pyscript_folder):
         _LOGGER.debug("Folder %s not found in configuration folder, creating it", FOLDER)
-        await hass.async_add_executor_job(os.makedirs, pyscript_folder)
+        await hass.async_add_executor_job(os_makedirs, pyscript_folder)
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][CONFIG_ENTRY] = config_entry

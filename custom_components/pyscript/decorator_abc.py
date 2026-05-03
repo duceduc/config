@@ -122,7 +122,7 @@ class DecoratorManager(ABC):
         """Initialize the manager."""
         self.ast_ctx = ast_ctx
         self.name = name
-        self.func_name = name.split(".")[-1]
+        self.func_name = name.rsplit(".", maxsplit=1)[-1]
         self.logger = ast_ctx.get_logger()
 
         self.status: DecoratorManagerStatus = DecoratorManagerStatus.INIT
