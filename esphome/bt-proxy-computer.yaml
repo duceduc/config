@@ -4,24 +4,41 @@ substitutions:
   temp_offset: '-5'
   hum_offset: '10'
 
+packages:
+  aht10: !include components/aht10.yaml
+  ld2410B: !include components/ld2410b.yaml
+
+<<: !include .base.yaml
+
 esphome:
   name: $name
   platformio_options:
     board_build.flash_mode: dio
+
   project:
     name: Screek.Human_Sensor
     version: 1w
+  min_version: 2025.5.1
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: esp-idf
 
 external_components:
   - source:
-      type: git
-      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-      ref: main
-    components: [uart, ld2410]
+      type: local
+      path: components/screekworkshop/screek_1w/
+    components: [ ld2410, uart ]  
+  
+#      type: git
+#      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
+#      ref: main
+#    components: [ ld2410, uart ]
 
-packages:
-  aht10: !include components/aht10.yaml
-  ld2410B: !include components/ld2410b.yaml
+
+
+
 
 bluetooth_proxy:
   active: true
@@ -29,13 +46,6 @@ esp32_ble_tracker:
     scan_parameters:
       window: 900ms
       interval: 1000ms
-
-esp32:
-  board: wemos_d1_mini32
-  framework:
-    type: arduino # esp-idf 
-
-<<: !include .base.yaml
 
 i2c: # for aht10
   sda: GPIO21

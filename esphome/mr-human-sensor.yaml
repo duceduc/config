@@ -9,30 +9,23 @@ esphome:
   platformio_options:
     board_build.flash_mode: dio
     board_build.f_cpu: 80000000L
-  on_boot:
-    priority: 900
-    then:
-       lambda: |-
-        id(cpu_speed) = ESP.getCpuFreqMHz() ;
+
   project: 
     name: Screek.Human Presence Sensor
     version: 1w
+  min_version: 2025.5.1
 
 esp32:
   board: lolin_s2_mini
-
-globals:
-   - id: cpu_speed
-     type: int
-     restore_value: no
-     initial_value: '0'
+  framework:
+    type: esp-idf
 
 external_components:
   - source:
       type: git
       url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
       ref: main
-    components: [ ld2410, uart ]
+    components: [ ld2410 ]
 
 improv_serial:
 
@@ -43,7 +36,7 @@ wifi:
   ssid: !secret ssid
   password: !secret ssid_pwd
 
-captive_portal:
+#captive_portal:
 
 api:
   encryption:
@@ -71,21 +64,12 @@ binary_sensor:
       name: Still Target
 
 sensor:
-  - platform: template
-    name: ESP Cpu Speed
-    accuracy_decimals: 0
-    unit_of_measurement: Mhz
-    lambda: |-
-      return (id(cpu_speed));
-    entity_category: "diagnostic"
-
-  - platform: template
+  - platform: internal_temperature
     id: sys_esp_temperature
     name: ESP Temperature
-    lambda: return temperatureRead();
     unit_of_measurement: °C
     device_class: TEMPERATURE
-    update_interval: 5s
+    update_interval: 45s
     entity_category: "diagnostic"
 
   - platform: uptime

@@ -4,15 +4,18 @@ substitutions:
 
 packages:
   stats: !include components/stats.yaml
-  aircon: !include components/zw5620s.yaml
+#  aircon: !include components/zw5620s.yaml
 
 esphome:
   name: $name
 esp32:
   board: nodemcu-32s
+  framework:
+    type: esp-idf
 
 wifi:
   ssid: !secret ssid
+  min_auth_mode: WPA2
   password: !secret ssid_pwd
   fast_connect : true
   manual_ip:
@@ -20,7 +23,7 @@ wifi:
     subnet: 255.255.255.0
     gateway: 192.168.1.1
 
-captive_portal:
+#captive_portal:
 logger:
 
 mqtt:
@@ -80,6 +83,7 @@ remote_receiver:
   dump: raw
 
 remote_transmitter:
+  non_blocking: true
   pin: # GPIO2 # Pin is adjacent to GPIO15
     number: GPIO2 # Pin is adjacent to GPIO15
     ignore_strapping_warning: true

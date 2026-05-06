@@ -5,6 +5,12 @@
 #  scl: GPIO3
 #  scan: true
 
+i2c:
+  id: bus_a
+  sda: GPIO26
+  scl: GPIO27
+  scan: true
+
 esp32_camera:
   name: ' '
   external_clock:
@@ -12,9 +18,7 @@ esp32_camera:
       number: GPIO0
       ignore_strapping_warning: true
     frequency: 20MHz
-  i2c_pins:
-    sda: GPIO26
-    scl: GPIO27
+  i2c_id: bus_a
   data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
   vsync_pin: GPIO25
   href_pin: GPIO23

@@ -8,10 +8,14 @@ packages:
 
 <<: !include .base.yaml #.226
 
+psram:  #neccessary after ESPHome update 2025_11_0
+
 esphome:
   name: $name
 esp32:
   board: nodemcu-32s #esp-wrover-kit  
+  framework:
+    type: esp-idf
 
 sensor:
   - platform: wifi_signal

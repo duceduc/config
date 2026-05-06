@@ -45,6 +45,7 @@ ota:
 
 wifi:
   ssid: !secret ssid
+  min_auth_mode: WPA2  
   password: !secret ssid_pwd
   fast_connect : true
   manual_ip:

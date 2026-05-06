@@ -23,15 +23,14 @@ binary_sensor:
       name: Still Target
 
 sensor:
-# debugging attributes only for esp32
-  - platform: template
+  - platform: internal_temperature
     id: sys_esp_temperature
     name: ESP Temperature
-    lambda: return temperatureRead();
     unit_of_measurement: °C
     device_class: TEMPERATURE
-    update_interval: 30s
+    update_interval: 45s
     entity_category: "diagnostic"
+    
   - platform: template
     id: esp_memory
     icon: mdi:memory

@@ -30,6 +30,7 @@ esphome:
       - lambda: |-
           auto uart_component = static_cast<LD2410 *>(ld2410);
           uart_component->setNumbers(maxMovingDistanceRange, maxStillDistanceRange, noneDuration);
+
 esp8266:
   board: d1_mini
 
@@ -46,6 +47,7 @@ ota:
 
 wifi:
   ssid: !secret ssid
+  min_auth_mode: WPA2
   password: !secret ssid_pwd
   fast_connect : true
   power_save_mode: none
