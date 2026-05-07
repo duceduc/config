@@ -10,6 +10,7 @@ packages:
 
 <<: !include .base.yaml
 
+
 esphome:
   name: $name
   platformio_options:
@@ -18,26 +19,23 @@ esphome:
   project:
     name: Screek.Human_Sensor
     version: 1w
-  min_version: 2025.5.1
+#  min_version: 2025.5.1
 
 esp32:
   board: wemos_d1_mini32
   framework:
-    type: esp-idf
+    type: esp-idf # arduino  esp-idf Will need to convert to esp-idf with firmware 2026. +
 
 external_components:
   - source:
-      type: local
-      path: components/screekworkshop/screek_1w/
-    components: [ ld2410, uart ]  
+#      type: local
+#      path: components/screekworkshop/screek_1w/
+#    components: [ ld2410, uart ]  
   
-#      type: git
-#      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-#      ref: main
-#    components: [ ld2410, uart ]
-
-
-
+      type: git
+      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
+      ref: main
+    components: [ ld2410, uart ] # Needs ,uart for sensor to work. Removed for now for updating 
 
 
 bluetooth_proxy:
