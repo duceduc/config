@@ -6,23 +6,66 @@ substitutions:
 packages:
   stats: !include components/stats.yaml
 
-<<: !include .base.yaml 
+#<<: !include .base.yaml  # .204
+
+# the ip was .202. now dns02 is using. Need to have below for awhile.
+wifi:
+  ssid: !secret ssid
+  min_auth_mode: WPA2
+  password: !secret ssid_pwd
+  fast_connect : true
+  manual_ip:
+    static_ip: 192.168.1.204
+    subnet: 255.255.255.0
+    gateway: 192.168.1.1
+
+logger:
+  baud_rate: 0
+
+api:
+  encryption:
+    key: !secret esphome_apikey
+
+ota:
+  - platform: esphome
+    password: !secret ota_pass
 
 esphome:
   name: $name
 esp32:
   board: nodemcu-32s
+  framework:
+    type: esp-idf
+
 
 i2s_audio:
-  i2s_lrclk_pin: GPIO25
-  i2s_bclk_pin: GPIO26
+  - id: i2s_out
+    i2s_lrclk_pin: GPIO25
+    i2s_bclk_pin: GPIO26
+
+speaker:
+  - platform: i2s_audio
+    id: output_speaker
+    i2s_audio_id: i2s_out
+    i2s_dout_pin: GPIO22
+    dac_type: external    
+    sample_rate: 48000 
+    bits_per_sample: 16bit
 
 media_player:
-  - platform: i2s_audio
+  - platform: speaker
     name: ' '
-    dac_type: external
-    i2s_dout_pin: GPIO22
-    mode: mono
+    id: media_out
+    internal: False
+    volume_min: 0.4
+    volume_max: 0.95
+    volume_increment: 0.15    
+    announcement_pipeline:
+      speaker: output_speaker
+      num_channels: 1
+      format: WAV
+      sample_rate: 48000 
+    buffer_size: 6000
     on_play:
       - logger.log: "Playback started!"
     on_pause:
