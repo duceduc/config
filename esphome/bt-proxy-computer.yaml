@@ -50,11 +50,11 @@ i2c: # for aht10
   scl: GPIO22
   scan: true
 
-uart:
-  id: uart_ld2410
-  tx_pin: GPIO3
-  rx_pin: GPIO1
-  baud_rate: 256000
-  parity: NONE
-  stop_bits: 1
+#uart:
+#  id: uart_ld2410
+#  tx_pin: GPIO3
+#  rx_pin: GPIO1
+#  baud_rate: 256000
+#  parity: NONE
+#  stop_bits: 1
 
