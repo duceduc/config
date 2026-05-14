@@ -26,7 +26,7 @@ command_line:
       command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.163"
       value_template: '{{ value == "1" }}'
 
-  - switch: 
+  - switch:
       name: Desktop Internet
       command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.112"
       command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.112"
@@ -66,36 +66,6 @@ command_line:
       command_state: "/usr/bin/ssh -i /config/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@192.168.1.1 'uci -q get wireless.wifinet6.disabled || echo 0'"
       value_template: '{{ value == "1" }}'
 
-#  - switch:
-#      name: iPad
-#      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.103"
-#      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.103"
-#      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.103"
-#      value_template: '{{ value == "1" }}'
-
-#  - switch:
-#      name: iphone8 
-#      command_on: "/usr/bin/curl -X GET http://192.168.1.20:7022/disconnect?ip=192.168.1.220"
-#      command_off: "/usr/bin/curl -X GET http://192.168.1.20:7022/reconnect?ip=192.168.1.220"
-#      command_state: "/usr/bin/curl -X GET http://192.168.1.20:7022/status?ip=192.168.1.220"
-#      value_template: '{{ value == "1" }}'
-
-
-# pihole testing
-#  - switch:
-#      name: Pihole Shion NoAccess
-#      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess enable'
-#      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess disable'
-#      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoAccess status'
-#      value_template: '{{ value == "1" }}'
-
-#  - switch:
-#      name: Pihole Shion Novideos
-#      command_on: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos enable'
-#      command_off: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos disable'
-#      command_state: ssh -i /config/.ssh/id_ha -o StrictHostKeyChecking=no ngx@192.168.1.55 'docker exec pihole bash /etc/pihole/setGroupStatus.sh Shion-NoVideos status'
-#      value_template: '{{ value == "1" }}'
-
 
 
 template:
@@ -117,3 +87,14 @@ automation:
     actions:
       - action: switch.turn_on
         entity_id: switch.ipad
+
+  - alias: disable yellow_dwar wifi
+    triggers:
+      - trigger: time
+        at: '00:00:00'
+    conditions:
+      - condition: template
+        value_template: "{{ states('switch.openwrt_yellow_dwar') != 'on' }}"
+    actions:
+      - action: switch.turn_on
+        entity_id: switch.openwrt_yellow_dwar
