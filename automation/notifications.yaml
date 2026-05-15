@@ -1,5 +1,47 @@
 #########################################################
 #
+#                   Amazon Price Drop Alerts
+#
+#########################################################
+
+- alias: Amazon price drop alert
+  triggers:
+    - trigger: state
+      entity_id:
+        - sensor.grazie_balance_chair
+        - sensor.az_switchbot_sensor
+      not_to:
+        - unknown
+        - unavailable
+  conditions:
+    - condition: template
+      value_template: >
+        {% set price = trigger.to_state.state | float(none) %} {% set old_price =
+        trigger.from_state.state | float(none) if trigger.from_state is not none
+        else none %} {% set threshold =
+        trigger.to_state.attributes.alert_threshold | float(none) %} {{ price is
+        not none
+             and old_price is not none
+             and threshold is not none
+             and price < old_price
+             and price <= threshold }}
+  actions:
+    - action: script.text_notify
+      data:
+        who: amber
+        title: Price Drop!
+        message: >
+          {{ trigger.to_state.attributes.title | default(trigger.to_state.name, true) }}
+          dropped to {{ trigger.to_state.state }} {{ trigger.to_state.attributes.unit_of_measurement }}
+          from {{ trigger.from_state.state }}
+          (threshold: {{ trigger.to_state.attributes.alert_threshold }} {{ trigger.to_state.attributes.unit_of_measurement }}
+  mode: queued
+  max: 10
+
+
+
+#########################################################
+#
 #                   Windows Desktop Notification
 #
 #########################################################
