@@ -216,12 +216,20 @@ rest_command:
 
 panel_custom:
   - name: panel-redirect
-    url_path: redirect-Zigbee2mqtt-controls
-    sidebar_title: Z2M Controls
-    sidebar_icon: mdi:graphql
+    url_path: redirect-system
+    sidebar_title: System
+    sidebar_icon: mdi:home-assistant
     module_url: /local/custom_ui/panel-redirect.js
     config:
-      target: /hassio/ingress/45df7312_zigbee2mqtt
+      target: /config/system
+
+#  - name: panel-redirect
+#    url_path: redirect-Zigbee2mqtt-controls
+#    sidebar_title: Z2M Controls
+#    sidebar_icon: mdi:graphql
+#    module_url: /local/custom_ui/panel-redirect.js
+#    config:
+#      target: /hassio/ingress/45df7312_zigbee2mqtt
 
 #  - name: panel-redirect
 #    url_path: redirect-server-controls
@@ -231,13 +239,7 @@ panel_custom:
 #    config:
 #      target: /developer-tools/yaml
 
-  - name: panel-redirect
-    url_path: redirect-system
-    sidebar_title: System
-    sidebar_icon: mdi:home-assistant
-    module_url: /local/custom_ui/panel-redirect.js
-    config:
-      target: /config/system
+
 
 
 #########################################################

@@ -41,7 +41,7 @@
         type: module
       - url: /local/custom_ui/button-card.js
         type: module
-      - url: /local/custom_ui/layout-card.js
+      - url: /local/custom_ui/layout-card.js?v=2
         type: module
       - url: /local/custom_ui/my-slider-v2.js
         type: module
