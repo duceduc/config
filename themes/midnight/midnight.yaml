@@ -23,18 +23,26 @@ midnight:
 #  switch-checked-color: "#03a9f4"
 #  switch-unchecked-color: "#7f848e"
 #  switch-unchecked-button-color: "#7f848e"
-  ha-switch-checked-background-color: rgba(30,136,229,0.38)
-  ha-switch-checked-thumb-background-color: "#1E88E5"
-  ha-switch-checked-border-color: transparent
-  ha-switch-checked-thumb-border-color: transparent
-  ha-switch-checked-background-color-hover: rgba(30,136,229,0.5)
-  ha-switch-checked-thumb-background-color-hover: "#1E88E5"
-  ha-switch-background-color: rgba(255,255,255,0.12)
-  ha-switch-thumb-background-color: "#7f848e"
-  ha-switch-border-color: transparent
-  ha-switch-thumb-border-color: transparent
-  ha-switch-background-color-hover: rgba(255,255,255,0.22)
-  ha-switch-thumb-background-color-hover: "#03a9f4"
+  # unchecked
+  ha-switch-background-color: "#414141"
+  ha-switch-background-color-hover: "#414141"
+  ha-switch-border-color: "#414141"
+  ha-switch-thumb-background-color: "#80828a"
+  ha-switch-thumb-background-color-hover: "#80828a"
+  ha-switch-thumb-border-color: "#80828a"
+  ha-switch-thumb-border-color-hover: "#80828a"
+  ha-switch-thumb-box-shadow: none
+
+  # checked
+  ha-switch-checked-background-color: "#414141"
+  ha-switch-checked-background-color-hover: "#414141"
+  ha-switch-checked-border-color: "#414141"
+  ha-switch-checked-thumb-background-color: "#096dcf"
+  ha-switch-checked-thumb-background-color-hover: "#096dcf"
+  ha-switch-checked-thumb-border-color: "#096dcf"
+  ha-switch-checked-thumb-border-color-hover: "#096dcf"
+  ha-switch-checked-thumb-box-shadow: none
+
   
   table-row-background-color: "#2c3139"
   table-row-alternative-background-color: "#424a56"

@@ -250,7 +250,7 @@
       - service: light.turn_on
         data_template:
           entity_id: '{{ entity_id }}'
-          color_temp_kelvin: '{{ color_temp_kelvin | int }}'
+#          color_temp_kelvin: '{{ color_temp_kelvin | int }}'
           transition: '{{ transition | int / 2 }}'
     mode: parallel # default 10
 
