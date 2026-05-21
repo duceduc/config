@@ -82,7 +82,7 @@
     - trigger: template
       value_template: "{{ is_state('binary_sensor.genkan_occupied', 'off') }}"
 #      value_template: "{{ is_state('binary_sensor.genkan_presence', 'off') }}"
-      for: 10
+      for: 5
       id: 'off'
   conditions:
     - condition: template # disable motion light
