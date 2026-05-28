@@ -13,6 +13,7 @@ from ..const import (
     EVENT_TRACKED_TOOK_OFF,
     EVENT_MOST_TRACKED_NEW,
     EVENT_TRACKED_ARRIVED_GATE,
+    EVENT_TRACKED_LEFT_GATE,
 )
 import pycountry
 
@@ -125,6 +126,17 @@ class FlightProcessor:
     def exited_list(self) -> list[dict[str, Any]]:
         return self._exited
 
+    def clear_live_data(self) -> None:
+        self._in_area = {}
+        self._most_tracked = {}
+        self._entered = []
+        self._exited = []
+        self._tracked = {key: {
+            'aircraft_registration': value.get('aircraft_registration'),
+            'flight_number': value.get('flight_number'),
+            'callsign': value.get('callsign'),
+        } for key, value in self._tracked.items()}
+
     def clear_tracked(self) -> None:
         self._tracked = {}
 
@@ -233,6 +245,19 @@ class FlightProcessor:
                 current.pop(fid, None)
         # -------------------------------------------------------------------
 
+        # --- LEFT GATE LOGIC ---
+        # Fire an event when a flight changes from 'schedule' to 'live'
+        # Issue context: https://github.com/AlexandrErohin/home-assistant-flightradar24/issues/171
+        for fid, new_data in current.items():
+            if new_data.get('tracked_type') == 'live':
+                number = new_data.get('flight_number') or new_data.get('callsign')
+                for old_data in self._tracked.values():
+                    old_number = old_data.get('flight_number') or old_data.get('callsign')
+                    if old_number == number and old_data.get('tracked_type') == 'schedule':
+                        self._event_manager.add_events(EVENT_TRACKED_LEFT_GATE, [new_data])
+                        break
+        # -----------------------
+
         self._tracked = current
 
     def _find_flight(self, current: dict[str, dict[str, Any]], number: str) -> None:
@@ -332,6 +357,7 @@ class FlightProcessor:
                 previous_closest_distance if previous_closest_distance is not None else new_distance,
             )
             flight['on_ground'] = obj.on_ground
+            flight['aircraft_category'] = "Helicopter" if is_helicopter(flight) else "Airplane"
             self._takeoff_and_landing(flight, last_position, obj.on_ground, sensor_type)
 
     def _takeoff_and_landing(self,
@@ -412,7 +438,7 @@ class FlightProcessor:
             'time_estimated_arrival': get_value(flight, ['time', 'estimated', 'arrival']),
         }
 
-    # --- IMPLEMENTED ALEXANDR'S FIX HERE ---
+    # --- IMPLEMENTED ALEXANDR'S FIX HERE SO I DONT FORGET ---
     def _is_valid(self, flight: dict) -> bool:
         if is_helicopter(flight):
             return flight.get("id") is not None
