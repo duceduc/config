@@ -80,7 +80,7 @@ time:
 
 ld2410:
   id: ld2410_radar
-  timeout: 150s # fix false positive
+#  timeout: 150s # fix false positive
   # max_move_distance : 6m
   # max_still_distance: 0.75m
   # g0_move_threshold: 10

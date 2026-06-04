@@ -29,6 +29,21 @@ from .state import State
 
 _LOGGER = logging.getLogger(__name__)
 
+LEGACY_WAIT_UNTIL_ARGS = [
+    "state_trigger",
+    "state_check_now",
+    "time_trigger",
+    "event_trigger",
+    "mqtt_trigger",
+    "mqtt_trigger_encoding",
+    "webhook_trigger",
+    "webhook_local_only",
+    "webhook_methods",
+    "timeout",
+    "state_hold",
+    "state_hold_false",
+]
+
 
 class DecoratorRegistry:
     """Decorator registry."""
@@ -102,8 +117,22 @@ class DecoratorRegistry:
         return None
 
     @classmethod
-    async def wait_until(cls, ast_ctx: AstEval, *_arg: Any, **kwargs: Any) -> Any:
+    async def wait_until(cls, ast_ctx: AstEval, *args: Any, **kwargs: Any) -> Any:
         """Build a temporary decorator manager that waits until one of trigger decorators fires."""
+
+        if len(args) > 0:
+            # Preserve legacy positional arguments for now; reject them in a future release.
+            ast_ctx.get_logger().warning(
+                "Ambiguous positional arguments in task.wait_until%s; use keyword arguments instead",
+                args,
+            )
+            kwargs = kwargs.copy()
+            for i, arg in enumerate(args):
+                key = LEGACY_WAIT_UNTIL_ARGS[i]
+                if key in kwargs:
+                    raise TypeError(f"task.wait_until() got multiple values for argument '{key}'")
+                kwargs[key] = arg
+
         func_args = set(kwargs.keys())
         if len(func_args) == 0:
             return {"trigger_type": "none"}

@@ -133,10 +133,12 @@ def webhook_trigger(
 
     Args:
         webhook_id: Webhook id to listen to.
-        str_expr: Optional expression evaluated against ``trigger_type``, ``webhook_id``, and ``payload``.
+        str_expr: Optional expression evaluated against ``trigger_type``, ``webhook_id``, ``request``, and ``payload``.
         local_only: If False, allow requests from anywhere on the internet.
         methods: HTTP methods to allow.
         kwargs: Extra keyword arguments merged into each invocation.
+
+    Trigger kwargs include ``trigger_type="webhook"``, ``webhook_id``, the parsed payload fields, and ``request`` (the underlying ``aiohttp.web.Request``).
     """
     ...
 
@@ -438,6 +440,7 @@ class task:
 
     @staticmethod
     def wait_until(
+        *,
         state_trigger: str | list[str] | None = None,
         time_trigger: str | list[str] | None = None,
         event_trigger: str | list[str] | None = None,

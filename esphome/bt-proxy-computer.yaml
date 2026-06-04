@@ -19,7 +19,6 @@ esphome:
   project:
     name: Screek.Human_Sensor
     version: 1w
-#  min_version: 2025.5.1
 
 esp32:
   board: wemos_d1_mini32
@@ -28,10 +27,6 @@ esp32:
 
 external_components:
   - source:
-#      type: local
-#      path: components/screekworkshop/screek_1w/
-#    components: [ ld2410, uart ]  
-  
       type: git
       url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
       ref: main

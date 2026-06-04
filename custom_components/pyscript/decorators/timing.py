@@ -77,7 +77,7 @@ class TimeTriggerDecorator(TriggerDecorator):
     run_on_startup: bool = False
     run_on_shutdown: bool = False
     timespec: list[str]
-    _cycle_task: asyncio.Task
+    _cycle_task: asyncio.Task = None
 
     async def validate(self) -> None:
         """Validate the decorator arguments."""
