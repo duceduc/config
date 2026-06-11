@@ -4,7 +4,7 @@ substitutions:
 
 packages:
   stats: !include components/stats.yaml
-#  aircon: !include components/zw5620s.yaml
+  aircon: !include components/zw5620s.yaml
 
 esphome:
   name: $name
