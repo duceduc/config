@@ -493,6 +493,7 @@ script:
           payload: running
           retain: true
 
+# RUN this script to turn off notification if not able too via opening of washer door.
   washer_complete:
     sequence:
       - action: mqtt.publish
