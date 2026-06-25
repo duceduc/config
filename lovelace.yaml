@@ -5,7 +5,7 @@
 #########################################################
 
 #    mode: yaml
-    resource_mode: yaml    
+    resource_mode: yaml
     resources:
       - url: /local/lovelace/css/styles.css?v=1.0.0
         type: css
@@ -15,8 +15,8 @@
         type: module
       - url: /local/custom_ui/fold-entity-row.js
         type: module
-      - url: /local/custom_ui/custom-header.js
-        type: module
+#      - url: /local/custom_ui/custom-header.js
+#        type: module
       - url: /local/custom_ui/stack-in-card.js
         type: module
       - url: /local/custom_ui/bar-card.js
@@ -49,6 +49,9 @@
         type: module
       - url: /local/custom_ui/honeycomb-menu.js?v=7
         type: module
+      - url: /local/custom_ui/simple-inventory-card.js?v.5
+        type: module
+
       - url: /local/custom_ui/vertical-stack-in-card.js
         type: js
       - url: /local/custom_ui/floorplan.js
@@ -83,7 +86,7 @@
         icon: mdi:home-automation
         show_in_sidebar: true
         filename: lovelace/dashboards/overview/ui-overview.yaml
-    
+
       lovelace-floorplan: # url slug need to contain a hyphen
         mode: yaml
         title: Floorplan

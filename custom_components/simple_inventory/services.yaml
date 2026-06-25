@@ -1,0 +1,488 @@
+add_item:
+  description: Add an item to an inventory
+  fields:
+    inventory_id:
+      description: ID of the inventory to add to
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    name:
+      description: Name of the item
+      example: "Frozen Pizza"
+      required: true
+      selector:
+        text:
+    barcode:
+      description: Barcode to associate with the item (UPC, EAN, etc.). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: false
+      default: ""
+      selector:
+        text:
+    quantity:
+      description: Quantity of the item
+      example: 2.5
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 0
+          step: 0.1
+    unit:
+      description: Unit of measurement
+      example: "boxes"
+      required: false
+      default: ""
+      selector:
+        text:
+    price:
+      description: Unit price of the item
+      example: 4.99
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+          step: 0.01
+    category:
+      description: Category of the item. Supports multiple categories as a comma-separated list.
+      example: "Prepared Foods, Frozen"
+      required: false
+      default: ""
+      selector:
+        text:
+    expiry_date:
+      description: Expiration date
+      example: "2025-12-31"
+      required: false
+      default: ""
+      selector:
+        date:
+    expiry_alert_days:
+      description: Number of days in advance to warn about expiring items
+      example: 7
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+    auto_add_enabled:
+      description: Enable automatic adding to todo list
+      example: true
+      required: false
+      default: false
+      selector:
+        boolean:
+    auto_add_to_list_quantity:
+      description: Quantity threshold for auto-adding
+      example: 1
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+    desired_quantity:
+      description: Desired stock level for restocking. When set, the todo item quantity will be the difference between this and the current quantity. When 0, the quantity is based on the auto-add threshold instead.
+      example: 10
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+    todo_list:
+      description: Todo list entity to add to
+      example: "todo.grocery_list"
+      required: false
+      default: ""
+      selector:
+        entity:
+          domain: todo
+    location:
+      description: Location of the item. Supports multiple locations as a comma-separated list.
+      example: "Basement Refrigerator, Kitchen Pantry"
+      required: false
+      default: ""
+      selector:
+        text:
+    description:
+      description: Item description
+      example: "Junk food"
+      required: false
+      default: ""
+      selector:
+        text:
+          multiline: true
+    auto_add_id_to_description_enabled:
+      description: Appends the inventory ID to the description
+      example: true
+      required: false
+      default: false
+      selector:
+        boolean:
+    todo_quantity_placement:
+      description: Where to show the quantity in todo items. "name" puts it in the item name (e.g. "Milk (x4)"), "description" puts it in the description field, "none" omits it entirely.
+      example: "description"
+      required: false
+      default: "name"
+      selector:
+        select:
+          options:
+            - "name"
+            - "description"
+            - "none"
+
+remove_item:
+  description: Remove an item from an inventory
+  fields:
+    inventory_id:
+      description: ID of the inventory to remove from
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    name:
+      description: Name of the item to remove (required unless barcode is provided)
+      example: "Frozen Pizza"
+      required: false
+      selector:
+        text:
+    barcode:
+      description: Barcode of the item to remove (alternative to name). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: false
+      selector:
+        text:
+
+increment_item:
+  description: Increment the quantity of an item
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    name:
+      description: Name of the item (required unless barcode is provided)
+      example: "Frozen Pizza"
+      required: false
+      selector:
+        text:
+    barcode:
+      description: Barcode of the item (alternative to name). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: false
+      selector:
+        text:
+    amount:
+      description: Amount to increment by
+      example: 0.5
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 0.1
+          step: 0.1
+    price:
+      description: Unit price to record for this transaction
+      example: 4.99
+      required: false
+      selector:
+        number:
+          min: 0
+          step: 0.01
+
+decrement_item:
+  description: Decrement the quantity of an item
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    name:
+      description: Name of the item (required unless barcode is provided)
+      example: "Frozen Pizza"
+      required: false
+      selector:
+        text:
+    barcode:
+      description: Barcode of the item (alternative to name). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: false
+      selector:
+        text:
+    amount:
+      description: Amount to decrement by
+      example: 0.5
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 0.1
+          step: 0.1
+    price:
+      description: Unit price to record for this transaction
+      example: 4.99
+      required: false
+      selector:
+        number:
+          min: 0
+          step: 0.01
+
+update_item:
+  description: Update an existing inventory item
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    old_name:
+      description: Current name of the item
+      example: "Old Item Name"
+      required: true
+      selector:
+        text:
+    name:
+      description: New name of the item
+      example: "New Item Name"
+      required: true
+      selector:
+        text:
+    barcode:
+      description: Barcode to associate with the item (UPC, EAN, etc.). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: false
+      selector:
+        text:
+    quantity:
+      description: New quantity
+      example: 5
+      required: false
+      selector:
+        number:
+          min: 0
+          step: 0.1
+    unit:
+      description: Unit of measurement
+      example: "boxes"
+      required: false
+      selector:
+        text:
+    price:
+      description: Unit price of the item
+      example: 4.99
+      required: false
+      selector:
+        number:
+          min: 0
+          step: 0.01
+    category:
+      description: Category. Supports multiple categories as a comma-separated list.
+      example: "Frozen Foods, Prepared Foods"
+      required: false
+      selector:
+        text:
+    expiry_date:
+      description: Expiration date
+      example: "2025-12-31"
+      required: false
+      selector:
+        date:
+    auto_add_enabled:
+      description: Enable auto-add to todo list
+      example: true
+      required: false
+      selector:
+        boolean:
+    auto_add_to_list_quantity:
+      description: Threshold for auto-add
+      example: 1
+      required: false
+      selector:
+        number:
+          min: 0
+    desired_quantity:
+      description: Desired stock level for restocking. When set, the todo item quantity will be the difference between this and the current quantity. When 0, the quantity is based on the auto-add threshold instead.
+      example: 10
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+    todo_list:
+      description: Todo list entity
+      example: "todo.grocery_list"
+      required: false
+      selector:
+        entity:
+          domain: todo
+    expiry_alert_days:
+      description: Number of days in advance to warn about expiring items
+      example: 7
+      required: false
+      selector:
+        number:
+          min: 0
+    location:
+      description: Location of the item. Supports multiple locations as a comma-separated list.
+      example: "Basement Refrigerator, Kitchen Pantry"
+      required: false
+      default: ""
+      selector:
+        text:
+    description:
+      description: Item description
+      example: "Junk food"
+      required: false
+      default: ""
+      selector:
+        text:
+          multiline: true
+    auto_add_id_to_description_enabled:
+      description: Appends the inventory ID to the description
+      example: true
+      required: false
+      default: false
+      selector:
+        boolean:
+    todo_quantity_placement:
+      description: Where to show the quantity in todo items. "name" puts it in the item name (e.g. "Milk (x4)"), "description" puts it in the description field, "none" omits it entirely.
+      example: "description"
+      required: false
+      default: "name"
+      selector:
+        select:
+          options:
+            - "name"
+            - "description"
+            - "none"
+
+get_items:
+  description: Return the full list of items for an inventory. Can specify either inventory_id or inventory_name (but not both).
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: false
+      selector:
+        text:
+    inventory_name:
+      description: Name of the inventory (case-insensitive)
+      example: "Kitchen Freezer"
+      required: false
+      selector:
+        text:
+
+get_items_from_all_inventories:
+  description: Return the full list of items grouped by inventory.
+  fields: {}
+
+lookup_barcode_product:
+  description: Look up a barcode in an external product database (e.g. Open Food Facts) and return product information.
+  fields:
+    barcode:
+      description: Barcode to look up (UPC, EAN, etc.). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: true
+      selector:
+        text:
+
+lookup_by_barcode:
+  description: Look up an item by barcode across all inventories. Returns all matching items.
+  fields:
+    barcode:
+      description: Barcode to search for (UPC, EAN, etc.). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: true
+      selector:
+        text:
+
+scan_barcode:
+  description: Scan a barcode and perform an action (increment, decrement, or lookup). Automatically resolves the item across inventories.
+  fields:
+    barcode:
+      description: Barcode to scan (UPC, EAN, etc.). Must be quoted in YAML if it has leading zeros.
+      example: "012345678901"
+      required: true
+      selector:
+        text:
+    action:
+      description: Action to perform on the matched item
+      example: "increment"
+      required: true
+      selector:
+        select:
+          options:
+            - "increment"
+            - "decrement"
+            - "lookup"
+    amount:
+      description: Amount to increment or decrement by (ignored for lookup)
+      example: 1
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 0.1
+          step: 0.1
+    inventory_id:
+      description: Optional inventory ID to scope the search. Required if the barcode exists in multiple inventories.
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: false
+      selector:
+        text:
+    price:
+      description: Unit price to record for this transaction
+      example: 4.99
+      required: false
+      selector:
+        number:
+          min: 0
+          step: 0.01
+
+get_inventory_consumption_rates:
+  description: Get consumption analytics for all items in an inventory based on their decrement history. Returns daily/weekly rates, days until depletion, and average restock interval per item.
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    window_days:
+      description: Number of days to look back for consumption data. Omit to use all history.
+      example: 30
+      required: false
+      selector:
+        number:
+          min: 1
+          step: 1
+
+get_item_consumption_rates:
+  description: Get consumption analytics for a specific item based on its decrement history. Returns daily/weekly rates, days until depletion, and average restock interval.
+  fields:
+    inventory_id:
+      description: ID of the inventory
+      example: "01JYFPCDMBRBRK4MB3C26S2FKH"
+      required: true
+      selector:
+        text:
+    name:
+      description: Name of the item
+      example: "Frozen Pizza"
+      required: true
+      selector:
+        text:
+    window_days:
+      description: Number of days to look back for consumption data. Omit to use all history.
+      example: 30
+      required: false
+      selector:
+        number:
+          min: 1
+          step: 1
