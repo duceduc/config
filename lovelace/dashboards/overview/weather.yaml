@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#                    WEATHER VIEW                                                           
-#                                                                                                    
+#
+#                    WEATHER VIEW
+#
 ####################################################
 
 title: Weather
@@ -77,7 +77,7 @@ cards:
         compact_view: true
         hide_buttons: true
         compact_menu_button: true
-        hide_compact_label: true        
+        hide_compact_label: true
         hide_starfield: true
         12hr_format: false
         font_customize:
@@ -202,7 +202,7 @@ cards:
 
 
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################
