@@ -68,7 +68,7 @@ cards:
 #            .compact-view {
 #              display: none !important;
 #            }
-        entity: ""
+        entity: sensor.tokyo_moon_phase
         use_default: true
         use_custom: false
         use_entity: false
