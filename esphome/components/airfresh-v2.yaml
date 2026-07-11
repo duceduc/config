@@ -68,6 +68,9 @@ select:
       then:
         - script.execute: squirtTimer
 
+
+# fix before updating to 2026 + version
+# https://github.com/3ative/scent-a-tron-glade
 script:
   # Script for Auto squirt
   - id: squirtTimer
@@ -80,6 +83,8 @@ script:
             - delay: !lambda 'return atoi(id(intervalSelect).state.c_str()) * 60000;' # For testing. Default 60000
             # Fire off a Squirt
             - switch.turn_on: theSquirter
+
+
 
 switch:
   # The Glade DC Motor

@@ -4,57 +4,62 @@
 #
 #########################################################
 
-  - name: home_assistant
-    platform: smtp
-    server: smtp.gmail.com
-    port: 587
-    timeout: 15
-    sender: !secret gmail_email
-    encryption: starttls
-    username: !secret gmail_email
-    password: !secret gmail_pass
-    sender_name: Home Assistant
-    recipient:
-      - !secret recipient_1
 
-  - name: eri
-    platform: smtp
-    server: smtp.gmail.com
-    port: 587
-    timeout: 15
-    sender: !secret gmail_email
-    encryption: starttls
-    username: !secret gmail_email
-    password: !secret gmail_pass
-    sender_name: Home Assistant
-    recipient:
-      - !secret recipient_2
+### moved to integration. no longer needed.
 
-  - name: renee
-    platform: smtp
-    server: smtp.gmail.com
-    port: 587
-    timeout: 15
-    sender: !secret gmail_email
-    encryption: starttls
-    username: !secret gmail_email
-    password: !secret gmail_pass
-    sender_name: Home Assistant
-    recipient:
-      - !secret recipient_4
+#  - name: home_assistant
+#    platform: smtp
+#    server: smtp.gmail.com
+#    port: 587
+#    timeout: 15
+#    sender: !secret gmail_email
+#    encryption: starttls
+#    username: !secret gmail_email
+#    password: !secret gmail_pass
+#    sender_name: Home Assistant
+#    recipient:
+#      - !secret recipient_1
 
-  - name: jcb
-    platform: smtp
-    server: smtp.gmail.com
-    port: 587
-    timeout: 15
-    sender: !secret gmail_email
-    encryption: starttls
-    username: !secret gmail_email
-    password: !secret gmail_pass
-    sender_name: Duc Su
-    recipient:
-      - !secret recipient_3
+#  - name: eri
+#    platform: smtp
+#    server: smtp.gmail.com
+#    port: 587
+#    timeout: 15
+#    sender: !secret gmail_email
+#    encryption: starttls
+#    username: !secret gmail_email
+#    password: !secret gmail_pass
+#    sender_name: Home Assistant
+#    recipient:
+#      - !secret recipient_2
+
+#  - name: renee
+#    platform: smtp
+#    server: smtp.gmail.com
+#    port: 587
+#    timeout: 15
+#    sender: !secret gmail_email
+#    encryption: starttls
+#    username: !secret gmail_email
+#    password: !secret gmail_pass
+#    sender_name: Home Assistant
+#    recipient:
+#      - !secret recipient_4
+
+#  - name: jcb
+#    platform: smtp
+#    server: smtp.gmail.com
+#    port: 587
+#    timeout: 15
+#    sender: !secret gmail_email
+#    encryption: starttls
+#    username: !secret gmail_email
+#    password: !secret gmail_pass
+#    sender_name: Duc Su
+#    recipient:
+#      - !secret recipient_3
+
+
 
 
 #########################################################
