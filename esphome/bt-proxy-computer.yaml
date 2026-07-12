@@ -15,6 +15,7 @@ esphome:
   name: $name
   platformio_options:
     board_build.flash_mode: dio
+    board_build.f_cpu: 80000000L
 
   project:
     name: Screek.Human_Sensor
@@ -28,9 +29,11 @@ esp32:
 external_components:
   - source:
       type: git
-      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-      ref: main
-    components: [ ld2410, uart ] # Needs ,uart for sensor to work. Removed for now for updating 
+      url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
+      ref: master
+#      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w # this used to worked.
+#      ref: main      
+    components: [ ld2410 ] # Needs ,uart for sensor to work. Removed for now for updating 
 
 
 bluetooth_proxy:

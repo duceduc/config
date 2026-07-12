@@ -34,7 +34,7 @@ esp32:
   board: seeed_xiao_esp32c3
   variant: esp32c3
   framework:
-    type: arduino
+    type: esp-idf
 #    platform_version: 5.4.0
 
 globals:
@@ -112,9 +112,10 @@ script:
     then:
       - while:
           condition:
-            lambda: 'return id(intervalSelect).current_option() != "Off";'
+            lambda: 'return (strcmp(id(intervalSelect).current_option(), "Off") != 0);'
+           # lambda: 'return (std::string(id(intervalSelect).current_option()) != "Off");'
           then:
-            - delay: !lambda 'return atoi(id(intervalSelect).current_option()) * 60000;' # For testing 1000. Default 60000
+            - delay: !lambda 'return atoi(id(intervalSelect).current_option()) * 60000;' # For testing. Default 60000
             - switch.turn_on: theSquirter
 
 switch:
