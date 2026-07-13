@@ -44,40 +44,41 @@
 #    unit_of_measurement: '%'
 
 
-  - name: mediaroomsatellite cpu usage
-    unique_id: 5222da0c-be68-45fb-ac3b-bec4b735885c
-    state_topic: "house/system_monitor/servers/mediaroomsatellite/cpu_load"
-    unit_of_measurement: '%'
-  - name: mediaroomsatellite temperature
-    unique_id: a8a587fc-e823-4374-96d2-0a69d02123e5
-    state_topic: "house/system_monitor/servers/mediaroomsatellite/cpu_temp"
-    unit_of_measurement: "°C" 
-  - name: mediaroomsatellite disk use
-    unique_id: 7598a1eb-4cc0-49b7-ab8e-15948ccb1e5a
-    state_topic: "house/system_monitor/servers/mediaroomsatellite/used_space"
-    unit_of_measurement: '%'
-  - name: mediaroomsatellite memory use
-    unique_id: f7aba200-3d2e-48d5-89b2-7f6f62e4d390
-    state_topic: "house/system_monitor/servers/mediaroomsatellite/memory"
-    unit_of_measurement: '%'
+#  - name: mediaroomsatellite cpu usage
+#    unique_id: 5222da0c-be68-45fb-ac3b-bec4b735885c
+#    state_topic: "house/system_monitor/servers/mediaroomsatellite/cpu_load"
+#    unit_of_measurement: '%'
+#  - name: mediaroomsatellite temperature
+#    unique_id: a8a587fc-e823-4374-96d2-0a69d02123e5
+#    state_topic: "house/system_monitor/servers/mediaroomsatellite/cpu_temp"
+#    unit_of_measurement: "°C" 
+#  - name: mediaroomsatellite disk use
+#    unique_id: 7598a1eb-4cc0-49b7-ab8e-15948ccb1e5a
+#    state_topic: "house/system_monitor/servers/mediaroomsatellite/used_space"
+#    unit_of_measurement: '%'
+#  - name: mediaroomsatellite memory use
+#    unique_id: f7aba200-3d2e-48d5-89b2-7f6f62e4d390
+#    state_topic: "house/system_monitor/servers/mediaroomsatellite/memory"
+#    unit_of_measurement: '%'
 
 ###
-  - name: rearsatellite cpu usage
-    unique_id: dcc1c4cf-844d-425d-ad96-1545448f56c4
-    state_topic: "house/system_monitor/servers/rearsatellite/cpu_load"
-    unit_of_measurement: '%'
-  - name: rearsatellite temperature
-    unique_id: a39322e1-041f-4bcb-81db-e8ee7b31c9ad
-    state_topic: "house/system_monitor/servers/rearsatellite/cpu_temp"
-    unit_of_measurement: "°C"
-  - name: rearsatellite disk use
-    unique_id: 693ea04b-be31-453c-ae14-963ce14683ba
-    state_topic: "house/system_monitor/servers/rearsatellite/used_space"
-    unit_of_measurement: '%'
-  - name: rearsatellite memory use
-    unique_id: b9f1ef13-ea62-4000-b23e-55b017b87e58
-    state_topic: "house/system_monitor/servers/rearsatellite/memory"
-    unit_of_measurement: '%'
+#  - name: rearsatellite cpu usage
+#    unique_id: dcc1c4cf-844d-425d-ad96-1545448f56c4
+#    state_topic: "house/system_monitor/servers/rearsatellite/cpu_load"
+#    unit_of_measurement: '%'
+#  - name: rearsatellite temperature
+#    unique_id: a39322e1-041f-4bcb-81db-e8ee7b31c9ad
+#    state_topic: "house/system_monitor/servers/rearsatellite/cpu_temp"
+#    unit_of_measurement: "°C"
+#  - name: rearsatellite disk use
+#    unique_id: 693ea04b-be31-453c-ae14-963ce14683ba
+#    state_topic: "house/system_monitor/servers/rearsatellite/used_space"
+#    unit_of_measurement: '%'
+#  - name: rearsatellite memory use
+#    unique_id: b9f1ef13-ea62-4000-b23e-55b017b87e58
+#    state_topic: "house/system_monitor/servers/rearsatellite/memory"
+#    unit_of_measurement: '%'
+
 
 # Monitor Presense
   - name: ms1 cpu usage

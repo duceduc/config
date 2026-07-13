@@ -315,18 +315,6 @@ cards:
 #          - entity_44: sensor.rearsatellite_temperature
 
 
-
-
-      - type: custom:streamline-card
-        template: server_tpl
-        variables:
-          - title: media sate
-          - entity_1: sensor.mediaroomsatellite_memory_use
-          - entity_2: sensor.mediaroomsatellite_disk_use
-          - entity_3: sensor.mediaroomsatellite_cpu_usage
-          - entity_4: sensor.mediaroomsatellite_temperature
-
-
       # Hide if PC is off
       - type: entities
         title: desktop
