@@ -51,7 +51,6 @@ g#entities .st0 {
 }
 
 
-
 @keyframes speaker-pulse {
   0% {
     filter: unset;
@@ -81,14 +80,14 @@ g#entities .st0 {
       filter:blur(2px);
   }
 }
+
 @keyframes tv-glare {
-  0% {
-    opacity: 0.95;
-  }
-  100% {
-    opacity: 0.1;
-  }
+	
+	
 }
+
+
+
 
 
 
@@ -137,11 +136,27 @@ g#entities #binary_sensor\.washer_water_leak {
    stroke-width: 0;   
 }
 
+
+.power-on {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 350px;
+  background: #111;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}	 
+	 
+
+
 g#entities .power-on {
     stroke: #FF10F0;
     stroke-dasharray: 6;
-  
 }
+
+
+
 
 
 #areas .motion-on
@@ -189,13 +204,25 @@ g#entities .status-fan
  	animation: fade-in 1s infinite alternate;
 }
 
+g#entities .manual-cool-heat
+{
+ 	fill: #D400FF ;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
+
+g#entities .man-auto
+{
+ 	fill: #2CFF05 ;
+ 	filter: unset;
+ 	animation: fade-in 1s infinite alternate;
+}
 
 #areas .light-on {
   stroke-width: 4px;
   stroke-opacity: 1;
   stroke: #a58ee1;
 }
-
 
 
 g path:active, g use:active, .light-on:active, g#entities > g:active path:not(.touch-area) {
@@ -213,16 +240,11 @@ g#entities path {
 }
 
 
-
 g#entities .light-on {
 	stroke: var(--paper-item-icon-active-color);
 }
 
-
-
-
 .static-temp, .static-temp tspan {
   text-shadow: 2px 2px 5px #120c04;
 }
-
 

@@ -59,7 +59,7 @@ cards:
                   background: #ffffff14;
                   height: auto !important;
                   transform: translate( 0, 0 );
-                  
+
                   animation: 1s alert linear infinite alternate;
                   box-shadow: 0px 0px 0px 1px #f970709e;
                   background: #ff000033;
@@ -90,13 +90,12 @@ cards:
               tap_action:
                 action: 'toggle'
               hold_action:
-                action: call-service
-                service: honeycomb
-                service_data:
+                action: fire-dom-event
+                honeycomb_menu:
                   template: base
                   autoclose: false
                   active: true
-                  buttons:                  
+                  buttons:
                     - icon: mdi:information-variant
                       tap_action:
                         action: more-info
@@ -113,7 +112,6 @@ cards:
                         service: switch.toggle
                         service_data:
                           entity_id: switch.tv_mute
-
 
                     - icon: mdi:volume-plus
                       tap_action:
@@ -155,33 +153,29 @@ cards:
               - input_select.lr_ac_mode
               - input_select.sr_ac_mode
     #          - input_select.mr_ac_mode
-              hold_action: more-info          
+              hold_action: more-info
               state_action:
                 service: floorplan.class_set
                 service_data: |
                   >
                     var stat = (entity.state);
-                    if (stat === "Powerful Heat") return "aircon status-heat";
-                    else if (stat === "Normal Heat") return "aircon status-heat";
-                    else if (stat === "Silent Heat") return "aircon status-heat";
-                    else if (stat === "Powerful Cool") return "aircon status-cool";
-                    else if (stat === "Normal Cool") return "aircon status-cool";
-                    else if (stat === "Silent Cool") return "aircon status-cool";
-                    else if (stat === "Normal Humidifier") return "aircon status-fan";
-                    else if (stat === "Ai Auto") return "aircon status-fan";
-                    else if (stat === "Fan") return "aircon status-fan";
+                    if (['Powerful Heat', 'Normal Heat', 'Silent Heat'].includes(stat)) return "aircon status-heat";
+                    else if (['Powerful Cool', 'Normal Cool', 'Silent Cool'].includes(stat)) return "aircon status-cool";
+                    else if (['Manual Cool', 'Manual Heat'].includes(stat)) return "aircon manual-cool-heat";
+                    else if (['Normal Humidifier', 'Ai Auto', 'Fan'].includes(stat)) return "aircon status-fan";
+                    else if (stat === "Man Auto") return "aircon man-auto";
                     else if (stat === "Off") return "aircon status-off";
                     else return "unknown";
 
             - entity: input_select.mr_ac_mode
               tap_action: false
               hover_action: false
-              state_action:     
+              state_action:
                 service: floorplan.image_set
                 service_data: |
                   >
-                   var imgName = ''; 
-                   switch (entity.state) { 
+                   var imgName = '';
+                   switch (entity.state) {
                      case 'Powerful Heat': imgName = 'heat'; break;
                      case 'Normal Heat': imgName = 'heat'; break;
                      case 'Silent Heat': imgName = 'heat'; break;
@@ -192,7 +186,7 @@ cards:
                      case 'Ai Auto': imgName = 'air'; break;
                      case 'Fan': imgName = 'air'; break;
                      case 'Off': imgName = 'off'; break;
-                   } 
+                   }
                    return '/local/lovelace/floorplan/img/fan-' + imgName + '.svg';
 
 
@@ -204,7 +198,7 @@ cards:
               - sensor.bt_proxy_computer_temperature
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
-              - sensor.aio_human_sensor_entrance_humidity                    
+              - sensor.aio_human_sensor_entrance_humidity
               - sensor.sr_radar_temperature
               - sensor.aio_human_sensor_master_temperature
               - sensor.wc_airfreshener_temperature
@@ -217,7 +211,7 @@ cards:
               state_action:
                 - service: floorplan.class_set
                   service_data: 'static-temp'
-         
+
             - entities:
               - sensor.bt_proxy_computer_temperature
               - sensor.kt_human_sensor_temperature
@@ -272,7 +266,7 @@ cards:
     #        - entities:
     #          - person.duc
     #          - person.eri
-    #          - person.shion          
+    #          - person.shion
     #          tap_action: false
     #          state_action:
     #            action: call-service
@@ -365,7 +359,7 @@ cards:
                              hue-rotate(calc( ${hue}deg - 55deg ))
                              saturate(calc( ${sat}% * 2 ))
                              brightness(calc( ${entity.attributes.brightness} / 255));`
-  
+
 
 #################################################
 ### Speakers
@@ -379,7 +373,7 @@ cards:
                --vertical-stack-card-margin: 5px;
                transform: translate(0, 0);
                top: var(--header-height);
-               right: 6px;              
+               right: 6px;
                position: absolute;
                width: 265px;
                height: auto !important;
@@ -445,8 +439,8 @@ cards:
   #################################################
   # Weather
   #################################################
-  
-  
+
+
       - type: custom:weather-card
         entity: weather.my_weather
         current: true
@@ -488,18 +482,18 @@ cards:
                 margin-left: -1em;
             }
             :host .current {
-              --primary-text-color: #606060; 
+              --primary-text-color: #606060;
             }
             .tempc {
                 font-size: .9em !important;
                 vertical-align: super;
             }
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
 ####################################################
 #
 #          END OF CONFIGURATION FILE
