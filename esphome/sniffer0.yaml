@@ -1,6 +1,6 @@
 #  [D4:D4:DA:5D:EC:4C]
 # AQI [see japan] https://en.wikipedia.org/wiki/Air_quality_index
-
+# location - kitchen
 substitutions:
   name: sniffer0
 #  upper: Sniffer0
