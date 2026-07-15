@@ -99,7 +99,7 @@ display:
     model: st7789v
     backlight_pin: GPIO4
 #      number: GPIO4
-      allow_other_uses: true
+#      allow_other_uses: true
     cs_pin: #GPIO5
       number: GPIO5
       ignore_strapping_warning: true
