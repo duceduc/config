@@ -95,7 +95,7 @@ spi:
   mosi_pin: GPIO19
 
 display:
-  - platform: st7789v
+  - platform: mipi_spi
     model: TTGO TDisplay 135x240
     backlight_pin:
       number: GPIO4
