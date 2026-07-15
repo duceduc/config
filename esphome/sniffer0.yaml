@@ -96,7 +96,7 @@ spi:
 
 display:
   - platform: mipi_spi
-    model: TTGO TDisplay 135x240
+    model: st7789v
     backlight_pin:
       number: GPIO4
       allow_other_uses: true
