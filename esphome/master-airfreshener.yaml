@@ -122,6 +122,7 @@ select:
       - $interval3 Minutes
       - $interval4 Minutes
       - $interval5 Minutes
+      - $interval6 Minutes
     on_value:
       then:
         - script.execute: squirtTimer
@@ -133,10 +134,9 @@ script:
     then:
       - while:
           condition:
-            lambda: 'return id(intervalSelect).state != "Off";'
+            lambda: 'return id(intervalSelect).current_option() != "Off";'
           then:
-            - delay: !lambda 'return atoi(id(intervalSelect).state.c_str()) * 60000;' # For testing. Default 60000
-            # Fire off a Squirt
+            - delay: !lambda 'return atoi(id(intervalSelect).current_option().c_str()) * 60000;' # For testing. Default 60000
             - switch.turn_on: theSquirter
 
 switch:
