@@ -1,6 +1,6 @@
 #  [08:B6:1F:90:BA:58]
 # AQI [see japan] https://en.wikipedia.org/wiki/Air_quality_index
-
+# location - livingroom
 substitutions:
   name: sniffer1
 #  upper: Sniffer1
