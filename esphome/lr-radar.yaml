@@ -17,7 +17,7 @@ external_components: # fix for removal of custom component in esphome 2025.xx an
       type: git
       url: https://github.com/esphome/esphome
       ref: refs/tags/2024.12.4
-    components: [ custom, custom_component ]
+    components: [ custom, custom_component1 ]
 
 esphome:
   name: $name
