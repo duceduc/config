@@ -1,7 +1,6 @@
 # ESP8266 NodeMCU.... 98:CD:AC:30:E9:4F
 substitutions:
   name: ikea-pm25
-#  ssid: !secret ssid3
 
 packages:
   pm1006k: !include components/pm1006k.yaml
