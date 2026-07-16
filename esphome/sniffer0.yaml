@@ -81,7 +81,7 @@ switch:
     name: Backlight
     pin: 
       number: GPIO4
-      allow_other_uses: true
+#      allow_other_uses: true
     id: backlight
     restore_mode: ALWAYS_ON
 
