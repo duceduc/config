@@ -50,17 +50,6 @@ wifi:
   password: !secret ssid_pwd
 
 
-#wifi:
-#  ssid: !secret ssid
-#  min_auth_mode: WPA2  
-#  password: !secret ssid_pwd
-#  fast_connect : true
-#  manual_ip:
-#    static_ip: 192.168.1.122 # dont use this ip. another is using
-#    subnet: 255.255.255.0
-#    gateway: 192.168.1.1
-
-
 sensor:
   - platform: wifi_signal
     name: wifi signal
