@@ -21,7 +21,7 @@ esphome:
     board_build.flash_mode: dio
     board_build.f_cpu: 80000000L
 
-  project: 
+  project:
     name: Screek.Human Presence Sensor
     version: 1U
   min_version: 2025.5.1
@@ -58,7 +58,7 @@ ota:
   - platform: esphome
     password: !secret ota_pass
 
-i2c: 
+i2c:
   - id: i2c_0 #aht10 master
     sda: GPIO23
     scl: # GPIO5
@@ -75,7 +75,7 @@ web_server:
 
 binary_sensor:
 # Master HLK
-  - platform: ld2410 
+  - platform: ld2410
     ld2410_id: ld2410_0
     has_target:
       name: $hlk0 Presence
@@ -84,7 +84,7 @@ binary_sensor:
     has_still_target:
       name: $hlk0 Still Target
 # Entry HLK
-  - platform: ld2410 
+  - platform: ld2410
     ld2410_id: ld2410_1
     has_target:
       name: $hlk1 Presence
@@ -170,7 +170,7 @@ sensor:
 light:
   - platform: status_led
     name: sys_status
-    pin: 
+    pin:
       number: GPIO2
       ignore_strapping_warning: true
     internal: True
@@ -231,7 +231,7 @@ button:
     entity_category: "config"
     on_press:
       lambda: |-
-        // auto* radar = LD2410Component::get(ld2410); 
+        // auto* radar = LD2410Component::get(ld2410);
         // radar -> roboot();
         id(ld2410_0) -> reboot();
 
@@ -258,7 +258,7 @@ button:
     entity_category: "config"
     on_press:
       lambda: |-
-        // auto* radar = LD2410Component::get(ld2410); 
+        // auto* radar = LD2410Component::get(ld2410);
         // radar -> roboot();
         id(ld2410_1) -> reboot();
 
