@@ -30,7 +30,7 @@ cards:
         entities:
           - entity: sensor.aio_human_sensor_rssi
             name: Master room Sensors
-          - entity: sensor.sr_radar_wifi_signal
+          - entity: sensor.sr_radar_rssi
             name: Shion Room Sensors
           - entity: sensor.entry_human_sensor_rssi
             name: Entry Human
@@ -135,7 +135,7 @@ cards:
           - type: divider
           - entity: binary_sensor.lr_radar_status
             name: Livingroom
-          - entity: binary_sensor.sr_radar_status
+          - entity: binary_sensor.sr_radar_online
             name: Shion Room
           - entity: binary_sensor.bt_proxy_computer_online
             name: Computer Room
