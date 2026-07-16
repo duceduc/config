@@ -18,7 +18,7 @@ external_components:
       ref: main
 #      url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
 #      ref: master      
-    components: [ ld2410]
+    components: [ ld2410 ]
 
 packages:
   aht10: !include components/aht10.yaml
