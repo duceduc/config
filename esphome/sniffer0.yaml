@@ -97,9 +97,7 @@ spi:
 display:
   - platform: mipi_spi
     model: t-display
-    backlight_pin:
-      number: GPIO4
-      allow_other_uses: true
+
     cs_pin: #GPIO5
       number: GPIO5
       ignore_strapping_warning: true
