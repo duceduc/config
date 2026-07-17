@@ -1,13 +1,13 @@
 
 binary_sensor:
   - platform: status
-    name: status
+    name: Online
     id: system_status # sniffer only uses this
 
 sensor:
   - platform: wifi_signal
-    name: wifi signal
-    update_interval: 15s
+    name: RSSI
+    update_interval: 5s
     accuracy_decimals: 1
     filters:
       - sliding_window_moving_average:
