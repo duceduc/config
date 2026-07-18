@@ -250,7 +250,7 @@ class FunctionDecoratorManager(DecoratorManager):
 
         def on_func_var_deleted():
             if self.status is DecoratorManagerStatus.RUNNING:
-                self.hass.async_create_task(self.stop())
+                self.hass.async_create_task(self.safe_await(self.stop()))
 
         weakref.finalize(eval_func_var, on_func_var_deleted)
 
@@ -261,9 +261,8 @@ class FunctionDecoratorManager(DecoratorManager):
         for handler_dec in handlers:
             if await handler_dec.handle_call(data) is False:
                 self.logger.debug("Calling canceled by %s", handler_dec)
-                # notify handlers with "None"
                 for result_handler_dec in result_handlers:
-                    await result_handler_dec.handle_call_result(data, None)
+                    await self.safe_await(result_handler_dec.handle_call_canceled(data))
                 return
         # Fire an event indicating that pyscript is running
         # Note: the event must have an entity_id for logbook to work correctly.
@@ -277,10 +276,14 @@ class FunctionDecoratorManager(DecoratorManager):
 
         try:
             result = await data.call_ast_ctx.call_func(self.eval_func, None, **data.func_args)
-            for result_handler_dec in result_handlers:
-                await result_handler_dec.handle_call_result(data, result)
         except Exception as e:
+            for result_handler_dec in result_handlers:
+                await self.safe_await(result_handler_dec.handle_call_exception(data, e))
             await self.handle_exception(e)
+            return
+
+        for result_handler_dec in result_handlers:
+            await self.safe_await(result_handler_dec.handle_call_result(data, result))
 
     async def dispatch(self, data: DispatchData) -> None:
         """Handle a trigger dispatch: run guards, create a context, and invoke the function."""
@@ -290,6 +293,8 @@ class FunctionDecoratorManager(DecoratorManager):
         for dec in decorators:
             if await dec.handle_dispatch(data) is False:
                 self.logger.debug("Trigger not active due to %s", dec)
+                for result_handler_dec in self.get_decorators(CallResultHandlerDecorator):
+                    await self.safe_await(result_handler_dec.handle_call_canceled(data))
                 return
 
         action_ast_ctx = AstEval(
