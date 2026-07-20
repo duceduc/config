@@ -1,6 +1,6 @@
 # This is a custom firmware for Human Presence Sensor 1U
 # https://screek.io/1u
-
+# MAC: 80:65:99:FA:BA:6E
 substitutions:
   name: mr-human-sensor
 
