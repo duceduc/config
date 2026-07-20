@@ -1,6 +1,6 @@
 # This is a custom firmware for Human Presence Sensor 1U
 # https://screek.io/1u
-
+# MAC: C8:2E:18:8C:1D:60
 substitutions:
   name: entry-human-sensor
   hlk0: Hallway
