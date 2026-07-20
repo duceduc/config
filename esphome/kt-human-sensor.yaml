@@ -1,4 +1,4 @@
-
+# MAC: C4:5B:BE:70:E0:FF
 substitutions:
   name: kt-human-sensor
   temp_offset: '1.5'
