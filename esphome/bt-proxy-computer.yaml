@@ -1,4 +1,4 @@
-
+#MAC: C4:DD:57:EB:1F:D0
 substitutions:
   name: bt-proxy-computer
   temp_offset: '-5'
