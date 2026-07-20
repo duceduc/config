@@ -1,5 +1,4 @@
-#  [ ]
-
+# MAC: 58:8C:81:A3:60:18
 substitutions:
   name: master-airfreshener
   temp_offset: ".8"
