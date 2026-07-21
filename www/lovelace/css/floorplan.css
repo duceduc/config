@@ -82,8 +82,12 @@ g#entities .st0 {
 }
 
 @keyframes tv-glare {
-	
-	
+    0% {
+      box-shadow: 0 0 10px rgba(0, 191, 255, 0.4), inset 0 0 10px rgba(0, 191, 255, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 30px rgba(0, 191, 255, 0.8), inset 0 0 20px rgba(0, 191, 255, 0.4);
+    }	
 }
 
 
@@ -151,8 +155,9 @@ g#entities #binary_sensor\.washer_water_leak {
 
 
 g#entities .power-on {
-    stroke: #FF10F0;
-    stroke-dasharray: 6;
+	stroke: #FF10F0;
+	stroke-dasharray: 6;	
+	animation: tv-glare 3s infinite alternate;
 }
 
 
