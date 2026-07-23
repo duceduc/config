@@ -42,3 +42,35 @@
           {%- else -%}
             Unknown
           {%- endif %}
+          
+          
+          
+#      - name: airtag_shion1
+#        unique_id: airtag_shion1
+#        icon: mdi:account
+#        state: >
+#          {% set home = "Namiki 3-Chome" %} 
+#          {% if ":" in states('input_text.airtag').split('Shion1')[1].split('•')[0] %} 
+#          {{ states('input_text.airtag').split('Shion')[1].split('•')[0].split(',')[0] }}
+#          {% elif home in states('input_text.airtag').split('Shion1')[1].split('•')[0] %}Home
+#          {% else %}
+#          {{ states('sensor.airtag_shion1_geo') }}
+#          {% endif %}
+#        attributes:
+#          latitude: >
+#            {% if ":" in states('input_text.airtag').split('Shion1')[1].split('•')[0] %}null
+#            {% else %}{{ state_attr('sensor.airtag_shion1_geo','lat') }}
+#            {% endif %}
+#          longitude: >
+#            {% if ":" in states('input_text.airtag').split('Shion1')[1].split('•')[0] %}null
+#            {% else %}{{ state_attr('sensor.airtag_shion1_geo','lon') }}
+#            {% endif %}
+#          last_update: "{{ as_timestamp(states.input_text.airtag.last_updated)|timestamp_custom ('%m/%d/%Y %H:%Mh') }}"
+#          status: >
+#            {% if ":" in states('input_text.airtag').split('Shion1')[1].split('•')[0] %}unavailable
+#            {% else %}available
+#            {% endif %}
+
+
+
+        

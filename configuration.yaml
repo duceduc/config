@@ -168,10 +168,10 @@ input_text:
     initial: !secret slack_app_verification_token
     mode: password
 
-#  pihole_app_token:
-#    initial: !secret pihole_app_token
-#    mode: password
-
+  airtag:
+    name: Airtag
+    min: 0
+    max: 255
 
   room_presence:
     name: Room Presence

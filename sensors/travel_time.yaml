@@ -1,8 +1,73 @@
 ####################################################
 #                                                                                                    
-#                      Waze Travel Time                                                       
+#                      FindMy                                                       
 #                                                                                                    
 ####################################################
+
+
+
+#  - platform: rest
+#    name: airtag_shion1_geo
+#    value_template: "{{ value_json.results[0].formatted }}"
+#    json_attributes_path: "$.results[0]"
+#    json_attributes:
+#      - lat
+#      - lon
+#    verify_ssl: true
+#    scan_interval: 900 # every 15 min
+#    force_update: true
+#    resource_template: >
+#      {% set address = states('input_text.airtag').split('Shion1')[1].split('•')[0] %}
+#      {% if address == "Home" %}
+#        {% set home = "Namiki 3-Chome, Kawaguchi" %}
+#        {{
+#          "https://api.geoapify.com/v1/geocode/search?text="
+#          + home | urlencode
+#          + "&apiKey=73828a2de3f74def9e7dd80f63df3ba6&format=json"
+#        }}
+#      {% else %}
+#        {% set fix = address + "Kawaguchi, Japan" %}
+#        {{
+#          "https://api.geoapify.com/v1/geocode/search?text="
+#          + fix | urlencode
+#          + "&apiKey=73828a2de3f74def9e7dd80f63df3ba6&format=json"
+#        }}
+#      {% endif %}
+
+
+# DEPRECATED
+#- platform: template
+#  sensors:
+#    airtag_shion:
+#      friendly_name: "Shion"
+#      value_template: >
+#        {% set home = "Namiki 3-Chome" %} 
+#        {% if ":" in states('input_text.airtag').split('ITEM_FINDMY_NAME')[1].split('•')[0] %} 
+#        {{ states('input_text.airtag').split('ITEM_FINDMY_NAME')[1].split('•')[0].split(',')[0] }}
+#        {% elif home in states('input_text.airtag').split('ITEM_FINDMY_NAME')[1].split('•')[0] %}Home
+#        {% else %}
+#        {{ states('sensor.airtag_shion_geo') }}
+#        {% endif %}
+#      attribute_templates:
+#        latitude: >
+#          {% if ":" in states('input_text.airtag').split('ITEM_FINDMY_NAME')[1].split('•')[0] %}null
+#          {% else %}{{ state_attr('sensor.airtag_shion_geo','lat') }}
+#          {% endif %}
+#        longitude: >
+#          {% if ":" in states('input_text.airtag').split('ITEM_FINDMY_NAME')[1].split('•')[0] %}null
+#          {% else %}{{ state_attr('sensor.airtag_shion_geo','lon') }}
+#          {% endif %}
+#        status: >
+#          {% if ":" in states('input_text.airtag').split('ITEM_FINDMY_NAME')[1].split('•')[0] %}unavailable
+#          {% else %}available
+#          {% endif %}
+#        last_update: "{{ as_timestamp(states.input_text.airtag.last_updated)|timestamp_custom ('%d/%m/%Y %H:%Mh') }}"
+#      icon_template: mdi:bag-personal
+
+
+
+
+
 
 
 ####################################################

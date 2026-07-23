@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#            Number of People Home                                                         
-#                                                                                                    
+#
+#            Number of People Home
+#
 ####################################################
 
 
@@ -14,7 +14,7 @@
          {% if is_state("sensor.n_people_home", "0") %} mdi:account-off
          {% elif is_state("sensor.n_people_home", "1") %} mdi:account
          {% elif is_state("sensor.n_people_home", "2") %} mdi:account-multiple
-         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group         
+         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group
          {% else %} mdi:account-plus {% endif %}
 
       - name: Guest Mode
@@ -29,11 +29,13 @@
           {% if person in ['iida','tobu','matsumoto'] %}
             grocery store
           {% elif person in ['ario','aeon','lalaport'] %}
-            mall            
+            mall
           {% elif person in ['mcdonalds','kfc','mos'] %}
             lunch takeout
           {% elif person in ['parents','yuri'] %}
             relatives
+          {% elif person in ['ueno park','yoyogi park'] %}
+            recreation
           {% else %}
             {% if person in ['not_home'] %}
               away
@@ -48,11 +50,13 @@
           {% if person in ['iida','tobu','matsumoto'] %}
             grocery store
           {% elif person in ['ario','aeon','lalaport'] %}
-            mall            
+            mall
           {% elif person in ['mcdonalds','kfc','mos'] %}
             lunch takeout
           {% elif person in ['parents','yuri'] %}
             relatives
+          {% elif person in ['ueno park','yoyogi park'] %}
+            recreation
           {% else %}
             {% if person in ['not_home'] %}
               away
@@ -67,11 +71,13 @@
           {% if person in ['iida','tobu','matsumoto'] %}
             grocery store
           {% elif person in ['ario','aeon','lalaport'] %}
-            mall            
+            mall
           {% elif person in ['mcdonalds','kfc','mos'] %}
             lunch takeout
           {% elif person in ['parents','yuri'] %}
             relatives
+          {% elif person in ['ueno park','yoyogi park'] %}
+            recreation            
           {% else %}
             {% if person in ['not_home'] %}
               away
@@ -117,7 +123,7 @@
 
       - name: sr occupancy lights
         state: >
-          {% if is_state('binary_sensor.sr_still_target', 'on') or 
+          {% if is_state('binary_sensor.sr_still_target', 'on') or
                    is_state('binary_sensor.sr_has_still_target', 'on') and
                    is_state('input_boolean.shionroom_mcl', 'off') %} on
           {% elif is_state('input_boolean.shionroom_mcl', 'on') %} on
@@ -131,7 +137,7 @@
           {% set w = states('sensor.date_weekday') %}
           {% set h = states('calendar.holidays_in_japan') %}
           {% set end = '19:59:00' %}
-          {% if w == 'on' and h == 'off' %} 
+          {% if w == 'on' and h == 'off' %}
             {{ '06:59:00' < states('sensor.time') < end }}
           {% else %}
             {{ '09:29:00' < states('sensor.time') < end }}
@@ -139,7 +145,7 @@
 
 
 ####################################################
-#                                                                                                    
-#            END OF CONFIGURATION FILE                                                 
-#                                                                                                    
+#
+#            END OF CONFIGURATION FILE
+#
 ####################################################

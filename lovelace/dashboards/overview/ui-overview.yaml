@@ -409,11 +409,16 @@ streamline_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-6)
+
         - value: "relatives"
           styles:
             entity_picture:
               - border: 2px solid var(--severity-7)
 
+        - value: "recreation"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-4)
 
 ####################################################
 #
