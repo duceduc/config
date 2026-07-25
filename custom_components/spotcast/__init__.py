@@ -1,423 +1,232 @@
-"""main module for spotcast homeassistant utility"""
+"""Spotcast Integration - Chromecast to Spotify integrator
 
-from __future__ import annotations
+Functions:
+    - async_setup_entry
+    - async_update_options
 
-__version__ = "4.0.1"
+Constants:
+    - PLATFORMS(list): List of platforms implemented in this
+        integration
+    - DOMAIN(str): name of the domain of the integration
+"""
 
-import collections
-import logging
-import time
+from datetime import timedelta
+from logging import getLogger
 
-import homeassistant.core as ha_core
-from homeassistant.components import websocket_api
-from homeassistant.const import CONF_ENTITY_ID, CONF_OFFSET, CONF_REPEAT
-from homeassistant.core import callback
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.const import Platform
+from homeassistant.helpers.device_registry import DeviceEntry
 
-from .const import (
-    CONF_ACCOUNTS,
-    CONF_DEVICE_NAME,
-    CONF_FORCE_PLAYBACK,
-    CONF_IGNORE_FULLY_PLAYED,
-    CONF_RANDOM,
-    CONF_SHUFFLE,
-    CONF_SP_DC,
-    CONF_SP_KEY,
-    CONF_SPOTIFY_ACCOUNT,
-    CONF_SPOTIFY_ALBUM_NAME,
-    CONF_SPOTIFY_ARTIST_NAME,
-    CONF_SPOTIFY_AUDIOBOOK_NAME,
-    CONF_SPOTIFY_CATEGORY,
-    CONF_SPOTIFY_COUNTRY,
-    CONF_SPOTIFY_DEVICE_ID,
-    CONF_SPOTIFY_EPISODE_NAME,
-    CONF_SPOTIFY_GENRE_NAME,
-    CONF_SPOTIFY_LIMIT,
-    CONF_SPOTIFY_PLAYLIST_NAME,
-    CONF_SPOTIFY_SHOW_NAME,
-    CONF_SPOTIFY_TRACK_NAME,
-    CONF_SPOTIFY_URI,
-    CONF_START_VOL,
-    DOMAIN,
-    SCHEMA_PLAYLISTS,
-    SCHEMA_WS_ACCOUNTS,
-    SCHEMA_WS_CASTDEVICES,
-    SCHEMA_WS_DEVICES,
-    SCHEMA_WS_PLAYER,
-    CONF_START_POSITION,
-    SERVICE_START_COMMAND_SCHEMA,
-    SPOTCAST_CONFIG_SCHEMA,
-    WS_TYPE_SPOTCAST_ACCOUNTS,
-    WS_TYPE_SPOTCAST_CASTDEVICES,
-    WS_TYPE_SPOTCAST_DEVICES,
-    WS_TYPE_SPOTCAST_PLAYER,
-    WS_TYPE_SPOTCAST_PLAYLISTS,
-)
-from .helpers import (
-    add_tracks_to_queue,
-    async_wrap,
-    get_cast_devices,
-    get_random_playlist_from_category,
-    get_search_results,
-    get_spotify_devices,
-    get_spotify_install_status,
-    get_spotify_media_player,
-    is_empty_str,
-    is_valid_uri,
-    url_to_spotify_uri,
-)
-from .spotcast_controller import SpotcastController
+from .const import DOMAIN
+from .services import ServiceHandler
+from .services.const import SERVICE_SCHEMAS
+from .sessions.exceptions import TokenRefreshError, InternalServerError
+from .utils import ensure_default_data
+from .websocket import async_setup_websocket
+from .config_flow import DEFAULT_OPTIONS
+from .spotify import SpotifyAccount
+from .coordinator import SpotcastCoordinator
 
-CONFIG_SCHEMA = SPOTCAST_CONFIG_SCHEMA
-DEBUG = True
-
-_LOGGER = logging.getLogger(__name__)
+__version__ = "6.5.4"
 
 
-def setup(hass: ha_core.HomeAssistant, config: collections.OrderedDict) -> bool:
-    """setup method for integration with Home Assistant
+LOGGER = getLogger(__name__)
+PLATFORMS = [
+    Platform.SENSOR,
+    Platform.BINARY_SENSOR,
+    Platform.MEDIA_PLAYER,
+]
 
-    Args:
-        hass (ha_core.HomeAssistant): the HomeAssistant object of the
-            server
-        config (collections.OrderedDict): the configuration of the
-            server
+
+def get_missing_scopes(entry: ConfigEntry) -> set[str]:
+    """Returns the required OAuth scopes missing from the entry's
+    public token. OAuth scopes are frozen at consent time, so a scope
+    added in a newer release is absent from tokens authorized before
+    it and the account must reauthenticate to grant it.
+    """
+    token = entry.data.get("external_api", {}).get("token", {})
+    granted = token.get("scope")
+
+    if not granted:
+        # No scope information available. Assume valid rather than
+        # locking the account out.
+        return set()
+
+    granted_scopes = set(granted.replace(",", " ").split())
+    return set(SpotifyAccount.SCOPE) - granted_scopes
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Initial setup of spotcast.
 
     Returns:
-        bool: returns a bollean based on if the setup wroked or not
+        bool: returns `True` if the integration setup was successfull
     """
+    # ensure default options
+    updated_options = DEFAULT_OPTIONS | entry.options
 
-    # get spotify core integration status
-    # if return false, could indicate a bad spotify integration. Race
-    # condition doesn't permit us to abort setup, see #258
-    if not get_spotify_install_status(hass):
-        _LOGGER.debug(
-            "Spotify integration was not found, please verify integration is "
-            "functionnal. Could result in python error..."
+    if updated_options != entry.options:
+        hass.config_entries.async_update_entry(entry, options=updated_options)
+
+    missing_scopes = get_missing_scopes(entry)
+
+    if missing_scopes:
+        raise ConfigEntryAuthFailed(
+            "The Spotify authorization is missing the required scopes "
+            f"`{', '.join(sorted(missing_scopes))}`. Reauthenticate the "
+            "account to grant the new permissions."
         )
 
-    # Setup the Spotcast service.
-    conf = config[DOMAIN]
+    try:
+        account = await SpotifyAccount.async_from_config_entry(
+            hass=hass,
+            entry=entry,
+        )
 
-    sp_dc = conf[CONF_SP_DC]
-    sp_key = conf[CONF_SP_KEY]
-    accounts = conf.get(CONF_ACCOUNTS)
+        LOGGER.info(
+            "Loaded spotify account `%s`. Set as default: %s",
+            account.id,
+            account.is_default,
+        )
 
-    spotcast_controller = SpotcastController(hass, sp_dc, sp_key, accounts)
+        await account.async_ensure_tokens_valid()
 
-    if DOMAIN not in hass.data:
-        hass.data[DOMAIN] = {}
-    hass.data[DOMAIN]["controller"] = spotcast_controller
+    except TokenRefreshError as exc:
+        raise ConfigEntryAuthFailed() from exc
+    except InternalServerError as exc:
+        raise ConfigEntryNotReady(f"{exc.code} - {exc.message}") from exc
 
-    @callback
-    def websocket_handle_playlists(
-            hass: ha_core.HomeAssistant,
-            connection,
-            msg: str
-    ):
-        @async_wrap
-        def get_playlist():
-            """Handle to get playlist"""
-            playlist_type = msg.get("playlist_type")
-            country_code = msg.get("country_code")
-            locale = msg.get("locale", "en")
-            limit = msg.get("limit", 10)
-            account = msg.get("account", None)
+    coordinator = SpotcastCoordinator(hass, entry, account)
+    await coordinator.async_config_entry_first_refresh()
 
-            _LOGGER.debug("websocket_handle_playlists msg: %s", msg)
-            resp = spotcast_controller.get_playlists(
-                account, playlist_type, country_code, locale, limit
-            )
-            connection.send_message(
-                websocket_api.result_message(msg["id"], resp))
+    ensure_default_data(hass, entry.entry_id)
+    hass.data[DOMAIN][entry.entry_id]["coordinator"] = coordinator
 
-        hass.async_add_job(get_playlist())
+    entry.async_on_unload(entry.add_update_listener(async_update_options))
 
-    @callback
-    def websocket_handle_devices(
-            hass: ha_core.HomeAssistant,
-            connection,
-            msg: str,
-    ):
-        @async_wrap
-        def get_devices():
-            """Handle to get devices. Only for default account"""
-            account = msg.get("account", None)
-            client = spotcast_controller.get_spotify_client(account)
-            me_resp = client._get("me")  # pylint: disable=W0212
-            spotify_media_player = get_spotify_media_player(
-                hass, me_resp["id"])
-            resp = get_spotify_devices(spotify_media_player, hass)
-            connection.send_message(
-                websocket_api.result_message(msg["id"], resp))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-        hass.async_add_job(get_devices())
+    service_handler = ServiceHandler(hass)
 
-    @callback
-    def websocket_handle_player(
-            hass: ha_core.HomeAssistant,
-            connection,
-            msg: str,
-    ):
-        @async_wrap
-        def get_player():
-            """Handle to get player"""
-            account = msg.get("account", None)
-            _LOGGER.debug("websocket_handle_player msg: %s", msg)
-            client = spotcast_controller.get_spotify_client(account)
-            resp = client._get("me/player")  # pylint: disable=W0212
-            connection.send_message(
-                websocket_api.result_message(msg["id"], resp))
+    for service, schema in SERVICE_SCHEMAS.items():
+        LOGGER.debug("Registering service %s.%s", DOMAIN, service)
 
-        hass.async_add_job(get_player())
+        hass.services.async_register(
+            domain=DOMAIN,
+            service=service,
+            service_func=service_handler.async_relay_service_call,
+            schema=schema,
+        )
 
-    @callback
-    def websocket_handle_accounts(
-            hass: ha_core.HomeAssistant,
-            connection,
-            msg: str,
-    ):
-        """Handle to get accounts"""
-        _LOGGER.debug("websocket_handle_accounts msg: %s", msg)
-        resp = list(accounts.keys()) if accounts is not None else []
-        resp.append("default")
-        connection.send_message(websocket_api.result_message(msg["id"], resp))
+    await async_setup_websocket(hass)
 
-    @callback
-    def websocket_handle_castdevices(
-            hass: ha_core.HomeAssistant,
-            connection, msg: str
-    ):
-        """Handle to get cast devices for debug purposes"""
-        _LOGGER.debug("websocket_handle_castdevices msg: %s", msg)
+    return True
 
-        known_devices = get_cast_devices(hass)
-        _LOGGER.debug("%s", known_devices)
-        resp = [
-            {
-                "uuid": str(cast_info.cast_info.uuid),
-                "model_name": cast_info.cast_info.model_name,
-                "friendly_name": cast_info.cast_info.friendly_name,
-            }
-            for cast_info in known_devices
-        ]
 
-        connection.send_message(websocket_api.result_message(msg["id"], resp))
+async def async_update_options(hass: HomeAssistant, entry: ConfigEntry):
+    """Applies a config entry update to the loaded account and
+    coordinator.
 
-    def start_casting(call: ha_core.ServiceCall):
-        """service called."""
-        uri = call.data.get(CONF_SPOTIFY_URI)
-        category = call.data.get(CONF_SPOTIFY_CATEGORY)
-        country = call.data.get(CONF_SPOTIFY_COUNTRY)
-        limit = call.data.get(CONF_SPOTIFY_LIMIT)
-        artistName = call.data.get(CONF_SPOTIFY_ARTIST_NAME)
-        albumName = call.data.get(CONF_SPOTIFY_ALBUM_NAME)
-        playlistName = call.data.get(CONF_SPOTIFY_PLAYLIST_NAME)
-        trackName = call.data.get(CONF_SPOTIFY_TRACK_NAME)
-        showName = call.data.get(CONF_SPOTIFY_SHOW_NAME)
-        episodeName = call.data.get(CONF_SPOTIFY_EPISODE_NAME)
-        audiobookName = call.data.get(CONF_SPOTIFY_AUDIOBOOK_NAME)
-        genreName = call.data.get(CONF_SPOTIFY_GENRE_NAME)
-        random_song = call.data.get(CONF_RANDOM, False)
-        repeat = call.data.get(CONF_REPEAT, False)
-        shuffle = call.data.get(CONF_SHUFFLE, False)
-        start_volume = call.data.get(CONF_START_VOL)
-        spotify_device_id = call.data.get(CONF_SPOTIFY_DEVICE_ID)
-        position = call.data.get(CONF_OFFSET)
-        start_position = call.data.get(CONF_START_POSITION)
-        force_playback = call.data.get(CONF_FORCE_PLAYBACK)
-        account = call.data.get(CONF_SPOTIFY_ACCOUNT)
-        ignore_fully_played = call.data.get(CONF_IGNORE_FULLY_PLAYED)
-        device_name = call.data.get(CONF_DEVICE_NAME)
-        entity_id = call.data.get(CONF_ENTITY_ID)
+    Registered as the entry update listener. Keeps the account
+    options and the coordinator update interval in sync with the
+    entry options without requiring a reload.
 
-        try:  # yes this is ugly, quick fix while working on V4
+    Args:
+        hass(HomeAssistant): The Home Assistant Instance
+        entry(ConfigEntry): The config entry that was updated
+    """
+    entry_data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
 
-            # if no market information try to get global setting
-            if is_empty_str(country):
-                try:
-                    country = config[DOMAIN][CONF_SPOTIFY_COUNTRY]
-                except KeyError:
-                    country = None
+    if entry_data is None:
+        return
 
-            client = spotcast_controller.get_spotify_client(account)
+    account = entry_data.get("account")
+    coordinator = entry_data.get("coordinator")
 
-            # verify the uri provided and clean-up if required
-            if not is_empty_str(uri):
+    options = DEFAULT_OPTIONS | entry.options
+    refresh_rate = options["base_refresh_rate"]
 
-                # remove ? from badly formatted URI
-                uri = uri.split("?")[0]
+    if account is not None:
+        account.is_default = options["is_default"]
+        account.base_refresh_rate = refresh_rate
 
-                if uri.startswith("http"):
-                    try:
-                        u = url_to_spotify_uri(uri)
-                        _LOGGER.debug(
-                            "converted web URL %s to spotify URI %s", uri, u)
-                        uri = u
-                    except ValueError:
-                        _LOGGER.error(
-                            "invalid web URL provided, could not convert to spotify URI: %s", uri)
+    device_manager = entry_data.get("device_manager")
 
-                if not is_valid_uri(uri):
-                    _LOGGER.error("Invalid URI provided, aborting casting")
-                    return
+    if device_manager is not None:
+        device_manager.apply_device_options(options)
 
-                # force first two elements of uri to lowercase
-                uri = uri.split(":")
-                uri[0] = uri[0].lower()
-                uri[1] = uri[1].lower()
-                uri = ":".join(uri)
+    if coordinator is None:
+        return
 
-            # first, rely on spotify id given in config otherwise get one
-            if not spotify_device_id:
-                spotify_device_id = spotcast_controller.get_spotify_device_id(
-                    account, spotify_device_id, device_name, entity_id
-                )
+    new_interval = timedelta(seconds=refresh_rate)
 
-            if start_position is not None:
-                start_position *= 1000
+    if coordinator.update_interval != new_interval:
+        LOGGER.info(
+            "Setting spotcast entry `%s` to a base refresh rate of %d",
+            entry.entry_id,
+            refresh_rate,
+        )
+        coordinator.update_interval = new_interval
+        await coordinator.async_request_refresh()
+        return
 
-            if (
-                is_empty_str(uri)
-                and len(
-                    list(
-                        filter(
-                            lambda x: not is_empty_str(x),
-                            [
-                                artistName,
-                                playlistName,
-                                trackName,
-                                showName,
-                                episodeName,
-                                audiobookName,
-                                genreName,
-                                category,
-                            ],
-                        )
-                    )
-                )
-                == 0
-            ):
-                _LOGGER.debug("Transfering playback")
-                current_playback = client.current_playback()
-                if current_playback is not None:
-                    _LOGGER.debug("Current_playback from spotify: %s",
-                                  current_playback)
-                    force_playback = True
-                _LOGGER.debug("Force playback: %s", force_playback)
-                client.transfer_playback(
-                    device_id=spotify_device_id, force_play=force_playback
-                )
-            elif not is_empty_str(category):
-                uri = get_random_playlist_from_category(
-                    client, category, country, limit)
+    coordinator.async_update_listeners()
 
-                if uri is None:
-                    _LOGGER.error("No playlist returned. Stop service call")
-                    return None
 
-                spotcast_controller.play(
-                    client,
-                    spotify_device_id,
-                    uri,
-                    random_song,
-                    position,
-                    ignore_fully_played,
-                    start_position,
-                )
-            else:
-                searchResults = []
-                if is_empty_str(uri):
-                    # get uri from search request
-                    searchResults = get_search_results(
-                        spotify_client=client,
-                        limit=limit,
-                        artistName=artistName,
-                        country=country,
-                        albumName=albumName,
-                        playlistName=playlistName,
-                        trackName=trackName,
-                        showName=showName,
-                        episodeName=episodeName,
-                        audiobookName=audiobookName,
-                        genreName=genreName,
-                    )
-                    # play the first track
-                    if len(searchResults) > 0:
-                        uri = searchResults[0]["uri"]
+async def async_remove_config_entry_device(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    device_entry: DeviceEntry,
+) -> bool:
+    """Allows removing a device from the UI unless Spotify currently
+    reports it as an available Spotify Connect device."""
+    entry_data = hass.data.get(DOMAIN, {}).get(entry.entry_id) or {}
+    account = entry_data.get("account")
 
-                spotcast_controller.play(
-                    client,
-                    spotify_device_id,
-                    uri,
-                    random_song,
-                    position,
-                    ignore_fully_played,
-                    start_position,
-                )
+    if account is None:
+        return True
 
-                if len(searchResults) > 1:
-                    add_tracks_to_queue(client, searchResults[1:])
-
-            if start_volume <= 100:
-                _LOGGER.debug("Setting volume to %d", start_volume)
-                time.sleep(2)
-                client.volume(volume_percent=start_volume,
-                              device_id=spotify_device_id)
-            if shuffle:
-                _LOGGER.debug("Turning shuffle on")
-                time.sleep(3)
-                client.shuffle(state=shuffle, device_id=spotify_device_id)
-            if repeat:
-                _LOGGER.debug("Turning repeat on")
-                time.sleep(3)
-                client.repeat(state=repeat, device_id=spotify_device_id)
-
-        except Exception as exc:
-            if DEBUG:
-                raise exc
-
-            raise HomeAssistantError(exc) from exc
-
-    # Register websocket and service
-    websocket_api.async_register_command(
-        hass=hass,
-        command_or_handler=WS_TYPE_SPOTCAST_PLAYLISTS,
-        handler=websocket_handle_playlists,
-        schema=SCHEMA_PLAYLISTS,
-    )
-    websocket_api.async_register_command(
-        hass=hass,
-        command_or_handler=WS_TYPE_SPOTCAST_DEVICES,
-        handler=websocket_handle_devices,
-        schema=SCHEMA_WS_DEVICES,
-    )
-    websocket_api.async_register_command(
-        hass=hass,
-        command_or_handler=WS_TYPE_SPOTCAST_PLAYER,
-        handler=websocket_handle_player,
-        schema=SCHEMA_WS_PLAYER,
+    # Device registry entries are keyed on the stable identity key
+    # (name + account). Older entries may still be keyed on the raw
+    # Spotify device id, so accept both for the active check.
+    # local import avoids a circular import with the media_player package
+    from .media_player import (  # pylint: disable=import-outside-toplevel
+        SpotifyDevice,
     )
 
-    websocket_api.async_register_command(
-        hass=hass,
-        command_or_handler=WS_TYPE_SPOTCAST_ACCOUNTS,
-        handler=websocket_handle_accounts,
-        schema=SCHEMA_WS_ACCOUNTS,
+    active = {device["id"] for device in account.devices}
+    active |= {
+        SpotifyDevice.compute_identity_key(device["name"], account.id)
+        for device in account.devices
+    }
+
+    return not any(
+        identifier in active
+        for domain, identifier in device_entry.identifiers
+        if domain == DOMAIN
     )
 
-    websocket_api.async_register_command(
-        hass=hass,
-        command_or_handler=WS_TYPE_SPOTCAST_CASTDEVICES,
-        handler=websocket_handle_castdevices,
-        schema=SCHEMA_WS_CASTDEVICES,
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unloads the Spotcast config entry."""
+    LOGGER.info("Unloading Spotcast entry `%s`", entry.entry_id)
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        entry,
+        PLATFORMS,
     )
 
-    hass.services.register(
-        domain=DOMAIN,
-        service="start",
-        service_func=start_casting,
-        schema=SERVICE_START_COMMAND_SCHEMA,
-    )
+    if not unload_ok:
+        return False
+
+    hass.data[DOMAIN].pop(entry.entry_id, None)
+
+    # check if no entry remaining
+    if len(hass.data[DOMAIN]) == 0:
+        LOGGER.info("Last Spotcast Entry removed. Unloading services")
+
+        for service in SERVICE_SCHEMAS:
+            hass.services.async_remove(DOMAIN, service)
 
     return True

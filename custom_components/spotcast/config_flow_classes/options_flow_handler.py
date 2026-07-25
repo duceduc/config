@@ -1,0 +1,176 @@
+"""Module containing the Option Flow Handler for Spotcast
+
+Classes:
+    - SpotcastOptionsFlowHandler
+"""
+
+from logging import getLogger
+from types import MappingProxyType
+
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
+from homeassistant.config_entries import (
+    OptionsFlow,
+    ConfigFlowResult,
+)
+import voluptuous as vol
+
+from custom_components.spotcast import DOMAIN
+from custom_components.spotcast.utils import copy_to_dict
+
+LOGGER = getLogger(__name__)
+
+DEFAULT_OPTIONS = MappingProxyType({
+    "is_default": False,
+    "base_refresh_rate": 30,
+    "stale_device_timeout": 7,
+    "device_filter_mode": "deny",
+    "device_filter_patterns": "",
+})
+
+
+class SpotcastOptionsFlowHandler(OptionsFlow):
+    """Handles option configuration via the Integration page"""
+
+    _options: dict = None
+
+    SCHEMAS = {
+        "init": vol.Schema(
+            {
+                vol.Required("set_default"): bool,
+                vol.Required("base_refresh_rate"): vol.All(
+                    cv.positive_int,
+                    vol.Range(min=5),
+                ),
+                vol.Required("stale_device_timeout"): cv.positive_int,
+                vol.Required("device_filter_mode"): SelectSelector(
+                    SelectSelectorConfig(
+                        options=["deny", "allow"],
+                        mode=SelectSelectorMode.DROPDOWN,
+                        translation_key="device_filter_mode",
+                    ),
+                ),
+                vol.Optional("device_filter_patterns", default=""): str,
+            }
+        )
+    }
+
+    async def async_step_init(
+        self,
+        _user_input: dict[str] | None = None,
+    ) -> ConfigFlowResult:
+        """Initial Step for the Option Configuration Flow"""
+
+        options = copy_to_dict(self.config_entry.options)
+
+        LOGGER.debug("Opening Config menu for `%s`", self.config_entry.title)
+
+        self._options = DEFAULT_OPTIONS | options
+
+        LOGGER.debug("Options set to `%s`", self._options)
+
+        return self.async_show_form(
+            step_id="apply_options",
+            data_schema=self.add_suggested_values_to_schema(
+                self.SCHEMAS["init"],
+                self._options,
+            ),
+            errors={},
+        )
+
+    def set_default_user(self) -> dict:
+        """Set the current user as default for spotcast.
+
+        The entry update listener applies the change to the loaded
+        accounts when the entries are updated.
+        """
+
+        entries = self.hass.config_entries.async_entries(DOMAIN)
+        old_default = None
+
+        for entry in entries:
+
+            is_default = entry.options["is_default"]
+            options = copy_to_dict(entry.options)
+            options["is_default"] = False
+
+            if is_default:
+                old_default = entry.title
+
+            self.hass.config_entries.async_update_entry(
+                entry,
+                options=options,
+            )
+
+        LOGGER.info(
+            "Switching Default Spotcast account from `%s` to `%s`",
+            old_default,
+            self.config_entry.title,
+        )
+
+        self._options["is_default"] = True
+
+    def set_base_refresh_rate(self, new_refresh_rate: int):
+        """Sets the base refresh rate for the account.
+
+        The entry update listener applies the change to the account
+        and its coordinator when the entry is updated.
+
+        Args:
+            - new_refresh_rate(int): the new refresh rate to set for
+                the account
+        """
+
+        if new_refresh_rate == self._options["base_refresh_rate"]:
+            LOGGER.debug("Same refresh rate. Skipping")
+            return
+
+        LOGGER.info(
+            "Setting spotcast entry `%s` to a base refresh rate of %d",
+            self.config_entry.title,
+            new_refresh_rate,
+        )
+
+        self._options["base_refresh_rate"] = new_refresh_rate
+
+    def set_device_options(self, user_input: dict):
+        """Sets the device lifecycle and filtering options.
+
+        The entry update listener applies the change to the device
+        manager when the entry is updated.
+
+        Args:
+            - user_input(dict): the options submitted in the flow
+        """
+        self._options["stale_device_timeout"] = (
+            user_input["stale_device_timeout"]
+        )
+        self._options["device_filter_mode"] = (
+            user_input["device_filter_mode"]
+        )
+        self._options["device_filter_patterns"] = (
+            user_input.get("device_filter_patterns", "")
+        )
+
+    async def async_step_apply_options(
+        self,
+        user_input: dict[str]
+    ) -> ConfigFlowResult:
+        """Step to apply the options configured"""
+
+        if user_input["set_default"]:
+            self.set_default_user()
+
+        self.set_base_refresh_rate(user_input["base_refresh_rate"])
+        self.set_device_options(user_input)
+
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            options=self._options,
+        )
+
+        return self.async_abort(reason="success")
