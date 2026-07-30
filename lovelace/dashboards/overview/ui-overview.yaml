@@ -420,6 +420,12 @@ streamline_templates:
             entity_picture:
               - border: 2px solid var(--severity-4)
 
+        - value: "government"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-8)
+
+
 ####################################################
 #
 #          END OF CONFIGURATION FILE
