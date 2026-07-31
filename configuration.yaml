@@ -139,9 +139,9 @@ rest:
 #
 #########################################################
 
-spotcast:  
-  sp_dc: !secret duc_sp_dc
-  sp_key: !secret duc_sp_key
+#spotcast:  
+#  sp_dc: !secret duc_sp_dc
+#  sp_key: !secret duc_sp_key
 #  country: US #optional, added in 3.6.24
 
 #media_player:

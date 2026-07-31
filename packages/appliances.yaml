@@ -101,6 +101,7 @@ mqtt:
       value_template: "{{ value_json['ENERGY'].Power }}"
       qos: 1
       unit_of_measurement: "W"
+      force_update: true ####  TESTING
       icon: mdi:gauge
 
     - name: "Gosund Washer Total Energy"
@@ -333,14 +334,26 @@ automation:
       - trigger: numeric_state
         entity_id: sensor.gosund_washer_power
         below: 7
-        for: 36
+        for: 32 # default 36
         id: 'done'
 
+# TESTING
       - trigger: template
-#        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
-        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 or states('sensor.gosund_washer_power')| int(0) == 6 }}"
-        for: 60 # use 60
+        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"      
+        for: 28
         id: 'filter'
+      - trigger: template
+        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
+        for: 28
+        id: 'filter'
+        
+#      - trigger: template
+##        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
+#        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 or states('sensor.gosund_washer_power')| int(0) == 6 }}"
+#        for: 63 # use 63
+#        id: 'filter'        
+        
+        
     conditions: []
     actions:
       - choose:
