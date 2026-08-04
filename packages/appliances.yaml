@@ -340,11 +340,11 @@ automation:
 # TESTING
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"      
-        for: 32
+        for: 34
         id: 'filter'
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
-        for: 32
+        for: 34
         id: 'filter'
 
 #      - trigger: template
