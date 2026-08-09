@@ -76,13 +76,15 @@ mqtt:
  binary_sensor: !include_dir_merge_list mqtt/binary_sensors/
  button: !include_dir_merge_list mqtt/buttons/
 
-# https://community.home-assistant.io/t/reverse-proxy-error/312936
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 192.168.1.180 #proxmox traefik
-    - 192.168.1.197 #proxmox nginx
-    - 172.0.0.0/24 # Docker network
+
+## https://community.home-assistant.io/t/reverse-proxy-error/312936
+# Moved to Settings → System → Network → Reverse Proxy
+#http:
+#  use_x_forwarded_for: true
+#  trusted_proxies:
+#    - 192.168.1.180 #proxmox traefik
+#    - 192.168.1.197 #proxmox nginx
+#    - 172.0.0.0/24 # Docker network
 
 
 #########################################################

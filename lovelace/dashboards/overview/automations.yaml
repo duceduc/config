@@ -252,11 +252,11 @@ cards:
         entities:
           - entity: automation.turn_on_appletv_netflix
             name: Turn On Apple TV - Netflix
-            icon: si:netflix
+            icon: simple-icons:netflix
             secondary_info: last-triggered
           - entity: automation.turn_on_appletv_plex
             name: Turn on Apple Tv - Plex
-            icon: si:plex
+            icon: simple-icons:plex
             secondary_info: last-triggered
 
 
@@ -314,15 +314,15 @@ cards:
             secondary_info: last-triggered
           - entity: automation.announce_who_is_arriving
             name: Announce Who is Arriving
-            icon: si:amazonalexa
+            icon: simple-icons:amazonalexa
             secondary_info: last-triggered
           - entity: automation.welcome_family_announcement
             name: Welcome Family Announcement
-            icon: si:amazonalexa
+            icon: simple-icons:amazonalexa
             secondary_info: last-triggered
           - entity: automation.welcome_guest_announcement
             name: Welcome Guest Announcement
-            icon: si:amazonalexa
+            icon: simple-icons:amazonalexa
             secondary_info: last-triggered
 
       - type: entities
@@ -397,19 +397,6 @@ cards:
                 custom_fields:
                   status: |
                     [[[ return entity.attributes.tracking_id ]]]
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

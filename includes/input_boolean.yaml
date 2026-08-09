@@ -131,7 +131,7 @@
 
   appletv_netflix:
     name: AppleTV Netflix
-    icon: si:netflix
+    icon: simple-icons:netflix
     initial: off
   appletv_plex:
     name: Appletv Plex

@@ -3,7 +3,7 @@ sensor.hacs:
   hidden: true
 
 sensor.last_alexa:
-  icon: si:amazonalexa
+  icon: simple-icons:amazonalexa
 sensor.home_assistant_v2_db_size_gb:
   icon: mdi:database
 
@@ -179,12 +179,18 @@ person.shion:
 
 cover.fr_curtains:
   assumed_state: true
+  
 device_tracker.shion:
   friendly_name: Shion
 device_tracker.duc:
   friendly_name: Duc
+  icon: mdi:crosshairs-gps
+  entity_picture: /local/img/people/avatar-duc.png
+
 device_tracker.eri:
   friendly_name: Eri
+  icon: mdi:crosshairs-gps
+  entity_picture: /local/img/people/avatar-eri.png
 
 #########################################################
 #                                                                                                              

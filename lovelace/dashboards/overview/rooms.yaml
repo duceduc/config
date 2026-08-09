@@ -198,7 +198,7 @@ cards:
             - entity: script.tv_volume_down
               icon: mdi:volume-minus
             - entity: script.appletv_netflix
-              icon: si:netflix
+              icon: simple-icons:netflix
             - entity: switch.tv_mute
               icon: mdi:volume-mute
             - entity: script.tv_volume_up
@@ -218,7 +218,7 @@ cards:
             label: Jarvis Voice
           - entity: input_select.jarvis_voice
             name: Select a Voice
-            icon: si:amazonalexa
+            icon: simple-icons:amazonalexa
 
 
 

@@ -56,7 +56,7 @@
      - sensor.alexa_last_msg
       
   speak_list:
-    icon: si:amazonalexa 
+    icon: simple-icons:amazonalexa 
     name: Speak List
     options:
      - do not use

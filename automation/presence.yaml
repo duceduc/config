@@ -359,26 +359,35 @@
 #    - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
     - service_template: script.set_device_tracker_shion
 
-- alias: Set Location Waze
-  triggers:
-    - trigger: numeric_state
-      entity_id: sensor.duc_to_work_waze, sensor.eri_to_work_waze # sensor.shion_to_school_waze
-      below: 3
-  actions:
-    choose:
-      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'duc to work waze' }}"
-        sequence:
-          - action: device_tracker.see
-            data:
-              dev_id: duc
-              location_name: 'Duc Work'
-              
-      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'eri to work waze' }}"
-        sequence:
-          - action: device_tracker.see
-            data:
-              dev_id: eri
-              location_name: 'Eri Work'
+
+
+
+# iF DATA.YAML SHOWS CORRECTLY OF LOCATION, MAY NEED BELOW ANY LONGER.
+
+#- alias: Set Location Waze
+#  triggers:
+#    - trigger: numeric_state
+#      entity_id: sensor.duc_to_work_waze, sensor.eri_to_work_waze # sensor.shion_to_school_waze
+#      below: 3
+#  actions:
+#    choose:
+#      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'duc to work waze' }}"
+#        sequence:
+#          - action: device_tracker.see
+#            data:
+#              dev_id: duc
+#              location_name: 'Duc Work'
+#              
+#      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'eri to work waze' }}"
+#        sequence:
+#          - action: device_tracker.see
+#            data:
+#              dev_id: eri
+#              location_name: 'Eri Work'
+
+
+
+
 
 #      - conditions: "{{ trigger.to_state.attributes.friendly_name == 'shion to school waze' }}"
 #        sequence:

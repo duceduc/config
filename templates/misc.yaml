@@ -1,4 +1,70 @@
 
+####################################################
+#
+#            Web Hooks
+#
+####################################################
+
+# old way from web_hook.yaml in automation folder
+# iOS Native Presence
+
+  - triggers:
+      - trigger: webhook
+        webhook_id: !secret ducpresence_webhook
+        allowed_methods:
+          - POST
+        local_only: false
+    device_tracker:
+      - name: Duc
+        unique_id: duc
+        location_accuracy: 80
+        in_zones: >
+          {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
+          
+          
+  - triggers:
+      - trigger: webhook
+        webhook_id: !secret eripresence_webhook
+        allowed_methods:
+          - POST
+        local_only: false
+    device_tracker:
+      - name: Eri
+        unique_id: eri
+        location_accuracy: 80
+        in_zones: >
+          {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
+
+
+
+## TESTing
+  - triggers:
+      - trigger: state
+        entity_id: input_boolean.shion_presence
+    device_tracker:
+      - name: Shion2
+        unique_id: shion2
+        location_accuracy: 80
+        in_zones: >
+          {% if states('input_boolean.shion_presence') == 'on' %}
+            ['zone.home']
+          {% elif states('binary_sensor.shion_at_school_baysn') == 'on' %}
+            ['zone.school_jr']
+          {% else %}
+            ['']
+          {% endif %}
+
+
+
+
+
+####################################################
+#
+#           
+#
+####################################################
+
+
 
   - sensor:
 # https://community.home-assistant.io/t/map-values-for-an-input-select/94354/5
