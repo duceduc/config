@@ -225,21 +225,23 @@
           - condition: template
             value_template: '{{ who == "duc"}}'
           sequence:
-          - service: notify.home_assistant
+          - service: smtp.send_message
             data_template:
               title: '{{ title }}'
               message: '{{ message }}'
               data:
+                entity_id: notify.home_assistant
                 images: []
         - conditions:
           - condition: template
             value_template: '{{ who == "eri"}}'
           sequence:
-          - service: notify.eri
+          - service: smtp.send_message
             data_template:
               title: '{{ title }}'
               message: '{{ message }}'
               data:
+                entity_id: notify.eri
                 images: []
         - conditions:
           - condition: template

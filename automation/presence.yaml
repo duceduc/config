@@ -351,6 +351,9 @@
 #                                                                                                              
 #########################################################
 
+
+## disable also in homeassistant.yaml in automation folder aswell. x2
+
 - alias: Set tms Tile Location
   triggers:
     - trigger: state

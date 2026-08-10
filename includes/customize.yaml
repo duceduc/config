@@ -182,15 +182,21 @@ cover.fr_curtains:
   
 device_tracker.shion:
   friendly_name: Shion
+  icon: mdi:crosshairs-gps
+  entity_picture: /local/img/people/avatar-shion.png
+  track: true
+  
 device_tracker.duc:
   friendly_name: Duc
   icon: mdi:crosshairs-gps
   entity_picture: /local/img/people/avatar-duc.png
+  track: true
 
 device_tracker.eri:
   friendly_name: Eri
   icon: mdi:crosshairs-gps
   entity_picture: /local/img/people/avatar-eri.png
+  track: true
 
 #########################################################
 #                                                                                                              

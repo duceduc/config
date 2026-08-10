@@ -16,7 +16,7 @@
        
       Holidays & Birthdays
       
-      {% if is_state('sensor.holiday', 'none') %}No Holidays or Birthdays Today {% else %}Today is {{ states('sensor.holiday') }}.{% endif %}
+      {% if is_state('sensor.holiday', 'none') %}No Holidays or Birthdays Today. {% else %}Today is {{ states('sensor.holiday') }}.{% endif %}
       {% if is_state('sensor.holidaytomorrow', 'none') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %}
       
       {% if is_state('sensor.holidayinaweek', 'none') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}

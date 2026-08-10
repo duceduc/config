@@ -20,8 +20,7 @@
         location_accuracy: 80
         in_zones: >
           {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
-          
-          
+
   - triggers:
       - trigger: webhook
         webhook_id: !secret eripresence_webhook
@@ -35,24 +34,49 @@
         in_zones: >
           {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
 
+#  - triggers:
+#      - trigger: webhook
+#        webhook_id: !secret shionpresence_webhook
+#        allowed_methods:
+#          - POST
+#        local_only: false
+#    device_tracker:
+#      - name: Shion2
+#        unique_id: shion2
+#        location_accuracy: 80
+#        in_zones: >
+#          {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
 
 
 ## TESTing
   - triggers:
       - trigger: state
         entity_id: input_boolean.shion_presence
+#      - trigger: webhook
+#        webhook_id: !secret shionpresence_webhook
+#        allowed_methods:
+#          - POST
+#        local_only: false
+
+# may need to enable for every reboot
+#      - trigger: homeassistant
+#        event: start
+
     device_tracker:
       - name: Shion2
         unique_id: shion2
         location_accuracy: 80
         in_zones: >
-          {% if states('input_boolean.shion_presence') == 'on' %}
-            ['zone.home']
+          {% if states('input_boolean.shion_presence') == 'off'  %}
+             []
           {% elif states('binary_sensor.shion_at_school_baysn') == 'on' %}
             ['zone.school_jr']
+          {% elif states('input_boolean.shion_presence') == 'on' or trigger.json.location_name == 'home' %}
+             ['zone.home']
           {% else %}
-            ['']
+             ['zone.home']
           {% endif %}
+
 
 
 
@@ -60,7 +84,7 @@
 
 ####################################################
 #
-#           
+#
 #
 ####################################################
 
@@ -83,7 +107,7 @@
       - name: Jarvis  Voice Speed
         unique_id: jarvis_voice_speed
         state: > # brain= fast or 115%
-          {% if is_state('input_select.jarvis_voice', 'Brian') %} 
+          {% if is_state('input_select.jarvis_voice', 'Brian') %}
              fast
           {% else %}
              medium
@@ -111,13 +135,13 @@
 
       - name: Toilet
         state: >
-          {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}          
+          {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
         icon: >
           {% if is_state("binary_sensor.wc_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 
       - name: Kitchen
         state: >
-          {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}          
+          {% if is_state("group.motion_kitchen_occupancy", "off") %}Closed{% else %}Open{% endif %}
         icon: >
           {% if is_state("group.motion_kitchen_occupancy", "off") %}mdi:storefront-outline{% else %}mdi:storefront{% endif %}
 
@@ -129,7 +153,7 @@
 
       - name: Washroom
         state: >
-          {% if is_state("group.motion_showerroom_occupancy", "off") %}Off{% else %}On{% endif %}          
+          {% if is_state("group.motion_showerroom_occupancy", "off") %}Off{% else %}On{% endif %}
         icon: >
           {% if is_state("group.motion_showerroom_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 
@@ -141,31 +165,31 @@
 
       - name: Shionroom
         state: >
-          {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}          
+          {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
         icon: >
           {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 
-      - name: Livingroom 
+      - name: Livingroom
         state: >
-          {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}          
+          {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
         icon: >
           {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
 
-      - name: Computerroom 
+      - name: Computerroom
         state: >
-          {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}Off{% else %}On{% endif %}          
+          {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}Off{% else %}On{% endif %}
         icon: >
           {% if is_state("binary_sensor.bt_proxy_computer_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
 
       - name: Closet
         state: >
-          {% if is_state("binary_sensor.master_clo_door_contact", "off") %}Close{% else %}Open{% endif %}          
+          {% if is_state("binary_sensor.master_clo_door_contact", "off") %}Close{% else %}Open{% endif %}
         icon: >
           {% if is_state("binary_sensor.master_clo_door_contact", "off") %}mdi:door-closed{% else %}mdi:door-open{% endif %}
 
       - name: Sleeping
         state: >
-          {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}          
+          {% if is_state("group.bed_sensors", "on") %}Sleeping{% else %}Awake{% endif %}
         icon: >
           {% if is_state("group.bed_sensors", "on") %}mdi:bed{% else %}mdi:bed-outline{% endif %}
 
@@ -177,7 +201,7 @@
 
       - name: Mailbox
         state: >
-          {% if is_state("sensor.lora_mailbox", "0xA2B2") %}Yes{% else %}No{% endif %}         
+          {% if is_state("sensor.lora_mailbox", "0xA2B2") %}Yes{% else %}No{% endif %}
         icon: >
           {% if is_state("sensor.lora_mailbox", "0xA2B2") %}mdi:email-alert{% else %}mdi:email{% endif %}
 
@@ -220,13 +244,13 @@
           {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
             on
           {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.20 %}
-            on            
+            on
           {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
             on
           {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
             on
           {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.45 %}
-            on            
+            on
           {% else %}
             off
           {% endif %}

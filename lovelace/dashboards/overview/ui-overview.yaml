@@ -394,6 +394,10 @@ streamline_templates:
           styles:
             entity_picture:
               - border: 2px solid var(--severity-3)
+        - value: "school jr"
+          styles:
+            entity_picture:
+              - border: 2px solid var(--severity-3)
 
         - value: "lunch takeout"
           styles:
