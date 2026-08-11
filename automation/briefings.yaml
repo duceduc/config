@@ -22,7 +22,7 @@
       {% if is_state('sensor.holidayinaweek', 'none') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}
       
       
-      A Picture of Us!
+      👪A Picture of Us!
   triggers:
     - trigger: time
       at: input_datetime.morning_report
@@ -32,8 +32,9 @@
         who: duc
         title: 'Morning Briefing'
         message: '{{ msg }}'
-        path:
-        - '/config/www/img/private/{{ range(1, 25) | random }}.jpg'
+        media_content_id: 'media-source://media_source/local/img/family/{{ range(1, 25) | random }}.jpg'
+
+        
     - action: script.text_notify
       data:
         who: duc
@@ -61,8 +62,8 @@
         who: eri
         title: 'Morning Briefing'
         message: '{{ msg }}'
-        path:
-        - '/config/www/img/private/{{ range(1, 25) | random }}.jpg'
+        media_content_id: 'media-source://media_source/local/img/family/{{ range(1, 25) | random }}.jpg'
+        
 
 
 #########################################################

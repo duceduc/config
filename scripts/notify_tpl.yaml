@@ -1,8 +1,9 @@
 #########################################################
-#                                                                                                              
-#             Text Notify                                                                             
-#                                                                                                              
+#
+#             Text Notify
+#
 #########################################################
+
 
   text_notify:
     sequence:
@@ -17,10 +18,13 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.mobile_app_id
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: notify.send_message
+              target:
+                entity_id: notify.id # notify.mobile_app_id
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+
         - conditions:
           - condition: template
             value_template: '{{ who == "eri"}}'
@@ -28,14 +32,15 @@
             entity_id: input_boolean.text_notify_eri
             state: 'on'
           sequence:
-          - service: notify.mobile_app_ie
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              
+            - service: notify.send_message
+              target:
+                entity_id: notify.ie
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
 
 
-
+# NEED TO FIX BEFORE 2027.3
         - conditions:
           - condition: template
             value_template: '{{ who == "whatsapp_hass"}}'
@@ -43,11 +48,12 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.greenapi
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              target: !secret whatsapp_hass
+            - service: notify.greenapi
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                target: !secret whatsapp_hass
+                
         - conditions:
           - condition: template
             value_template: '{{ who == "whatsapp_jcb"}}'
@@ -55,11 +61,22 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.greenapi
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              target: !secret whatsapp_jcb
+            - service: notify.greenapi
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                target: !secret whatsapp_jcb
+
+        - conditions:
+          - condition: template
+            value_template: '{{ who == "discord_eta"}}'
+          sequence:
+            - service: notify.discord_bot
+              data:
+                target:
+                - "1093135539277942784"
+                message: '{{ message }}'
+
 
         - conditions:
           - condition: template
@@ -68,29 +85,20 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: telegram_bot.send_message  # notify.amberthebot # telegram_bot.send_message 
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              entity_id: notify.telegram_bot_1730593885_591654584
+            - service: telegram_bot.send_message  # notify.amberthebot # telegram_bot.send_message
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                entity_id: notify.telegram_bot_1730593885_591654584
 
         - conditions:
           - condition: template
             value_template: '{{ who == "desktop"}}'
           sequence:
-          - service: notify.desktop_3l5pa48
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-        - conditions:
-          - condition: template
-            value_template: '{{ who == "discord_eta"}}'
-          sequence:
-          - service: notify.discord_bot
-            data:
-              target:
-              - "1093135539277942784"            
-              message: '{{ message }}'
+            - service: notify.desktop_3l5pa48 # old id of msi desktop
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
 
 
   text_notify_image:
@@ -106,12 +114,12 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: notify.desktop_fddl8i4 # image no longer works.
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: notify.desktop_fddl8i4 # image no longer works.
               data:
-                image: '{{ image }}'
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  image: '{{ image }}'
         - conditions:
           - condition: template
             value_template: '{{ who == "amber"}}'
@@ -119,36 +127,22 @@
             entity_id: input_boolean.text_notify_duc
             state: 'on'
           sequence:
-          - service: telegram_bot.send_photo # notify.amberthebot # telegram_bot.send_message 
-            data:
-              verify_ssl: true
-              entity_id: notify.telegram_bot_1730593885_591654584
-              file: >-
-                {{ image }}
-              caption: >-
-                {{ caption }}
-
-
-# old way send photo codes
-#          - service: telegram_bot.send_photo # notify.amberthebot # telegram_bot.send_message 
-#            data_template:
-#              message: >-
-#                {{ message}} # optional
-#              data:
-#                photo: 
-#                   - file: >-
-#                        {{ image }}
-#                     caption: >-
-#                       {{ caption }}
-
+            - service: telegram_bot.send_photo # notify.amberthebot # telegram_bot.send_message
+              data:
+                verify_ssl: true
+                entity_id: notify.telegram_bot_1730593885_591654584
+                file: >-
+                  {{ image }}
+                caption: >-
+                  {{ caption }}
 
 
 
 
 #########################################################
-#                                                                                                              
-#             Text Alert                                                                             
-#                                                                                                              
+#
+#             Text Alert
+#
 #########################################################
 
   text_alert:
@@ -156,17 +150,17 @@
       - service: >
            {% if who == 'duc' %}
               notify.mobile_app_id
-           {% elif who == 'eri' %}  
+           {% elif who == 'eri' %}
               notify.mobile_app_ie
-           {% endif %}        
+           {% endif %}
         data:
           title: '{{ title }}'
           message: '{{ message }}'
 
 #########################################################
-#                                                                                                              
-#             Text Alert Image                                                                       
-#                                                                                                              
+#
+#             Text Alert Image
+#
 #########################################################
 
   text_alert_image:
@@ -174,9 +168,9 @@
       - service: >
            {% if who == 'duc' %}
               notify.mobile_app_id
-           {% elif who == 'eri' %}  
+           {% elif who == 'eri' %}
               notify.mobile_app_ie
-           {% endif %}        
+           {% endif %}
         data:
           title: '{{ title }}'
           message: '{{ message }}'
@@ -187,9 +181,9 @@
               hide-thumbnail: false
 
 #########################################################
-#                                                                                                              
-#             Announcement Alert                                                                       
-#                                                                                                              
+#
+#             Announcement Alert
+#
 #########################################################
 
   alexa_alert:
@@ -201,10 +195,10 @@
           retain: true
       - service: >-
           {% if who in ['ai_4'] %}
-             notify.alexa_media_ai_4    
+             notify.alexa_media_ai_4
           {% else %}
              notify.alexa_media_ai_1
-          {% endif %}      
+          {% endif %}
         data:
           message: >-
             {{ message }}
@@ -213,10 +207,14 @@
 
 
 #########################################################
-#                                                                                                              
-#             Email Notify                                                                       
-#                                                                                                              
+#
+#             Email Notify
+#
 #########################################################
+#  notify.home_assistant_duceduc_gmail_com
+# notify.eri_esomeya_hotmail_com
+# notify.renee_jxchen3_hotmail_com
+# notify.jcb_duc_jcballiance_com
 
   email_notify:
     sequence:
@@ -225,50 +223,57 @@
           - condition: template
             value_template: '{{ who == "duc"}}'
           sequence:
-          - service: smtp.send_message
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.home_assistant_duceduc_gmail_com
               data:
-                entity_id: notify.home_assistant
-                images: []
+                title: '{{ title }}'
+                message: '{{ message }}'
+
+
         - conditions:
           - condition: template
             value_template: '{{ who == "eri"}}'
           sequence:
-          - service: smtp.send_message
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.eri_esomeya_hotmail_com
               data:
-                entity_id: notify.eri
-                images: []
+                title: '{{ title }}'
+                message: '{{ message }}'
+
+
         - conditions:
           - condition: template
             value_template: '{{ who == "renee"}}'
           sequence:
-          - service: notify.renee
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.renee_jxchen3_hotmail_com
               data:
-                images: []                
+                title: '{{ title }}'
+                message: '{{ message }}'
+
+
         - conditions:
           - condition: template
             value_template: '{{ who == "jcb"}}'
           sequence:
-          - service: notify.jcb
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.jcb_duc_jcballiance_com
               data:
-                images: []
+                title: '{{ title }}'
+                message: '{{ message }}'
+
 
 #########################################################
-#                                                                                                              
-#             Email Notify Image                                                                       
-#                                                                                                              
+#
+#             Email Notify Image
+#
 #########################################################
+
+### notify.home_assistant  # notify.home_assistant_duceduc_gmail_com
 
   email_notify_image:
     sequence:
@@ -277,45 +282,74 @@
           - condition: template
             value_template: '{{ who == "duc"}}'
           sequence:
-          - service: notify.home_assistant
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.home_assistant_duceduc_gmail_com
               data:
-                images: '{{ path }}'
+                title: '{{ title }}'
+                message: '{{ message }}'
+                #html: |
+                attachments:
+                  - media_source:
+                      media_content_id: '{{ media_content_id }}'
+                      media_content_type: image/jpg
+#                    filename: 1.jpg
+                    content_id: memories
+
+# notify.eri_esomeya_hotmail_com
         - conditions:
           - condition: template
             value_template: '{{ who == "eri"}}'
           sequence:
-          - service: notify.eri
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.eri_esomeya_hotmail_com
               data:
-                images: '{{ path }}'
+                title: '{{ title }}'
+                message: '{{ message }}'
+                attachments:
+                  - media_source:
+                      media_content_id: '{{ media_content_id }}'
+                      media_content_type: image/jpg
+                    content_id: memories
+
+# notify.renee_jxchen3_hotmail_com
         - conditions:
           - condition: template
             value_template: '{{ who == "renee"}}'
           sequence:
-          - service: notify.renee
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.renee_jxchen3_hotmail_com
               data:
-                images: '{{ path }}'                
+                title: '{{ title }}'
+                message: '{{ message }}'
+                attachments:
+                  - media_source:
+                      media_content_id: '{{ media_content_id }}'
+                      media_content_type: image/jpg
+                    content_id: memories
+
+# notify.jcb_duc_jcballiance_com
         - conditions:
           - condition: template
             value_template: '{{ who == "jcb"}}'
           sequence:
-          - service: notify.jcb
-            data_template:
-              title: '{{ title }}'
-              message: '{{ message }}'
+            - service: smtp.send_message
+              target:
+                entity_id: notify.jcb_duc_jcballiance_com
               data:
-                images: '{{ path }}'
+                title: '{{ title }}'
+                message: '{{ message }}'
+                attachments:
+                  - media_source:
+                      media_content_id: '{{ media_content_id }}'
+                      media_content_type: image/jpg
+                    content_id: memories
+
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

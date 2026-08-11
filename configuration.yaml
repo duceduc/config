@@ -28,6 +28,7 @@ homeassistant:
   allowlist_external_dirs:
     - '/config'
     - '/media/music'
+    - '/media/data'
 
 tts:
   - platform: google_translate
@@ -97,11 +98,11 @@ person:
   - name: Shion
     id: shion0614
     device_trackers:
-     - device_tracker.shion
+      - device_tracker.shion
   - name: Eri
     id: eri1118
     device_trackers:
-     - device_tracker.ie
+      - device_tracker.ie
 
 #########################################################
 #
@@ -170,10 +171,10 @@ input_text:
     initial: !secret slack_app_verification_token
     mode: password
 
-  airtag:
-    name: Airtag
-    min: 0
-    max: 255
+#  airtag:
+#    name: Airtag
+#    min: 0
+#    max: 255
 
   room_presence:
     name: Room Presence

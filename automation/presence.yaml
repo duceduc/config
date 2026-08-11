@@ -354,18 +354,18 @@
 
 ## disable also in homeassistant.yaml in automation folder aswell. x2
 
-- alias: Set tms Tile Location
-  triggers:
-    - trigger: state
-      entity_id: input_boolean.shion_presence
-  actions:
-#    - service_template: script.set_device_tracker_shion_{{ 'home' if is_state('input_boolean.shion_presence', 'on') else 'not_home' }}
-    - service_template: script.set_device_tracker_shion
+#########################
+#- alias: Set tms Tile Location
+#  triggers:
+#    - trigger: state
+#      entity_id: input_boolean.shion_presence
+#  actions:
+#    - service_template: script.set_device_tracker_shion
 
 
 
 
-# iF DATA.YAML SHOWS CORRECTLY OF LOCATION, MAY NEED BELOW ANY LONGER.
+# iF DATA.YAML SHOWS CORRECTLY OF LOCATION, MAY NOT NEED BELOW ANY LONGER.
 
 #- alias: Set Location Waze
 #  triggers:

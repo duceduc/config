@@ -1,7 +1,7 @@
 
 ####################################################
 #
-#            Web Hooks
+#            Web Hooks iOS
 #
 ####################################################
 
@@ -34,41 +34,23 @@
         in_zones: >
           {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
 
-#  - triggers:
-#      - trigger: webhook
-#        webhook_id: !secret shionpresence_webhook
-#        allowed_methods:
-#          - POST
-#        local_only: false
-#    device_tracker:
-#      - name: Shion2
-#        unique_id: shion2
-#        location_accuracy: 80
-#        in_zones: >
-#          {{ ['zone.home'] if trigger.json.location_name == 'home' else [] }}
-
 
 ## TESTing
   - triggers:
       - trigger: state
         entity_id: input_boolean.shion_presence
-#      - trigger: webhook
-#        webhook_id: !secret shionpresence_webhook
-#        allowed_methods:
-#          - POST
-#        local_only: false
-
-# may need to enable for every reboot
-#      - trigger: homeassistant
-#        event: start
-
+      - trigger: webhook
+        webhook_id: !secret shionpresence_webhook
+        allowed_methods:
+          - POST
+        local_only: false
     device_tracker:
-      - name: Shion2
-        unique_id: shion2
+      - name: Shion
+        unique_id: shion
         location_accuracy: 80
         in_zones: >
           {% if states('input_boolean.shion_presence') == 'off'  %}
-             []
+            []
           {% elif states('binary_sensor.shion_at_school_baysn') == 'on' %}
             ['zone.school_jr']
           {% elif states('input_boolean.shion_presence') == 'on' or trigger.json.location_name == 'home' %}
@@ -76,8 +58,6 @@
           {% else %}
              ['zone.home']
           {% endif %}
-
-
 
 
 

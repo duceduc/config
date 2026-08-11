@@ -307,8 +307,8 @@ automation:
         from:
           - 'fill'
           - 'run'          
-          - 'rinse'
-        to: 'pulse'
+          - 'rinse' #
+        to: 'dryer' #
 
     conditions:
       - condition: numeric_state
