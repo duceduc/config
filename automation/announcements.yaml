@@ -195,6 +195,7 @@
       entity_id:
         - device_tracker.id #duc
         - device_tracker.ie #eri
+        - device_tracker.eri #eri
 #        - device_tracker.shion
       to: 'home'
   actions:
@@ -223,7 +224,7 @@
             who: "{{ states('sensor.room_audio') }}"
             voice: "{{ states('input_select.jarvis_voice') }}"
             message: >
-              {% set alias = {"iE":"mommy", "id":"daddy", "Shion":"she-on"} %}
+              {% set alias = {"Eri":"mommy", "iE":"mommy", "id":"daddy", "Shion":"she-on"} %}
               {% set p = trigger.to_state.attributes.friendly_name %}
               {% set person = alias.get(p) %}
                 {{ person }}, will be home in about 5 minutes.

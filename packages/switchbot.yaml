@@ -265,12 +265,12 @@ template: ########################
         state: "{{ states('input_boolean.sb_humidifier') }}"
         turn_on:
           - action: input_select.select_option
-            data_template:
+            data:
               entity_id: input_select.sb_humidifier_mode
               option: High
         turn_off:
           - action: input_select.select_option
-            data_template:
+            data:
               entity_id: input_select.sb_humidifier_mode
               option: 'Off'
 

@@ -53,6 +53,7 @@ sensor.lr_radar_illuminance:
 sensor.ikea_pm25:
   friendly_name: Air Quality
 
+
 sensor.shion_room_battery:
   friendly_name: Shion Room Light Controller
 sensor.cr_curtains_battery:
@@ -67,7 +68,8 @@ sensor.computer_room_battery:
   friendly_name: Computer Room Controller Battery
 sensor.shower_room_battery:
   friendly_name: Shower Room Dimmer Battery
-
+sensor.24hr_fan_battery:
+  friendly_name: Bathroom Fan
 
 
 sensor.vj_ssl_cert_expiry:
