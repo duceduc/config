@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Inventory Items Reminder                                                                 
-#                                                                                                              
+#
+#             Inventory Items Reminder
+#
 #########################################################
 
 
@@ -38,9 +38,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Maintenance Reminders                                                                  
-#                                                                                                              
+#
+#             Maintenance Reminders
+#
 #########################################################
 
 # solstice season integration - sensors update 32mins pass the hour.
@@ -87,9 +87,9 @@
 
 
 #########################################################
-#                                                                                                              
-#            Turn on Shion Lights During School Days                                             
-#                                                                                                              
+#
+#            Turn on Shion Lights During School Days
+#
 #########################################################
 
 # sensors located at sensors/wakeup.yaml
@@ -122,9 +122,9 @@
 
 
 #########################################################
-#                                                                                                              
+#
 #             Sensors that need a little push
-#                                                                                                              
+#
 #########################################################
 
 - alias: Daily Entity Refresh
@@ -176,7 +176,7 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

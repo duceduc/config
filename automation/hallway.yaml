@@ -88,7 +88,7 @@
         - conditions:
             - condition: trigger
               id: 'off'
-          sequence: 
+          sequence:
             - action: light.turn_off
               entity_id: light.g_1
       default:
@@ -116,7 +116,7 @@
       to: 'on'
   conditions:
     - condition: template
-      value_template: >- 
+      value_template: >-
         {%- set trig = (now() - states.switch.gk_airfreshener.last_changed).seconds -%}
             {{ trig >= 3600 }}
   actions:

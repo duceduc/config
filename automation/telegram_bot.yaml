@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Telegram PC is on                                                    
-#                                                                                                              
+#
+#             Telegram PC is on
+#
 #########################################################
 
 - alias: Telegram - Notification PC is on
@@ -27,7 +27,7 @@
           sequence:
             - action: telegram_bot.send_message
               data:
-                entity_id: notify.telegram_bot_1730593885_591654584   
+                entity_id: notify.telegram_bot_1730593885_591654584
                 message: "The PC was left {{ states('binary_sensor.desktop_status') }} and there are {{ states('sensor.n_people_home') }} {% if states('sensor.n_people_home')| int > 1 %}persons{% else %}person{% endif %} at home."
                 inline_keyboard: Turn off pc:/turn_off_pc, Leave it:/donothing
 
@@ -58,9 +58,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Telegram You've got mail                                                   
-#                                                                                                              
+#
+#             Telegram You've got mail
+#
 #########################################################
 
 - alias: Telegram - You got mail
@@ -137,9 +137,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Global Callback DoNoThing                                                                       
-#                                                                                                              
+#
+#             Global Callback DoNoThing
+#
 #########################################################
 
 # Do Nothing
@@ -162,9 +162,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Controllable Devices                                                                       
-#                                                                                                              
+#
+#             Controllable Devices
+#
 #########################################################
 
 - alias: Control Devices
@@ -213,7 +213,7 @@
           {%- endfor -%}
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

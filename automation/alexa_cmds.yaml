@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Alexa Commands                                                                           
-#                                                                                                              
+#
+#             Alexa Commands
+#
 #########################################################
 
 - alias: Item Select to speak
@@ -18,7 +18,7 @@
       value_template: '{{states.input_select.speak_list.state != "do not use"  }}'
   actions:
     - action: script.speech_engine
-      data: 
+      data:
         who: "{{ states('sensor.last_alexa') }}"
         voice: "{{ states('input_select.jarvis_voice') }}"
         message: !include ../tpl/speech/alexa_cmds.yaml
@@ -41,7 +41,7 @@
       to: 'on'
   actions:
     - action: input_select.select_option
-      data:  
+      data:
         entity_id: input_select.speak_list
         option: >
           {% set slist = state_attr('input_select.speak_list','options') %}
@@ -50,13 +50,13 @@
           {% if opt|int > slist|length %}
             {% set opt = 0 %}
           {% endif %}
-          {{slist[opt]}} 
+          {{slist[opt]}}
     - action: light.turn_off
       entity_id: light.alexa_virtual
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Shelly EM Automation                                                                    
-#                                                                                                              
+#
+#             Shelly EM Automation
+#
 #########################################################
 
 - alias: 'Daily Energy Use Message'
@@ -39,17 +39,11 @@
       data:
         message: "{{ states('sensor.date') }},{{ states('sensor.energy_fridge_power_monthly') }}"
 
-# Depreciate in 2024.12 
-#    - action: notify.fridge_log
-#      data:
-#        message: "{{ states('sensor.date') }},{{ states('sensor.energy_fridge_power_monthly') }}"
-
-
 
 #########################################################
-#                                                                                                              
-#             Switch Day Night Readings                                                              
-#                                                                                                              
+#
+#             Switch Day Night Readings
+#
 #########################################################
 
 
@@ -63,7 +57,7 @@
       data:
         entity_id: input_select.select_theme
         option: midnight
-    - action: select.select_option ###### Tariff change to night from utility_meter.select_tariff 
+    - action: select.select_option ###### Tariff change to night from utility_meter.select_tariff
       target:
         entity_id:
         - select.energy_t31_light_and_power
@@ -81,7 +75,7 @@
       data:
         entity_id: input_select.select_theme
         option: default_ha
-    - action: select.select_option ###### Tariff change to day from utility_meter.select_tariff 
+    - action: select.select_option ###### Tariff change to day from utility_meter.select_tariff
       target:
         entity_id:
         - select.energy_t31_light_and_power
@@ -90,7 +84,7 @@
         option: 'day'
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

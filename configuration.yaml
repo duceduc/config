@@ -103,6 +103,8 @@ person:
     id: eri1118
     device_trackers:
       - device_tracker.ie
+      - device_tracker.eri
+
 
 #########################################################
 #

@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Slack Actionable Notifications                                                          
-#                                                                                                              
+#
+#             Slack Actionable Notifications
+#
 #########################################################
 
 - alias: Slack - PC is on
@@ -34,7 +34,7 @@
                 type: button
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

@@ -67,7 +67,7 @@
         - condition: template
           value_template: "{{ is_state('sensor.date_weekday', 'off') or  is_state('binary_sensor.shion_presence', 'on') }}"
         - condition: template
-          value_template: "{{ states('sensor.holiday')| trim != 'none' }}"  
+          value_template: "{{ states('sensor.holiday')| trim != 'none' }}"
   actions:
     - choose:
       - conditions:

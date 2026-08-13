@@ -259,10 +259,10 @@ utility_meter:
 
 # Start Date Jun 20 2023
   energy_fridge_power_monthly:
-    source: sensor.gosund_fridge_total_energy 
+    source: sensor.gosund_fridge_total_energy
     cycle: monthly
   energy_fridge_power_yearly:
-    source: sensor.gosund_fridge_total_energy 
+    source: sensor.gosund_fridge_total_energy
     cycle: yearly
 
 automation:
@@ -306,7 +306,7 @@ automation:
         entity_id: sensor.gosund_washer_state
         from:
           - 'fill'
-          - 'run'          
+          - 'run'
           - 'rinse' #
         to: 'dryer' #
 
@@ -339,21 +339,20 @@ automation:
 
 # TESTING
       - trigger: template
-        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"      
-        for: 36
+        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"
+        for: 37
         id: 'filter'
       - trigger: template
-        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
-        for: 36
+        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"
+        for: 37
         id: 'filter'
 
 #      - trigger: template
-##        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"      
+##        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"
 #        value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 or states('sensor.gosund_washer_power')| int(0) == 6 }}"
 #        for: 63 # use 63
-#        id: 'filter'        
-        
-        
+#        id: 'filter'
+
     conditions: []
     actions:
       - choose:

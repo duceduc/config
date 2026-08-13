@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Security Camera                                                                            
-#                                                                                                              
+#
+#             Security Camera
+#
 #########################################################
 
 
@@ -22,9 +22,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Alarm Triggered                                                                            
-#                                                                                                              
+#
+#             Alarm Triggered
+#
 #########################################################
 
 #- alias: 'Trigger alarm while armed away'
@@ -36,7 +36,7 @@
 #       - binary_sensor.sr_has_moving_target
 #      to: 'on'
 #  conditions:
-#    - condition: template 
+#    - condition: template
 #      value_template: "{{ is_state('alarm_control_panel.home_alarm', 'armed_away') }}"
 #  actions:
 #    - action: script.alarm_light_flash
@@ -66,9 +66,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Randomize Vacation Lights                                                                            
-#                                                                                                              
+#
+#             Randomize Vacation Lights
+#
 #########################################################
 
 
@@ -80,14 +80,14 @@
     - condition: state
       entity_id: input_boolean.vacation_mode
       state: 'on'
-  actions: 
+  actions:
     - service_template: >
         {% if is_state('input_boolean.randomize_vacation_lights', 'on' )%} script.turn_on {% else %}
            script.turn_off
         {% endif %}
- 
+
       data:
-        entity_id: script.randomize_vacation_lights   
+        entity_id: script.randomize_vacation_lights
 
 - alias: Run Vacation Lights
   triggers:
@@ -127,7 +127,7 @@
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

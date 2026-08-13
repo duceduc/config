@@ -204,7 +204,7 @@
           {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
            List of Containers | Roro arriving on _{{ today }}_.
            Please make arrangements to have BL docs send to customers.
-           
+
           {{ state_attr('sensor.units_arriving', 'description') }}
 #          {{ states('sensor.units_arriving') }}
 #          {{ trigger.calendar_event.description }}
@@ -360,11 +360,11 @@
         title: "lions.snailmsg.lan expires in {{ states('sensor.lions_ssl_cert_expiry') }} days"
         message: >-
           Today is {{ now().strftime( '%B %d, %Y') }}
-         
-         
+
+
           This is to notify you that lions.snailmsg.lan certificate will expire in {{ states('sensor.lions_ssl_cert_expiry') }} days.
-          
-          Renew the certificate via Traefik /usr/local/bin. 
+
+          Renew the certificate via Traefik /usr/local/bin.
 
 
 - alias: "Mqtt SSL Certificate Expiry Notification"
@@ -414,7 +414,7 @@
       data:
         message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
 
-# Depreciate in 2024.12 
+# Depreciate in 2024.12
 #    - action: notify.earthquake_log
 #      data:
 #        message: "{{ state_attr('sensor.earthquake_alert', 'at') }},{{ state_attr('sensor.earthquake_alert', 'en_anm') }},{{ state_attr('sensor.earthquake_alert', 'mag') }},{{ state_attr('sensor.earthquake_alert', 'maxi') }}"
@@ -608,10 +608,10 @@
         title: "Water Leak Detected"
         message: >-
           Today is {{ now().strftime( '%B %d, %Y') }}
-          
-          
+
+
           There may have been a water leak around the washing machine area. Action is require as soon as possible.
-          
+
   mode: single
 
 

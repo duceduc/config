@@ -9,19 +9,19 @@
   variables:
     msg: >-
       Today is {{ now().strftime( '%B %d, %Y') }}
-       
+
       Today's Weather
-      
+
       The current temperature is {{ states('sensor.wbio_current_temperature')| round(1) }}° ( {{states('sensor.oa_feels_like')}}° feel like) with a forecast of {{ states('sensor.nws_overnight_forecast') }}. Today's low is {{ states('sensor.wbio_overnight_low') }}° with a high of {{ states('sensor.wbio_daytime_temperature') }}°. The predicted precipitation today is{% if state_attr('sensor.my_weather_forecast_daily', 'forecast')[0].precipitation == 0 %} 0mm. {% else %} {{ states.sensor.my_weather_forecast_daily.attributes.forecast[0].precipitation }}mm at a chance of {{ states('sensor.wbio_current_rain_forecast') }}%. {% endif %}
-       
+
       Holidays & Birthdays
-      
+
       {% if is_state('sensor.holiday', 'none') %}No Holidays or Birthdays Today. {% else %}Today is {{ states('sensor.holiday') }}.{% endif %}
       {% if is_state('sensor.holidaytomorrow', 'none') %} {% else %}Tomorrow is {{ states('sensor.holidaytomorrow') }}.{% endif %}
-      
+
       {% if is_state('sensor.holidayinaweek', 'none') %} {% else %} {{ states('sensor.holidayinaweek') }} is in one week.{% endif %}
-      
-      
+
+
       👪A Picture of Us!
   triggers:
     - trigger: time
@@ -34,7 +34,7 @@
         message: '{{ msg }}'
         media_content_id: 'media-source://media_source/local/img/family/{{ range(1, 25) | random }}.jpg'
 
-        
+
     - action: script.text_notify
       data:
         who: duc
@@ -63,7 +63,7 @@
         title: 'Morning Briefing'
         message: '{{ msg }}'
         media_content_id: 'media-source://media_source/local/img/family/{{ range(1, 25) | random }}.jpg'
-        
+
 
 
 #########################################################
@@ -75,7 +75,7 @@
 - alias: 'Morning Wakeup Report'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.bt_proxy_computer_moving_target 
+      entity_id: binary_sensor.bt_proxy_computer_moving_target
       to: 'on'
   conditions:
     - condition: time
@@ -103,7 +103,7 @@
 - alias: 'Morning Report'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.bt_proxy_computer_moving_target 
+      entity_id: binary_sensor.bt_proxy_computer_moving_target
       to: 'on'
   conditions:
     - condition: time
@@ -133,7 +133,7 @@
 - alias: 'Daily Report'
   triggers:
     - trigger: state
-      entity_id: binary_sensor.bt_proxy_computer_moving_target 
+      entity_id: binary_sensor.bt_proxy_computer_moving_target
       to: 'on'
   conditions:
     - condition: time

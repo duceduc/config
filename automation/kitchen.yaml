@@ -12,7 +12,7 @@
       id: time
       seconds: '10'
     - trigger: state
-      entity_id:  group.motion_kitchen_occupancy # binary_sensor.motion_kitchen_occupancy 
+      entity_id:  group.motion_kitchen_occupancy # binary_sensor.motion_kitchen_occupancy
       id: motion
       to: 'on'
   conditions:
@@ -21,7 +21,7 @@
 #    - condition: template # disable motion light
 #      value_template: >- # can remove when human sensor is working
 #        {%- set trig = (now() - states.binary_sensor.motion_kitchen_occupancy.last_changed).seconds -%}
-#          {{ trig <= 300 }}      
+#          {{ trig <= 300 }}
     - condition: template # mcl is off
       value_template: "{{ is_state('input_boolean.kitchen_mcl', 'off') }}"
   actions:
@@ -72,11 +72,11 @@
         {%- set trig = (now() - states.group.motion_kitchen_occupancy.last_changed).seconds -%}
           {{ is_state('binary_sensor.kitchen_presence', 'off') and trig > 5 }}
       id: 'off'
-      for: 40         
+      for: 40
   conditions:
     - condition: template # disable motion light
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
-  
+
   actions:
     - choose:
       - conditions:
@@ -142,7 +142,7 @@
       id: 'off'
       from: 'on'
       to: 'off'
-  
+
   conditions:
     - condition: template # disable motion light
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
@@ -179,7 +179,7 @@
           - action: timer.finish
             entity_id: timer.kitchen_timer
       default: []
-            
+
 
 
 

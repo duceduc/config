@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Turn on Netflix on ATV                                                                   
-#                                                                                                              
+#
+#             Turn on Netflix on ATV
+#
 #########################################################
 
 - alias: 'turn on appletv netflix'
@@ -16,9 +16,9 @@
       entity_id: input_boolean.appletv_netflix
 
 #########################################################
-#                                                                                                              
-#             Turn on Plex on ATV                                                                      
-#                                                                                                              
+#
+#             Turn on Plex on ATV
+#
 #########################################################
 
 - alias: 'turn on appletv plex'
@@ -33,9 +33,9 @@
       entity_id: input_boolean.appletv_plex
 
 #########################################################
-#                                                                                                              
-#             Toggle Jcom Tv Box                                                                       
-#                                                                                                              
+#
+#             Toggle Jcom Tv Box
+#
 #########################################################
 
 #- alias: 'toggle jcom tv box'
@@ -51,9 +51,9 @@
 #      entity_id: input_boolean.jcom_tv_box
 
 #########################################################
-#                                                                                                              
-#             Toggle Floor Heater                                                                       
-#                                                                                                              
+#
+#             Toggle Floor Heater
+#
 #########################################################
 
 #- alias: 'toggle floor heater'
@@ -66,12 +66,12 @@
 #    - action: switch.turn_on
 #      entity_id: switch.floor_heater
 #    - action: input_boolean.toggle
-#      entity_id: input_boolean.floor_heater     
+#      entity_id: input_boolean.floor_heater
 
 #########################################################
-#                                                                                                              
-#             Desktop Automations                                                                     
-#                                                                                                              
+#
+#             Desktop Automations
+#
 #########################################################
 
 - alias: 'Turn on desktop in morning'
@@ -122,7 +122,7 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################
