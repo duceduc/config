@@ -236,9 +236,9 @@
           data:
             entity_id: |
              {% if trigger.to_state.attributes.friendly_name == 'iE' %}
-                input_boolean.eri_travel_monitor
+               input_boolean.eri_travel_monitor
              {% elif trigger.to_state.attributes.friendly_name == 'id' %}
-                input_boolean.duc_travel_monitor
+               input_boolean.duc_travel_monitor
              {% else %}
              {% endif %}
 
@@ -261,9 +261,9 @@
       data:
         entity_id: |
           {% if is_state('input_boolean.toggle_guest_presence', 'on') %}
-             switch.momentary_activate_guest
+            switch.momentary_activate_guest
           {% elif is_state('binary_sensor.duc_presence', 'on') %}
-             switch.momentary_activate_tv
+            switch.momentary_activate_tv
           {% endif %}
     - delay: 2
     - condition: template

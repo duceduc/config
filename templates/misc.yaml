@@ -39,6 +39,8 @@
   - triggers:
       - trigger: state
         entity_id: input_boolean.shion_presence
+      - trigger: homeassistant
+        event: start
       - trigger: webhook
         webhook_id: !secret shionpresence_webhook
         allowed_methods:
@@ -49,14 +51,14 @@
         unique_id: shion
         location_accuracy: 80
         in_zones: >
-          {% if states('input_boolean.shion_presence') == 'off'  %}
-            []
-          {% elif states('binary_sensor.shion_at_school_baysn') == 'on' %}
+          {% if states('input_boolean.shion_presence') == 'off' and states('binary_sensor.shion_at_school_baysn') == 'on' %}
             ['zone.school_jr']
+          {% elif states('input_boolean.shion_presence') == 'off' %}
+            []
           {% elif states('input_boolean.shion_presence') == 'on' or trigger.json.location_name == 'home' %}
-             ['zone.home']
+            ['zone.home']
           {% else %}
-             ['zone.home']
+            ['zone.home']
           {% endif %}
 
 
