@@ -1,15 +1,15 @@
 ###############################################################################
-#   @author         :   Duc Su 
+#   @author         :   Duc Su
 #   @date           :   08/13/2022
 #   @package        :   Camera
-#   @description    :   All the Camera related stuff 
+#   @description    :   All the Camera related stuff
 ###############################################################################
 
 #######################################################################
 # Using the HACS Arlo Integration
 # If you see the cloudflare error in the logs uncomment the user_agent line and try that
 #
-# Also, Don't forget to add the Camera section below.  
+# Also, Don't forget to add the Camera section below.
 
 input_boolean:
   balcony_motion:
@@ -25,7 +25,7 @@ script:
     sequence:
       - condition: state
         entity_id: input_boolean.balcony_motion
-        state: 'off' 
+        state: 'off'
       - action: input_boolean.turn_on
         entity_id: input_boolean.balcony_motion
       - delay: '00:01:00'
@@ -72,7 +72,7 @@ automation:
         data:
           entity_id: camera.security_balcony
           filename: '/config/www/img/security/balcony/security_balcony_camera_last.jpg'
-      - delay: 1         
+      - delay: 1
       - action: camera.snapshot
         data:
           entity_id: camera.security_balcony

@@ -5,7 +5,7 @@
 #########################################################
 
 
-input_boolean: 
+input_boolean:
   duc_unlock_door:
   eri_unlock_door:
 
@@ -135,7 +135,7 @@ automation:
               - condition: template # duc
                 value_template: "{{ is_state('input_boolean.duc_unlock_door', 'on') and is_state('device_tracker.id', 'home') }}"
               - condition: template
-                value_template: >- 
+                value_template: >-
                   {%- set trig = (now() - states.device_tracker.duc_bermuda_bermuda_tracker.last_changed).seconds -%}
                     {{ is_state('device_tracker.duc_bermuda_bermuda_tracker', 'home') and trig <= 60 }}
 
@@ -151,7 +151,7 @@ automation:
               - condition: template # eri
                 value_template: "{{ is_state('input_boolean.eri_unlock_door', 'on') and is_state('device_tracker.ie', 'home') }}"
               - condition: template
-                value_template: >- 
+                value_template: >-
                   {%- set trig = (now() - states.device_tracker.eri_bermuda_bermuda_tracker.last_changed).seconds -%}
                     {{ is_state('device_tracker.eri_bermuda_bermuda_tracker', 'home') and trig <= 60 }}
 
@@ -162,7 +162,6 @@ automation:
                 entity_id: lock.lock_pro_8d0a
               - action: input_boolean.turn_off
                 entity_id: input_boolean.eri_unlock_door
-
 
 
 #########################################################

@@ -18,7 +18,7 @@ template:
           {{ flight.flight_number }} - {{ flight.airline_short }} - {{ flight.aircraft_model }} ({{ flight.aircraft_registration }})
           {{ flight.airport_origin_city }} > {{ flight.airport_destination_city }}
         attributes:
-          icon: mdi:airplane        
+          icon: mdi:airplane
           flights: >-
             {% set n = 5 %}
             {% set m = this.attributes.flights | count | default(0) %}
@@ -64,7 +64,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
 #              - condition: template
-#                value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"                
+#                value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"
 
               - condition: or
                 conditions:
@@ -72,7 +72,7 @@ automation:
                     value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways|photo|misconfigured') }}"
                   - condition: template
                     value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_origin_city is undefined }}"
-                
+
             sequence:
               - action: script.text_notify
                 data:
@@ -112,7 +112,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'jcb') }}"
 #              - condition: template
-#                value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"                
+#                value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways') }}"
 
               - condition: or
                 conditions:
@@ -120,7 +120,7 @@ automation:
                     value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways|photo|misconfigured') }}"
                   - condition: template
                     value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_destination_city is undefined }}"
-                
+
             sequence:
               - action: script.text_notify
                 data:

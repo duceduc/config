@@ -41,7 +41,6 @@ template:
             mdi:weather-sunny
           {% endif %}
 
-
       - name: 'Today is'
         unique_id: aa24c0d6-c263-483c-93cd-c6aff1bb146a
         state: "{{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}"
@@ -141,17 +140,6 @@ template:
           {% else %}
             999
           {% endif %}
-
-#      - name: 'School Tomorrow'
-#        unique_id: cace00f8-bf49-4206-85ea-2be58c98f178
-#        state: >-
-#          {%- set tt=(as_timestamp(now())+ (86400)) | timestamp_custom("%Y-%m-%d",true) %}
-#          {% if states.calendar.shion_school.attributes.start_time == tt + " 08:15:00" %}
-#            on
-#          {% else %}
-#            off
-#          {% endif %}
-
 
   - binary_sensor:
       - name: 'School Tomorrow'

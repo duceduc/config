@@ -1,15 +1,15 @@
 ###############################################################################
-#   @author         :   Duc Su 
+#   @author         :   Duc Su
 #   @date           :   10/18/2022
 #   @package        :   Aqara Cube Livingroom
-#   @description    :   All the Aqara Cube related stuff 
+#   @description    :   All the Aqara Cube related stuff
 ###############################################################################
 
 script:
   cube_dimmer_control:
     description: Template Dimmer Control
     variables:
-      light:    
+      light:
       angle:
     sequence:
       - action: light.turn_on
@@ -60,12 +60,11 @@ script:
 #            {% else %}
 #              {# Send the value calculated #}
 #              {{ R, new_green, B }}
-#            {% endif %}            
-          
-          
-          
-          
-          
-          
-          
-          
+#            {% endif %}
+
+
+
+
+
+
+

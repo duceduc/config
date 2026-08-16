@@ -1,5 +1,5 @@
 ###############################################################################
-#   @author          :   Duc Su 
+#   @author          :   Duc Su
 #   @date              :   04/20/2025
 #   @package        :   Utilities
 #   @description    :   Maintenances
@@ -13,7 +13,7 @@ group:
 script:
   update_critical_battery_group:
     sequence:
-      # Reset group 
+      # Reset group
       - service: group.set
         data:
           object_id: "critical_batteries"
@@ -23,35 +23,34 @@ script:
         data:
           object_id: "critical_batteries"
           add_entities: >-
-            {{ states.sensor | 
+            {{ states.sensor |
               selectattr('entity_id', 'in', area_entities('Critical Batteries')) |
-              map(attribute='entity_id') | list  | join(',') }} 
-
+              map(attribute='entity_id') | list  | join(',') }}
 
 template:
   - sensor:
       - name: Critical Battery Count
         unique_id: critical_battery_count
         state: >
-          {{ expand('group.critical_batteries') 
+          {{ expand('group.critical_batteries')
           | rejectattr('state', 'eq', '100')
           | rejectattr('state', 'in', ['unavailable','unknown'])
           | selectattr('state', 'lt', '31') | list | count }}
-    
+
 # TESTING
   - binary_sensor:
       - name: wash_occupied # entity must be set to an area
         unique_id: wash_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('Wash Room')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion|door)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion|door)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
-        attributes: 
+        attributes:
           initiated: >
             {{ is_state('binary_sensor.washer_door_motion', 'on') or is_state('binary_sensor.washroom_radar_moving_target', 'on') }}
 
@@ -59,125 +58,117 @@ template:
         unique_id: wc_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('WC')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(door|occupancy|motion)') | 
+                 selectattr('attributes.device_class', 'search', '(door|occupancy|motion)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
         delay_off: 10
 
       - name: genkan_occupied
-        unique_id: genkan_occupied 
+        unique_id: genkan_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('Genkan')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion|door)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion|door)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
 
       - name: hallway_occupied
-        unique_id: hallway_occupied 
+        unique_id: hallway_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('Hallway')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
-        attributes: 
+        attributes:
           nightlight: >
             {{ now().hour > 23 or now().hour < 6 }}
 
-# can delete this if above attr fires.
-#      - name: hallway_nightlight
-#        unique_id: hallway_nightlight 
-#        icon: mdi:account-group
-#        state: >
-#         {{ now().hour > 23 or now().hour < 6 }}
-
-
       - name: kitchen_occupied
-        unique_id: kitchen_occupied 
+        unique_id: kitchen_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('Kitchen')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
-        attributes: 
+        attributes:
           people_count: >
-            {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Kitchen') 
-            | list 
+            {{ expand('group.room_presence')
+            | selectattr('state', 'eq', 'Kitchen')
+            | list
             | count }}
           full_on: >
             {%- set trig = (now() - states.light.cabinet.last_changed).seconds -%}
               {{ is_state('light.cabinet', 'on') and trig > 15 }}
 
       - name: livingroom_occupied
-        unique_id: livingroom_occupied 
+        unique_id: livingroom_occupied
         icon: mdi:account-group
         state: >
-          {{ (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Living') 
-            | list 
+          {{ (expand('group.room_presence')
+            | selectattr('state', 'eq', 'Living')
+            | list
             | count >= 1 )
-            or 
-            (states.binary_sensor | 
+            or
+            (states.binary_sensor |
                 selectattr('entity_id', 'in', area_entities('Living Room')) |
                 rejectattr('attributes.device_class', 'undefined') |
-                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                selectattr('attributes.device_class', 'search', '(occupancy|motion)') |
                 selectattr('state', 'eq', 'on') |
                 map(attribute='entity_id') |
                 list | count > 0 )
-            or (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Living') 
-            | list 
+            or (expand('group.room_presence')
+            | selectattr('state', 'eq', 'Living')
+            | list
             | count >= 1)
             }}
-        attributes: 
+        attributes:
           people_count: >
-            {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Living') 
-            | list 
+            {{ expand('group.room_presence')
+            | selectattr('state', 'eq', 'Living')
+            | list
             | count }}
 
       - name: computerroom_occupied
-        unique_id: computerroom_occupied 
+        unique_id: computerroom_occupied
         icon: mdi:account-group
         state: >
-          {{ (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Computer') 
-            | list 
+          {{ (expand('group.room_presence')
+            | selectattr('state', 'eq', 'Computer')
+            | list
             | count >= 1 )
-            or 
-            (states.binary_sensor | 
+            or
+            (states.binary_sensor |
                 selectattr('entity_id', 'in', area_entities('Computer Room')) |
                 rejectattr('attributes.device_class', 'undefined') |
-                selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                selectattr('attributes.device_class', 'search', '(occupancy|motion)') |
                 selectattr('state', 'eq', 'on') |
                 map(attribute='entity_id') |
                 list | count > 0 )
-            or (expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Computer') 
-            | list 
+            or (expand('group.room_presence')
+            | selectattr('state', 'eq', 'Computer')
+            | list
             | count >= 1)
             }}
-        attributes: 
+        attributes:
           people_count: >
-            {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'Computer') 
-            | list 
+            {{ expand('group.room_presence')
+            | selectattr('state', 'eq', 'Computer')
+            | list
             | count }}
 
 
@@ -185,18 +176,18 @@ template:
         unique_id: shionroom_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('Shion Room')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion|moving)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion|moving)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
-        attributes: 
+        attributes:
           people_count: >
-            {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'shionroom') 
-            | list 
+            {{ expand('group.room_presence')
+            | selectattr('state', 'eq', 'shionroom')
+            | list
             | count }}
           squirt: >
             {%- set squirt = (now() - states.switch.shion_airfreshener.last_changed).seconds -%}
@@ -206,18 +197,17 @@ template:
         unique_id: masterroom_occupied
         icon: mdi:account-group
         state: >
-          {{ (states.binary_sensor | 
+          {{ (states.binary_sensor |
                  selectattr('entity_id', 'in', area_entities('Master Room')) |
                  rejectattr('attributes.device_class', 'undefined') |
-                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') | 
+                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') |
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
         delay_off: 5
-        attributes: 
+        attributes:
           people_count: >
-            {{ expand('group.room_presence') 
-            | selectattr('state', 'eq', 'masterroom') 
-            | list 
+            {{ expand('group.room_presence')
+            | selectattr('state', 'eq', 'masterroom')
+            | list
             | count }}
-

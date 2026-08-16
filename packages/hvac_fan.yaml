@@ -255,11 +255,11 @@ template:
         state: "{{ states('input_boolean.cool_fan_power_status') }}"
         # percentage_template: "{{ states('input_number.cool_fan_speed_status') }}"
         speed_count: 3
-        turn_on: 
+        turn_on:
           - action: script.cool_fan_speed_set
             data:
               percentage: "{{ (33,66,100) | random }}"
-        turn_off: 
+        turn_off:
           - action: script.cool_fan_speed_set
             data:
               percentage: "{{ 0 }}"
@@ -273,11 +273,11 @@ template:
         state: "{{ states('input_boolean.warm_fan_power_status') }}"
         # percentage_template: "{{ states('input_number.cool_fan_speed_status') }}"
         speed_count: 3
-        turn_on: 
+        turn_on:
           - action: script.warm_fan_speed_set
             data:
               percentage: "{{ 33 }}"
-        turn_off: 
+        turn_off:
           - action: script.warm_fan_speed_set
             data:
               percentage: "{{ 0 }}"
@@ -302,7 +302,7 @@ template:
           - action: input_boolean.turn_on
             entity_id: input_boolean.status_yfan_power
 
-        turn_off: 
+        turn_off:
           - action: remote.send_command
             data:
               entity_id: remote.rm4_remote
@@ -327,87 +327,3 @@ template:
               device: Yuasa Fan
               command: speed
 
-
-
-
-#fan:
-#  - platform: template
-#    fans:
-#      ceiling_fan_summer:
-#        friendly_name: Summer Fan
-#        speed_count: 3
-#        value_template: "{{ states('input_boolean.cool_fan_power_status') }}"
-#        percentage_template: "{{ states('input_number.cool_fan_speed_status') }}"
-#        turn_on:
-#          - action: script.cool_fan_speed_set
-#            data:
-#              percentage: "{{ (33,66,100) | random }}"
-#        turn_off:
-#          - action: script.cool_fan_speed_set
-#            data:
-#              percentage: "{{ 0 }}"
-#        set_percentage:
-#          - action: script.cool_fan_speed_set
-#            data:
-#              percentage: "{{ percentage }}"
-
-#  - platform: template
-#    fans:
-#      ceiling_fan_winter:
-#        friendly_name: Winter Fan
-#        speed_count: 3
-#        value_template: "{{ states('input_boolean.warm_fan_power_status') }}"
-#        percentage_template: "{{ states('input_number.warm_fan_speed_status') }}"
-#        turn_on:
-#          - action: script.warm_fan_speed_set
-#            data:
-#              percentage: "{{ 33 }}"
-#        turn_off:
-#          - action: script.warm_fan_speed_set
-#            data:
-#              percentage: "{{ 0 }}"
-#        set_percentage:
-#          - action: script.warm_fan_speed_set
-#            data:
-#              percentage: "{{ percentage }}"
-
-#  - platform: template
-#    fans:
-#      yuasa_fan:
-#        speed_count: 3
-#        value_template: "{{ states('input_boolean.status_yfan_power') }}"
-#        turn_on:
-#          - condition: state
-#            entity_id: input_boolean.status_yfan_power
-#            state: 'off'
-#          - action: remote.send_command
-#            data:
-#              entity_id: remote.rm4_remote
-#              device: Yuasa Fan
-#              command: power
-#          - action: input_boolean.turn_on
-#            entity_id: input_boolean.status_yfan_power
-#        turn_off:
-#          - action: remote.send_command
-#            data:
-#              entity_id: remote.rm4_remote
-#              device: Yuasa Fan
-#              command: power
-#          - action: input_boolean.turn_off
-#            entity_id: input_boolean.status_yfan_power
-#        percentage_template: >
-#          {{ states('input_number.status_yfan_speed') if is_state('input_boolean.status_yfan_power', 'on') else 0 }}
-#        set_percentage:
-#          - action: input_boolean.turn_{{ 'on' if percentage > 0 else 'off' }}
-#            target:
-#              entity_id: input_boolean.status_yfan_power
-#          - action: input_number.set_value
-#            target:
-#              entity_id: input_number.status_yfan_speed
-#            data:
-#              value: "{{ percentage }}"
-#          - action: remote.send_command
-#            data:
-#              entity_id: remote.rm4_remote
-#              device: Yuasa Fan
-#              command: speed

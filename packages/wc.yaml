@@ -42,34 +42,6 @@ template:
               device: Toilet
               command: auto flush disable
 
-
-
-#switch:
-#  - platform: template
-#    switches:
-#      wc_auto_flush:
-#        friendly_name: 'WC Auto Flush'
-#        value_template: "{{ is_state('input_boolean.wc_auto_flush', 'on') }}"
-#        turn_on:
-#          - service: input_boolean.turn_on
-#            entity_id: input_boolean.wc_auto_flush
-#          - service: remote.send_command
-#            data:
-#              entity_id: remote.rm32_remote
-#              device: Toilet
-#              command: auto flush enable
-#        turn_off:
-#          - service: input_boolean.turn_off
-#            entity_id: input_boolean.wc_auto_flush
-#          - service: remote.send_command
-#            data:
-#              entity_id: remote.rm32_remote
-#              device: Toilet
-#              command: auto flush disable
-#       icon_template: 
-
-
-
 script:
   toilet_seat_low_heat:
     sequence:
@@ -123,10 +95,10 @@ automation:
           who: duc
           message: >-
             Today is {{ now().strftime( '%B %d, %Y') }}
-            
-            
+
+
             The {{ state_attr('switch.wc_airfreshener', 'friendly_name')|lower() }} canister needs to be replaced. It has about {{ states('sensor.wc_airfreshener_can') |round(1) }}% left.
-            
+
 
   - alias: 'motion wc room'
     triggers:
@@ -262,11 +234,6 @@ automation:
                is_state('input_select.home_mode', 'Home') }}
           sequence:
             - action: script.toilet_seat_low_heat
-#      - conditions: > # default to low if sensor not on
-#           {{ not is_state('binary_sensor.aio_wemos_status', 'on') and
-#              states.input_select.home_mode.state == 'Home' }}
-#        sequence:
-#          - action: script.toilet_seat_low_heat
 
 # Hibernate Toilet Seat Heater
   - alias: 'Hibernate Toilet Seat Heater'

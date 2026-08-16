@@ -34,9 +34,9 @@ automation:
 
 ############################
 #
-# This file should not be modified directly. 
-# To add or remove entities to monitor, 
-# Please modify the 'quick_look_mobile_macros.jinja' file 
+# This file should not be modified directly.
+# To add or remove entities to monitor,
+# Please modify the 'quick_look_mobile_macros.jinja' file
 # Located in the '/custom_templates' folder.
 #
 ############################
@@ -62,8 +62,6 @@ template:
           {% from 'quick_look_mobile_macros.jinja' import some_alarms_are_on %}
           {{ some_alarms_are_on().split(',')[1] }}
 
-
-
 # DOORS & WINDOWS :
       - name: some contact sensors are on
         state: >
@@ -75,7 +73,6 @@ template:
           {% from 'quick_look_mobile_macros.jinja' import some_contact_sensors_are_on %}
           {{ some_contact_sensors_are_on().split(',')[1] }}
 
-
 # PRESENCES :
       - name: some occupancy sensors are on
         state: >
@@ -86,7 +83,6 @@ template:
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_occupancy_sensors_are_on %}
           {{ some_occupancy_sensors_are_on().split(',')[1] }}
-
 
     # LOCKS :
       - name: some locks are on
@@ -106,7 +102,6 @@ template:
 #
 ############################
 
-
 # CLIMATES :
       - name: some climates are on
         state: >
@@ -114,18 +109,15 @@ template:
           {% set count = some_climates_are_on().split(',')[1]|int %}
           {{ 'on' if count > 0 else 'off' }}
 
-
       - name: climates dominance
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_climates_are_on %}
           {{ some_climates_are_on().split(',')[0] }}
 
-
       - name: climates count
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_climates_are_on %}
           {{ some_climates_are_on().split(',')[1] }}
-
 
     # FANS :
       - name: some fans are on
@@ -133,13 +125,10 @@ template:
           {% from 'quick_look_mobile_macros.jinja' import some_fans_are_on %}
           {{ some_fans_are_on().split(',')[0] }}
 
-
       - name: fans count
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_fans_are_on %}
           {{ some_fans_are_on().split(',')[1] }}
-
-
 
 
 ############################
@@ -159,18 +148,15 @@ template:
           {% from 'quick_look_mobile_macros.jinja' import some_lights_are_on %}
           {{ some_lights_are_on().split(',')[1] }}
 
-
       - name: some covers are on
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_covers_are_on %}
           {{ some_covers_are_on().split(',')[0] }}
 
-
       - name: covers count
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_covers_are_on %}
           {{ some_covers_are_on().split(',')[1] }}
-
 
 
 ############################
@@ -190,7 +176,6 @@ template:
           {% from 'quick_look_mobile_macros.jinja' import some_audio_players_are_on %}
           {{ some_audio_players_are_on().split(',')[1] }}
 
-
 # VIDEO PLAYERS :
       - name: some video players are on
         state: >
@@ -201,7 +186,6 @@ template:
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_video_players_are_on %}
           {{ some_video_players_are_on().split(',')[1] }}
-
 
 
 ############################
@@ -215,7 +199,6 @@ template:
         state: >
           {% from 'quick_look_mobile_macros.jinja' import some_devices_are_on %}
           {{ some_devices_are_on().split(',')[0] }}
-
 
       - name: devices count
         state: >

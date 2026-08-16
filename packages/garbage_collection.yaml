@@ -1,8 +1,8 @@
 ###############################################################################
-#   @author         :   Duc Su 
+#   @author         :   Duc Su
 #   @date           :   4/15/2023
 #   @package        :   Local Calendar
-#   @description    :   Local Calendar automations 
+#   @description    :   Local Calendar automations
 ###############################################################################
 
 template:
@@ -30,7 +30,7 @@ template:
         attributes:
           days: >-
            {{ ((state_attr('calendar.metal_paper','start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}
-           
+
       - name: bottle_can_days
         icon: mdi:delete
         state: >-
@@ -38,11 +38,11 @@ template:
         attributes:
           days: >-
            {{ ((state_attr('calendar.bottle_can','start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}
-                            
+
       - name: pet_clothes_days
         icon: mdi:delete
         state: >-
          {{ min(((state_attr('calendar.pet_clothes','start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int,2) }}
         attributes:
           days: >-
-           {{ ((state_attr('calendar.pet_clothes','start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}   
+           {{ ((state_attr('calendar.pet_clothes','start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}

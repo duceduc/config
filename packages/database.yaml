@@ -54,6 +54,14 @@ logbook:
      - device_tracker
      - input_boolean
      - person
+  exclude:
+    entities:
+      - sensor.healthsync_last_sync
+      - event.healthsync_heart_rate_reading
+      - event.healthsync_heart_rate_variability_reading
+      - event.healthsync_vo2_max_reading
+      - event.healthsync_weight_reading
+
 
 # Lets try to make the logs less chatty and more fine tuned.
 logger:
@@ -81,7 +89,7 @@ history:
       - automation
 
 
-## DISABLED for now. but need to setup via the integration. 
+## DISABLED for now. but need to setup via the integration.
 #influxdb:
 #  api_version: 2
 #  host: 192.168.1.197

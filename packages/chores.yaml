@@ -1,5 +1,5 @@
 ###############################################################################
-#   @author         :   Duc Su 
+#   @author         :   Duc Su
 #   @date           :   08/05/2022
 #   @package        :   Chores
 #   @description    :   Time sensitive chores arund the house.
@@ -10,7 +10,7 @@ group:
     entities:
       - sensor.change_bed_sheets
       - sensor.clean_air_filters
-      
+
 automation:
   - alias: Notify Chore Task Due
     variables:
@@ -38,6 +38,5 @@ automation:
                 title: "🧹 {{ state_attr(entity_id, 'friendly_name') }}"
                 message: >
                   Chore last done {{ last_done_days }} days ago.
-   
-   
-   
+
+

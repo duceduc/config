@@ -1,8 +1,8 @@
 ###############################################################################
-#   @author         :   Duc Su 
+#   @author         :   Duc Su
 #   @date           :   03/05/2022
 #   @package        :   Monitor Presence
-#   @description    :   Package for handling Presence detection based on RSSI level using Monitor script.  
+#   @description    :   Package for handling Presence detection based on RSSI level using Monitor script.
 ###############################################################################
 
 # iphone irk:
@@ -11,91 +11,18 @@
 input_boolean:
   audible_notifications:
 
-#binary_sensor:
-#  - platform: template 
-#    sensors:
-#      duc_masterroom_presence:
-#        friendly_name: "Duc Masterroom Presence"
-#        device_class: occupancy
-#        delay_off:
-#          seconds: 30 
-#        value_template: >-
-#          {% if not (states('sensor.duc_masterroom_proximity') == 'unknown') and (states('sensor.duc_masterroom_proximity')|int > -3) %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-#      duc_shionroom_presence:
-#        friendly_name: "Duc Shionroom Presence"
-#        device_class: occupancy
-#        delay_off:
-#          seconds: 30         
-#        value_template: >-
-#          {% if not (states('sensor.duc_shionroom_proximity') == 'unknown') and (states('sensor.duc_shionroom_proximity')|int > -3) %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-#      duc_livingroom_presence:
-#        friendly_name: "Duc Livingroom Presence"
-#        device_class: occupancy
-#        delay_off:
-#          seconds: 30         
-#        value_template: >-
-#          {% if not (states('sensor.duc_livingroom_proximity') == 'unknown') and (states('sensor.duc_livingroom_proximity')|int > -8) %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-
-#      eri_masterroom_presence:
-#        friendly_name: "Eri Masterroom Presence"
-#        device_class: occupancy
-#        delay_off:
-#          seconds: 30 
-#        value_template: >-
-#          {% if not (states('sensor.eri_masterroom_proximity') == 'unknown') and (states('sensor.eri_masterroom_proximity')|int > -3) %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-#      eri_shionroom_presence:
-#        friendly_name: "Eri Shionroom Presence"
-#        device_class: occupancy
-#        delay_off:
-#          seconds: 30         
-#        value_template: >-
-#          {% if not (states('sensor.eri_shionroom_proximity') == 'unknown') and (states('sensor.eri_shionroom_proximity')|int > -3) %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-#      eri_livingroom_presence:
-#        friendly_name: "Eri Livingroom Presence"
-#        device_class: occupancy
-#        delay_off:
-#          seconds: 30         
-#        value_template: >-
-#          {% if not (states('sensor.eri_livingroom_proximity') == 'unknown') and (states('sensor.eri_livingroom_proximity')|int > -8) %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-
 mqtt:
   sensor:
     - name: "Room Presence"
       state_topic: "house/alerts/presence/current_room"
 
-
-## NEW FORMAT 
 template:
   - sensor:
       - name: "Room Audio"
         unique_id: room_audio
         state: >- # rejectattr fix
           {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.app_id', 'in',['music_assistant','satellite']) | map(attribute='last_updated') | first)).seconds -%}
-          {%- if last_alexa_called_seconds <= 60 %}  
+          {%- if last_alexa_called_seconds <= 60 %}
             {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
           {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
             {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}

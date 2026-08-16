@@ -32,7 +32,7 @@ input_select:
 timer:
 # washer load filter checks
   washer_monitor:
-    duration: '00:30:00'
+    duration: '00:32:00'
 
 #  dish_cabinet:
 #    duration: '00:02:00'
@@ -212,27 +212,6 @@ sensor:
 #    value_template: "{{ value_json.sys.uptime | int(0) | timestamp_custom('%-Hh %-Mmin %-Ssec', false) }}"
     scan_interval: 50
 
-#  For the above. Not in use now.
-
-#  - platform: template
-#    sensors:
-#      fridge_plug_apower:
-#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'apower') }}"
-#        unit_of_measurement: "W"
-#      fridge_plug_voltage:
-#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'voltage') }}"
-#        unit_of_measurement: "V"
-#      fridge_plug_current:
-#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'current') }}"
-#        unit_of_measurement: "A"
-#      fridge_plug_tenergy:
-#        value_template: "{{ '{:.1f}'.format(state_attr('sensor.fridge_plug_status', 'aenergy').total | float /10 | round(3)) }}"
-#        unit_of_measurement: "kWh"
-#      fridge_plug_temperature:
-#        value_template: "{{ state_attr('sensor.fridge_plug_status', 'temperature').tC }}"
-#        unit_of_measurement: "C"
-###################
-
 
 # Calibrate meter back to zero
 # https://community.home-assistant.io/t/cant-get-service-utility-meter-reset-working/582492/2
@@ -340,11 +319,11 @@ automation:
 # TESTING
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"
-        for: 37
+        for: 40
         id: 'filter'
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"
-        for: 37
+        for: 40
         id: 'filter'
 
 #      - trigger: template
@@ -409,12 +388,6 @@ automation:
           message: 'Just a quick heads up, It appears the washing machine has completed its cycle.'
       - action: script.turn_on
         entity_id: script.washer_finished_notification_audible
-
-  #    - condition: template
-  #      value_template: '{{ states("sensor.period_of_the_day") != "daylight" }}'
-  #    - action: cover.open_cover
-  #      entity_id:
-  #       - cover.lr_curtain_lt_curtain
 
   - alias: Washer Emptied
     initial_state: true

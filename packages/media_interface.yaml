@@ -76,21 +76,6 @@ input_select:
 # Spotify Statistic Usage
 ###################################################################################################
 
-#switch:
-#  - platform: template
-#    switches:
-#      spotify_usage:
-#        value_template: "{{ is_state('media_player.spotify_duc', 'playing')  }}"
-#        turn_on:
-#          - action: switch.turn_on
-#            target:
-#              entity_id: switch.target
-#        turn_off:
-#          - action: switch.turn_off
-#            target:
-#              entity_id: switch.target
-
-
 sensor:
   #Spotify Daily
   - platform: history_stats

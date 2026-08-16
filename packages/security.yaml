@@ -52,8 +52,6 @@ mqtt:
     - name: front_door_motion_away_count
       state_topic: "house/alerts/front_door_motion/away_count"
 
-
-
 template:
   - binary_sensor:
       - name: computerroom window triggered
@@ -64,7 +62,6 @@ template:
           {% else %}
             false
           {% endif %}
-
 
       - name: livingroom window triggered
         state: >
@@ -84,47 +81,12 @@ template:
             false
           {% endif %}
 
-
-
-
-#binary_sensor:
-#  - platform: template
-#    sensors:
-#      computerroom_window_triggered:
-#        value_template: >
-#          {% set sentry_mode = states('input_boolean.sentry_mode') %}
-#          {% if is_state("binary_sensor.computerroom_window", "on") and sentry_mode == "on" %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-
-#      livingroom_window_triggered:
-#        value_template: >
-#          {% set sentry_mode = states('input_boolean.sentry_mode') %}
-#          {% if is_state("binary_sensor.livingroom_window", "on") and sentry_mode == "on" %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-
-#      genkan_door_triggered:
-#        value_template: >
-#          {% set sentry_mode = states('input_boolean.sentry_mode') %}
-#          {% if is_state("binary_sensor.genkan_door_contact", "on") and sentry_mode == "on" %}
-#            true
-#          {% else %}
-#            false
-#          {% endif %}
-
-
-
 automation:
   - alias: 'Toggle Balcony Light'
     triggers:
-      - entity_id: binary_sensor.lr_window_button 
+      - entity_id: binary_sensor.lr_window_button
         trigger: state
-        to: 'on' 
+        to: 'on'
     actions:
       - action: switch.toggle
         entity_id: switch.balcony_light
@@ -230,9 +192,6 @@ automation:
     mode: single
 
 
-
-
-
   #############################################
   # When sentry mode is enabled / security armed by any method, check the doors and notify everyone.
   - id: sentry_mode_enabled
@@ -293,7 +252,7 @@ automation:
             data:
               modus: |
                 {% set night = (now() - state_attr('automation.nightly_lockdown', 'last_triggered')).seconds %}
-                
+
                 {% if is_state('input_boolean.vacation_mode', 'on') %} armed_vacation
                 {%elif night <= 2 %} armed_night
                 {% else %} armed_away {% endif %}
@@ -401,7 +360,6 @@ automation:
       - action: script.sentry_mode_status
         data:
           modus: 'triggered'
-
 
 
   #############################################
@@ -783,4 +741,3 @@ script:
               "Initiating my security response, and sounding the alarm. Oh, and I dont charge a monthly monitoring fee. #itsloudinhere #securityalarm",
               "Hey, wanna hear the most annoying sound in the world? The intruder inside Lions Home evidently did.  #itsloudinhere #securityalarm"
             ] | random }}
-
