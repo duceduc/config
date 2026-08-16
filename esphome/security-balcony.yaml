@@ -13,7 +13,7 @@ psram:  #neccessary after ESPHome update 2025_11_0
 esphome:
   name: $name
 esp32:
-  board: nodemcu-32s #esp-wrover-kit  
+  board: nodemcu-32s #esp-wrover-kit
   framework:
     type: esp-idf
 
@@ -31,7 +31,7 @@ binary_sensor:
   - platform: gpio
     pin: GPIO14 # D17 ??
     name: occupancy
-    device_class: motion    
+    device_class: motion
 
   - platform: status
     name: status
@@ -39,4 +39,4 @@ binary_sensor:
 switch:
   - platform: restart
     name: restart
-    icon: mdi:restart    
+    icon: mdi:restart
