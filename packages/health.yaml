@@ -30,6 +30,7 @@ automation:
       - trigger: state
         entity_id: sensor.duc_withings_weight, sensor.duc_withings_fat_ratio
     actions:
+      - delay: 8
       - action: script.text_notify
         data:
           who: amber
