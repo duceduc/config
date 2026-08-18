@@ -30,14 +30,14 @@ automation:
       - trigger: state
         entity_id: sensor.duc_withings_weight, sensor.duc_withings_fat_ratio
     actions:
-      - delay: 8
+      - delay: 5
       - action: script.text_notify
         data:
           who: amber
           title: 'Today\`s Weight:'
           message: >
             {% set t = as_timestamp(states.sensor.duc_withings_weight.last_changed) | timestamp_custom('%-I:%M %p') %}
-            Your weight recorded at {{ t }} is {{ states('sensor.duc_withings_weight') }}.
+            Your weight recorded at {{ t }} is {{ '%.1f' | format(states('sensor.duc_withings_weight') | float(0)) }}.
 
       - action: notify.send_message
         target:

@@ -20,6 +20,7 @@ HA considers "its" data.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import sqlite3
@@ -29,6 +30,17 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 
 _LOGGER = logging.getLogger(__name__)
+
+# Generous busy-wait before sqlite3 gives up and raises "database is locked",
+# passed to every connection. Python's default is 5s, which sounds like a
+# lot but wasn't — a big historical backfill (e.g. Weight/VO2 Max pulling
+# full history, added 16 Aug 2026) can fire dozens of webhook POSTs in quick
+# succession, each with its own executor-job thread opening its own
+# connection; under that burst, 5s of queueing was measurably not always
+# enough. 30s costs nothing in the common case (a write that isn't
+# contended returns immediately either way) and gives a burst plenty of
+# room to drain instead of failing outright.
+_CONNECT_TIMEOUT = 30.0
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS readings (
@@ -49,6 +61,38 @@ CREATE TABLE IF NOT EXISTS readings (
 );
 CREATE INDEX IF NOT EXISTS idx_readings_lookup
     ON readings (entry_id, metric, start_epoch);
+"""
+
+# One-time cleanup before the unique index below can be created — added 17
+# Aug 2026 after a Weight full-history backfill (across several HA restarts
+# during today's testing) got archived twice, since the only dedup guarding
+# inserts lived in memory (`data.mark_seen`) and doesn't survive a restart.
+# Keeps whichever copy has the lowest id (i.e. the first one ever archived)
+# and drops the rest. Safe to run every startup — a no-op once no
+# duplicates remain, since `GROUP BY` + `MIN(id)` always resolves to
+# exactly the surviving rows.
+_DEDUP_EXISTING = """
+DELETE FROM readings WHERE id NOT IN (
+    SELECT MIN(id) FROM readings
+    GROUP BY entry_id, metric, start_date, end_date, value, COALESCE(sleep_stage, '')
+);
+"""
+
+# Real, permanent fix for the same issue: a uniqueness constraint on the
+# fields that define "the same reading", so the exact same sample can never
+# be stored twice again — no matter how many times it's replayed or how
+# many restarts it survives across, for any metric, not just the ones that
+# happen to get a bespoke persistent dedup store (contrast with workouts'
+# `seen_workout_keys`, added 12 Aug 2026 for this same class of bug, but
+# only for that one metric). COALESCE normalizes the nullable columns
+# (`value`, `sleep_stage`) to a fixed sentinel first — SQLite treats NULL as
+# distinct from NULL in a unique constraint, so without this, every
+# non-sleep-stage reading (i.e. everything except the four sleep-stage
+# snapshots) would silently bypass the constraint entirely.
+_UNIQUE_INDEX = """
+CREATE UNIQUE INDEX IF NOT EXISTS idx_readings_unique
+    ON readings (entry_id, metric, start_date, end_date,
+                 COALESCE(value, -1e18), COALESCE(sleep_stage, ''));
 """
 
 
@@ -73,13 +117,65 @@ class ReadingsStore:
         self._hass = hass
         self._entry_id = entry_id
         self._path = hass.config.path(".storage", f"healthsync_{entry_id}_readings.db")
+        self._conn: sqlite3.Connection | None = None
+        # Guards every access to `_conn`. Originally each insert/query opened
+        # its own short-lived connection; under a big historical batch (e.g.
+        # Weight/VO2 Max's new full-history first sync, 16 Aug 2026) several
+        # of those could land close enough together that two connections
+        # tried to write at once, and sqlite3 raised "database is locked" —
+        # 86 occurrences logged, all archive writes failing, the same day
+        # that first-sync change shipped. A single persistent connection,
+        # entirely serialized through this lock, removes the race outright
+        # rather than just tolerating it with a longer timeout: nothing ever
+        # contends for the file in the first place, since only one caller is
+        # ever inside SQLite at a time. It also fixes a second symptom from
+        # the same root cause — the client-side webhook POST timing out
+        # while backfilling a big batch, since each sample was previously
+        # paying for its own connection open/journal-init/close cycle;
+        # reusing one open connection makes each insert markedly cheaper, so
+        # a whole batch's worth no longer risks outrunning the app's request
+        # timeout.
+        self._lock = asyncio.Lock()
 
     async def async_setup(self) -> None:
         await self._hass.async_add_executor_job(self._setup)
 
+    async def async_close(self) -> None:
+        """Closes the persistent connection cleanly on unload/reload — this
+        integration gets restarted often (every update needs one), and with
+        a single long-lived connection now (rather than the old
+        open-per-call pattern, which had nothing to leak) leaving it open
+        across a reload would hold the file handle unnecessarily and risk
+        WAL/SHM files not getting merged back into the main db file cleanly.
+        Best-effort: never worth blocking unload over."""
+        conn, self._conn = self._conn, None
+        if conn is not None:
+            try:
+                await self._hass.async_add_executor_job(conn.close)
+            except Exception:  # noqa: BLE001
+                _LOGGER.exception("HealthSync: failed to close readings database cleanly")
+
     def _setup(self) -> None:
-        with sqlite3.connect(self._path) as conn:
-            conn.executescript(_SCHEMA)
+        # check_same_thread=False: HA's executor job pool doesn't guarantee
+        # the same worker thread runs every call, but `self._lock` already
+        # guarantees only one of them is ever inside this connection at a
+        # time, which is the actual requirement sqlite3 cares about — so
+        # disabling its same-thread check here is safe, not a workaround.
+        conn = sqlite3.connect(self._path, timeout=_CONNECT_TIMEOUT, check_same_thread=False)
+        # WAL: readers (get_readings) are never blocked waiting on a writer,
+        # and writers queue via the lock above rather than colliding.
+        # synchronous=NORMAL is WAL's standard pairing — still crash-safe,
+        # just without fsync-ing on every single insert, which matters here
+        # given how many inserts a big historical batch fires in a row.
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.executescript(_SCHEMA)
+        # Order matters: clear out any duplicates that already exist
+        # *before* the unique index is created, since SQLite refuses to
+        # build a unique index over data that would violate it.
+        conn.executescript(_DEDUP_EXISTING)
+        conn.executescript(_UNIQUE_INDEX)
+        self._conn = conn
 
     async def async_insert(self, metric: str, sample: dict[str, Any]) -> None:
         """Archives one sample exactly as received. Best-effort — deliberately
@@ -87,16 +183,19 @@ class ReadingsStore:
         integration (sensors, events, statistics) already processed this
         sample regardless of whether the archive write succeeds."""
         try:
-            await self._hass.async_add_executor_job(self._insert, metric, sample)
+            async with self._lock:
+                await self._hass.async_add_executor_job(self._insert, metric, sample)
         except Exception:  # noqa: BLE001
             _LOGGER.exception("HealthSync: failed to archive a %s reading", metric)
 
     def _insert(self, metric: str, sample: dict[str, Any]) -> None:
+        if self._conn is None:
+            raise RuntimeError("ReadingsStore used before async_setup")
         raw_payload = json.dumps({k: v for k, v in sample.items() if k != "secret"})
-        with sqlite3.connect(self._path) as conn:
-            conn.execute(
+        with self._conn:
+            self._conn.execute(
                 """
-                INSERT INTO readings
+                INSERT OR IGNORE INTO readings
                     (entry_id, metric, value, sleep_stage, unit, start_date,
                      end_date, start_epoch, source, daily_total, workout_type,
                      distance, raw_payload)
@@ -125,7 +224,8 @@ class ReadingsStore:
         start: datetime | None = None,
         end: datetime | None = None,
     ) -> list[dict[str, Any]]:
-        return await self._hass.async_add_executor_job(self._query, metric, start, end)
+        async with self._lock:
+            return await self._hass.async_add_executor_job(self._query, metric, start, end)
 
     def _query(
         self,
@@ -147,7 +247,9 @@ class ReadingsStore:
             + " AND ".join(clauses)
             + " ORDER BY start_epoch ASC"
         )
-        with sqlite3.connect(self._path) as conn:
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute(query, params).fetchall()
+        if self._conn is None:
+            raise RuntimeError("ReadingsStore used before async_setup")
+        self._conn.row_factory = sqlite3.Row
+        rows = self._conn.execute(query, params).fetchall()
+        self._conn.row_factory = None
         return [dict(row) for row in rows]
