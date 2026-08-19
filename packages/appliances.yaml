@@ -313,7 +313,7 @@ automation:
       - trigger: numeric_state
         entity_id: sensor.gosund_washer_power
         below: 7
-        for: 32 # default 36
+        for: 25 # default 36 if 25 failed, fallback to 32
         id: 'done'
 
 # TESTING
