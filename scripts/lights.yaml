@@ -89,155 +89,12 @@
 
 #########################################################
 #
-#             Computer Room Lights Fade in
-#
-#########################################################
-
-  cr_lights_fadein_day:
-    alias: 'cr lights fadein_day'
-    sequence:
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 1
-          color_temp_kelvin: 5000
-      - delay:
-          seconds: 1
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 64
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 128
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 151
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-
-  cr_lights_fadein_night:
-    alias: 'cr lights fadein_night'
-    sequence:
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 1
-          color_temp_kelvin: 5000
-      - delay:
-          seconds: 1
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 64
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 128
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 191
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 254
-          color_temp_kelvin: 5000
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-
-#########################################################
-#
-#             Living Room Lights Fade
-#
-#########################################################
-
-
-  lr_lights_fadein_day:
-    alias: 'lr lights fadein_day'
-    sequence:
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 1
-      - delay:
-          seconds: 1
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 64
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 128
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 181
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-
-  lr_lights_fadein_night:
-    alias: 'lr lights fadein_night'
-    sequence:
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 1
-      - delay:
-          seconds: 1
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 64
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 128
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 191
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - delay: '00:00:{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-      - service: light.turn_on
-        data_template:
-          entity_id: light.{{ entity }}
-          brightness: 254
-          transition: '{{ (( states.input_number.wakeup_duration.state | float * 60 / 4 )| round ) | int }}'
-
-
-
-#########################################################
-#
 #             Tradfri Light Transitions
 #
 #########################################################
 
 # https://community.home-assistant.io/t/tradfri-transition/17530/23
+# hallway still using this script
 
   tradfri_transition:
     sequence:
@@ -250,7 +107,6 @@
       - service: light.turn_on
         data_template:
           entity_id: '{{ entity_id }}'
-#          color_temp_kelvin: '{{ color_temp_kelvin | int }}'
           transition: '{{ transition | int / 2 }}'
     mode: parallel # default 10
 
@@ -267,6 +123,11 @@
 #          entity_id: '{{ entity_id }}'
 #          transition: '{{ transition | int / 2 }}'
 #    mode: parallel # default 10
+
+
+
+
+
 
 
 #########################################################
