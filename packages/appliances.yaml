@@ -313,17 +313,17 @@ automation:
       - trigger: numeric_state
         entity_id: sensor.gosund_washer_power
         below: 7
-        for: 25 # default 36 if 25 failed, fallback to 32
+        for: 34 # default 36 if 25 failed, fallback to 32
         id: 'done'
 
 # TESTING
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"
-        for: 42
+        for: 40
         id: 'filter'
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"
-        for: 42
+        for: 400
         id: 'filter'
 
 #      - trigger: template
