@@ -8,7 +8,6 @@
 #TESTING
 
 script:
-
   cleanup_text:
     sequence:
     - variables:
@@ -20,7 +19,7 @@ script:
               {{ item | trim }} {% endfor -%}
           {%- endmacro -%} {%- macro mother_of_all_macros() -%}
             {{ getReport() }}
-          {%- endmacro -%} 
+          {%- endmacro -%}
           {"text":"{{- cleanup(mother_of_all_macros()) | string -}}"}
     - stop: "ok, Im done."
       response_variable: "cleaned"
@@ -35,7 +34,7 @@ script:
         {{ duc_briefing.critical_battery_count | int > 0 }}
     - variables:
         message: >
-          {% set batts = expand('group.critical_batteries') 
+          {% set batts = expand('group.critical_batteries')
             | rejectattr('state', 'eq', '100')
             | selectattr('state', 'lt', '30') | list %}
           {% for bat in batts %}
@@ -55,14 +54,11 @@ script:
     - service: persistent_notification.dismiss
       data:
         notification_id: "battery_notification"
-    - service: persistent_notification.create 
+    - service: persistent_notification.create
       data:
         notification_id: "battery_notification"
         message: "{{ message }}"
         title: "Battery List - To Change"
-
-
-
 
 
 # duc morning brief v2
@@ -119,7 +115,7 @@ script:
                 'I suspect your phone has had a power failure.',
                 'Your mobile device is no longer responding.'
                 ] | random }}
-                I suggest you locate it. 
+                I suggest you locate it.
             {% endif %}
             {{ [
             'And.',
@@ -150,12 +146,12 @@ script:
                 'Your tablet is no longer responsive. I suspect a power failure.',
                 'I am unable to communicate with your tablet.'
                 ] | random }}
-                I suggest you locate it. 
+                I suggest you locate it.
             {% endif %}
-            
+
           critical_battery_count: >
             {{ states('sensor.critical_battery_count') }}
-          critical_battery_info: >- 
+          critical_battery_info: >-
             {% if critical_battery_count | int > 0 %}
               {{ [
                 'One more thing.',
@@ -176,7 +172,7 @@ script:
                   'I suggest you make time to change a battery. Because ' ~ critical_battery_count ~ ' device is nearing power failure.'
                   ] | random }}
               {% endif %}
-                I sent a list to your phone. 
+                I sent a list to your phone.
             {% else %}
 
             {% endif %}

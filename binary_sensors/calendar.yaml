@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#            Times of Day                                                                                           
-#                                                                                                              
+#
+#            Times of Day
+#
 #########################################################
 
 
@@ -47,7 +47,7 @@
   - platform: tod
     name: Afternoon Cooking
     after: '12:00'
-    before: '14:00'    
+    before: '14:00'
   - platform: tod
     name: Evening Cooking
     after: '16:00'
@@ -55,7 +55,7 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################
