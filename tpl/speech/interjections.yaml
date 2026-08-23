@@ -2,7 +2,7 @@
   {# Interjections #}
   {%- macro getReport() -%}
     {{ [
-      'Okay.', 
+      'Okay.',
       'If you insist.',
       'I am afraid I can not do that <break time="1s"/> I am kidding,',
       'Leave it to me.',

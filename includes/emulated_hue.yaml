@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             EMULATED HUE                                                                             
-#                                                                                                              
+#
+#             EMULATED HUE
+#
 #########################################################
 # Flush
 # https://community.home-assistant.io/t/how-to-efficiently-flush-emulated-hue-solved/201480/25
@@ -45,7 +45,7 @@
 #    switch.ceiling_fan_light:
 #      name: 'Ceiling Fan Lights'
 #      hidden: false
-     
+
 #    switch.ceiling_fan_summer:
 #      name: 'Ceiling Fan Summer'
 #      hidden: false
@@ -91,17 +91,17 @@
 
 
 #########################################################
-#                                                                                                              
-#             Aircons                                                                                       
-#                                                                                                              
+#
+#             Aircons
+#
 #########################################################
 
 #    switch.ac_lr_unit:
 #      name: AC Livingroom
-#      hidden: false      
+#      hidden: false
 #    switch.heater_lr_unit:
 #      name: Heater Livingroom
-#      hidden: false    
+#      hidden: false
 #    switch.humidifier_lr_unit:
 #      name: Humidifier Livingroom
 #      hidden: false
@@ -111,7 +111,7 @@
 #      hidden: false
 #    switch.heater_mr_unit:
 #      name: Heater Master Room
-#      hidden: false    
+#      hidden: false
 #    switch.humidifier_mr_unit:
 #      name: Humidifier Master Room
 #      hidden: false
@@ -121,25 +121,25 @@
 #      hidden: false
 #    switch.heater_sr_unit:
 #      name: Heater She On Room
-#      hidden: false    
+#      hidden: false
 #    switch.humidifier_sr_unit:
 #      name: Humidifier She On Room
 #      hidden: false
 
 
 #########################################################
-#                                                                                                              
-#             Humidifier                                                                                   
-#                                                                                                              
+#
+#             Humidifier
+#
 #########################################################
 
 #    switch.sb_humidifier:
 #      name: Humidifier
-#      hidden: false  
+#      hidden: false
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################

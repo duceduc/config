@@ -10,9 +10,9 @@
     {% for i in guest_home %}
       {% set ns.guests = ns.guests ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
     {% endfor %}
-    
+
     {{ns.guests}}.
-    {{ ( 
+    {{ (
      'Welcome,',
      'Welcome back,',
      'Hello,',
@@ -28,7 +28,7 @@
      'Look what the cat dragged in!,',
      'How have you been?,',
      'You have made it,',
-     'What’s going on?,',             
+     'What’s going on?,',
      'Great to have you back,',
      'Nice to see you back,',
      'You are are here,',
@@ -42,9 +42,9 @@
      'Enjoy your stay,',
      'Enjoy the rest of the day.',
      'I am glad to see you.'
-     )|random }}  
+     )|random }}
 
-     
+
   {%- endmacro -%}
 
 

@@ -18,14 +18,11 @@
         device_class: moving
 
 
-
-
 #########################################################
 #
 #             Template Sensors
 #
 #########################################################
-
 
   - sensor:
       - name: "Security Genkan"
@@ -53,7 +50,7 @@
         unique_id: 1478ae4b-d907-405d-8a8e-4bab94e3ab0f
         unit_of_measurement: Days
         state: >
-          {{ ((as_timestamp(now().replace(month=10, day=31)) - as_timestamp(now()) | int) / 86400) | round(0) +1 }}  
+          {{ ((as_timestamp(now().replace(month=10, day=31)) - as_timestamp(now()) | int) / 86400) | round(0) +1 }}
 
       - name: Line Dry Time
         unique_id: line_dry_time
@@ -77,7 +74,6 @@
           {% set d = (1-humidity)*ea %}
           {% set e = (delta*rn+y*(6.43*(1+0.536*wind)*d))/(lamda*(delta+y)) %}
           {{((0.2/(e))*1440)|round(2)}}
-
 
 
       - name: wakeup alarm time
@@ -134,7 +130,7 @@
         state: '{{ states.binary_sensor | count }}'
 
       - name: light count
-        state: '{{ states.light | count }}' 
+        state: '{{ states.light | count }}'
 
       - name: tracker count
         state: '{{ states.device_tracker | count }}'
@@ -151,17 +147,11 @@
         state: "{% set nr = as_timestamp(state_attr('sun.sun','next_rising')) %} {% set ns = as_timestamp(state_attr('sun.sun','next_setting')) %} {% if nr > ns %} {% set nr = nr - 60*60*24 %} {% endif %} {{ (ns - nr)|timestamp_custom('%H:%M',false) }}"
 
 
-
-
-
-
-
 #########################################################
 #
-#             Template Misc 
+#             Template Misc
 #
 #########################################################
-
 
   - trigger:
       - platform: event
@@ -177,7 +167,6 @@
           {{ trigger.event.data.action }} -
           {{ trigger.event.data.side }} frm
           {{ trigger.event.data.last_side }}
-
 
 
 #########################################################
@@ -211,7 +200,6 @@
 #             Calendar Holidays
 #
 #########################################################
-
 
   - trigger:
       - platform: calendar
@@ -287,7 +275,6 @@
           event_id: "tomorrow"
 
 
-
 # https://community.home-assistant.io/t/syntax-for-multiple-search-criteria-for-imap-search/568471/7
 # https://community.home-assistant.io/t/syntax-for-multiple-search-criteria-for-imap-search/568471/10
   - trigger:
@@ -300,7 +287,7 @@
         state: >
           {% set sender_list = ['cibadmin@sbishinseibank.co.jp', 'info@snailmsg.com'] %}
           {% set current = this.state|default('off', 1) %}
-          
+
           {% if trigger.event.data['sender'] in sender_list and
           "Information from Transfer" in
           trigger.event.data['subject'] %} on

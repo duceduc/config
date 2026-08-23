@@ -39,14 +39,14 @@
   actions:
     - choose:
         - conditions:
-            - condition: template
-              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') and now().hour < 21 or now().hour > 7 }}"
+            - condition: template # 7am - 11pm
+              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') and now().hour < 22 or now().hour > 6 }}"
           sequence:
             - action: light.turn_on
               entity_id: light.laundry
         - conditions:
-            - condition: template
-              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') and now().hour > 21 or now().hour < 7 }}"
+            - condition: template # 11pm - 7pm
+              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') and now().hour > 22 or now().hour < 6 }}"
           sequence:
             - action: light.turn_off
               entity_id: light.laundry

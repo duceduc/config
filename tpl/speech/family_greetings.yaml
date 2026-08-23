@@ -11,7 +11,7 @@
       {% for i in people_home %}
         {% set ns.occupants = ns.occupants ~ ' and ' ~ alias.get(i,i) if loop.index > 1 else alias.get(i,i) %}
       {% endfor %}
-     
+
       {% macro p1(person) %}
       {% set p1 = [
          "Welcome home " ~ns.occupants~" ",
@@ -48,9 +48,9 @@
       {% set p2 = [
          "Welcome home " ~ns.occupants~" ",
           ns.occupants~ " You guys are home now. ",
-          "Welcome back home " ~ns.occupants~" ",          
+          "Welcome back home " ~ns.occupants~" ",
           "Welcome home " ~ns.occupants~". I missed you guys. ",
-          "Hey " ~ns.occupants~"! High Five! Glad you are finally home.",          
+          "Hey " ~ns.occupants~"! High Five! Glad you are finally home.",
           "Our house is now complete, rest and relax !. Welcome back " ~ns.occupants~" ",
           "Hey there! " ~ns.occupants~ " Welcome home! ",
           "Knock knock. Who's here? It's " ~ns.occupants~" ",
@@ -71,18 +71,18 @@
       {% if n_home == 0 %}
        Attention!!!
        No family members are home at the moment!!
-       
+
       {% elif n_home == 1 %}
        {{ p1(person) }}
       {% elif  n_home > 1 and n_home < t_family %}
-       {{ p2(persons) }}   
-       
+       {{ p2(persons) }}
+
       {% elif  n_home == t_family  %}
       {% set p = trigger.to_state.attributes.friendly_name %}
       {% set user = alias.get(p) %}
         {{ user }}. {{ ('Wow!,','Tickle me pink!,','Tickle me blue!,') | random }} What an event! The whole {{ ('family,','gang,','crew,') | random }} is at home!
       {% endif %}
-  
+
     </p>
 
     <p>
@@ -104,19 +104,19 @@
 
     <p>
        {%- if is_state('sensor.washer_status_m', 'complete') %}
-         The washing machine completed its cycle 
+         The washing machine completed its cycle
          {% set seconds = (now() - states.sensor.washer_status_m.last_changed).seconds %}
          {% if (seconds / ( 60 * 60 )) | int == 1 %}
            over an hour ago.
            {{ [
-           'Do not forget to rotate the clothes.', 
+           'Do not forget to rotate the clothes.',
            'Was someone going to rotate the laundry?',
            'Once you rotate the laundry I will stop reminding you to do it. So if you want me to stop. Its up to you.'
            ] | random }}
          {% elif (seconds / ( 60 * 60 )) | int > 1 and (seconds / ( 60 * 60 )) | int < 6 %}
            over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
            {{ [
-           'Much longer and you are going to need to wash them again.', 
+           'Much longer and you are going to need to wash them again.',
            'Someone needs to rotate the laundry.',
            'Do not forget about the clothes in the washing machine.',
            'Surely you did not mean to forget about the clothes. Mistakes happen. But you can still fix it.',
@@ -125,7 +125,7 @@
          {% elif (seconds / ( 60 * 60 )) | int > 6 %}
            over {{ (seconds //  ( 60 * 60 )) | int }} hours ago.
            {{ [
-           'That is a crazy amount of time.', 
+           'That is a crazy amount of time.',
            'Did you decide you want those clothes to suffer?',
            'You might as well just rewash those clothes.',
            'I can smell the mildew. Virtually that is.',
@@ -134,7 +134,7 @@
          {% else %}
            {{ (seconds // 60) | int }} minutes ago.
            {{ [
-           'Do not forget to rotate the clothes.', 
+           'Do not forget to rotate the clothes.',
            'Someone forgot to move the clothes to the dryer. I am not going to name names, but there is a camera in there. Do I need to publically shame someone?',
            'You might want to move them to the dryer.'
            ] | random }}
@@ -146,13 +146,13 @@
     {% if is_state('sensor.front_door_motion_away_count','0') %}
       While you were gone there was no motion detected at the front door.
     {% elif is_state('sensor.front_door_motion_away_count','1') %}
-      While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} time.      
+      While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} time.
     {% else %}
       While you were out I detected motion at the front door {{ states('sensor.front_door_motion_away_count')| int }} times.
     {% endif %}
     </p>
 
-       
+
   {%- endmacro -%}
 
 

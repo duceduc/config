@@ -2,7 +2,7 @@
   {# Alexa Cmds #}
   {%- macro getReport() -%}
     {{ [
-      'Okay.', 
+      'Okay.',
       'If you insist.',
       'I am afraid I can not do that <break time="1s"/> I am kidding,',
       'Leave it to me.',
@@ -28,7 +28,7 @@
       'vibration':('detected','clear'),'problem':('not',''),
       'smoke':('detected','clear'),'sound':('detected','clear'),
       'motion':('detected','clear'),'battery':('on','off'),
-      'occupancy':('detected','clear') } %} 
+      'occupancy':('detected','clear') } %}
     {% set word = ns.speak.split() %}
     {% for ps in word %}
       {% set tn = ps[ps.find("("):ps.find(")")+1] %}
@@ -61,13 +61,13 @@
               {% set st = states[et].state_with_unit %}
             {% endif %}
             {% set dt = state_attr(et,"device_class")|string %}
-            {% if (dt != "None") and (st =='off' or st == 'on')  %} 
+            {% if (dt != "None") and (st =='off' or st == 'on')  %}
               {% set st = dy[dt][st|int] %}
             {% endif %}
-            {% set rp = st %} 
+            {% set rp = st %}
           {% elif tn|regex_search('\(e..[bB]\)') %}
             {% set br = state_attr(et,"brightness")|int %}
-            {% set rp = br|string %} 
+            {% set rp = br|string %}
             {% if tn[4:5] == 'b' %}
               {% set rp = ((100*br/254)|int)|string %}
             {% endif %}
@@ -80,7 +80,7 @@
       {% set ns.speak = ns.speak.replace(tn,rp) %}
     {% endfor %}
     {{ns.speak}}
-      
+
   {%- endmacro -%}
 
   {# a macro that removes all newline characters, empty spaces, and returns formatted text  #}

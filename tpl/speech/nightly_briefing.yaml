@@ -10,14 +10,14 @@
           'I will be going as HAL 9000. The Pod Bay Doors are being installed today. I dare you to ask me to open them. '
         ] | random }}
       {% elif states('sensor.halloween_countdown')| int < 30 and states('sensor.halloween_countdown')| int > 1 %}
-        There are only {{states('sensor.halloween_countdown') }} days 
+        There are only {{states('sensor.halloween_countdown') }} days
         {{ [ 'until Halloween.',
           'until Halloween. It might not be enough time. ',
           'and counting until the best holiday ever.',
           'until you need a costume.'
-        ] | random }} 
+        ] | random }}
 
-      {% else %}  
+      {% else %}
       {% endif %}
 
       {% if states('sensor.christmas_countdown')| int == 1 %}
@@ -30,15 +30,15 @@
           'It is starting to smell a lot like Christmas. Or it could be the christmas tree is on fire.',
           'I do not want to be a smarthome. I want to be a dentist.',
           'Do not eat all the cookies. '
-        ] | random }} 
+        ] | random }}
 
       {% else %}
       {% endif %}
       </p>
-      
+
       <p>
         {% if states('sensor.holiday_golden_week') | int(0) == 120 %}
-        There are only one hundred and twenty days until the next Golden Week Holiday. 
+        There are only one hundred and twenty days until the next Golden Week Holiday.
         {% endif %}
         {% if states('sensor.holiday_golden_week') | int(0) == 60 %}
         There are only on sixty days until the next Golden Week Holiday.
@@ -51,19 +51,19 @@
         {% endif %}
         {% endif %}
         {% if states('sensor.anniversary_our_wedding') | int(0) == 1 %}
-        Tomorrow is Duck and Eddie's Wedding Anniversary. 
+        Tomorrow is Duck and Eddie's Wedding Anniversary.
         {% endif %}
         {% if states('calendar.birthdays') == 'on' %}
-          Today is {{ state_attr('calendar.birthdays', 'message') }}! 
-          So Happy Birthday! The confetti cannon is not working 
-          otherwise I would shower you in paper garbage that 
+          Today is {{ state_attr('calendar.birthdays', 'message') }}!
+          So Happy Birthday! The confetti cannon is not working
+          otherwise I would shower you in paper garbage that
           someone else would have to pick up.
-        {% endif %}  
+        {% endif %}
       </p>
-      
+
       <p>
          {% if states('sensor.holiday_golden_week') | int(0) == 1 %}
-           Oh, and there is just one more sleep until the next Golden Week Holiday! 
+           Oh, and there is just one more sleep until the next Golden Week Holiday!
          {% endif %}
       </p>
 
@@ -90,6 +90,6 @@
     {%- macro mother_of_all_macros() -%}
       {{ getReport() }}
     {%- endmacro -%}
-    
+
     {# Call the macro  #}
     {{- cleanup(mother_of_all_macros()) -}}

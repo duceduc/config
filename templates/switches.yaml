@@ -46,9 +46,9 @@
 
 
 ####################################################
-#                                                                                                    
-#                    Convert to Switch                                                        
-#                                                                                                    
+#
+#                    Convert to Switch
+#
 ####################################################
 
       - name: Ceiling Fan Light
@@ -120,7 +120,7 @@
             target:
               entity_id: input_select.mr_ac_mode
             data:
-              option: Normal Cool 
+              option: Normal Cool
         turn_off:
           - action: input_boolean.turn_off
             entity_id: input_boolean.ac_mr_unit
@@ -159,7 +159,7 @@
             target:
               entity_id: input_select.sr_ac_mode
             data:
-              option: Normal Cool 
+              option: Normal Cool
         turn_off:
           - action: input_boolean.turn_off
             entity_id: input_boolean.ac_sr_unit

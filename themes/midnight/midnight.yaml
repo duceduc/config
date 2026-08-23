@@ -82,7 +82,6 @@ midnight:
 #  wa-color-text-quiet: var(--secondary-text-color)
 
 
-
   # The items below are some of the default values from 
   # https://github.com/home-assistant/frontend/blob/master/src/resources/ha-style.ts 
   # Where the default value isn't changed, its noted.
@@ -108,6 +107,7 @@ midnight:
   #States and badges
   state-icon-color: "#03a9f4"
   state-icon-active-color: "#ffff00"
+
 
   #Background and sidebar
   card-background-color: "#000000"

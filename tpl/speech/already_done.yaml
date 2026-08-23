@@ -2,7 +2,7 @@
   {# Interjections #}
   {%- macro getReport() -%}
     {{ [
-      'Okay. Well, I have already handled that.', 
+      'Okay. Well, I have already handled that.',
       'Looks like someone already did that, but I will gladly take credit.',
       'I am so fast it is already done.'
       ]| random }}

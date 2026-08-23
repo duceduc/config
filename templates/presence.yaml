@@ -37,7 +37,7 @@
           {% elif person in ['ueno park','yoyogi park'] %}
             recreation
           {% elif person in ['immigration bureau','TMG building'] %}
-            government 
+            government
           {% else %}
             {% if person in ['not_home'] %}
               away
@@ -60,7 +60,7 @@
           {% elif person in ['ueno park','yoyogi park'] %}
             recreation
           {% elif person in ['immigration bureau','TMG building'] %}
-            government 
+            government
           {% else %}
             {% if person in ['not_home'] %}
               away
@@ -83,7 +83,7 @@
           {% elif person in ['ueno park','yoyogi park'] %}
             recreation
           {% elif person in ['immigration bureau','TMG building'] %}
-            government 
+            government
           {% else %}
             {% if person in ['not_home'] %}
               away

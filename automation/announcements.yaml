@@ -227,7 +227,7 @@
               {% set alias = {"Eri":"mommy", "iE":"mommy", "id":"daddy", "Shion":"she-on"} %}
               {% set p = trigger.to_state.attributes.friendly_name %}
               {% set person = alias.get(p) %}
-                {{ person }}, will be home in about 5 minutes.
+                {{ person }}, will be home {{ ('in 5 minutes','in few minutes','momentarily','shortly','briefly','in a flash','soon') | random }}.
         - action: light.turn_on
           data:
             entity_id: light.g_1

@@ -1,5 +1,4 @@
 
-
   - sensor:
       - name: duc destination waze
         state: >
@@ -20,7 +19,7 @@
           {%- if is_state("input_select.eri_destination_waze", "home") -%}
             35.81842918238185, 139.70377984736893
           {%- elif is_state("input_select.eri_destination_waze", "school") -%}
-            35.81214930237013, 139.71171706362946              
+            35.81214930237013, 139.71171706362946
           {%- elif is_state("input_select.eri_destination_waze", "costcokawa") -%}
             35.52270052783271, 139.7320772738939
           {%- elif is_state("input_select.eri_destination_waze", "costcokisa") -%}
@@ -38,19 +37,19 @@
           {%- elif is_state("input_select.shion_destination_waze", "school") -%}
             35.81214930237013, 139.71171706362946
           {%- elif is_state("input_select.shion_destination_waze", "others") -%}
-            35.455399803928515, 139.63117593861773           
+            35.455399803928515, 139.63117593861773
           {%- else -%}
             Unknown
           {%- endif %}
-          
-          
-          
+
+
+
 #      - name: airtag_shion1
 #        unique_id: airtag_shion1
 #        icon: mdi:account
 #        state: >
-#          {% set home = "Namiki 3-Chome" %} 
-#          {% if ":" in states('input_text.airtag').split('Shion1')[1].split('•')[0] %} 
+#          {% set home = "Namiki 3-Chome" %}
+#          {% if ":" in states('input_text.airtag').split('Shion1')[1].split('•')[0] %}
 #          {{ states('input_text.airtag').split('Shion')[1].split('•')[0].split(',')[0] }}
 #          {% elif home in states('input_text.airtag').split('Shion1')[1].split('•')[0] %}Home
 #          {% else %}
@@ -71,6 +70,3 @@
 #            {% else %}available
 #            {% endif %}
 
-
-
-        

@@ -54,9 +54,9 @@
      - sensor.carbon_dioxide
      - sensor.carbon_monoxide #20
      - sensor.alexa_last_msg
-      
+
   speak_list:
-    icon: simple-icons:amazonalexa 
+    icon: simple-icons:amazonalexa
     name: Speak List
     options:
      - do not use
@@ -81,18 +81,6 @@
      - (e21$)
 
 #       - The current (e04f) is {{(e04$)|round(1)}} degrees and the humidity is {{(e07$)|round(1)}} percent # Livingroom Temp
-
-
-#  sb_humidifier_mode:
-#    name: SB Humidifier Mode
-#    icon: mdi:air-humidifier
-#    options:
-#      - 'Off'
-#      - Auto
-#      -  Low
-#      - Med
-#      - High
-
 
   lr_ac_mode:
     name: Livingroom AC Mode
@@ -163,30 +151,30 @@
 
   duc_destination_waze:
     name: Duc Destination Waze
-    options: 
+    options:
      - home
      - school
      - jcb
      - others
-    initial: jcb  
+    initial: jcb
 
   eri_destination_waze:
     name: Eri Destination Waze
-    options: 
+    options:
      - home
      - school
      - costcokawa
      - costcokisa
      - others
-    initial: costcokisa  
+    initial: costcokisa
 
   shion_destination_waze:
     name: Shion Destination Waze
-    options: 
+    options:
      - home
      - school
      - others
-    initial: school  
+    initial: school
 
 
 

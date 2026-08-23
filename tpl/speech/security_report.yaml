@@ -3,7 +3,7 @@
   {%- macro getReport() -%}
     <p>
     <audio src='https://ha.snailmsg.com/local/alerts/en/super_mario_up.mp3'/>
-    
+
     {%- if states.group.external_doors.state == 'off' %}
       <break time="1s"/> All external doors and locks are currently secured. No actions required.
     {% else %}
@@ -18,7 +18,7 @@
         {{ [
           open_doors ~ is_are + "standing open.",
           open_doors ~ is_are + "not secured.",
-          open_doors ~ is_are + "not closed.",          
+          open_doors ~ is_are + "not closed.",
           open_doors ~ is_are + "open."
           ] | random }}
         {%- endmacro -%}
@@ -39,6 +39,6 @@
     {%- macro mother_of_all_macros() -%}
       {{ getReport() }}
     {%- endmacro -%}
-    
+
     {# Call the macro  #}
     {{- cleanup(mother_of_all_macros()) -}}

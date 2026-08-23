@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Dummy Climate Template for QLM Theme                                           
-#                                                                                                              
+#
+#             Dummy Climate Template for QLM Theme
+#
 #########################################################
 # Climate Template Integration via CComponent
 # https://github.com/jcwillox/hass-template-climate
@@ -68,7 +68,7 @@
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

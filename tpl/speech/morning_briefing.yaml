@@ -10,7 +10,7 @@
           Good evening.
         {% endif %}
       </p>
-      
+
       <p>
       {% if now().strftime('%H')|int < 12 %}
         {% if now().strftime('%M')|int == 0 %}
@@ -38,22 +38,22 @@
               'Now that you are awake I can tell you that today is '
                 ]|random }}{{ states('sensor.date_dayoftheweek') }}. The time is {{ now().strftime('%H')|int }} {{ now().strftime('%M')|int }} p.m.
         {% endif %}
-      
+
       {% else %}
 
       {% endif %}
       </p>
 
       <p>
-        It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.aio_human_sensor_entrance_temperature', rounded=True) }} degrees in Kawagoodchi. 
+        It is currently {{states('sensor.wbio_current_forecast') }} and {{states('sensor.aio_human_sensor_entrance_temperature', rounded=True) }} degrees in Kawagoodchi.
       </p>
-      
+
       <p>
         {{ [
             'The rest of the day should be,',
             'Weather forecast should be,'
         ]|random }}
-          {{ states('sensor.wbio_current_condition') }}. 
+          {{ states('sensor.wbio_current_condition') }}.
         </p>
 
         <p>
@@ -66,7 +66,7 @@
             {% endif %}
           {% endif %}
         </p>
-        
+
         <p>
         {% if is_state('sensor.halloween_countdown', '0') %}
           Happy Halloween!
@@ -75,14 +75,14 @@
           Merry Christmas Everyone!
         {% endif %}
         {% if is_state('sensor.anniversary_our_wedding', '0') %}
-          Happy Anniversary! It been an amazing {{ state_attr('sensor.anniversary_our_wedding', 'years') }} years!          
+          Happy Anniversary! It been an amazing {{ state_attr('sensor.anniversary_our_wedding', 'years') }} years!
         {% endif %}
         </p>
 
         <p>
           {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) %}
             {% if is_state('sensor.school_start_days2go', '0') %}
-                Today is the first day of school! 
+                Today is the first day of school!
               {% else %}
                 {{ [ 'Today is a school day.',
                   'It is a school day. '
@@ -91,29 +91,29 @@
             Pickup will be at {{(state_attr('input_datetime.school_day_end', 'timestamp') | int | timestamp_custom('%I:%M %p', False)) }}.
             {% if 'After School Care' in states('sensor.school_event') %}
               But will be at the After School Day Care.
-            {% endif %} 
+            {% endif %}
             {% if 'Walking Home' in states('sensor.school_event') %}
               But Sheon will be walking home from school.
             {% endif %}
             {% if states('sensor.school_end_days2go')| int == 0 -%}
-              But today is the last day of School! 
+              But today is the last day of School!
             {%- endif %}
           {% endif %}
           {% if is_state('input_boolean.school_today', 'on') and state_attr('input_datetime.school_day_end', 'timestamp') < as_timestamp(now()) and 'After School Care' not in states('sensor.school_event') %}
             {% if is_state('sensor.school_lunch', 'Nothing') %}
-              I am not sure what the school menu is, so plan on She on taking his lunch 
+              I am not sure what the school menu is, so plan on She on taking his lunch
             {% else %}
               School lunch is {{ states('sensor.school_lunch') }}, lets hope She on is not too picky on his plate.
             {% endif %}
           {% endif %}
 
           {% if states('sensor.school_end_days2go')| int == -1 -%}
-            Today is the first day of Summer Break! 
+            Today is the first day of Summer Break!
           {%- endif %}
 
           {% if 'School Off' in states('sensor.school_event') and  is_state('input_boolean.school_today', 'off') %}
             There is no school today.
-          {% endif %} 
+          {% endif %}
 
           {% if is_state('calendar.shion_events', 'on') %}
             Shion has {{ state_attr('calendar.shion_events', 'message') }} today as well!
@@ -139,18 +139,18 @@
              Currently it will take {{states('sensor.eri_destinations')|round}} minutes to get to costco.
           {% endif %}
       </p>
-      
+
       <p>
-        {{ ['My latest smart device sensor sweep has detected that','Smart device sensors have detected that','My smart device crystal ball has revealed that'] | random }} 
+        {{ ['My latest smart device sensor sweep has detected that','Smart device sensors have detected that','My smart device crystal ball has revealed that'] | random }}
           {% set batts_count = states('sensor.critical_battery_count')|float(0) %}
           {% set srv_batts_count = states('sensor.srv_critical_battery_count')|float(0) %}
           {% if batts_count > 0 %}
-          {% set batts = expand('group.critical_batteries') 
+          {% set batts = expand('group.critical_batteries')
             | rejectattr('state', 'eq', '100')
             | rejectattr('state', 'in', ['unavailable','unknown'])
             | selectattr('state', 'lt', '41') | list %}
           {% for bat in batts %}
-            The {{ bat.name }} is at {{ bat.state }}%. 
+            The {{ bat.name }} is at {{ bat.state }}%.
             {{ ['This is lower than the minimum thresshold for satisfactory operation.',
                 'Any lower and it will cease to function.',
                 'That is pretty low.'] | random }}
@@ -158,7 +158,7 @@
                 'So it might be time for replacement batteries.',
                 'So I guess you know what to do.' ] | random }}
             {% endfor %}
-          {% elif srv_batts_count > 0 %}  
+          {% elif srv_batts_count > 0 %}
           {% set batts = expand('group.srv_critical_batteries')
             | selectattr('state', 'eq', 'on') | list %}
           {% for bat in batts %}
@@ -170,16 +170,16 @@
                 'So it might be time for replacement batteries.',
                 'So I guess you know what to do.' ] | random }}
             {% endfor %}
-            {% else %} 
+            {% else %}
                 You have no batteries to replace.
             {% endif %}
       </p>
 
       <p>
-          {{ ['That about wraps it up for today. Have a good one.',   
+          {{ ['That about wraps it up for today. Have a good one.',
               'Well there you have it.  I have expended terajoules of energy and gigabytes of processing power putting this report together for you.  Did you hear a word of it?  Oh well there is always tomorrow.', 'That is all for today. Shall we do it again tomorrow? Same time same place?',
-              'That concludes todays report. Tune in at the same time tomorrow for another thrilling report.',   
-              'Thats all folks. Perhaps you could give me something more meaningful to do before we do this all over again tomorrow? ',   
+              'That concludes todays report. Tune in at the same time tomorrow for another thrilling report.',
+              'Thats all folks. Perhaps you could give me something more meaningful to do before we do this all over again tomorrow? ',
               'Thats all for now. Have a good day.'] | random }}
       </p>
       <p>
@@ -259,7 +259,6 @@
     {%- macro mother_of_all_macros() -%}
       {{ getReport() }}
     {%- endmacro -%}
-    
+
     {# Call the macro  #}
     {{- cleanup(mother_of_all_macros()) -}}
-    

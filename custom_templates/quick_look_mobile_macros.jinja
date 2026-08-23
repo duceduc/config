@@ -3,7 +3,7 @@
 #### PART 1 ########################################################################################################################
 #
 # This file consists of two parts.
-# Only first part requires a modification from you. 
+# Only first part requires a modification from you.
 # To prioritize simplicity and compatibility, I have chosen to individually list all the entities to be monitored in the Header.
 # Replace every "your_entity" with your personal entities IDs
 # The second part may be changed but is intended for advanced users who wish to create smart rules for entities inclusion or exclusion.
@@ -33,7 +33,7 @@
   'binary_sensor.washer_door',
 ] %}
 
-# PRESENCES:        
+# PRESENCES:
 {% set occupancy_entity_ids = [
   'group.motion_kitchen_occupancy',
   'group.motion_showerroom_occupancy',
@@ -48,7 +48,7 @@
 
 ] %}
 
-# LOCKS:        
+# LOCKS:
 {% set locks_entity_ids = [
   'binary_sensor.genkan_door_contact',
   'lock.your_entity',
@@ -62,8 +62,8 @@
 
 # CLIMATES :
 {% set climate_entity_ids = [
-  'climate.sr_ac_mode', 
-  'climate.lr_ac_mode', 
+  'climate.sr_ac_mode',
+  'climate.lr_ac_mode',
   'climate.mr_ac_mode',
 ] %}
 
@@ -138,7 +138,7 @@
 
     |   |
     |   |
-    |   |    
+    |   |
     |   |
     |   |
     |   |
@@ -150,7 +150,7 @@
 ### PART 2 #########################################################################################################################
 #
 # MACROS :
-# Don't change the following code unless you have experience with Jinja2 templating. 
+# Don't change the following code unless you have experience with Jinja2 templating.
 # Any incorrect modifications may lead to unpredictable results.
 #
 ####################################################################################################################################
@@ -219,15 +219,15 @@
     {% if entity_state in ['heat', 'cool', 'fan', 'dry', 'auto'] %}
       {% set ns.count = ns.count + 1 %}
     {% endif %}
-  {% endfor %} 
+  {% endfor %}
   {% set dominant_state = 'off' %}
-  {% if 'heat' in ns.result %} 
+  {% if 'heat' in ns.result %}
     {% set dominant_state = 'heat' %}
-  {% elif 'auto' in ns.result %} 
+  {% elif 'auto' in ns.result %}
     {% set dominant_state = 'auto' %}
-  {% elif 'cool' in ns.result or 'fan' in ns.result %} 
+  {% elif 'cool' in ns.result or 'fan' in ns.result %}
     {% set dominant_state = 'cool' %}
-  {% elif 'dry' in ns.result %} 
+  {% elif 'dry' in ns.result %}
     {% set dominant_state = 'dry' %}
   {% endif %}
   {{ dominant_state }}, {{ ns.count }}

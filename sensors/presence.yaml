@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#            PRESENCE - MIN/MAX                                                           
-#                                                                                                    
+#
+#            PRESENCE - MIN/MAX
+#
 ####################################################
 
   - platform: min_max
@@ -79,9 +79,9 @@
 
 
 ####################################################
-#                                                                                                    
-#            PRESENCE/RSSI - GENKAN                                                      
-#                                                                                                    
+#
+#            PRESENCE/RSSI - GENKAN
+#
 ####################################################
 
 ## Duc
@@ -143,9 +143,9 @@
 
 
 ####################################################
-#                                                                                                    
-#            PRESENCE/RSSI - SHION ROOM                                               
-#                                                                                                    
+#
+#            PRESENCE/RSSI - SHION ROOM
+#
 ####################################################
 
 ## Duc
@@ -207,9 +207,9 @@
 
 
 ####################################################
-#                                                                                                    
-#            PRESENCE/RSSI - MASTER ROOM                                               
-#                                                                                                    
+#
+#            PRESENCE/RSSI - MASTER ROOM
+#
 ####################################################
 
 ## Duc
@@ -271,9 +271,9 @@
 
 
 ####################################################
-#                                                                                                    
-#            PRESENCE/RSSI - LIVINGROOM                                               
-#                                                                                                    
+#
+#            PRESENCE/RSSI - LIVINGROOM
+#
 ####################################################
 
 ## Duc
@@ -283,7 +283,7 @@
 #    value_template: '{{ value_json.confidence }}'
 #    unit_of_measurement: '%'
 #    icon: mdi:account
-# 
+#
 ## Eri
 #  - platform: mqtt
 #    name: 'iE Livingroom'
@@ -334,12 +334,12 @@
 
 
 
-      
+
 
 ####################################################
-#                                                                                                    
-#            Number of People Home                                                         
-#                                                                                                    
+#
+#            Number of People Home
+#
 ####################################################
 
 #  - platform: template
@@ -355,7 +355,7 @@
 #         {% if is_state("sensor.n_people_home", "0") %} mdi:account-off
 #         {% elif is_state("sensor.n_people_home", "1") %} mdi:account
 #         {% elif is_state("sensor.n_people_home", "2") %} mdi:account-multiple
-#         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group         
+#         {% elif is_state("sensor.n_people_home", "3") %} mdi:account-group
 #         {% else %} mdi:account-plus {% endif %}
 
 
@@ -365,9 +365,9 @@
 #               (1 if is_state('input_boolean.guest_mode','on') else 0) }}
 
 ####################################################
-#                                                                                                    
-#            Have Guest Status                                                               
-#                                                                                                    
+#
+#            Have Guest Status
+#
 ####################################################
 
 #  - platform: template
@@ -389,7 +389,7 @@
 #          {% if person in ['iida','tobu','matsumoto'] %}
 #            grocery store
 #          {% elif person in ['ario','aeon','lalaport'] %}
-#            mall            
+#            mall
 #          {% elif person in ['mcdonalds','kfc','mos'] %}
 #            lunch takeout
 #          {% elif person in ['parents','yuri'] %}
@@ -412,7 +412,7 @@
 #          {% if person in ['iida','tobu','matsumoto'] %}
 #            grocery store
 #          {% elif person in ['ario','aeon','lalaport'] %}
-#            mall            
+#            mall
 #          {% elif person in ['mcdonalds','kfc','mos'] %}
 #            lunch takeout
 #          {% elif person in ['parents','yuri'] %}
@@ -435,7 +435,7 @@
 #          {% if person in ['iida','tobu','matsumoto'] %}
 #            grocery store
 #          {% elif person in ['ario','aeon','lalaport'] %}
-#            mall            
+#            mall
 #          {% elif person in ['mcdonalds','kfc','mos'] %}
 #            lunch takeout
 #          {% elif person in ['parents','yuri'] %}
@@ -451,7 +451,7 @@
 
 
 ####################################################
-#                                                                                                    
-#            END OF CONFIGURATION FILE                                                 
-#                                                                                                    
+#
+#            END OF CONFIGURATION FILE
+#
 ####################################################

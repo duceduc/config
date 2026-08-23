@@ -101,22 +101,22 @@ group.wakeuplight:
 group.bed_sensors:
   device_class: problem
 
-  
-  
 
-  
+
+
+
 switch.ceiling_fan_summer:
   friendly_name: Ceiling Fan Summer
-  assumed_state: false  
-  
+  assumed_state: false
+
 switch.heater_lr_unit:
   friendly_name: Heater Living Room
   icon: mdi:power
   assumed_state: false
-  
-  
-  
-  
+
+
+
+
 
 switch.humidifier_lr_unit:
   friendly_name: Humidifier Living Room
@@ -181,13 +181,13 @@ person.shion:
 
 cover.fr_curtains:
   assumed_state: true
-  
+
 device_tracker.shion:
   friendly_name: Shion
   icon: mdi:crosshairs-gps
   entity_picture: /local/img/people/avatar-shion.png
   track: true
-  
+
 device_tracker.duc:
   friendly_name: Duc
   icon: mdi:crosshairs-gps
@@ -201,9 +201,9 @@ device_tracker.eri:
   track: true
 
 #########################################################
-#                                                                                                              
-#             Customize UI                                                                                
-#                                                                                                              
+#
+#             Customize UI
+#
 #########################################################
 # https://github.com/Mariusthvdb/custom-ui
 
@@ -300,7 +300,7 @@ sensor.sniffer0_pm_2_5_aqi:
   templates:
     icon_color: >
      if ( state <  51 ) return 'RGB(3, 169, 245)';
-     if ( state < 101 ) return 'RGB(16, 128, 8)';    
+     if ( state < 101 ) return 'RGB(16, 128, 8)';
      if ( state < 201 ) return 'RGB(240, 240, 10)';
      if ( state < 351 ) return 'RGB(221, 156, 72)';
      if ( state > 350 ) return 'RGB(252, 88, 18)';
@@ -310,7 +310,7 @@ sensor.sniffer1_pm_2_5_aqi:
   templates:
     icon_color: >
      if ( state <  51 ) return 'RGB(3, 169, 245)';
-     if ( state < 101 ) return 'RGB(16, 128, 8)';    
+     if ( state < 101 ) return 'RGB(16, 128, 8)';
      if ( state < 201 ) return 'RGB(240, 240, 10)';
      if ( state < 351 ) return 'RGB(221, 156, 72)';
      if ( state > 350 ) return 'RGB(252, 88, 18)';

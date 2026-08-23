@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Traval Time Monitor Alerts                                                 
-#                                                                                                              
+#
+#             Traval Time Monitor Alerts
+#
 #########################################################
 # For testing, turn on their respective input_boolean entity
 
@@ -35,9 +35,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Monitor Devices                           
-#                                                                                                              
+#
+#             Monitor Devices
+#
 #########################################################
 
   monitor_rpi_zero:
@@ -45,7 +45,7 @@
     entity_id: binary_sensor.monitor_rpi_zero
     state: "on"
     can_acknowledge: true
-    skip_first: true    
+    skip_first: true
     message: >-
       Rpi zero devices possibly offline.
       ms1: {{ states('sensor.ms1_wifi_strength') }}.
@@ -62,7 +62,7 @@
     entity_id: binary_sensor.monitor_broadlink
     state: "on"
     can_acknowledge: true
-    skip_first: true    
+    skip_first: true
     message: >-
       Broadlink devices possibly offline.
       rm31: {{ states('remote.rm31_remote') }}.
@@ -75,22 +75,10 @@
       - 'amberthebot'
 
 #########################################################
-#                                                                                                              
-#             Security Alerts                           
-#                                                                                                              
+#
+#             Security Alerts
+#
 #########################################################
-
-#  rpi_updates:
-#    name: Raspberry Pi Updates Alert
-#    entity_id: binary_sensor.ms2_updates
-#    title: "{{ states('sensor.ms2_updates') }} Raspberry Pi Updates Available"
-#    message: "There are {{ states('sensor.ms2_updates') }} updates available for the Raspberry Pi servers"
-#    state: 'on'
-#    can_acknowledge: true
-#    repeat: 720
-#    notifiers:
-#      - 'amberthebot'
-
 
   replace_toilet_airfreshener:
     name: Replace Toilet Airfreshener Alert
@@ -117,10 +105,11 @@
 
 
 #########################################################
-#                                                                                                              
-#             Low Battery Alert                                    
-#                                                                                                              
+#
+#             Low Battery Alert
+#
 #########################################################
+
 # replaced with critical battery area method. utilities package
 #  low_battery_alert:
 #    name: Replace Battery Alert
@@ -135,16 +124,16 @@
 #      - 'greenapi'
 
 #########################################################
-#                                                                                                              
-#             Washer Finished Alert                                    
-#                                                                                                              
+#
+#             Washer Finished Alert
+#
 #########################################################
 
 
   washing_machine_finished:
     name: Washing Machine Finished
     message: >-
-      The washing machine has completed its cycle 
+      The washing machine has completed its cycle
         {%- set seconds = (now() - states.sensor.washer_status_m.last_changed).seconds -%}
         {%- set hours = seconds / 3600 -%}
         {%- if hours == 1 -%} over an hour ago.
@@ -169,9 +158,8 @@
 
   clean_nozzle_filters_notification:
     name: Clean Nozzle Filters Notification
-#    message: "The next season changes to {{ state_attr('sensor.home_next_season_change', 'event_type') }} will happen in {{ ((states('sensor.home_next_season_change')|as_timestamp(default=0) - utcnow()|as_timestamp)/3600)|round }} hours."
     message: >-
-      {{ state_attr('sensor.home_next_season_change', 'event_type') | capitalize }} season starts in 
+      {{ state_attr('sensor.home_next_season_change', 'event_type') | capitalize }} season starts in
       {%- set hours =  ((states('sensor.home_next_season_change')|as_timestamp(default=0) - utcnow()|as_timestamp)/3600)|round -%}
       {%- set mins = hours * 60 -%}
       {%- set days = hours * 60 / 1440 -%}
@@ -199,7 +187,7 @@
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

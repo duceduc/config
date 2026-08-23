@@ -1,9 +1,8 @@
 ####################################################
-#                                                                                                    
-#                    HOME ASSISTANT ADD-ON                                            
-#                                                                                                    
+#
+#                    HOME ASSISTANT ADD-ON
+#
 ####################################################
-
 
   - switch:
       - name: sambabackup
@@ -68,7 +67,7 @@
 
       - name: sambanas
         unique_id: sambanas
-        state: "{{ is_state('binary_sensor.samba_nas_running', 'on') }}" 
+        state: "{{ is_state('binary_sensor.samba_nas_running', 'on') }}"
         turn_on:
           - service: hassio.addon_start
             data:
@@ -115,15 +114,8 @@
               addon: 5c53de3b_esphome
 
 
-
-
-
-
-
-
-
 ####################################################
-#                                                                                                    
-#          END OF CONFIGURATION FILE                                                   
-#                                                                                                    
+#
+#          END OF CONFIGURATION FILE
+#
 ####################################################

@@ -1,7 +1,7 @@
 ####################################################
-#                                                                                                    
-#                      CONDENSATION                                                         
-#                                                                                                    
+#
+#                      CONDENSATION
+#
 ####################################################
 
 # LR Mold Chance
@@ -19,7 +19,7 @@
     indoor_humidity_sensor: sensor.aio_human_sensor_master_humidity
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 2.4
-    
+
 # SR Mold Chance
   - platform: mold_indicator
     name: Sr Condensation Chance
@@ -63,8 +63,8 @@
 # Computer Room Mold Chance
   - platform: mold_indicator
     name: Computerroom Condensation Chance
-    indoor_temp_sensor: sensor.bt_proxy_computer_temperature 
-    indoor_humidity_sensor: sensor.bt_proxy_computer_humidity 
+    indoor_temp_sensor: sensor.bt_proxy_computer_temperature
+    indoor_humidity_sensor: sensor.bt_proxy_computer_humidity
     outdoor_temp_sensor: sensor.aio_human_sensor_entrance_temperature
     calibration_factor: 0.6
 
@@ -77,7 +77,7 @@
     calibration_factor: 0.6 # need to calibrate
 
 ####################################################
-#                                                                                                    
-#            END OF CONFIGURATION FILE                                                 
-#                                                                                                    
+#
+#            END OF CONFIGURATION FILE
+#
 ####################################################

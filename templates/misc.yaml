@@ -62,16 +62,6 @@
           {% endif %}
 
 
-
-
-####################################################
-#
-#
-#
-####################################################
-
-
-
   - sensor:
 # https://community.home-assistant.io/t/map-values-for-an-input-select/94354/5
       - name: Exercise Map
