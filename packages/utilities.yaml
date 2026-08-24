@@ -53,6 +53,8 @@ template:
         attributes:
           initiated: >
             {{ is_state('binary_sensor.washer_door_motion', 'on') or is_state('binary_sensor.washroom_radar_moving_target', 'on') }}
+          nightlight: >
+            {{ now().hour == 23 }}
 
       - name: wc_occupied
         unique_id: wc_occupied

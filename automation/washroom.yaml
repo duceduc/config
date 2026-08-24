@@ -7,11 +7,11 @@
 - alias: 'motion washroom auto-on'
   mode: parallel
   triggers:
-    - trigger: template
+    - trigger: template # primary trigger
       value_template: "{{ state_attr('binary_sensor.wash_occupied', 'initiated') == true }}"
-    - trigger: template
+    - trigger: template # secondary trigger
       value_template: "{{ is_state('binary_sensor.washroom_radar_moving_target', 'on') }}"
-    - trigger: state
+    - trigger: state # button trigger for shower room
       entity_id: binary_sensor.washer_door_button
       to: 'on'
       id: 'shower'
@@ -33,7 +33,9 @@
     - trigger: state
       entity_id: binary_sensor.wash_occupied
       to: 'off'
-#  conditions:
+  conditions:
+    - condition: template 
+      value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
 #    - condition: template # disable motion light
 #      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   actions:
@@ -45,8 +47,8 @@
             - action: light.turn_on
               entity_id: light.laundry
         - conditions:
-            - condition: template # 11pm - 7pm
-              value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') and now().hour > 22 or now().hour < 6 }}"
+            - condition: template # auto off at 11pm and  between 11pm - 7pm
+              value_template: "{{ state_attr('binary_sensor.wash_occupied', 'nightlight') == true or not is_state('input_boolean.disable_motion_lights', 'on') and now().hour > 22 or now().hour < 6 }}"
           sequence:
             - action: light.turn_off
               entity_id: light.laundry
