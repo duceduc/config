@@ -290,7 +290,6 @@
                   - media_source:
                       media_content_id: '{{ media_content_id }}'
                       media_content_type: image/jpg
-#                    filename: 1.jpg
                     content_id: memories
 
 # notify.eri_esomeya_hotmail_com

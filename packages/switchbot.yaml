@@ -169,8 +169,6 @@ template:
             data:
               bot: '24hr_fan'
               press: 0
-#          - action: switch.turn_on
-#            entity_id: switch.24hr_fan_switch
           - action: input_boolean.turn_on
             entity_id: input_boolean.washroom_fan
         turn_off:
@@ -178,8 +176,6 @@ template:
             data:
               bot: '24hr_fan'
               press: 3
-#          - action: switch.turn_on
-#            entity_id: switch.24hr_fan_switch
           - action: input_boolean.turn_off
             entity_id: input_boolean.washroom_fan
 
@@ -208,7 +204,6 @@ template:
             entity_id: switch.jcom_tv_box_switch
           - action: input_boolean.turn_off
             entity_id: input_boolean.jcom_tv
-
 
       - name: hdmi selector
         state: "{{ states('input_boolean.hdmi_selector') }}"
@@ -245,11 +240,9 @@ template:
           - action: script.toggle
             entity_id: script.humidifier_mode
 
-
   - cover:
       - name: fr curtains
         state: "{{is_state('sensor.fr_curtains', 'open')}}"
-#        device_class: curtain
         open_cover:
           - action: script.fr_curtains
             data:
@@ -269,7 +262,6 @@ template:
 
       - name: living room curtain
         state: "{{ is_state('cover.lr_curtain_lt_curtain', 'open') }}"
-#        device_class: curtain
         open_cover:
           - action: cover.open_cover
             data:
@@ -285,7 +277,6 @@ template:
 
       - name: computer room curtain
         state: "{{ is_state('cover.cr_curtain_lt_curtain', 'open') }}"
-#        device_class: curtain
         open_cover:
           - action: cover.open_cover
             data:
