@@ -72,6 +72,7 @@ from .const import (
     OPT_WEBHOOK_NOTIFIED,
     QUANTITY_METRICS,
     SERVICE_GET_READINGS,
+    SERVICE_GET_WEBHOOK_URL,
     SIGNAL_METRIC_READING,
     SIGNAL_UPDATE,
     SIGNAL_WORKOUT,
@@ -189,6 +190,8 @@ class HealthSyncData:
         return True
 
 
+GET_WEBHOOK_URL_SCHEMA = vol.Schema({vol.Required("device_id"): cv.string})
+
 GET_READINGS_SCHEMA = vol.Schema(
     {
         vol.Required("device_id"): cv.string,
@@ -232,11 +235,46 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         readings = await store.async_query(metric, start, end)
         return {"readings": readings, "count": len(readings)}
 
+    async def _async_handle_get_webhook_url(call: ServiceCall) -> ServiceResponse:
+        device_id = call.data["device_id"]
+
+        device = dr.async_get(hass).async_get(device_id)
+        if device is None:
+            raise ServiceValidationError(f"Unknown device: {device_id}")
+
+        entry_id = next(iter(device.config_entries), None)
+        entry = hass.config_entries.async_get_entry(entry_id) if entry_id else None
+        if entry is None or entry.domain != DOMAIN:
+            raise ServiceValidationError("That device isn't a HealthSync device")
+
+        webhook_id = entry.data[CONF_WEBHOOK_ID]
+
+        # Same two URLs `async_setup_entry` computes at startup for the
+        # one-time notification — recomputed here rather than cached, so
+        # this always reflects the *current* cloud/local reachability
+        # rather than whatever happened to be true at last HA restart.
+        cloud_url: str | None = None
+        if cloud.async_active_subscription(hass):
+            try:
+                cloud_url = await cloud.async_get_or_create_cloudhook(hass, webhook_id)
+            except cloud.CloudNotAvailable:
+                cloud_url = None
+        local_url = webhook.async_generate_url(hass, webhook_id, prefer_external=False)
+
+        return {"cloud_url": cloud_url, "local_url": local_url}
+
     hass.services.async_register(
         DOMAIN,
         SERVICE_GET_READINGS,
         _async_handle_get_readings,
         schema=GET_READINGS_SCHEMA,
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_GET_WEBHOOK_URL,
+        _async_handle_get_webhook_url,
+        schema=GET_WEBHOOK_URL_SCHEMA,
         supports_response=SupportsResponse.ONLY,
     )
     return True
@@ -559,7 +597,42 @@ def _make_webhook_handler(entry: HealthSyncConfigEntry):
             _flush_hourly_statistic(hass, data, entry, touched_metric, touched_hour)
 
         if data.readings_store is not None and readings_to_archive:
-            await data.readings_store.async_insert_many(readings_to_archive)
+            # Fire-and-forget, not awaited — added 25 Aug 2026. Root cause of
+            # a real regression: `async_insert_many` (db.py) serializes every
+            # call through one global `asyncio.Lock` (added 16 Aug to stop
+            # concurrent writers corrupting SQLite), and this call used to be
+            # awaited *before* the webhook's HTTP response went out. That
+            # meant every one of the app's now-concurrent POSTs (`WebhookClient`,
+            # up to 5 at once as of 23 Aug) actually queued behind this same
+            # lock one at a time anyway — the concurrency the app pays for
+            # bought nothing, because each request's full round trip (from
+            # the app's point of view) included waiting its turn for a lock
+            # plus a SQLite write, not just network time. Measured as a real
+            # backfill regression: ~1-3 500-sample chunks/sec before this was
+            # actually exercised end-to-end, down to one chunk per ~10s once
+            # it was.
+            #
+            # Scheduling the write instead of awaiting it lets `handle_webhook`
+            # return as soon as the payload's parsed, so concurrent requests
+            # from the app are no longer serialized on each other's DB write —
+            # each just schedules its own task and returns. The lock in
+            # db.py still fully serializes the *actual* writes (correctness
+            # unchanged, SQLite still only ever has one writer at a time),
+            # but that no longer blocks the HTTP response, so it no longer
+            # blocks the next request from being accepted either.
+            #
+            # Trade-off, deliberately accepted: a request now reports success
+            # once queued, not once durably written — a HA crash/restart in
+            # the small window between "queued" and "actually committed"
+            # could lose that batch. Same risk class as normal OS write
+            # buffering, and already covered by the same safety net the rest
+            # of this design leans on: HA-side dedup (the replay key above,
+            # and db.py's own unique index) makes the app simply resending
+            # that batch on its next sync completely harmless.
+            hass.async_create_task(
+                data.readings_store.async_insert_many(readings_to_archive),
+                name="healthsync_archive_insert",
+            )
 
         if handled == 0 and samples:
             # Everything was a duplicate — still fine, still 200.
