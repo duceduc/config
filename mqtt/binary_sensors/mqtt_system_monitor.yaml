@@ -5,37 +5,6 @@
 ####################################################
 # https://github.com/hjelev/rpi-mqtt-monitor
 
-  - name: ngx status
-    unique_id: 034f5313-1113-4d1d-8ae0-abad4172badb
-    state_topic: house/system_monitor/servers/ngx/status
-    json_attributes_topic: house/system_monitor/servers/ngx/git_update
-    device_class: connectivity
-    payload_on: 1
-    payload_off: 0
-
-  - name: ser status
-    unique_id: ae266003-3371-4fee-8fa7-c5a3a714feb5
-    state_topic: house/system_monitor/servers/ser/status
-    json_attributes_topic: house/system_monitor/servers/ser/git_update
-    device_class: connectivity
-    payload_on: 1
-    payload_off: 0
-
-  - name: mrs status
-    unique_id: fabf5b3e-e083-46d2-ab2d-88d00332fc57
-    state_topic: house/system_monitor/servers/mediaroomsatellite/status
-    json_attributes_topic: house/system_monitor/servers/mediaroomsatellite/git_update
-    device_class: connectivity
-    payload_on: 1
-    payload_off: 0
-
-  - name: rrs status
-    unique_id: 94bc23b1-d241-4d17-bf43-029516108a47
-    state_topic: house/system_monitor/servers/rearsatellite/status
-    json_attributes_topic: house/system_monitor/servers/rearsatellite/git_update
-    device_class: connectivity
-    payload_on: 1
-    payload_off: 0
 
   - name: ms1 status
     unique_id: 3aff8358-847d-4d98-8028-8e2e717c0e51
@@ -60,6 +29,42 @@
     device_class: connectivity
     payload_on: 1
     payload_off: 0
+
+
+
+#  - name: ngx status
+#    unique_id: 034f5313-1113-4d1d-8ae0-abad4172badb
+#    state_topic: house/system_monitor/servers/ngx/status
+#    json_attributes_topic: house/system_monitor/servers/ngx/git_update
+#    device_class: connectivity
+#    payload_on: 1
+#    payload_off: 0
+
+#  - name: ser status
+#    unique_id: ae266003-3371-4fee-8fa7-c5a3a714feb5
+#    state_topic: house/system_monitor/servers/ser/status
+#    json_attributes_topic: house/system_monitor/servers/ser/git_update
+#    device_class: connectivity
+#    payload_on: 1
+#    payload_off: 0
+
+#  - name: mrs status
+#    unique_id: fabf5b3e-e083-46d2-ab2d-88d00332fc57
+#    state_topic: house/system_monitor/servers/mediaroomsatellite/status
+#    json_attributes_topic: house/system_monitor/servers/mediaroomsatellite/git_update
+#    device_class: connectivity
+#    payload_on: 1
+#    payload_off: 0
+
+#  - name: rrs status
+#    unique_id: 94bc23b1-d241-4d17-bf43-029516108a47
+#    state_topic: house/system_monitor/servers/rearsatellite/status
+#    json_attributes_topic: house/system_monitor/servers/rearsatellite/git_update
+#    device_class: connectivity
+#    payload_on: 1
+#    payload_off: 0
+
+
 
 
 ####################################################

@@ -1,0 +1,96 @@
+###############################################################################
+#   @author          :   Duc Su
+#   @date              :   12/03/2024
+#   @package        :   Integrations
+#   @description    :   All 3rd Party Integrations
+###############################################################################
+
+## CAN DELETE IF SWITCHBOT.YAML FAN TEMPLATES WORKS
+
+
+#input_number:
+#  24hr_fan_speed_status:
+#    min: 0
+#    max: 100
+
+
+#script:
+#  24hr_fan_speed_set:
+#    mode: single
+#    sequence:
+#      - action: input_number.set_value
+#        target:
+#          entity_id: input_number.24hr_fan_speed_status
+#        data:
+#          value: '{{ percentage }}'
+#      - action: script.24hr_fan_speed_action
+#        data: {}
+
+#  24hr_fan_speed_action:
+#    mode: single
+#    sequence:
+#      - choose:
+#          - conditions:
+#              - condition: state
+#                entity_id: input_number.24hr_fan_speed_status
+#                state: '0.0'
+#            sequence:
+#              - choose:
+#                  - conditions:
+#                      - condition: state
+#                        entity_id: input_boolean.washroom_fan
+#                        state: 'on'
+#                    sequence:
+#                      - action: script.holdpress_bot
+#                        data:
+#                          bot: '24hr_fan'
+#                          press: 3
+#                default: []
+#              - action: input_boolean.turn_off
+#                target:
+#                  entity_id: input_boolean.washroom_fan
+#          - conditions:
+#              - condition: state
+#                entity_id: input_number.24hr_fan_speed_status
+#                state: '50.0'
+#            sequence:
+#              - action: script.holdpress_bot
+#                data:
+#                  bot: '24hr_fan'
+#                  press: 0
+#              - action: input_boolean.turn_on
+#                target:
+#                  entity_id: input_boolean.washroom_fan
+#          - conditions:
+#              - condition: state
+#                entity_id: input_number.24hr_fan_speed_status
+#                state: '100.0'
+#            sequence:
+#              - action: script.holdpress_bot
+#                data:
+#                  bot: '24hr_fan'
+#                  press: 0
+#              - action: input_boolean.turn_on
+#                target:
+#                  entity_id: input_boolean.washroom_fan
+#        default: []
+
+
+#template:
+#  - fan:
+#      - name: 24hr fan
+#        state: "{{ states('input_boolean.washroom_fan') }}"
+#        percentage: "{{ states('input_number.24hr_fan_speed_status') }}"
+#        speed_count: 2
+#        turn_on:
+#          - action: script.24hr_fan_speed_set
+#            data:
+#              percentage: "{{ 50 }}"
+#        turn_off:
+#          - action: script.24hr_fan_speed_set
+#            data:
+#              percentage: "{{ 0 }}"
+#        set_percentage:
+#          - action: script.24hr_fan_speed_set
+#            data:
+#              percentage: "{{ percentage }}"

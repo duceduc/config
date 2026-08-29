@@ -42,6 +42,10 @@ input_select:
       - High
 
 input_number:
+  24hr_fan_speed_status: # Testing fan template.
+    min: 0
+    max: 100
+
   lrh_humidity_low_set:
     name: Humidity Low Set Point
     icon: mdi:thermometer
@@ -72,6 +76,26 @@ mqtt:
 
 
 template:
+  - fan: # Testing fan template. 
+      - name: 24hr fan
+        state: "{{ states('input_boolean.washroom_fan') }}"
+        percentage: "{{ states('input_number.24hr_fan_speed_status') }}"
+        speed_count: 2
+        turn_on:
+          - action: script.24hr_fan_speed_set
+            data:
+              percentage: "{{ 50 }}"
+        turn_off:
+          - action: script.24hr_fan_speed_set
+            data:
+              percentage: "{{ 0 }}"
+        set_percentage:
+          - action: script.24hr_fan_speed_set
+            data:
+              percentage: "{{ percentage }}"
+
+
+
   - binary_sensor:
       - name: genkan doorlock
         device_class: lock
@@ -162,6 +186,8 @@ template:
             data:
               entity_id: cover.lr_curtain_lt_curtain
 
+
+#  CAN DELETE THIS FAN SWTICH OF THE FAN TEMPLATE SWITCH IS WORKING.
       - name: 24hr fan
         state: "{{ states('input_boolean.washroom_fan') }}"
         turn_on:
@@ -178,6 +204,8 @@ template:
               press: 3
           - action: input_boolean.turn_off
             entity_id: input_boolean.washroom_fan
+
+
 
       - name: floor heat
         state: "{{ states('input_boolean.floor_heat') }}"
@@ -291,6 +319,68 @@ template:
               entity_id: cover.cr_curtain_lt_curtain
 
 script:
+  24hr_fan_speed_set: # Testing fan template.
+    mode: single
+    sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.24hr_fan_speed_status
+        data:
+          value: '{{ percentage }}'
+      - action: script.24hr_fan_speed_action
+        data: {}
+
+  24hr_fan_speed_action: # Testing fan template.
+    mode: single
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_number.24hr_fan_speed_status
+                state: '0.0'
+            sequence:
+              - choose:
+                  - conditions:
+                      - condition: state
+                        entity_id: input_boolean.washroom_fan
+                        state: 'on'
+                    sequence:
+                      - action: script.holdpress_bot
+                        data:
+                          bot: '24hr_fan'
+                          press: 3
+                default: []
+              - action: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.washroom_fan
+          - conditions:
+              - condition: state
+                entity_id: input_number.24hr_fan_speed_status
+                state: '50.0'
+            sequence:
+              - action: script.holdpress_bot
+                data:
+                  bot: '24hr_fan'
+                  press: 0
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.washroom_fan
+          - conditions:
+              - condition: state
+                entity_id: input_number.24hr_fan_speed_status
+                state: '100.0'
+            sequence:
+              - action: script.holdpress_bot
+                data:
+                  bot: '24hr_fan'
+                  press: 0
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.washroom_fan
+        default: []
+
+
+
   fr_curtains:
     sequence:
       - action: "cover.{{ modus }}_cover"
@@ -487,14 +577,15 @@ automation:
       - condition: template # Don't run if on vacation
         value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
     actions:
-      - action: switch.turn_{{ 'on' if is_state('sensor.time', '04:00') else 'off' }}
+      - action: fan.turn_{{ 'on' if is_state('sensor.time', '04:00') else 'off' }}
         data:
-          entity_id: switch.24hr_fan
+          entity_id: fan.24hr_fan #  switch.24hr_fan
+
 
   - alias: '24hr fan toggle speed'
     triggers:
       - trigger: time
-        at: '04:05:00'
+        at: '04:05:00' #am
       - trigger: state
         entity_id: sensor.period_of_the_day
         to: 'dusklight'
@@ -502,11 +593,34 @@ automation:
       - condition: template # Don't run if on vacation
         value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
     actions:
-      - delay: 90
-      - action: script.holdpress_bot
+      - action: fan.set_percentage
+        target:
+          entity_id: fan.24hr_fan      
         data:
-          bot: '24hr_fan'
-          press: 0
+          percentage: "{{ '100' if is_state('sensor.period_of_the_day', 'dusklight') else '50' }}"
+
+
+
+## CAN DELETE IF ABOVE TOGGLE IS WORKING
+#  - alias: '24hr fan toggle speed'
+#    triggers:
+#      - trigger: time
+#        at: '04:05:00' #am
+#      - trigger: state
+#        entity_id: sensor.period_of_the_day
+#        to: 'dusklight'
+#    conditions:
+#      - condition: template # Don't run if on vacation
+#        value_template: "{{ not is_state('input_select.home_mode', 'Vacation') }}"
+#    actions:
+#      - delay: 90
+#      - action: script.holdpress_bot
+#        data:
+#          bot: '24hr_fan'
+#          press: 0
+
+
+
 
   - alias: 'Open Front Curtains at Sunrise'
     triggers:

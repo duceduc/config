@@ -9,7 +9,7 @@ from ..const             import (DEVICE_TYPE_DN, CONF_FAMSHR_DEVICENAME, CONF_MO
 from ..utils.utils     import (instr, is_number, is_empty, isnot_empty,
                                 encode_password, decode_password, )
 from ..utils.messaging import (log_exception, log_debug_msg, log_info_msg, add_log_file_filter,
-                                _log, _evlog, )
+                                _log, _evlog, log_stack, )
 
 from .const_form_lists   import (MENU_KEY_TEXT_PAGE_0, MENU_KEY_TEXT_PAGE_1,
                                 ACTION_LIST_ITEMS_KEY_BY_TEXT, ACTION_LIST_OPTIONS,
@@ -48,9 +48,16 @@ def menu_text_to_item(self, user_input, selection_list):
         selected_text = user_input[selection_list]
         selected_text_len = 35 if len(selected_text) > 35 else len(selected_text)
 
-        if selected_text.startswith('EXIT'):
+        # selected_text contains the 'exit_xxx key', not the displayed menu text
+        if selected_text.startswith('exit_'):
+            user_input['menu_items'] = selected_text
+            return user_input, selected_text
+
+        # selected_text contains the displayed menu text
+        elif selected_text.startswith('EXIT'):
             user_input['menu_items'] = 'exit'
             return user_input, 'exit'
+
         elif selected_text.startswith('MENU'):
             user_input['menu_items'] = 'menu'
             return user_input, 'menu'
@@ -78,8 +85,12 @@ def set_header_msg(self):
     '''
     if self.header_msg:
         if self.errors is None: self.errors = {}
-        self.errors['base'] = self.header_msg
+        self.errors = {'base': self.header_msg}
         self.header_msg = None
+
+        return self.errors
+
+    return {}
 
 #--------------------------------------------------------------------
 def strip_spaces(user_input, parm_list=[]):
@@ -466,7 +477,26 @@ def discard_changes(user_input):
         return False
 
 #--------------------------------------------------------------------
-def log_step_info(self, user_input, action_item=None):
+def log_step_info(self, user_input, action_item=None, subtitle=''):
 
-    log_info_msg(  f"⭐ {self.step_id.upper()} ({action_item}) > "
-                    f"UserInput-{user_input}, Errors-{self.errors}")
+    if Gb.is_log_level_debug:
+        # log_stack_data=configure/screens/step_icloud3_device.py, 98, async_step_device_list'
+        log_stack_data = log_stack(return_cnt=1)
+        log_stack_data = log_stack_data.replace(' ', '')
+        filename, line_no, fct = log_stack_data.split(',')
+        filename = filename.split('/')[-1][:-3]
+        filename = filename.replace('step', 's')
+        filename = filename.replace('form', 'f')
+        fct      = fct.replace('async_step_', '')
+        log_stack_msg = f"[{filename[:12]}:{fct[:12]}:{line_no}] "
+    else:
+        log_stack_msg = ''
+
+    info_msg =( f"⭐ {self.step_id.upper()} {subtitle.upper()} "
+                f"({action_item}/{self.menu_item}) {log_stack_msg}> "
+                f"UserInput-{user_input}, Errors-{self.errors}")
+
+    if Gb.is_log_level_debug:
+        log_debug_msg(info_msg)
+    else:
+        log_info_msg(info_msg)

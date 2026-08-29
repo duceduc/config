@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .client import async_create_client
 from .const import (
     AVAILABILITY_SELECTOR,
     BASE_INTERVAL_SECONDS,
@@ -23,22 +22,22 @@ from .const import (
     DOMAIN_CONFIG,
     JITTER_SECONDS,
     MIN_PRODUCT_PAGE_BYTES,
+    NO_FEATURED_OFFER_SELECTORS,
     OUT_OF_STOCK_SELECTOR,
+    PRICE_FALLBACK_SELECTOR,
     PRICE_SELECTORS,
-    REQUEST_TIMEOUT,
+    PRODUCT_ROOT_SELECTORS,
     TITLE_SELECTORS,
     WISHLIST_ID_RE,
 )
+from .exceptions import AmazonBlockedError, AmazonCaptchaError
+from .session import AmazonSession, async_get_session
 
 _LOGGER = logging.getLogger(__name__)
 
 _CURRENCY_SYMBOLS = ("€", "£", "$", "¥", "kr", "zł", "EUR", "GBP", "USD", "JPY", "CAD", "AUD", "PLN", "SEK")
 _ASIN_IN_HREF_RE = re.compile(r"/dp/([A-Z0-9]{10})")
 _WISHLIST_RE = re.compile(WISHLIST_ID_RE, re.IGNORECASE)
-
-
-class AmazonCaptchaError(Exception):
-    """Amazon served an anti-bot wall instead of the product page."""
 
 
 def parse_price(raw: str, european_format: bool = True) -> float | None:
@@ -90,6 +89,20 @@ def parse_product_page(
     if avail_el:
         availability_text = avail_el.get_text(strip=True) or None
 
+    # The listing's own block. Everything unanchored is searched inside it, so
+    # that a page whose buy box has no price cannot yield the price of the
+    # alternative item Amazon suggests above it.
+    product_root = None
+    for selector in PRODUCT_ROOT_SELECTORS:
+        product_root = soup.select_one(selector)
+        if product_root is not None:
+            break
+
+    no_featured_offer = any(
+        soup.select_one(selector) is not None
+        for selector in NO_FEATURED_OFFER_SELECTORS
+    )
+
     price: float | None = None
     title: str | None = None
 
@@ -119,7 +132,7 @@ def parse_product_page(
         except (json.JSONDecodeError, AttributeError, StopIteration):
             continue
 
-    # --- Strategy 2: CSS selectors (scoped, narrow → wide) ---
+    # --- Strategy 2: CSS selectors anchored to the buy box (narrow → wide) ---
     if price is None:
         for selector in PRICE_SELECTORS:
             el = soup.select_one(selector)
@@ -129,10 +142,19 @@ def parse_product_page(
                     price = candidate
                     break
 
-    # --- Strategy 2b: composite whole + fraction fallback ---
+    # --- Strategy 2b: any price node, but only inside the product's block ---
+    if price is None and product_root is not None:
+        for el in product_root.select(PRICE_FALLBACK_SELECTOR):
+            candidate = parse_price(el.get_text(strip=True), european_format)
+            if candidate is not None:
+                price = candidate
+                break
+
+    # --- Strategy 2c: composite whole + fraction fallback, same scope ---
     if price is None:
-        whole_el = soup.select_one("span.a-price-whole")
-        frac_el = soup.select_one("span.a-price-fraction")
+        scope = product_root if product_root is not None else soup
+        whole_el = scope.select_one("span.a-price-whole")
+        frac_el = scope.select_one("span.a-price-fraction")
         if whole_el and frac_el:
             whole = whole_el.get_text(strip=True).rstrip(",. ")
             frac = frac_el.get_text(strip=True).strip()
@@ -164,7 +186,20 @@ def parse_product_page(
             f"({len(html)} bytes, no title, no price)"
         )
 
-    if price is None and is_available:
+    if price is None and no_featured_offer:
+        # Nothing is wrong with the page or the parser: Amazon has withdrawn the
+        # buy box for this listing, so there is no price to read. Mark it
+        # unavailable — the sensor goes unknown, which beats a stale or foreign
+        # number — and say why, instead of warning about a layout change.
+        is_available = False
+        availability_text = availability_text or "No featured offer"
+        _LOGGER.info(
+            "Amazon is not showing a price for ASIN %s: the listing has no "
+            "featured offer right now (\"See all buying options\"). The sensor "
+            "stays unknown until a price comes back.",
+            asin,
+        )
+    elif price is None and is_available:
         # Dumping the first 300 chars only ever showed Amazon's boilerplate
         # doctype. Report what actually helps triage instead, and keep the full
         # page behind debug logging.
@@ -247,33 +282,41 @@ class AmazonPriceCoordinator(DataUpdateCoordinator[dict]):
         self.product_name = name
         self.marketplace = marketplace
         self._market_config = DOMAIN_CONFIG.get(marketplace, DOMAIN_CONFIG[DEFAULT_MARKETPLACE])
-        self._client: httpx.AsyncClient | None = None
+        # True when the last failure was Amazon blocking us rather than a
+        # network or configuration problem. Setup reads this to decide whether
+        # the entry is genuinely not ready or merely walled for now.
+        self.blocked_by_amazon = False
 
-    async def _get_client(self) -> httpx.AsyncClient:
-        if self._client is None or self._client.is_closed:
-            self._client = await async_create_client(
-                self.hass, self.marketplace, REQUEST_TIMEOUT
-            )
-        return self._client
-
-    async def async_shutdown(self) -> None:
-        if self._client and not self._client.is_closed:
-            await self._client.aclose()
+    @property
+    def session(self) -> AmazonSession:
+        """The session shared by every product on this marketplace."""
+        return async_get_session(self.hass, self.marketplace)
 
     async def _async_update_data(self) -> dict:
         url = BASE_URL.format(marketplace=self.marketplace, asin=self.asin)
         european_format: bool = self._market_config["european_format"]
 
+        session = self.session
+
         try:
-            client = await self._get_client()
-            response = await client.get(url)
+            response = await session.async_get(url)
             response.raise_for_status()
+        except AmazonBlockedError as err:
+            # The marketplace is already in cooldown — no request was sent and
+            # there is no new block to record. Stay quiet; the session logged
+            # the block once, for all products, when it happened.
+            self.blocked_by_amazon = True
+            _LOGGER.debug("Skipped %s: %s", self.asin, err)
+            self.update_interval = timedelta(minutes=30)
+            raise UpdateFailed(str(err)) from err
         except httpx.HTTPStatusError as err:
+            self.blocked_by_amazon = False
             self.update_interval = timedelta(minutes=30)
             raise UpdateFailed(
                 f"HTTP {err.response.status_code} for {self.asin}"
             ) from err
         except httpx.HTTPError as err:
+            self.blocked_by_amazon = False
             self.update_interval = timedelta(minutes=30)
             raise UpdateFailed(f"Network error for {self.asin}: {err}") from err
 
@@ -283,14 +326,16 @@ class AmazonPriceCoordinator(DataUpdateCoordinator[dict]):
                     parse_product_page, response.text, self.asin, european_format
                 )
             )
-        except AmazonCaptchaError as err:
-            _LOGGER.warning(
-                "Amazon is blocking scraping for ASIN %s (%s) — retrying in 30 min",
-                self.asin,
-                err,
-            )
+        except AmazonBlockedError as err:
+            # We spent a request and got a wall: put the whole marketplace in
+            # cooldown so the other products don't each collect one too.
+            _LOGGER.debug("Anti-bot page for %s: %s", self.asin, err)
+            self.blocked_by_amazon = True
+            await session.async_note_block()
             self.update_interval = timedelta(minutes=30)
             raise UpdateFailed(str(err)) from err
+
+        self.blocked_by_amazon = False
 
         jitter = random.uniform(-JITTER_SECONDS, JITTER_SECONDS)
         self.update_interval = timedelta(seconds=BASE_INTERVAL_SECONDS + jitter)

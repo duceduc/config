@@ -21,7 +21,7 @@ from .const             import (HOME, NOT_SET,
                                 DATETIME_ZERO, HHMMSS_ZERO, HHMM_ZERO,
                                 TOWARDS, AWAY_FROM,
                                 INZONE, INZONE_HOME, INZONE_STATZONE, INZONE_CODES,
-                                INTERVAL, DISTANCE,
+                                INTERVAL, INTERVAL_METHOD, DISTANCE,
                                 ZONE_DISTANCE, ZONE_DISTANCE_M, ZONE_DISTANCE_M_EDGE,
                                 MAX_DISTANCE, CALC_DISTANCE, WAZE_DISTANCE, WAZE_METHOD,
                                 FROM_ZONE, ZONE_INFO,
@@ -103,13 +103,9 @@ class iCloud3_DeviceFmZone():
         self.sensors_um = {}
         self.sensors    = {}
 
-        # Restore the sensors from restore file
-        if self.from_zone in Gb.restore_state_devices[self.devicename]['from_zone']:
-            self.sensors = Gb.restore_state_devices[self.devicename]['from_zone'][self.from_zone].copy()
-            return
-
         self.sensors[FROM_ZONE]            = self.from_zone
         self.sensors[INTERVAL]             = 0
+        self.sensors[INTERVAL_METHOD]      = 'FZIV'
         self.sensors[LAST_LOCATED_DATETIME] = DATETIME_ZERO
         self.sensors[LAST_LOCATED_TIME]     = HHMMSS_ZERO
         self.sensors[LAST_LOCATED]          = HHMMSS_ZERO
@@ -135,6 +131,9 @@ class iCloud3_DeviceFmZone():
         self.sensors[MOVED_DISTANCE]       = 0
         self.sensors[ZONE_INFO]            = ''
 
+        # Restore the sensors from restore file
+        if self.from_zone in Gb.restore_state_devices[self.devicename]['from_zone']:
+            self.sensors.update(Gb.restore_state_devices[self.devicename]['from_zone'][self.from_zone])
 
         Sensors_from_zone      = Gb.Sensors_by_devicename_from_zone.get(self.devicename, {})
         from_this_zone_sensors = {k:v   for k, v in Sensors_from_zone.items()

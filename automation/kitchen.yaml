@@ -18,10 +18,6 @@
   conditions:
     - condition: template # disable motion light
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
-#    - condition: template # disable motion light
-#      value_template: >- # can remove when human sensor is working
-#        {%- set trig = (now() - states.binary_sensor.motion_kitchen_occupancy.last_changed).seconds -%}
-#          {{ trig <= 300 }}
     - condition: template # mcl is off
       value_template: "{{ is_state('input_boolean.kitchen_mcl', 'off') }}"
   actions:

@@ -141,6 +141,19 @@ cards:
             name: Computer Room
 
 
+      - type: statistics-graph
+        title: Heart rate Duc
+        entities:
+          - sensor.healthsync_duc_heart_rate
+        stat_types:
+          - min
+          - mean
+          - max
+        period:
+          hour: 1
+
+
+
 #      - type: custom:bar-card
 #        title: Zigbee Dimmer Signals
 #        show_header_toggle: false

@@ -118,15 +118,21 @@ def check_mobapp_state_trigger_change(Device):
                                 or Device.mobapp_data_state == NOT_SET)
 
         # Force a reject if periodic and has not moved
-        if mobapp_data_trigger == 'periodic':
-            if (Device.is_dev_data_source_SET
+        if (mobapp_data_trigger == 'periodic'
+                and Gb.use_data_source_ICLOUD):
+            if Device.isin_zone and mobapp_data_state == Device.loc_data_zone:
+                mobapp_data_change_flag = False
+            elif (Device.is_dev_data_source_SET
                     and device_trkr_attrs[LATITUDE] == Device.mobapp_data_latitude
                     and device_trkr_attrs[LONGITUDE] == Device.mobapp_data_longitude):
                 mobapp_data_change_flag = False
 
         # Force a reject if signaled and last update was less than 15-secs ago
-        elif mobapp_data_trigger == 'signaled':
+        elif (mobapp_data_trigger == 'signaled'
+                and Gb.use_data_source_ICLOUD):
             if secs_since(Device.loc_data_secs) < 15:
+                mobapp_data_change_flag = False
+            elif Device.isin_zone and mobapp_data_state == Device.loc_data_zone:
                 mobapp_data_change_flag = False
 
         # Update Device mobapp_data with the state & trigger location data
@@ -455,7 +461,7 @@ def check_if_mobapp_is_alive(Device):
                 and secs_since(Device.mobapp_data_secs) > 21600):
             event_msg =(f"Last Mobile App update from {Device.mobapp_device_trkr_entity_id_fname}"
                         f"—{format_time_age(Device.mobapp_data_secs)}")
-            posst_event(Device, event_msg)
+            post_event(Device, event_msg)
 
     except Exception as err:
         log_exception(err)

@@ -187,10 +187,6 @@ class iCloud3:
     def start_icloud3_stage_4_5_6_load_aa_device_to_locate(self):
         try:
             # Terminate startup process if internet is down
-            # Gb.InternetError.is_internet_available()
-            # event_msg = f"Internet Connection Test > Connected-{yes_no(not Gb.internet_error)}"
-            # log_data(event_msg, Gb.InternetError.data)
-            # post_alert(event_msg)
             if Gb.internet_error:
                 start_ic3_control.stage_6_initialization_complete()
                 Gb.InternetError.start_internet_error_handler()
@@ -203,10 +199,14 @@ class iCloud3:
                 start_ic3_control.stage_6_initialization_complete()
 
                 if Gb.was_icloud3_reloaded:
-                    post_event( f"{ICLOUD3_ATTENTION_MSG} > Restart Complete")
-                    # log_info_msg(f"{'🔶'*5} ICLOUD3 WAS RELOADED {'🔶'*5}")
+                    event_msg = "Restart Complete"
                 else:
-                    post_event( f"{ICLOUD3_ATTENTION_MSG} > Initial Start-up Complete")
+                    event_msg = "Initial Start-up is Complete"
+                    if is_empty(Gb.conf_apple_accounts) and is_empty(Gb.conf_devices):
+                        event_msg +=(   ". Set up Apple Accounts and Devices on the iCloud3 "
+                                        "Configure Settings screens. Click the `Gear` "
+                                        "Icon (⚙️) above the Actions item.")
+                post_event(f"{ICLOUD3_ATTENTION_MSG} > {event_msg}")
 
                 start_ic3_control.stage_7_initial_locate()
 
@@ -326,7 +326,7 @@ class iCloud3:
 
             if Gb.is_all_tracking_paused:
                 post_greenbar_msg(f"All Devices > Tracking Paused at "
-                                        f"{format_time_age(Gb.all_tracking_paused_secs)}")
+                                    f"{format_time_age(Gb.all_tracking_paused_secs)}")
                 return
 
             #<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>
@@ -1423,7 +1423,7 @@ class iCloud3:
 
         msg = ""
         for username, AppleAcct in Gb.AppleAcct_by_username.items():
-            if AppleAcct.is_auth_code_needed:
+            if AppleAcct.is_reauth_needed:
                 msg += (f"Apple Acct > {AppleAcct.account_owner}, "
                         f"Auth Code Needed")
 

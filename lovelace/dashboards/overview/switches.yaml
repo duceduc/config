@@ -28,7 +28,7 @@ cards:
           - entity: light.pc_desktop_led
             name: Desk Led
           - entity: light.ceiling_fan_light
-            name: Dining Room            
+            name: Dining Room
           - type: divider
           - entity: fan.ceiling_fan_summer
             icon: mdi:pinwheel
@@ -103,10 +103,10 @@ cards:
           - entity: light.wc
             name: WC
           - type: divider
-          - entity: switch.24hr_fan
-            name: 24hr Fan
-    #      - entity: switch.24h_fan
-    #        name: 24h Fan Mqtt
+          - entity: fan.24hr_fan
+            name: 24h Fan
+#          - entity: switch.24hr_fan
+#            name: 24hr Fan
 
       - type: entities
         title: Front Area Lights
@@ -137,7 +137,7 @@ cards:
           - entity: switch.desktop_internet
             name: Desktop
           - entity: switch.ai_4
-            name: Ai4        
+            name: Ai4
           - entity: switch.is
             name: iS
           - entity: switch.ipad
