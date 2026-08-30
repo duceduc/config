@@ -12,6 +12,7 @@ automation:
       - trigger: state
         entity_id: sensor.duc_withings_systolic_blood_pressure, sensor.duc_withings_diastolic_blood_pressure
     actions:
+      - delay: 2    
       - action: script.text_notify
         data:
           who: amber
