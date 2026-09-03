@@ -275,6 +275,21 @@
           event_id: "tomorrow"
 
 
+# for shion events, after school, juku, etc
+
+
+
+
+
+
+
+#########################################################
+#
+#             SMTP Imap
+#
+#########################################################
+
+
 # https://community.home-assistant.io/t/syntax-for-multiple-search-criteria-for-imap-search/568471/7
 # https://community.home-assistant.io/t/syntax-for-multiple-search-criteria-for-imap-search/568471/10
   - trigger:

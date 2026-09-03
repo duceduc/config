@@ -106,18 +106,21 @@
 #
 #########################################################
 
-- alias: Shion Event Starting Soon
-  triggers:
-    - trigger: calendar
-      event: start
-      offset: "-0:45:0"
-      entity_id: calendar.shion_events
-  actions:
-    - action: script.status_annc
-      data:
-        who: ai_1
-        call_interuption: 1
-        call_shion_events: 1
+
+#- alias: Shion Event Starting Soon
+#  triggers:
+#    - trigger: calendar
+#      event: start
+#      offset: "-0:45:0"
+#      entity_id: calendar.shion_events
+#  actions:
+#    - action: script.status_annc
+#      data:
+#        who: ai_1
+#        call_interuption: 1
+#        call_shion_events: 1
+
+
 
 
 #- alias: School Pickup Reminder
@@ -153,12 +156,35 @@
       event: start
       offset: '-1:00:00'
       entity_id: calendar.appointments
+    - trigger: calendar
+      event: start
+      offset: '-1:00:00'
+      entity_id: calendar.shion_events
+      id: 'events'
   actions:
-    - action: script.status_annc
-      data:
-        who: ai_1
-        call_interuption: 1
-        call_appointments: 1
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: 'events'
+          sequence:
+            - action: script.status_annc
+              data:
+                who: ai_1
+                call_interuption: 1
+                call_shion_events: 1
+            - action: script.text_notify
+              data:
+                who: duc
+                title: "{{ state_attr('calendar.shion_events', 'message') }}"
+                message: "Shion's {{ state_attr('calendar.shion_events', 'message') }} starts in about 1 hour."
+
+      default:
+        - action: script.status_annc
+          data:
+            who: ai_1
+            call_interuption: 1
+            call_appointments: 1
+
 
 
 - alias: Appointment Reminder Tomorrow

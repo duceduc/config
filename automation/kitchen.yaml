@@ -48,7 +48,7 @@
       to: 'on'
       for: '00:01:00'
     - trigger: state
-      entity_id: sensor.kt_illuminance
+      entity_id: sensor.kt_illuminance # this sensor in template folder has been comment out. No longer needed if this automation is deleted.
       id: 'on'
       from: 'off'
       to: 'on'
@@ -111,7 +111,7 @@
 
 #### TEST for above removal #####
 - alias: Kitchen Auto-on
-  mode: single
+  mode: parallel
   triggers:
     - trigger: state
       entity_id: binary_sensor.kitchen_occupied, group.motion_kitchen_occupancy
@@ -122,11 +122,12 @@
     - trigger: template
       value_template: "{{ state_attr('binary_sensor.kitchen_occupied', 'full_on') == true }}"
       id: 'on'
-    - trigger: state
-      entity_id: sensor.kt_illuminance
-      id: 'on'
-      from: 'off'
-      to: 'on'
+## NOT USING ???      
+#    - trigger: state
+#      entity_id: sensor.kt_illuminance
+#      id: 'on'
+#      from: 'off'
+#      to: 'on'
 
     - trigger: state # manual turn off lights
       entity_id: light.cabinet

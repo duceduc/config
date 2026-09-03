@@ -109,7 +109,7 @@
             {% endmacro %}
 
             {% macro shion_events() %}
-              She on has {{ states.calendar.shion_events.attributes.message }} starting in forty five minutes.
+              She on has {{ states.calendar.shion_events.attributes.message }} starting in one hour.
               {{ [ 'It is time to get ready to leave. ',
                   'You should prepare to leave. ',
                   'If you are not ready, you start getting ready.',

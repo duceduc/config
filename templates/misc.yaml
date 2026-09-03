@@ -209,23 +209,26 @@
 #
 ####################################################
 
-      - name: kt illuminance
-        state: >
-          {% if states.sensor.lr_radar_illuminance.state | float(0) == 0.10 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.20 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
-            on
-          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.45 %}
-            on
-          {% else %}
-            off
-          {% endif %}
+## POSSIBLE NOT USING ANYMORE
+#      - name: kt illuminance
+#        state: >
+#          {% if states.sensor.lr_radar_illuminance.state | float(0) == 0.10 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.20 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
+#            on
+#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.45 %}
+#            on
+#          {% else %}
+#            off
+#          {% endif %}
+
+
 
 ####################################################
 #
