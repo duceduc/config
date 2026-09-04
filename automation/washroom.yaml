@@ -30,28 +30,32 @@
 - alias: 'motion washroom auto-off'
   mode: parallel
   triggers:
+    - trigger: template # start nightlight monitoring
+      value_template: "{{ state_attr('binary_sensor.wash_occupied', 'nightlight') == true }}"
     - trigger: state
       entity_id: binary_sensor.wash_occupied
       to: 'off'
   conditions:
-    - condition: template 
+    - condition: template
       value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
 #    - condition: template # disable motion light
 #      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   actions:
     - choose:
         - conditions:
-            - condition: template # 7am - 11pm stays on during the day
-              value_template: "{{ is_state('input_boolean.disable_motion_lights', 'on') and (now().hour < 22 or now().hour > 6) }}"
-          sequence:
-            - action: light.turn_on
+            - condition: template # stays on during the day between 7am - 11pm
+              value_template: "{{ is_state('input_boolean.disable_motion_lights', 'on') and (now().hour > 22 or now().hour > 6) }}"
+          sequence: # possibly don't need the template of attr being true #
+            - service_template: light.turn_{{ 'off' if state_attr('binary_sensor.wash_occupied', 'nightlight') == true else 'on' }}
               entity_id: light.laundry
-        - conditions:
-            - condition: template # auto off at 11pm and  between 11pm - 7pm
-              value_template: "{{ state_attr('binary_sensor.wash_occupied', 'nightlight') == true or not is_state('input_boolean.disable_motion_lights', 'on') and (now().hour > 22 or now().hour < 7) }}"
-          sequence:
-            - action: light.turn_off
-              entity_id: light.laundry
+
+#        - conditions:
+#            - condition: template # auto off at 11pm and  between 11pm - 7pm
+#              value_template: "{{ state_attr('binary_sensor.wash_occupied', 'nightlight') == true or not is_state('input_boolean.disable_motion_lights', 'on') and (now().hour > 22 or now().hour < 7) }}"
+#          sequence:
+#            - action: light.turn_off
+#              entity_id: light.laundry
+
       default:
         - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
           entity_id: light.laundry
