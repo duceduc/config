@@ -1,0 +1,21 @@
+force_upload:
+  name: Request force upload
+  description: Queue a force-upload command for the Halthy iOS app.
+  fields:
+    app_username:
+      name: App username
+      description: Optional configured app username. Leave empty to target all Halthy entries.
+      example: tester1
+      selector:
+        text:
+
+force_influx_backfill:
+  name: Request Influx backfill
+  description: Queue an Influx backfill command for the Halthy iOS app.
+  fields:
+    app_username:
+      name: App username
+      description: Optional configured app username. Leave empty to target all Halthy entries.
+      example: tester1
+      selector:
+        text:

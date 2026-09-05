@@ -144,7 +144,7 @@ cards:
       - type: statistics-graph
         title: Heart rate Duc
         entities:
-          - sensor.healthsync_duc_heart_rate
+          - sensor.duc_heart_rate # sensor.healthsync_duc_heart_rate
         stat_types:
           - min
           - mean
