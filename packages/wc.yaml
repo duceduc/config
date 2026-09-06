@@ -159,14 +159,14 @@ automation:
           - action: homeassistant.turn_on
             entity_id: input_boolean.engage_toilet_airfreshener
 
-# Automate Toilet Seat Heater Arrival
+# Automate Toilet Seat Heater when 1st person Arrivals
   - alias: 'Enable Toilet Seat Heater Upon Arrival'
     triggers:
       - trigger: state
         entity_id: input_select.home_mode
     conditions:
-      - condition: template # Is not summer
-        value_template: "{{ not is_state('sensor.season', 'summer') }}"
+#      - condition: template # Is not summer or temp is below 20
+#        value_template: "{{ not is_state('sensor.season', 'summer') or states('sensor.aio_human_sensor_entrance_temperature') | int(0) <= 19 }}"
     actions:
       choose:
         - conditions: "{{ trigger.to_state.state == 'Away' or trigger.to_state.state == 'Vacation' }}"
@@ -204,14 +204,14 @@ automation:
       - trigger: state
         entity_id: sensor.aio_human_sensor_entrance_temperature
     conditions:
-      - condition: template # is not summer
-        value_template: "{{ not is_state('sensor.season', 'summer') }}"
+#      - condition: template # Is not summer or temp is below 20
+#        value_template: "{{ not is_state('sensor.season', 'summer') }}"
       - condition: template # only run if sensor is on
         value_template: "{{ not is_state('binary_sensor.aio_human_sensor_online', 'off') }}"
-      - condition: template # delay turning off too fast 10 mins
-        value_template: |
-          {%- set last_toilet_heat_off_seconds = (now() - as_local(states.script.toilet_seat_off_heat.last_updated )).seconds -%}
-          {%- if last_toilet_heat_off_seconds >= 600 %} true {% else %} false {% endif %}
+#      - condition: template # delay turning off too fast 10 mins
+#        value_template: |
+#          {%- set last_toilet_heat_off_seconds = (now() - as_local(states.script.toilet_seat_off_heat.last_updated )).seconds -%}
+#          {%- if last_toilet_heat_off_seconds >= 600 %} true {% else %} false {% endif %}
     actions:
       choose:
         - conditions: >

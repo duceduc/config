@@ -97,7 +97,7 @@ influxdb:
 #  ssl: false
 #  verify_ssl: false
 #  token: !secret influx_token
-#  organization: 4837e7ed846db56e
+#  organization: 4837e7ed846db56e or ngx
 #  bucket: homeassistant
   include:
     domains:

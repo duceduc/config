@@ -109,11 +109,11 @@
             {% endmacro %}
 
             {% macro shion_events() %}
-              She on has {{ states.calendar.shion_events.attributes.message }} starting in one hour.
+              She on has {{ states.calendar.shion_events.attributes.message }} starting at {{ as_datetime(state_attr('calendar.shion_events', 'start_time')).strftime('%I:%M %p') }}.
               {{ [ 'It is time to get ready to leave. ',
-                  'You should prepare to leave. ',
-                  'If you are not ready, you start getting ready.',
-                  'Gather your things and prepare to leave.'
+                  'He should prepare to leave. ',
+                  'If he is not ready, he needs to start getting ready now.',
+                  'Gather your things and prepare to leave, she on.'
                 ] | random }}
             {% endmacro %}
 
