@@ -90,6 +90,7 @@ _FRIENDLY_TOKEN_EXPANSIONS = {
 }
 
 _FRIENDLY_KEY_OVERRIDES = {
+    "body_mass": "weight",
     "last_full_sync": "last full sync",
     "last_update": "last update",
     "oxygen_saturation": "blood oxygen",
@@ -246,6 +247,10 @@ def metric_icon(metric_key: str, provided_icon: str | None) -> str:
         return icon
 
     key = sanitize_identifier(metric_key)
+    if key == "go_to_bed_time":
+        return "mdi:bed-clock"
+    if key == "wake_up_time":
+        return "mdi:weather-sunset-up"
     if any(token in key for token in ("sleep", "asleep", "in_bed")):
         return "mdi:sleep"
     if any(token in key for token in ("heart", "atrial", "pulse", "hrv", "sdnn")):

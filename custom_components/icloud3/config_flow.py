@@ -234,7 +234,7 @@ class iCloud3_ConfigFlow(config_entries.ConfigFlow, FlowHandler,
     # def _reauth_goto_previous(self, exit_by_x_click=False):
     def ha_reconfigure_reauth_exit(self, exit_by_x_click=False):
         self.is_reauth_initialized = False
-        utils_cf.log_step_info(self, f'Xclick-{exit_by_x_click}', 'exit')
+        utils_cf.log_step_info(self, f'XClick-{exit_by_x_click}', 'exit')
 
         if Gb.AppleAcct_reauth_needed is None:
             return self.async_abort(reason="auth_code_accepted")
@@ -690,7 +690,7 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow,
         self.step_id = 'Exit Configure Settings'
         Gb.is_config_flow_open = False
         self.is_initialize_options_required = False
-        utils_cf.log_step_info(self, f'Xclick-{exit_by_x_click}, UpdateParms-{Gb.config_parms_update_control}', 'start')
+        utils_cf.log_step_info(self, f'XClick-{exit_by_x_click}, UpdateParms-{Gb.config_parms_update_control}', 'start')
 
         # If the initial config file was just installed, set it to 'has been reviewed'
         if Gb.conf_profile[CONF_VERSION] <= 0:
@@ -706,7 +706,9 @@ class iCloud3_OptionsFlowHandler(config_entries.OptionsFlow,
             self.create_device_tracker_sensor_enities_on_exit = False
             await config_file.async_build_conf_device_sensors_from_conf_sensors()
             await ic3_device_tracker.async_create_Device_Tracker_objects()
+            self.exit_msg += f"* Devices have been added ({Gb.device_trackers_cnt})\n"
             await ic3_sensor.async_create_Sensor_objects()
+            self.exit_msg += f"* Sensors have been added ({Gb.sensors_cnt})\n"
             self.rebuild_ic3db_dashboards = True
             list_add(self.config_parms_update_control, 'restart')
 

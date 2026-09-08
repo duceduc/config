@@ -33,6 +33,12 @@ NAMING = _load_naming_module()
 
 
 class NamingHelpersTests(unittest.TestCase):
+    def test_body_mass_display_name_preserves_metric_identity(self) -> None:
+        for key in ("body_mass", "bodyMass", "HKQuantityTypeIdentifierBodyMass"):
+            self.assertEqual(NAMING.friendly_metric_name(key, "Body mass"), "Weight")
+            self.assertEqual(NAMING.normalize_metric_key(key), "body_mass")
+        self.assertEqual(NAMING.friendly_metric_name("lean_body_mass", None), "Lean body mass")
+
     def test_normalize_healthkit_identifier(self) -> None:
         key = NAMING.normalize_metric_key("HKQuantityTypeIdentifierAppleSleepingWristTemperature")
         self.assertEqual(key, "sleeping_wrist_temperature")

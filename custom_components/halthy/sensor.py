@@ -9,12 +9,14 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import UnitOfLength
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util.unit_conversion import DistanceConverter, MassConverter
 
 from .runtime import HalthySensorState, IntegrationRuntime, runtime_device_identifiers
 from .const import (
@@ -24,7 +26,7 @@ from .const import (
     remove_sensor_signal,
     update_sensor_signal,
 )
-from .naming import sanitize_identifier
+from .naming import friendly_metric_name, normalize_metric_key, sanitize_identifier
 from .units import (
     duration_suggested_display_precision,
     is_duration_metric,
@@ -107,9 +109,15 @@ class HalthySensor(SensorEntity):
     @callback
     def _apply_state(self, state: HalthySensorState) -> None:
         self._sensor_state = state
-        self._attr_name = state.name
+        metric_key = normalize_metric_key(state.metric_key)
+        self._attr_name = (
+            friendly_metric_name(metric_key, state.name)
+            if metric_key in {"body_mass", "weight"}
+            else state.name
+        )
         self._attr_native_value = state.state
         self._attr_native_unit_of_measurement = state.unit
+        self._attr_suggested_unit_of_measurement = None
         self._attr_entity_category = (
             EntityCategory.DIAGNOSTIC
             if state.metric_key in {"last_update", "last_full_sync", "daily_upload_count"}
@@ -123,7 +131,19 @@ class HalthySensor(SensorEntity):
             else None
         )
 
-        if is_duration_metric(state.metric_key, state.unit):
+        if metric_key == "height" and state.unit in DistanceConverter.VALID_UNITS:
+            self._attr_device_class = SensorDeviceClass.DISTANCE
+            self._attr_native_unit_of_measurement = UnitOfLength.CENTIMETERS
+            self._attr_suggested_unit_of_measurement = UnitOfLength.CENTIMETERS
+            self._attr_suggested_display_precision = 1
+            if is_numeric_state:
+                self._attr_native_value = DistanceConverter.convert(
+                    state.state, state.unit, UnitOfLength.CENTIMETERS
+                )
+        elif metric_key in {"body_mass", "weight"} and state.unit in MassConverter.VALID_UNITS:
+            self._attr_device_class = SensorDeviceClass.WEIGHT
+            self._attr_suggested_display_precision = 1
+        elif is_duration_metric(state.metric_key, state.unit):
             self._attr_device_class = SensorDeviceClass.DURATION
             self._attr_state_class = SensorStateClass.MEASUREMENT
             self._attr_suggested_display_precision = duration_suggested_display_precision(
@@ -131,7 +151,12 @@ class HalthySensor(SensorEntity):
             )
         elif is_timestamp_metric(state.metric_key):
             parsed_timestamp = _parse_timestamp_state(state.state)
-            if parsed_timestamp is not None:
+            if metric_key in {"go_to_bed_time", "fall_asleep_time", "wake_up_time"}:
+                self._attr_native_value = parsed_timestamp
+                self._attr_native_unit_of_measurement = None
+                self._attr_device_class = SensorDeviceClass.TIMESTAMP
+                self._attr_suggested_display_precision = None
+            elif parsed_timestamp is not None:
                 self._attr_native_value = parsed_timestamp
                 self._attr_device_class = SensorDeviceClass.TIMESTAMP
                 self._attr_suggested_display_precision = None

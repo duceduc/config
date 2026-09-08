@@ -47,6 +47,22 @@ The `v0.1.0-beta` release archive could install Halthy under an incorrect nested
    - **Display Name** (optional): shown as device name in Home Assistant
 4. Repeat for each person.
 
+### Sleep times
+
+Select a sleep metric for upload in the updated iOS app to create three timestamp sensors per user:
+
+- **Go to bed time** (`sensor.<username>_go_to_bed_time`): start of the matching recorded in-bed interval. Missing in-bed data is shown as **unknown**, never estimated.
+- **Fall asleep time** (`sensor.<username>_fall_asleep_time`): first recorded asleep stage.
+- **Wake up time** (`sensor.<username>_wake_up_time`): end of the final asleep stage, not the time you left bed.
+
+All three use the same latest main sleep session from the past 48 hours. Stages and gaps up to 90 minutes are grouped, and overlapping samples are merged. Sessions lasting at least two hours take priority over short naps; if none exists, the app falls back to sessions lasting at least 20 minutes. These are recorded boundaries, not live sleep detection.
+
+Full timestamps are displayed using Home Assistant's timestamp handling. Values refresh on the next app upload even when sleep duration is unchanged. A new session without in-bed data clears the previous bedtime to unknown; an unreadable or missing session leaves existing values unchanged. Both the app and integration must be updated, and the app needs access to sleep data.
+
+### Height and Weight sensor settings
+
+Height is reported in centimetres by default. Body mass is displayed as **Weight**. Both sensors suggest one decimal place and support Home Assistant's unit conversion and display precision settings: open the sensor, select the settings cog, and adjust **Unit of measurement** and **Display precision**. Your choices are kept across uploads. Existing entity IDs stay the same, including `sensor.<username>_body_mass`.
+
 ## Built-in Workout Card
 
 Halthy includes a bundled Lovelace card: `custom:halthy-workout-card`.

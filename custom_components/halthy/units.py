@@ -85,6 +85,9 @@ _DURATION_METRIC_KEYS = {
 }
 
 _TIMESTAMP_METRIC_KEYS = {
+    "go_to_bed_time",
+    "fall_asleep_time",
+    "wake_up_time",
     "last_full_sync",
     "last_update",
     "workout_start",

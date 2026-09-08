@@ -177,6 +177,11 @@
                 who: duc
                 title: "{{ state_attr('calendar.shion_events', 'message') }}"
                 message: "Shion's {{ state_attr('calendar.shion_events', 'message') }} is at {{ as_datetime(state_attr('calendar.shion_events', 'start_time')).strftime('%I:%M %p') }}."
+            - action: script.text_notify
+              data:
+                who: eri
+                title: "{{ state_attr('calendar.shion_events', 'message') }}"
+                message: "Shion's {{ state_attr('calendar.shion_events', 'message') }} is at {{ as_datetime(state_attr('calendar.shion_events', 'start_time')).strftime('%I:%M %p') }}."
 
       default:
         - action: script.status_annc
