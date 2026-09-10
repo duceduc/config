@@ -113,14 +113,14 @@ def statistics_metadata(statistic_id: str, name: str, unit: str | None) -> Any:
         "statistic_id": statistic_id,
         "source": statistics_source_for_id(statistic_id),
         "name": name,
-        "has_mean": True,
         "has_sum": False,
         "unit_class": None,
+        "unit_of_measurement": unit,
     }
     if StatisticMeanType is not None:
         kwargs["mean_type"] = StatisticMeanType.ARITHMETIC
-    if unit:
-        kwargs["unit_of_measurement"] = unit
+    else:
+        kwargs["has_mean"] = True
     try:
         return StatisticMetaData(**kwargs)
     except TypeError:
@@ -252,8 +252,9 @@ def prepare_statistics_imports_for_runtime(
         filtered_rows: list[dict[str, Any]] = []
         for row in rows:
             start = row["start"]
-            if cursor_at is not None and start <= cursor_at:
-                continue
+            # A high-water mark cannot prove older samples were imported:
+            # backfills and retries can arrive after newer live readings.
+            # Recorder upserts rows by statistic ID and hour.
             filtered_rows.append(row)
             if latest_imported_at is None or start > latest_imported_at:
                 latest_imported_at = start

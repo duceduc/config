@@ -49,6 +49,8 @@ The `v0.1.0-beta` release archive could install Halthy under an incorrect nested
 
 ### Sleep times
 
+For UTC-looking timestamps, absolute date formatting, missing statistics, or HACS icon placeholders, see [Troubleshooting](https://github.com/Mosher23/Halthy/blob/main/docs/troubleshooting.md).
+
 Select a sleep metric for upload in the updated iOS app to create three timestamp sensors per user:
 
 - **Go to bed time** (`sensor.<username>_go_to_bed_time`): start of the matching recorded in-bed interval. Missing in-bed data is shown as **unknown**, never estimated.

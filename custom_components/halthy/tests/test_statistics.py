@@ -262,6 +262,78 @@ BRIDGE, ARCHIVE, STATISTICS, TIMESTAMPS = _load_integration_module()
 
 
 class StatisticsHelpersTests(unittest.TestCase):
+    def test_push_uses_receipt_time_and_imports_older_and_duplicate_samples(self):
+        import json
+        from unittest.mock import AsyncMock, patch
+
+        async def exercise():
+            runtime = BRIDGE.IntegrationRuntime(
+                configured_username="tester", app_username="tester", display_name="Tester"
+            )
+            hass = types.SimpleNamespace(
+                data={BRIDGE.DOMAIN: {"entries": {"entry": runtime}}},
+                config=types.SimpleNamespace(units=types.SimpleNamespace(temperature_unit="°C")),
+            )
+            registry = types.SimpleNamespace(async_get_entity_id=lambda *args: None)
+            queued = []
+
+            async def importer(_hass, batches):
+                queued.extend(batches)
+                return sum(len(rows) for _, rows in batches), {
+                    STATISTICS.metadata_statistic_id(metadata) for metadata, _ in batches
+                }
+
+            async def upload(timestamp):
+                payload = {"username": "tester", "device_id": "phone",
+                           "prune_unselected_metrics": True, "selected_metric_keys": ["heart_rate"],
+                           "sensors": [{"key": "heart_rate", "state": 65, "unit": "bpm",
+                                        "attributes": {"measurement_timestamp": timestamp}}]}
+                body = json.dumps(payload).encode()
+                request = types.SimpleNamespace(
+                    app={BRIDGE.KEY_HASS: hass}, content_length=len(body),
+                    read=AsyncMock(return_value=body),
+                    get=lambda key: types.SimpleNamespace(id="owner"),
+                )
+                return await BRIDGE.HalthyPushView().post(request)
+
+            with patch.object(BRIDGE, "_schedule_store_save"), \
+                 patch.object(BRIDGE, "_async_emit_activity_log_entries", new=AsyncMock()), \
+                 patch.object(BRIDGE, "_current_local_day_key", return_value="2026-09-09"), \
+                 patch.object(BRIDGE.er, "async_get", return_value=registry), \
+                 patch.object(BRIDGE, "_async_import_statistics_batches", side_effect=importer):
+                before = datetime.now(timezone.utc)
+                await upload("2099-09-09T12:00:00Z")
+                after = datetime.now(timezone.utc)
+                diagnostics = {state.metric_key: state for state in runtime.sensors.values()}
+                for key in ("last_update", "last_full_sync"):
+                    timestamp = datetime.fromisoformat(diagnostics[key].state.replace("Z", "+00:00"))
+                    self.assertLessEqual(before, timestamp)
+                    self.assertLessEqual(timestamp, after)
+                await upload("2026-09-08T10:15:00Z")
+                await upload("2026-09-08T10:15:00Z")
+                self.assertEqual(len(queued), 3)
+                self.assertEqual(queued[-1][1][0].start, datetime(2026, 9, 8, 10, tzinfo=timezone.utc))
+
+        asyncio.run(exercise())
+
+    def test_backfill_and_retry_are_not_discarded_by_newer_cursor(self):
+        runtime = BRIDGE.IntegrationRuntime(
+            configured_username="tester", app_username="tester", display_name="Tester"
+        )
+        statistic_id = "halthy:tester_heart_rate"
+        runtime.statistics_cursors[statistic_id] = "2026-09-09T12:00:00+00:00"
+        candidate = {
+            "statistic_id": statistic_id, "name": "Heart rate (tester)",
+            "unit": "bpm", "start": datetime(2026, 9, 8, 10, 15, tzinfo=timezone.utc),
+            "value": 65.0,
+        }
+        for _ in range(2):
+            batches, updates = STATISTICS.prepare_statistics_imports_for_runtime(runtime, [candidate])
+            self.assertEqual(len(batches), 1)
+            self.assertEqual(batches[0][1][0].mean, 65.0)
+            STATISTICS.commit_statistics_cursor_updates(runtime, updates, {statistic_id})
+            self.assertEqual(runtime.statistics_cursors[statistic_id], "2026-09-09T12:00:00+00:00")
+
     def test_workout_archive_timestamp_from_file_name_formats(self) -> None:
         self.assertEqual(
             ARCHIVE._workout_archive_timestamp_from_file_name("20260323T123436Z_uuid_test.jpg"),

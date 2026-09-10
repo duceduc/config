@@ -1685,7 +1685,6 @@ class HalthyPushView(HomeAssistantView):
                 image_metric_lookup = _build_image_metric_lookup(runtime)
                 runtime_statistics_candidates: list[dict[str, Any]] = []
                 entry_has_state_update = False
-                entry_last_update_at: datetime | None = None
                 workout_inputs = list(prepared_workouts)
                 workout_inputs.extend(
                     prepared_image["attributes"]
@@ -1704,10 +1703,6 @@ class HalthyPushView(HomeAssistantView):
                         duplicates += 1
 
                     if workout_result in {"created", "updated"}:
-                        workout_record = _workout_record_from_attributes(workout_attributes)
-                        if workout_record is not None:
-                            if entry_last_update_at is None or workout_record.end > entry_last_update_at:
-                                entry_last_update_at = workout_record.end
                         entry_has_state_update = True
 
                 if _prune_runtime_workouts(runtime, runtime.workout_archive_retention):
@@ -1729,7 +1724,6 @@ class HalthyPushView(HomeAssistantView):
                     )
                     incoming_measurement_raw = _measurement_timestamp_value(attributes)
                     incoming_measurement = _parse_measurement_timestamp(incoming_measurement_raw)
-                    sensor_applied = False
 
                     matching_unique_ids = _matching_metric_unique_ids(runtime, metric_key, metric_lookup)
                     if matching_unique_ids:
@@ -1779,11 +1773,6 @@ class HalthyPushView(HomeAssistantView):
                             )
                             accepted_sensor_ids.append(target_unique_id)
                             updated += 1
-                            sensor_applied = True
-                            if entry_last_update_at is None:
-                                entry_last_update_at = incoming_measurement or datetime.now(timezone.utc)
-                            elif incoming_measurement is not None and incoming_measurement > entry_last_update_at:
-                                entry_last_update_at = incoming_measurement
                             entry_has_state_update = True
                             pending_sensor_updates.append(target_unique_id)
                     else:
@@ -1801,11 +1790,6 @@ class HalthyPushView(HomeAssistantView):
                         )
                         accepted_sensor_ids.append(unique_id)
                         created += 1
-                        sensor_applied = True
-                        if entry_last_update_at is None:
-                            entry_last_update_at = incoming_measurement or datetime.now(timezone.utc)
-                        elif incoming_measurement is not None and incoming_measurement > entry_last_update_at:
-                            entry_last_update_at = incoming_measurement
                         entry_has_state_update = True
                         metric_lookup.setdefault(metric_key, []).append(unique_id)
                         compact_metric = metric_key.replace("_", "")
@@ -1814,17 +1798,18 @@ class HalthyPushView(HomeAssistantView):
                         pending_sensor_new.append(unique_id)
                         pending_sensor_updates.append(unique_id)
 
-                    if sensor_applied:
-                        runtime_statistics_candidates.extend(
-                            _statistics_candidates_from_sensor(
-                                runtime=runtime,
-                                metric_key=metric_key,
-                                metric_name=name,
-                                state=_coerce_state(state),
-                                unit=unit,
-                                attributes=attributes,
-                            )
+                    # Historical/retried samples still belong in recorder even when
+                    # they must not replace the latest live sensor state.
+                    runtime_statistics_candidates.extend(
+                        _statistics_candidates_from_sensor(
+                            runtime=runtime,
+                            metric_key=metric_key,
+                            metric_name=name,
+                            state=_coerce_state(state),
+                            unit=unit,
+                            attributes=attributes,
                         )
+                    )
 
                 for prepared_image in prepared_images:
                     metric_key = prepared_image["metric_key"]
@@ -1855,8 +1840,6 @@ class HalthyPushView(HomeAssistantView):
                             )
                             accepted_image_ids.append(target_unique_id)
                             updated += 1
-                            if entry_last_update_at is None:
-                                entry_last_update_at = datetime.now(timezone.utc)
                             entry_has_state_update = True
                             pending_image_updates.append(target_unique_id)
                     else:
@@ -1873,8 +1856,6 @@ class HalthyPushView(HomeAssistantView):
                         )
                         accepted_image_ids.append(unique_id)
                         created += 1
-                        if entry_last_update_at is None:
-                            entry_last_update_at = datetime.now(timezone.utc)
                         entry_has_state_update = True
                         image_metric_lookup.setdefault(metric_key, []).append(unique_id)
                         compact_metric = metric_key.replace("_", "")
@@ -1907,19 +1888,16 @@ class HalthyPushView(HomeAssistantView):
                     deleted += len(removed_image_ids)
 
                 deleted_count_delta = deleted - deleted_count_before
+                # Diagnostics describe this upload, not a sample's timestamp.
+                received_at = datetime.now(timezone.utc)
                 if entry_has_state_update or deleted_count_delta > 0:
-                    upserted_last_update_at = (
-                        entry_last_update_at
-                        if entry_last_update_at is not None
-                        else datetime.now(timezone.utc)
-                    )
                     _upsert_last_update_sensor(
                         hass=hass,
                         runtime=runtime,
                         entry_id=entry_id,
                         metric_lookup=metric_lookup,
                         source_device_id=device_id,
-                        updated_at=upserted_last_update_at,
+                        updated_at=received_at,
                     )
 
                 accepted_count_delta = (
@@ -1933,7 +1911,7 @@ class HalthyPushView(HomeAssistantView):
                         entry_id=entry_id,
                         metric_lookup=metric_lookup,
                         source_device_id=device_id,
-                        updated_at=entry_last_update_at or datetime.now(timezone.utc),
+                        updated_at=received_at,
                     )
                 # Count session-level uploads only. Single-point incremental pushes can issue
                 # many HTTP requests per sync cycle and would inflate this diagnostic metric.
@@ -1943,7 +1921,7 @@ class HalthyPushView(HomeAssistantView):
                         runtime=runtime,
                         entry_id=entry_id,
                         source_device_id=device_id,
-                        updated_at=entry_last_update_at or datetime.now(timezone.utc),
+                        updated_at=received_at,
                     )
                 runtime_statistics_batches, runtime_cursor_updates = (
                     _prepare_statistics_imports_for_runtime(runtime, runtime_statistics_candidates)
