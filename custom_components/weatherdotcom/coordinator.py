@@ -19,7 +19,15 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.unit_system import METRIC_SYSTEM
 from homeassistant.const import (
-    PERCENTAGE, UnitOfPressure, UnitOfTemperature, UnitOfLength, UnitOfSpeed, UnitOfVolumetricFlux)
+    CONF_LATITUDE,
+    CONF_LONGITUDE,
+    PERCENTAGE,
+    UnitOfPressure,
+    UnitOfTemperature,
+    UnitOfLength,
+    UnitOfSpeed,
+    UnitOfVolumetricFlux
+)
 from .const import (
     DOMAIN,
     ICON_CONDITION_MAP,
@@ -59,11 +67,14 @@ class WeatherUpdateCoordinatorConfig:
     unit_system_api: str
     unit_system: str
     lang: str
-    latitude: str
-    longitude: str
+
     update_interval = MIN_TIME_BETWEEN_UPDATES
     tranfile: str
 
+    location_entity_id: str | None = None
+    # For legacy services that have not migrated
+    latitude: str | None = None
+    longitude: str | None = None
 
 class WeatherUpdateCoordinator(DataUpdateCoordinator):
     """The Weather.com update coordinator."""
@@ -80,12 +91,14 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         self._unit_system_api = config.unit_system_api
         self.unit_system = config.unit_system
         self._lang = config.lang
-        self._latitude = config.latitude
-        self._longitude = config.longitude
         self.data = None
         self._session = async_get_clientsession(self._hass)
         self._tranfile = config.tranfile
         self._store = WeatherDotComStorage(self._hass, self._location_name)
+
+        self._location_entity_id = config.location_entity_id
+        self._latitude = config.latitude
+        self._longitude = config.longitude
 
         self.device_info = _get_device_info(self._location_name)
 
@@ -117,11 +130,37 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         """Return the location used for data."""
         return self._location_name
 
+    def _get_coordinates(self) -> tuple[float | None, float | None]:
+        """Fetch current latitude and longitude and obfuscate if needed."""
+        lat, long = None, None
+
+        # New configuration attempt
+        if self._location_entity_id and (state := self._hass.states.get(self._location_entity_id)):
+            raw_lat = state.attributes.get(CONF_LATITUDE)
+            raw_long = state.attributes.get(CONF_LONGITUDE)
+            if raw_lat is not None and raw_long is not None:
+                return round(float(raw_lat), 2), round(float(raw_long), 2)
+
+        # Fallback to legacy config if entity is missing
+        if lat is None or long is None:
+            if self._latitude is not None and self._longitude is not None:
+                return float(self._latitude), float(self._longitude)
+            else:
+                _LOGGER.error("Could not determine latitude/longitude from entity or prior config")
+                return None, None
+
     async def _async_update_data(self) -> dict[str, Any]:
         return await self.get_weather()
 
     async def get_weather(self):
         """Get weather data."""
+        latitude, longitude = self._get_coordinates()
+        if latitude is None or longitude is None:
+            raise UpdateFailed(f"Could not retrieve location coordinates {self._location_entity_id}")
+
+        self.current_latitude = latitude
+        self.current_longitude = longitude
+
         headers = {
             'Accept-Encoding': 'gzip',
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -136,7 +175,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         for attempt in range(2):
             try:
                 async with async_timeout.timeout(10):
-                    url = self._build_url(_RESOURCECURRENT)
+                    url = self._build_url(_RESOURCECURRENT, latitude, longitude)
                     response = await self._session.get(url, headers=headers)
                     result_current = await response.json(content_type=None)
                     if result_current is None:
@@ -154,7 +193,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         for attempt in range(2):
             try:
                 async with async_timeout.timeout(10):
-                    url = self._build_url(_RESOURCEFORECASTDAILY)
+                    url = self._build_url(_RESOURCEFORECASTDAILY, latitude, longitude)
                     response = await self._session.get(url, headers=headers)
                     result_forecast_daily = await response.json(content_type=None)
                     if result_forecast_daily is None:
@@ -177,7 +216,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         for attempt in range(2):
             try:
                 async with async_timeout.timeout(10):
-                    url = self._build_url(_RESOURCEFORECASTHOURLY)
+                    url = self._build_url(_RESOURCEFORECASTHOURLY, latitude, longitude)
                     response = await self._session.get(url, headers=headers)
                     result_forecast_hourly = await response.json(content_type=None)
                     if result_forecast_hourly is None:
@@ -203,15 +242,15 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
             self.data = result
             return result
 
-    def _build_url(self, baseurl):
+    def _build_url(self, baseurl: str, latitude: float, longitude: float) -> str:
         baseurl += '&language={language}'
         baseurl += _RESOURCESHARED
 
         return baseurl.format(
             apiKey=self._api_key,
             language=self._lang,
-            latitude=self._latitude,
-            longitude=self._longitude,
+            latitude=latitude,
+            longitude=longitude,
             units=self._unit_system_api
         )
 
@@ -243,13 +282,13 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
                 # Those fields exist per-day, rather than per dayPart, so the period is halved
                 return self.data[RESULTS_FORECAST_DAILY][field][int(period / 2)]
             return self.data[RESULTS_FORECAST_DAILY][FIELD_DAYPART][0][field][period]
-        except IndexError:
+        except (IndexError, TypeError):
             return None
 
     def get_forecast_hourly(self, field, hour):
         try:
             return self.data[RESULTS_FORECAST_HOURLY][field][hour]
-        except IndexError:
+        except (IndexError, TypeError):
             return None
 
     @classmethod

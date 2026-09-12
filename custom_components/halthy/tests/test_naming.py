@@ -67,6 +67,14 @@ class NamingHelpersTests(unittest.TestCase):
         name = NAMING.friendly_metric_name("workout_route_start", None)
         self.assertEqual(name, "Workout start")
 
+    def test_sleep_stage_names_and_keys(self) -> None:
+        for key, name in {"sleep_awake": "Awake", "sleep_core": "Core sleep",
+                          "sleep_deep": "Deep sleep", "sleep_rem": "Rem sleep"}.items():
+            with self.subTest(key=key):
+                self.assertEqual(NAMING.normalize_metric_key(key), key)
+                self.assertEqual(NAMING.friendly_metric_name(key, None), name)
+                self.assertTrue(NAMING.is_selection_managed_metric(key))
+
     def test_selection_management_includes_regular_metric(self) -> None:
         self.assertTrue(NAMING.is_selection_managed_metric("steps"))
 

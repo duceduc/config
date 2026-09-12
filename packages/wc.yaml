@@ -159,7 +159,7 @@ automation:
           - action: homeassistant.turn_on
             entity_id: input_boolean.engage_toilet_airfreshener
 
-# Automate Toilet Seat Heater when 1st person Arrivals
+# Automate Toilet Seat Heater when 1st person Arrives
   - alias: 'Enable Toilet Seat Heater Upon Arrival'
     triggers:
       - trigger: state

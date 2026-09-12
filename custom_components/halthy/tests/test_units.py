@@ -109,6 +109,11 @@ class UnitHelpersTests(unittest.TestCase):
         self.assertFalse(UNITS.is_duration_metric("heart_rate", "bpm"))
 
     def test_duration_precision_suggestion(self) -> None:
+        for key in ("sleep_awake", "sleep_core", "sleep_deep", "sleep_rem"):
+            with self.subTest(key=key):
+                self.assertEqual(UNITS.canonical_unit(key, None), "h")
+                self.assertTrue(UNITS.is_duration_metric(key, "h"))
+                self.assertEqual(UNITS.duration_suggested_display_precision(key, "h"), 2)
         self.assertEqual(UNITS.duration_suggested_display_precision("sleep_duration", "h"), 2)
         self.assertEqual(UNITS.duration_suggested_display_precision("exercise_time", "min"), 1)
         self.assertIsNone(UNITS.duration_suggested_display_precision("heart_rate", "bpm"))

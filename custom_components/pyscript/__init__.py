@@ -217,8 +217,11 @@ async def watchdog_start(
                     return do_reload
                 return True
             # only reload if it's a script, yaml, or requirements.txt file
+            # also check dest_path: atomic saves (tempfile + os.replace) surface
+            # as a moved event whose src_path is an unrelated temp name
+            paths = (event.src_path, event.dest_path)
             for valid_suffix in [".py", ".yaml", "/" + REQUIREMENTS_FILE]:
-                if event.src_path.endswith(valid_suffix):
+                if any(path.endswith(valid_suffix) for path in paths):
                     return True
             return do_reload
 
