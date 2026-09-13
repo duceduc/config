@@ -21,23 +21,23 @@ template:
       - name: "Room Audio"
         unique_id: room_audio
         state: >- # rejectattr fix
-          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.app_id', 'in',['music_assistant','satellite']) | map(attribute='last_updated') | first)).seconds -%}
+          {%- set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.app_id', 'in',['music_assistant','satellite']) | map(attribute='last_updated') | first )).seconds -%}
           {%- if last_alexa_called_seconds <= 60 %}
             {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
           {% elif expand('group.occupancy') | selectattr('state', 'eq', 'on') | list | count >= 1 %}
             {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last %}
               {% if is_state('input_boolean.audible_notifications', 'off') %}
-                {% if sensor.name == 'motion cr-sensor occupancy' %}
+                {% if sensor.name == 'Bt-Proxy-Computer Moving Target' %}
                   computer_room
                 {% else %}
                   living_room
                 {%- endif %}
               {% else %}
-                {% if sensor.name == 'motion cr-sensor occupancy' %}
+                {% if sensor.name == 'Bt-Proxy-Computer Moving Target' %}
                   computer_room
-                {% elif sensor.name in ('Wr Has Moving Target','Kitchen Moving Target','Lr Moving Target') %}
+                {% elif sensor.name in ('Lr-Radar Has Moving Target','Living-Airfreshener Moving Target','Washroom-Radar Moving Target','Kt-Human-Sensor Moving Target','Sr-Human-Sensor Moving Target') %}
                   living_room
-                {% elif sensor.name in ('Wc Moving Target','Sr Has Moving Target', 'Mr Moving Target', 'Hallway Moving Target','Genkan Moving Target') %}
+                {% elif sensor.name in ('Entry-Human-Sensor Hallway Moving Target','Entry-Human-Sensor Genkan Moving Target','Shion-Airfreshener Moving Target','Wc-Airfreshener Moving Target','Sr-Radar Moving Target','Aio-Human-Sensor Master Moving Target','Mr-Human-Sensor Moving Target') %}
                   hallway
                 {% else %}
                   living_room

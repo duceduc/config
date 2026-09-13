@@ -100,7 +100,7 @@
     name: Motion Kitchen Occupancy
     entities:
       - binary_sensor.kt_human_sensor_moving_target
-#      - binary_sensor.motion_kitchen_occupancy
+      - binary_sensor.sr_human_sensor_moving_target
 #      - binary_sensor.cabinet_has_moving_target
 
   motion_showerroom_occupancy:
@@ -114,20 +114,24 @@
     - binary_sensor.genkan_moving_target
 
   occupancy:
-    - binary_sensor.kitchen_moving_target
-    - binary_sensor.lr_airfreshener_moving_target
     - binary_sensor.mr_human_sensor_moving_target
-    - binary_sensor.sr_has_moving_target
     - binary_sensor.hallway_moving_target
     - binary_sensor.genkan_moving_target
     - binary_sensor.bt_proxy_computer_moving_target
     - binary_sensor.washroom_radar_moving_target
     - binary_sensor.wc_airfreshener_moving_target
+    - binary_sensor.shion_airfreshener_moving_target
+    - binary_sensor.sr_radar_moving_target
+    - binary_sensor.aio_human_sensor_master_moving_target
+    - binary_sensor.lr_radar_has_moving_target
+    - binary_sensor.living_airfreshener_moving_target
+    - binary_sensor.kt_human_sensor_moving_target
+    - binary_sensor.sr_human_sensor_moving_target
 
   home_alarm_motion_sensors:
-    - binary_sensor.lr_airfreshener_moving_target
+    - binary_sensor.living_airfreshener_moving_target
     - binary_sensor.mr_human_sensor_moving_target
-    - binary_sensor.sr_moving_target
+    - binary_sensor.shion_airfreshener_moving_target
 
   server_status:
     all: true
