@@ -14,21 +14,13 @@ input_boolean:
 mqtt:
   sensor:
     - name: "Room Presence"
-      unique_id: room_presence    
+      unique_id: room_presence
       state_topic: "house/alerts/presence/current_room"
 
 template:
   - sensor:
       - name: "Room Audio"
         unique_id: room_audio
-#        availability: >-
-#          {% set sensor = expand('group.occupancy') | selectattr('state', 'eq', 'on') | sort(attribute='last_changed') | last | default('living_room') %}
-#            {% if sensor.name == 'Bt-Proxy-Computer Moving Target' %}
-#              computer_room
-#            {% else %}
-#              {{ states('sensor.room_presence') }}
-#            {% endif %}       
-        
         state: >- # rejectattr fix
           {% set last_alexa_called_seconds = (now() - as_local(states.media_player | selectattr('attributes.last_called','eq',True) | rejectattr('attributes.app_id', 'in',['music_assistant','satellite']) | map(attribute='last_updated') | first )).seconds -%}
           {% if last_alexa_called_seconds <= 60 %}
@@ -57,7 +49,6 @@ template:
           {% else %}
             {{ states('sensor.room_presence') }}
           {% endif %}
-
 
       - name: "Duc Home Location" # can delete if not want to use for bermuda location
         unique_id: duc_home_location  # 85d5b1cd-7690-43bb-af8e-4ae1209c0087
@@ -88,7 +79,6 @@ template:
             --
           {% endif %}
 
-
       - name: "Eri Home Location"
         unique_id: eri_home_location #  25b62d84-7c53-4c9f-a80f-87b88fd8cc25
         icon: mdi:target
@@ -118,7 +108,6 @@ template:
             --
           {% endif %}
 
-
       - name: "Shion Home Location"
         unique_id: shion_home_location # 08513fd1-5a87-4d12-9365-69b045513e30
         icon: mdi:target
@@ -147,7 +136,6 @@ template:
           {% else %}
             --
           {% endif %}
-
 
 automation:
   - alias: Set Room Presence

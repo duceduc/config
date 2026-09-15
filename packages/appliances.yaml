@@ -284,11 +284,11 @@ automation:
       - trigger: state # dryer
         entity_id: sensor.gosund_washer_state
         from:
-          - 'fill'
-          - 'run'
-          - 'wash'
-          - 'rinse' #
-        to: 'dryer' #
+#          - 'fill'
+#          - 'run'
+#          - 'wash'
+          - 'wash' 
+        to: 'dryer' 
 
     conditions:
       - condition: numeric_state

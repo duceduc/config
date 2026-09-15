@@ -63,11 +63,21 @@
     - action: frontend.set_theme
       data:
         name: midnight
+    - delay: 10
+
+# restart monitor every reboot of Ha
     - action: automation.trigger
-      entity_id: automation.presence_restart_daily # restart monitor every reboot of Ha
-    - delay: 270 # 280 300
+      entity_id: automation.presence_restart_daily
+    - delay: 120 # alt 270
+
 # reset heavy load entities
     - action: script.update_critical_battery_group
+
+#  Restore Samba Backup on Startup
+    - action: hassio.addon_stdin
+      data:
+        addon: 15d21743_samba_backup
+        input: restore-sensor
 
 
 - alias: Refresh special event sensors # daily at midnight
@@ -203,7 +213,7 @@
         {% if states.persistent_notification.http_login.state is defined %}
           {% set str= state_attr('persistent_notification.http_login', 'message') %}
           {% set ip=(str|regex_findall_index('[\d.]+')) %}
-            {{ ip in ['192.168.1.111'] }}
+            {{ ip in ['192.168.1.112'] }}
         {% else %}
           false
         {% endif %}
@@ -218,15 +228,74 @@
 #
 #########################################################
 
-- alias: Restore Samba Backup sensor on startup
+#Relocate automation to above  'startup automations'
+#- alias: Restore Samba Backup sensor on startup
+#  triggers:
+#  - trigger: homeassistant
+#    event: start
+#  actions:
+#    - action: hassio.addon_stdin
+#      data:
+#        addon: 15d21743_samba_backup
+#        input: restore-sensor
+
+
+#########################################################
+#
+#             Notify.alexa media last_called workaround
+#
+#             https://community.home-assistant.io/t/using-alexa-media-player-last-called-service/332546/41
+#             https://community.simon42.com/t/notify-alexa-media-last-called-workaround/58718/7
+#########################################################
+
+
+- alias: Alexa - Detect last called echo via ghost attribute
   triggers:
-  - trigger: homeassistant
-    event: start
+    - trigger: homeassistant
+      event: start
+    - trigger: state
+      entity_id:
+        - media_player.ai_1
+        - media_player.ai_2
+        - media_player.ai_3
+        - media_player.ai_4
+      attribute: ghost
+      from: I will vanish when called
+      trigger: state
+
   actions:
-    - action: hassio.addon_stdin
-      data:
-        addon: 15d21743_samba_backup
-        input: restore-sensor
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.platform == 'state' }}"
+          sequence:
+            - variables:
+                echo_name: "{{ trigger.entity_id }}"
+            - action: input_text.set_value
+              data:
+                entity_id: input_text.last_called_echo
+                value: "{{ echo_name }}"
+            - delay: 5
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.platform == 'homeassistant' }}"
+          sequence:
+            - delay: 5
+    - repeat:
+        for_each:
+          - media_player.ai_1
+          - media_player.ai_2
+          - media_player.ai_3
+          - media_player.ai_4
+        sequence:
+          - action: python_script.set_state
+            data:
+              entity_id: "{{ repeat.item }}"
+              ghost: I will vanish when called
+  mode: single
+  max_exceeded: silent
+
+
 
 
 ####################################################

@@ -7,7 +7,7 @@ substitutions:
 packages:
   ld2410: !include components/ld2410.yaml
 
-<<: !include .base.yaml # .220
+<<: !include .base.yaml # .222
 
 esphome:
   name: $name

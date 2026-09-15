@@ -9,8 +9,8 @@
   triggers:
     - trigger: template # primary trigger
       value_template: "{{ state_attr('binary_sensor.wash_occupied', 'initiated') == true }}"
-    - trigger: template # secondary trigger
-      value_template: "{{ is_state('binary_sensor.washroom_radar_moving_target', 'on') }}"
+#    - trigger: template # secondary trigger
+#      value_template: "{{ is_state('binary_sensor.laundry_sensor_occupancy', 'on') }}"
     - trigger: state # button trigger for shower room
       entity_id: binary_sensor.washer_door_button
       to: 'on'

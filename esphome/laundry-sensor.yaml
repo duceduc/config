@@ -1,0 +1,23 @@
+# [40:91:51:50:68:18]
+substitutions:
+  name: laundry-sensor
+  temp_offset: '-3'
+  hum_offset: '15'
+
+packages:
+  stats: !include components/stats.yaml
+  bme280: !include components/bme280.yaml
+
+<<: !include .base.yaml # .157
+
+esphome:
+  name: $name
+esp8266:
+  board: d1_mini
+
+binary_sensor:
+  - platform: gpio
+    pin: D6
+    name: occupancy
+    device_class: motion
+

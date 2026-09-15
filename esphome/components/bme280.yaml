@@ -12,15 +12,21 @@ sensor:
       name: Temperature
       id: bme280_temperature
       oversampling: 16x
-
-    pressure:
-      name: Pressure
-      id: bme280_pressure
-      oversampling: 16x
+      accuracy_decimals: 1
+      filters:
+        - offset: "$temp_offset"
 
     humidity:
       name: Humidity
       id: bme280_humidity
+      oversampling: 16x
+      accuracy_decimals: 1
+      filters:
+        - offset: "$hum_offset"
+
+    pressure:
+      name: Pressure
+      id: bme280_pressure
       oversampling: 16x
 
   - platform: homeassistant

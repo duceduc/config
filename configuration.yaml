@@ -178,6 +178,9 @@ input_text:
 #    min: 0
 #    max: 255
 
+  last_called_echo:
+    name: Last Called Echo
+
   room_presence:
     name: Room Presence
 
