@@ -1,6 +1,6 @@
 # MAC: 40:91:51:4F:90:90
 substitutions:
-  temp_offset: '-6'
+  temp_offset: '-5'
   hum_offset: '18'
 
 esphome:
