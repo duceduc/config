@@ -18,6 +18,8 @@
 #
 ####################################################
 
+
+
 - alias: "Sensor Low Battery"
   initial_state: true
   triggers:
@@ -39,12 +41,12 @@
         - sensor.shion_dimmer_battery
         - sensor.shower_room_battery
 
-      below: 30
+      below: 21
   actions:
     - action: script.text_notify
       data:
         who: whatsapp_hass
-        message: "The battery for {{ trigger.to_state.attributes.friendly_name }} is below 30 percent."
+        message: "The battery for {{ trigger.to_state.attributes.friendly_name | replace('_', ' ') | lower }} is at {{ trigger.to_state.state }}%."
 
 
 #########################################################

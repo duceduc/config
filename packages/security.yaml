@@ -293,11 +293,11 @@ automation:
         entity_id: input_boolean.sentry_mode
         state: "on"
     actions:
-      - delay: 2
+      - delay: 2 # delay for person to open front door and step inside
       - choose:
           - conditions:
               - condition: template
-                value_template: "{{ is_state('binary_sensor.genkan_moving_target', 'on') }}"
+                value_template: "{{ is_state('binary_sensor.genkan_presence', 'on') }}"
             sequence:
               - action: mqtt.publish
                 data:

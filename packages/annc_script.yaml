@@ -36,7 +36,7 @@ script:
         message: >
           {% set batts = expand('group.critical_batteries')
             | rejectattr('state', 'eq', '100')
-            | selectattr('state', 'lt', '30') | list %}
+            | selectattr('state', 'lt', '20') | list %}
           {% for bat in batts %}
             {{ bat.name }} - {{ bat.state }}%
           {% endfor %}

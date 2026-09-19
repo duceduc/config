@@ -8,8 +8,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - sensor.grazie_balance_chair
         - sensor.az_switchbot_sensor
+        - sensor.az_withings_sleep
+        - sensor.az_homebase_s380
       not_to:
         - unknown
         - unavailable
