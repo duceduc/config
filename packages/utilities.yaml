@@ -50,7 +50,7 @@ template:
                  selectattr('state', 'eq', 'on') |
                  map(attribute='entity_id') |
                  list | count > 0) }}
-        attributes: # {{ is_state('binary_sensor.washer_door_motion', 'on') or is_state('binary_sensor.laundry_sensor_occupancy', 'on') }}
+        attributes: # {{ is_state('binary_sensor.washroom_radar_moving_target', 'on') or is_state('binary_sensor.laundry_sensor_occupancy', 'on') }}
           initiated: >
             {{ is_state('binary_sensor.laundry_sensor_occupancy', 'on') }}
           nightlight: >

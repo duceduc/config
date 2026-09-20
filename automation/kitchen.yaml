@@ -12,7 +12,7 @@
       id: time
       seconds: '10'
     - trigger: state
-      entity_id:  group.motion_kitchen_occupancy # binary_sensor.motion_kitchen_occupancy
+      entity_id:  group.motion_kitchen_occupancy 
       id: motion
       to: 'on'
   conditions:
