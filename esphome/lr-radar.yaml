@@ -7,9 +7,9 @@ substitutions:
 #  lower: lr
 
 packages:
-  ld2410: !include components/ld2410.yaml
+#  ld2410: !include components/ld2410.yaml
   bme280: !include components/bme280.yaml
-  adc: !include components/adc.yaml
+  adc: !include components/adc.yaml # Illuminance
 
 # https://github.com/robertklep/esphome-custom-component
 external_components: # fix for removal of custom component in esphome 2025.xx and up
