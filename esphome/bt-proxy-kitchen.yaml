@@ -3,7 +3,7 @@ substitutions:
   name: bt-proxy-kitchen
 
 <<: !include .base.yaml
-<<: !include .base.sensors.yaml 
+<<: !include .base.sensors.yaml
 
 packages:
   esphome.bluetooth-proxy: github://esphome/bluetooth-proxies/esp32-generic/esp32-generic.yaml@main
