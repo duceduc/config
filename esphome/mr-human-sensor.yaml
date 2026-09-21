@@ -10,7 +10,7 @@ esphome:
     board_build.flash_mode: dio
     board_build.f_cpu: 80000000L
 
-  project: 
+  project:
     name: Screek.Human Presence Sensor
     version: 1w
   min_version: 2025.5.1
@@ -163,7 +163,7 @@ button:
     entity_category: "config"
     on_press:
       lambda: |-
-        // auto* radar = LD2410Component::get(ld2410); 
+        // auto* radar = LD2410Component::get(ld2410);
         // radar -> roboot();
         id(ld2410_0) -> reboot();
 
