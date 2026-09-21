@@ -120,7 +120,7 @@
     - binary_sensor.mr_human_sensor_moving_target
     - binary_sensor.hallway_moving_target
     - binary_sensor.genkan_moving_target
-    - binary_sensor.lr_radar_has_moving_target
+    - binary_sensor.lr_radar_moving_target
     - binary_sensor.living_airfreshener_moving_target
     - binary_sensor.kt_human_sensor_moving_target
     - binary_sensor.sr_human_sensor_moving_target

@@ -16,6 +16,11 @@ input_datetime:
     has_time: true
     initial: '22:30'
 
+  disable_wifi_internet:
+    has_time: true
+    initial: '00:00:00'
+
+
 # From Arpspoof Portainer
 command_line:
 #ai3: .163; nes: .102 for laptop use .104  (.104 was .251 [70:66:55:D0:4E:C9])
@@ -88,10 +93,11 @@ automation:
       - action: switch.turn_on
         entity_id: switch.ipad
 
+
   - alias: disable yellow_dwar wifi
     triggers:
-      - trigger: time
-        at: '00:00:00'
+      - trigger: template
+        value_template: "{{ states('input_datetime.disable_wifi_internet') }}" # default @ midnight
     conditions:
       - condition: template
         value_template: "{{ states('switch.openwrt_yellow_dwar') != 'on' }}"

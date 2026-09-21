@@ -36,7 +36,7 @@ template:
               {% else %}
                 {% if sensor.name == 'Bt-Proxy-Computer Moving Target' %}
                   computer_room
-                {% elif sensor.name in ('Lr-Radar Has Moving Target','Living-Airfreshener Moving Target','Washroom-Radar Moving Target','Kt-Human-Sensor Moving Target','Sr-Human-Sensor Moving Target') %}
+                {% elif sensor.name in ('Lr-Radar Moving Target','Living-Airfreshener Moving Target','Washroom-Radar Moving Target','Kt-Human-Sensor Moving Target','Sr-Human-Sensor Moving Target') %}
                   living_room
                 {% elif sensor.name in ('Entry-Human-Sensor Hallway Moving Target','Entry-Human-Sensor Genkan Moving Target','Shion-Airfreshener Moving Target','Wc-Airfreshener Moving Target','Sr-Radar Moving Target','Aio-Human-Sensor Master Moving Target','Mr-Human-Sensor Moving Target') %}
                   hallway

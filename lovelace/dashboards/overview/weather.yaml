@@ -117,7 +117,6 @@ cards:
             icon: mdi:home-flood
             name: Daily Earthquakes
 
-
       - type: vertical-stack
         cards:
           - type: entities
@@ -193,6 +192,17 @@ cards:
                   type: section
                 padding: 0
                 type: 'custom:fold-entity-row'
+
+              - entities:
+                  - entity: input_datetime.disable_wifi_internet
+                    name: Disable Wifi Internet
+                head:
+                  label: Disable Internet
+                  type: section
+                padding: 0
+                type: 'custom:fold-entity-row'
+
+
 
             show_header_toggle: false
             style: |

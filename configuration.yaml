@@ -231,6 +231,28 @@ panel_custom:
     config:
       target: /config/system
 
+# for 2026.9 esphome fix:
+#  - name: config/integrations/integration/esphome
+#    sidebar_title: ESPHome
+#    sidebar_icon: mdi:chip
+#    module_url: config/integrations/integration/esphome
+#    embed_iframe: true
+#    require_admin: true
+
+
+#  - name: Developer Tools
+#    sidebar_title: Developer Tools
+#    sidebar_icon: mdi:hammer
+#    js_url: /api/hassio/app/entrypoint.js
+#    url_path: config/tools/state
+#    embed_iframe: true
+#    require_admin: true
+#    config:
+#      ingress: core_configurator
+
+
+
+
 #  - name: panel-redirect
 #    url_path: redirect-Zigbee2mqtt-controls
 #    sidebar_title: Z2M Controls
