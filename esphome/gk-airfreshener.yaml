@@ -78,7 +78,7 @@ button:
             id(can_level).publish_state(100);
             global_preferences->sync();
 
-binary_sensor: 
+binary_sensor:
   - platform: gpio
     name: Button
     disabled_by_default: true
@@ -119,7 +119,7 @@ select:
       - $interval3 Minutes
       - $interval4 Minutes
       - $interval5 Minutes
-      - $interval6 Minutes            
+      - $interval6 Minutes
     on_value:
       then:
         - script.execute: squirtTimer
