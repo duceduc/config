@@ -14,7 +14,7 @@ packages:
 esphome:
   name: $name
 esp32:
-  board: featheresp32 # need this chipset CP2104 
+  board: featheresp32 # need this chipset CP2104
   framework:
     type: esp-idf
 
@@ -79,7 +79,7 @@ binary_sensor:
 switch:
   - platform: gpio
     name: Backlight
-    pin: 
+    pin:
       number: GPIO4
 #      allow_other_uses: true
     id: backlight
