@@ -31,8 +31,8 @@ external_components:
       url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
       ref: master
 #      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w # this used to worked.
-#      ref: main      
-    components: [ ld2410 ] # Needs ,uart for sensor to work. Removed for now for updating 
+#      ref: main
+    components: [ ld2410 ] # Needs ,uart for sensor to work. Removed for now for updating
 
 
 bluetooth_proxy:
