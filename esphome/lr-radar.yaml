@@ -44,9 +44,6 @@ external_components:
       ref: main
     components: [ ld2410 ]
 
-
-
-
 esp8266:
   board: d1_mini
 
@@ -74,7 +71,6 @@ wifi:
 #    subnet: 255.255.255.0
 #    gateway: 192.168.1.1
 
-
 uart:
   id: uart_ld2410
   tx_pin: TX
@@ -82,7 +78,6 @@ uart:
   baud_rate: 256000
   parity: NONE
   stop_bits: 1
-
 
 sensor:
   - platform: uptime
@@ -123,19 +118,16 @@ sensor:
     light:
       name: Sun Light
 
-
 time:
   - platform: sntp
     id: time_now
     servers:
       - ntp.aliyun.com
 
-
 switch:
   - platform: restart
     name: Restart
     icon: mdi:restart
-
 
 binary_sensor:
   - platform: status
