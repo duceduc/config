@@ -27,7 +27,7 @@ binary_sensor:
   - platform: gpio
     pin: GPIO14
     name: occupancy
-    device_class: motion    
+    device_class: motion
 
   - platform: status
     name: status
@@ -35,4 +35,4 @@ binary_sensor:
 switch:
   - platform: restart
     name: Restart
-    icon: mdi:restart    
+    icon: mdi:restart
