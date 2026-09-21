@@ -6,7 +6,7 @@ substitutions:
   hum_offset: '0'
 
 packages:
-  ld2410: !include components/ld2410-v2
+#  ld2410: !include components/ld2410-v2
   bme280: !include components/bme280.yaml
   adc: !include components/adc.yaml # Illuminance
 
