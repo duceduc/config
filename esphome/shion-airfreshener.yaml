@@ -118,7 +118,7 @@ select:
       - $interval3 Minutes
       - $interval4 Minutes
       - $interval5 Minutes
-      - $interval6 Minutes      
+      - $interval6 Minutes
     on_value:
       then:
         - script.execute: squirtTimer
