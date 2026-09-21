@@ -50,10 +50,10 @@ output:
       number: GPIO3
       allow_other_uses: true
     id: gpio_3
-    
+
 light:
   - platform: binary
-    name: light  
+    name: light
     output: gpio_3
 
 sensor:
@@ -68,7 +68,7 @@ sensor:
   - platform: dht
     model: AM2302
     update_interval: 15s
-    pin: 
+    pin:
       number: GPIO3
       allow_other_uses: true
 
