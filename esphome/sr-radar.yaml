@@ -22,7 +22,7 @@ external_components:
     components: [ ld2410 ]
 
 packages:
-#  ld2410: !include components/ld2410-v2.yaml
+  ld2410: !include components/ld2410-v2.yaml
   aht10: !include components/aht10.yaml
 
 esp8266:
