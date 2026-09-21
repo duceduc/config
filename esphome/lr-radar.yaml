@@ -16,8 +16,6 @@ packages:
 #    components: [ custom, custom_component ]
 
 
-
-
 #esphome:
 #  name: $name
 #  includes:
