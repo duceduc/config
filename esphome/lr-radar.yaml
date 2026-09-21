@@ -2,9 +2,8 @@
 # https://github.com/rainchi/ESPHome-LD2410
 substitutions:
   name: lr-radar
-#  room: livingroom
-#  upper: Lr
-#  lower: lr
+  temp_offset: ''
+  hum_offset: ''
 
 packages:
 #  ld2410: !include components/ld2410.yaml
