@@ -2,8 +2,8 @@
 # https://github.com/rainchi/ESPHome-LD2410
 substitutions:
   name: lr-radar
-  temp_offset: ''
-  hum_offset: ''
+  temp_offset: '0'
+  hum_offset: '0'
 
 packages:
 #  ld2410: !include components/ld2410.yaml
