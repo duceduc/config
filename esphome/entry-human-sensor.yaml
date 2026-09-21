@@ -17,7 +17,7 @@ esphome:
     board_build.flash_mode: dio
     board_build.f_cpu: 80000000L
 
-  project: 
+  project:
     name: Screek.Human Presence Sensor
     version: 1U
   min_version: 2025.5.1
@@ -34,7 +34,7 @@ esp32:
   board: wemos_d1_mini32
   framework:
     type: esp-idf
- 
+
 improv_serial:
 
 logger:
@@ -75,7 +75,7 @@ binary_sensor:
     has_still_target:
       name: $hlk0 Still Target
 # Genkan HLK
-  - platform: ld2410 
+  - platform: ld2410
     ld2410_id: ld2410_1
     has_target:
       name: $hlk1 Presence
@@ -220,7 +220,7 @@ button:
     entity_category: "config"
     on_press:
       lambda: |-
-        // auto* radar = LD2410Component::get(ld2410); 
+        // auto* radar = LD2410Component::get(ld2410);
         // radar -> roboot();
         id(ld2410_0) -> reboot();
 
@@ -247,7 +247,7 @@ button:
     entity_category: "config"
     on_press:
       lambda: |-
-        // auto* radar = LD2410Component::get(ld2410); 
+        // auto* radar = LD2410Component::get(ld2410);
         // radar -> roboot();
         id(ld2410_1) -> reboot();
 
