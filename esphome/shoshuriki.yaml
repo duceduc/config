@@ -10,7 +10,7 @@ substitutions:
   interval3: "30"
   interval4: "60"
   interval5: "120"
-  interval6: "180"  
+  interval6: "180"
   # Plunger Pulse Duration. Range: 55-180
   squirt_pulse: "190ms"
   # Cannister Squirt Capacity
@@ -22,7 +22,7 @@ packages:
 <<: !include .base.yaml
 
 i2c: # for aht10
-  sda: GPIO6 
+  sda: GPIO6
   scl: GPIO7
   scan: true
 
@@ -67,7 +67,7 @@ binary_sensor: # not working for small glade
   - platform: gpio
     name: Button
     disabled_by_default: true
-    pin: 
+    pin:
       number: GPIO9 # not physically connected
       inverted: True
 
@@ -102,10 +102,10 @@ select:
       - $interval3 Minutes
       - $interval4 Minutes
       - $interval5 Minutes
-      - $interval6 Minutes      
+      - $interval6 Minutes
     on_value:
       then:
-        - script.execute: squirtTimer 
+        - script.execute: squirtTimer
 
 script:
   # Script for Auto squirt
@@ -125,8 +125,8 @@ switch:
     name: ' '
     id: theSquirter
     icon: mdi:spray
-    pin: 
-      number: GPIO10  
+    pin:
+      number: GPIO10
     on_turn_on:
       then:
         - delay: $squirt_pulse
