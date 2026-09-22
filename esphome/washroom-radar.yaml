@@ -22,7 +22,6 @@ external_components:
 
 packages:
   aht10: !include components/aht10.yaml
-#  ld2410: !include components/ld2410-v2.yaml
 
 esp8266:
   board: d1_mini
