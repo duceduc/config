@@ -17,7 +17,12 @@ esp8266:
 status_led:
   pin:
     number: GPIO2
-    inverted: true
+    inverted: true # true off blue led
+
+
+
+
+
 
 
 #  platformio_options:
