@@ -160,7 +160,7 @@ sensor:
 light:
   - platform: status_led
     name: sys_status
-    pin: #GPIO2
+    pin:
       number: GPIO2
       ignore_strapping_warning: true
     internal: True
