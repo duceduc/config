@@ -13,11 +13,7 @@ esphome:
   name: washroom-radar
 esp8266:
   board: d1_mini  
-  
-status_led:
-  pin:
-    number: GPIO2
-    inverted: false
+
 
 
 #  platformio_options:
