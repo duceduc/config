@@ -17,7 +17,7 @@ substitutions:
   maxSquirts: "300" #max 280
 
 packages:
-  ld2410: !include components/ld2410-v2.yaml
+  ld2410c: !include components/ld2410c-82.yaml
   aht10: !include components/aht10.yaml
 #  ky038: !include components/ky038.yaml
 
