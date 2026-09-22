@@ -5,7 +5,7 @@ substitutions:
   hum_offset: '4'
 
 packages:
-  ld2410: !include components/ld2410-v2.yaml
+  ld2410: !include components/ld2410-v2k.yaml
   aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml 
