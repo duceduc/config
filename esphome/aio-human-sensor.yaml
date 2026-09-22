@@ -9,7 +9,6 @@ substitutions:
   hum_offset0: '0'
   temp_offset1: '0'
   hum_offset1: '0'
-#  room: Entrance
 
 packages:
   aht10_dual: !include components/aht10-dual.yaml
