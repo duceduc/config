@@ -8,7 +8,7 @@ packages:
   ld2410: !include components/ld2410-v2k.yaml
   aht10: !include components/aht10.yaml
 
-<<: !include .base.yaml 
+<<: !include .base.yaml
 
 esphome:
   name: $name
