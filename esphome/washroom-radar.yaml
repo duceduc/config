@@ -3,29 +3,32 @@ substitutions:
   temp_offset: '-5'
   hum_offset: '18'
 
-esphome:
-  name: washroom-radar
-  platformio_options:
-    board_build.flash_mode: dio
-  project:
-    name: Screek.Human_Sensor
-    version: 1w
-
-external_components:
-  - source:
-      type: git
-      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-      ref: main
-#      url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
-#      ref: master
-    components: [ ld2410 ]
-
 packages:
+  ld2410c: !include components/ld2410c-82.yaml
   aht10: !include components/aht10.yaml
-  ld2410: !include components/ld2410-v2.yaml
-
-esp8266:
-  board: d1_mini
 
 <<: !include .base.yaml
 
+esphome:
+  name: washroom-radar
+esp8266:
+  board: d1_mini  
+  
+status_led:
+  pin:
+    number: GPIO2
+    inverted: false
+
+
+#  platformio_options:
+#    board_build.flash_mode: dio
+#  project:
+#    name: Screek.Human_Sensor
+#    version: 1w
+
+#external_components:
+#  - source:
+#      type: git
+#      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
+#      ref: main
+#    components: [ ld2410 ]
