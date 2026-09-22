@@ -23,9 +23,7 @@ status_led:
 
 # override package
 binary_sensor:
-  - platform: status
-    name: Online
-    id: ink_ha_connected
+
   - platform: ld2410
     has_target:
       name: Presence
