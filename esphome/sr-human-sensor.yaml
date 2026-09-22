@@ -1,8 +1,12 @@
 # This is a custom firmware for Human Presence Sensor 1U
 # https://screek.io/1u
 ## web_server needs to be disabled for this esp32-S2##
+# MAC: 80:65:99:FA:BA:1E
 substitutions:
   name: sr-human-sensor
+
+#packages:
+#  ld2410c: !include components/ld2410c.yaml
 
 esphome:
   name: $name
@@ -47,12 +51,6 @@ api:
 ota:
   - platform: esphome
     password: !secret ota_pass
-
-# By automatically importing to the console,
-# subsequent adjustments can be easily made without having to manually fix a specific name.
-#dashboard_import:
-#  package_import_url: github://screekworkshop/screek-human-sensor/1u/yaml/Screek-Humen-Dectet-1u.yaml@2023.06
-#  import_full_config: False
 
 #web_server:
 #  port: 80
