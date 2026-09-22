@@ -5,8 +5,8 @@
 substitutions:
   name: sr-human-sensor
 
-#packages:
-#  ld2410c: !include components/ld2410c.yaml
+packages:
+  ld2410c: !include components/ld2410c.yaml
 
 esphome:
   name: $name
