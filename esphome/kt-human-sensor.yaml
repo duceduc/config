@@ -20,16 +20,17 @@ status_led:
     number: GPIO2
     inverted: false
 
-sensor:
-  - platform: wifi_signal
-    name: wifi signal
-    update_interval: 5s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
+#sensor:
+#  - platform: wifi_signal
+#    name: RSSI
+#    update_interval: 5s
+#    filters:
+#      - sliding_window_moving_average:
+#          window_size: 15
+#          send_every: 15
+#          send_first_at: 1
 
-binary_sensor:
-  - platform: status
-    name: status
+#binary_sensor:
+#  - platform: status
+#    name: Online
 
