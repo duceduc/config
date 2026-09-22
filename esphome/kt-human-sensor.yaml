@@ -8,44 +8,28 @@ packages:
   ld2410: !include components/ld2410-v2.yaml
   aht10: !include components/aht10.yaml
 
-<<: !include .base.yaml
+<<: !include .base.yaml 
 
 esphome:
   name: $name
-  platformio_options:
-    board_build.flash_mode: dio
-  project:
-    name: Screek.Human_Sensor
-    version: 1w  
-  
 esp8266:
   board: d1_mini
-
-
-external_components:
-  - source:
-      type: git
-      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-      ref: main
-    components: [ ld2410 ]
-
-
 
 status_led:
   pin:
     number: GPIO2
     inverted: false
 
-#sensor:
-#  - platform: wifi_signal
-#    name: wifi signal
-#    update_interval: 5s
-#    filters:
-#      - sliding_window_moving_average:
-#          window_size: 15
-#          send_every: 15
+sensor:
+  - platform: wifi_signal
+    name: wifi signal
+    update_interval: 5s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
 
-#binary_sensor:
-#  - platform: status
-#    name: status
+binary_sensor:
+  - platform: status
+    name: status
 
