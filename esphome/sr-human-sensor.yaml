@@ -1,7 +1,6 @@
 # This is a custom firmware for Human Presence Sensor 1U
 # https://screek.io/1u
 ## web_server needs to be disabled for this esp32-S2##
-
 substitutions:
   name: sr-human-sensor
 
