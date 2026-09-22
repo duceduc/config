@@ -21,16 +21,11 @@ status_led:
 
 
 binary_sensor:
-  - platform: ld2410
-    has_target:
-      name: Presence
+
       filters: # fix false positive
         - delayed_on: 3s # 5s
         - delayed_off: 5s #10s
-    has_moving_target:
-      name: Moving Target
-    has_still_target:
-      name: Still Target
+
 
 
 
