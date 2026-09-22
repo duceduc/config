@@ -39,8 +39,6 @@ wifi:
   ssid: !secret ssid
   password: !secret ssid_pwd
 
-#captive_portal:
-
 api:
   encryption:
     key: !secret esphome_apikey
@@ -52,3 +50,4 @@ ota:
 web_server:
   port: 80
 
+#captive_portal:
