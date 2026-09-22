@@ -5,27 +5,26 @@ substitutions:
   hum_offset: '0'
 
 packages:
-  ld2410: !include components/ld2410-v2.yaml
+  ld2410c: !include components/ld2410c-82.yaml
   aht10: !include components/aht10.yaml
 
 esphome:
   name: $name
-  platformio_options:
-    board_build.flash_mode: dio
-  project:
-    name: Screek.Human_Sensor
-    version: 1w
-
-external_components:
-  - source:
-      type: git
-      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-      ref: main
-    components: [ ld2410 ]
-
-
 esp8266:
-  board: d1_mini
+  board: d1_mini  
+  
+#  platformio_options:
+#    board_build.flash_mode: dio
+#  project:
+#    name: Screek.Human_Sensor
+#    version: 1w
+
+#external_components:
+#  - source:
+#      type: git
+#      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
+#      ref: main
+#    components: [ ld2410 ]
 
 logger:
   baud_rate: 0
