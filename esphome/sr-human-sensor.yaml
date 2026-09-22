@@ -55,6 +55,9 @@ ota:
 #web_server:
 #  port: 80
 
+
+
+
 binary_sensor:
   - platform: status # consolidate
     name: Online
