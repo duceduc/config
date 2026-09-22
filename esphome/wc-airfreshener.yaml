@@ -19,7 +19,7 @@ substitutions:
   maxSquirts: "340" #340 is good
 
 packages:
-  ld2410: !include components/ld2410-v2.yaml
+  ld2410c: !include components/ld2410c-82.yaml
   airfresh: !include components/airfresh-v2.yaml
   aht10: !include components/aht10.yaml
   ky038: !include components/ky038.yaml
@@ -43,16 +43,17 @@ status_led:
     number: GPIO2 #ESP8266 OnBroad LED
     inverted: false # false=led on
 
-sensor:
-  - platform: wifi_signal
-    name: wifi signal
-    update_interval: 5s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
+#sensor:
+#  - platform: wifi_signal
+#    name: wifi signal
+#    update_interval: 15s
+#    filters:
+#      - sliding_window_moving_average:
+#          window_size: 15
+#          send_every: 15
+#          send_first_at: 1
 
-binary_sensor:
-  - platform: status
-    name: status
+#binary_sensor:
+#  - platform: status
+#    name: status
 
