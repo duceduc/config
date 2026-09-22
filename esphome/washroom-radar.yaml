@@ -3,6 +3,8 @@ substitutions:
   temp_offset: '-5'
   hum_offset: '18'
 
+<<: !include .base.yaml
+
 esphome:
   name: washroom-radar
   platformio_options:
@@ -25,8 +27,6 @@ packages:
 
 esp8266:
   board: d1_mini
-
-<<: !include .base.yaml
 
 uart:
   id: uart_ld2410
