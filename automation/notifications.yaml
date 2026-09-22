@@ -11,6 +11,7 @@
         - sensor.az_switchbot_sensor
         - sensor.az_withings_sleep
         - sensor.az_homebase_s380
+        - sensor.soundcorea30
       not_to:
         - unknown
         - unavailable

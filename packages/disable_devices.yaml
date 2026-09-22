@@ -96,8 +96,8 @@ automation:
 
   - alias: disable yellow_dwar wifi
     triggers:
-      - trigger: template
-        value_template: "{{ states('input_datetime.disable_wifi_internet') }}" # default @ midnight
+      - trigger: time
+        at: input_datetime.disable_wifi_internet # default @ midnight
     conditions:
       - condition: template
         value_template: "{{ states('switch.openwrt_yellow_dwar') != 'on' }}"

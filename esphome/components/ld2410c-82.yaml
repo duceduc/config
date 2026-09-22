@@ -1,0 +1,53 @@
+
+uart:
+  id: uart_1
+  tx_pin: TX
+  rx_pin: RX
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
+
+ld2410:
+  id: ld2410_radar
+
+sensor:
+  - platform: uptime
+    name: Uptime
+    id: sys_uptime
+    update_interval: 10s
+  - platform: wifi_signal
+    name: RSSI
+    update_interval: 5s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+
+  - platform: ld2410
+    moving_distance:
+      name: Moving Distance
+      disabled_by_default: true
+    still_distance:
+      name: Still Distance
+      disabled_by_default: true
+    moving_energy:
+      name: Move Energy
+      disabled_by_default: true
+    still_energy:
+      name: Still Energy
+      disabled_by_default: true
+    detection_distance:
+      name: Detection Distance
+      disabled_by_default: true
+
+binary_sensor:
+  - platform: status
+    name: Online
+  - platform: ld2410
+    has_target:
+      name: Presence
+    has_moving_target:
+      name: Moving Target
+    has_still_target:
+      name: Still Target
