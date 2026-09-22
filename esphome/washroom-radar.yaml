@@ -20,14 +20,6 @@ status_led:
     inverted: true # true off blue led
 
 
-binary_sensor:
-
-      filters: # fix false positive
-        - delayed_on: 3s # 5s
-        - delayed_off: 5s #10s
-
-
-
 
 #  platformio_options:
 #    board_build.flash_mode: dio
