@@ -20,7 +20,7 @@ substitutions:
   maxSquirts: "320" #max 280
 
 packages:
-  ld2410: !include components/ld2410-v2.yaml
+  ld2410c: !include components/ld2410c-82.yaml
   aht10: !include components/aht10.yaml
 
 <<: !include .base.yaml
@@ -102,8 +102,8 @@ binary_sensor:
             id(can_level).publish_state(100);
             global_preferences->sync();
             }
-  - platform: status
-    name: status
+#  - platform: status
+#    name: status
 
 select:
   - platform: template
@@ -155,14 +155,6 @@ switch:
             global_preferences->sync();
 
 sensor:
-  - platform: wifi_signal
-    name: wifi signal
-    update_interval: 15s
-    filters:
-      - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
-
   # Cannister Percentage
   - platform: template
     id: can_level
@@ -172,3 +164,13 @@ sensor:
     update_interval: $interval1 min
     lambda: |-
       return (($maxSquirts-id(squirts))/$maxSquirts) * 100;
+
+
+#  - platform: wifi_signal
+#    name: wifi signal
+#    update_interval: 5s
+#    filters:
+#      - sliding_window_moving_average:
+#          window_size: 15
+#          send_every: 15
+
