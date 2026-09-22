@@ -99,7 +99,7 @@ sensor:
   - platform: uptime
     name: Uptime
     id: sys_uptime
-    update_interval: 10s
+    update_interval: 5s
 
   - platform: wifi_signal # consolidate
     name: RSSI
