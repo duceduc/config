@@ -101,7 +101,6 @@
     entities:
       - binary_sensor.kt_human_sensor_moving_target
       - binary_sensor.sr_human_sensor_moving_target
-#      - binary_sensor.cabinet_has_moving_target
 
   motion_showerroom_occupancy:
     name: Motion Shower Room Occupancy
@@ -111,6 +110,16 @@
 
   motion_genkan_occupancy:
     - binary_sensor.genkan_moving_target
+
+  motion_living_occupancy:
+    entities:
+      - binary_sensor.living_airfreshener_moving_target
+      - binary_sensor.lr_radar_moving_target
+
+  motion_shion_occupancy:
+    entities:
+      - binary_sensor.sr_radar_moving_target
+      - binary_sensor.shion_airfreshener_moving_target
 
   occupancy:
     - binary_sensor.aio_human_sensor_master_moving_target
@@ -126,7 +135,6 @@
     - binary_sensor.sr_human_sensor_moving_target
     - binary_sensor.washroom_radar_moving_target
     - binary_sensor.bt_proxy_computer_moving_target
-
 
   home_alarm_motion_sensors:
     - binary_sensor.living_airfreshener_moving_target

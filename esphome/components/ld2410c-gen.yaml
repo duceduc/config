@@ -51,3 +51,14 @@ binary_sensor:
       name: Moving Target
     has_still_target:
       name: Still Target
+
+time:
+  - platform: sntp
+    id: time_now
+    servers:
+      - ntp.aliyun.com
+
+switch:
+  - platform: restart
+    name: Restart
+    icon: mdi:restart

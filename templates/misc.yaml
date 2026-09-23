@@ -137,15 +137,15 @@
 
       - name: Shionroom
         state: >
-          {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+          {% if is_state("group.motion_shion_occupancy", "off") %}Off{% else %}On{% endif %}
         icon: >
-          {% if is_state("binary_sensor.shion_airfreshener_moving_target", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
+          {% if is_state("group.motion_shion_occupancy", "off") %}mdi:lightbulb-outline{% else %}mdi:lightbulb{% endif %}
 
       - name: Livingroom
         state: >
-          {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}Off{% else %}On{% endif %}
+          {% if is_state("group.motion_living_occupancy", "off") %}Off{% else %}On{% endif %}
         icon: >
-          {% if is_state("binary_sensor.living_airfreshener_moving_target", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
+          {% if is_state("group.motion_living_occupancy", "off") %}mdi:motion-sensor-off{% else %}mdi:motion-sensor{% endif %}
 
       - name: Computerroom
         state: >
