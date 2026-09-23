@@ -19,7 +19,7 @@ substitutions:
   maxSquirts: "340" #340 is good
 
 packages:
-  ld2410c: !include components/ld2410c-82.yaml
+  ld2410c: !include components/ld2410c-gen.yaml
   airfresh: !include components/airfresh-v2.yaml
   aht10: !include components/aht10.yaml
   ky038: !include components/ky038.yaml
