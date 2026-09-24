@@ -1,0 +1,42 @@
+capture_snapshot:
+  name: Capture fresh snapshot
+  description: Wake a supported Eufy camera, wait for a new frame, and save it to a Home Assistant allowlisted path.
+  target:
+    entity:
+      integration: eufy_event_gateway
+      domain: camera
+  fields:
+    filename:
+      name: Filename
+      description: Templateable path and filename for the JPEG image.
+      required: true
+      example: /media/eufy/front_gate_{{ now().strftime('%Y%m%d-%H%M%S') }}.jpg
+      selector:
+        text:
+
+record_clip:
+  name: Record clip
+  description: Wake a supported Eufy camera and record an on-demand video clip.
+  target:
+    entity:
+      integration: eufy_event_gateway
+      domain: camera
+  fields:
+    filename:
+      name: Filename
+      description: Templateable path and filename for the MP4 video.
+      required: true
+      example: /media/eufy/front_gate_{{ now().strftime('%Y%m%d-%H%M%S') }}.mp4
+      selector:
+        text:
+    duration:
+      name: Duration
+      description: Recording duration in seconds.
+      required: true
+      default: 15
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: seconds
+          mode: box
