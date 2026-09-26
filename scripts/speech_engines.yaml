@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Speech Engines                                                                      
-#                                                                                                              
+#
+#             Speech Engines
+#
 #########################################################
 
 
@@ -10,9 +10,9 @@
     sequence:
       - condition: template
         value_template: "{{ is_state('binary_sensor.quiet_time', 'off') }}"
-      - condition: template 
-        value_template: "{{ is_state('input_boolean.vacation_mode', 'off') }}"        
-      - condition: template 
+      - condition: template
+        value_template: "{{ is_state('input_boolean.vacation_mode', 'off') }}"
+      - condition: template
         value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
       - service: >-
           {% if who in ['ai_1', 'living_room', 'media_player.ai_1'] %}
@@ -20,7 +20,7 @@
           {% elif who in ['ai_2', 'hallway', 'media_player.ai_2']  %}
              notify.alexa_media_ai_2
           {% elif who in ['ai_3']  %}
-             notify.alexa_media_ai_3  
+             notify.alexa_media_ai_3
           {% else %}
              notify.alexa_media_ai_4
           {% endif %}
@@ -53,8 +53,8 @@
           topic: 'house/alerts/alexa/msgtime'
           payload: >
             {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}
-          retain: true  
-       # Save location   
+          retain: true
+       # Save location
       - service: mqtt.publish
         data_template:
           topic: 'house/alerts/alexa/lastloc'
@@ -66,13 +66,13 @@
     sequence:
       - condition: template
         value_template: "{{ is_state('binary_sensor.quiet_time', 'off') }}"
-      - condition: template 
-        value_template: "{{ is_state('input_boolean.vacation_mode', 'off') }}"        
-      - condition: template 
+      - condition: template
+        value_template: "{{ is_state('input_boolean.vacation_mode', 'off') }}"
+      - condition: template
         value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
-      
+
       - service: notify.alexa_media
-        data: 
+        data:
           message: >
             <voice name="{{ voice }}">
             <amazon:auto-breaths>
@@ -83,17 +83,17 @@
             </voice>
           target: >
             {% if who in ['ai_1', 'living_room', 'media_player.ai_1'] %}
-               media_player.ai_1      
+               media_player.ai_1
             {% elif who in ['ai_2', 'hallway', 'media_player.ai_2'] %}
                media_player.ai_2
             {% elif who in ['ai_3', 'media_player.ai_3'] %}
-               media_player.ai_3            
+               media_player.ai_3
             {% else %}
                media_player.ai_4
             {% endif %}
           data:
             type: tts
-            
+
       # Save your message for recall
       - service: mqtt.publish
         data_template:
@@ -118,8 +118,8 @@
           topic: 'house/alerts/alexa/msgtime'
           payload: >
             {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}
-          retain: true  
-       # Save location   
+          retain: true
+       # Save location
       - service: mqtt.publish
         data_template:
           topic: 'house/alerts/alexa/lastloc'
@@ -133,27 +133,27 @@
   play_last_message:
     sequence:
       - service: script.speech_engine
-        data: 
+        data:
             who: '{{ states(''sensor.room_audio'') }}'
             voice: "{{ states('input_select.jarvis_voice') }}"
             message: >
-              At {{ states('sensor.alexa_last_msg_time') }} 
-              in the {{ states('sensor.alexa_last_location') }} 
+              At {{ states('sensor.alexa_last_msg_time') }}
+              in the {{ states('sensor.alexa_last_location') }}
               I said. {{ states('sensor.alexa_last_msg') }}
             msg_summary: "recall"
 
 
 
 #########################################################
-#                                                                                                              
-#             Briefings                                                                                 
-#                                                                                                              
+#
+#             Briefings
+#
 #########################################################
 
   morning_wakeup_report:
     sequence:
       - service: script.alexa_alert
-        data: 
+        data:
           who: ai_4
           message: !include ../tpl/speech/morning_wakeup_report.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
@@ -161,7 +161,7 @@
   morning_briefing:
     sequence:
       - service: script.speech_engine
-        data: 
+        data:
           who: ai_4
           message: !include ../tpl/speech/morning_briefing.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
@@ -170,8 +170,8 @@
     sequence:
       - service: script.speech_engine
         data:
-          who: ai_4        
-          message: !include ../tpl/speech/daily_briefing.yaml      
+          who: ai_4
+          message: !include ../tpl/speech/daily_briefing.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
 
   sundown_briefing:
@@ -189,7 +189,7 @@
   nightly_briefing:
     sequence:
       - service: script.speech_engine
-        data: 
+        data:
           who: ai_1
           message: !include ../tpl/speech/nightly_briefing.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
@@ -197,7 +197,7 @@
   shion_nightly_briefing:
     sequence:
       - service: script.speech_engine_echo
-        data: 
+        data:
           who: ai_3
           message: !include ../tpl/speech/shion_nightly_briefing.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
@@ -205,7 +205,7 @@
   event_briefing:
     sequence:
       - service: script.speech_engine
-        data: 
+        data:
           who: ai_4
           message: !include ../tpl/speech/event_briefing.yaml
           voice: "{{ states('input_select.jarvis_voice') }}"
@@ -213,7 +213,7 @@
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

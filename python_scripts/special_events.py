@@ -1,4 +1,4 @@
-# Create events using automation homeassistant.yaml 
+# Create events using automation homeassistant.yaml
 
 today = datetime.datetime.now().date()
 

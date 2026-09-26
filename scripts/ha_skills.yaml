@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              #
-#             Custom Skills                                                                                #
-#                                                                                                              #
+#                                                                                                              
+#             Custom Skills                                                                                
+#                                                                                                              
 #########################################################
 
   activate_alexa_actionable_notification:
@@ -13,7 +13,7 @@
       event_id:
         description: 'Correlation ID for event responses'
         example: 'ask_to_turn_on_ac_temp_above_25'
-      who: 
+      who:
         description: 'Alexa device you want to trigger'
         example: 'media_player.ai_1'
     sequence:
@@ -28,7 +28,7 @@
           media_content_id: amzn1.ask.skill.2ccd013f-8afa-4939-ab9e-996e8466f88c # Enable AC Skill
 
 #########################################################
-#                                                                                                              #
-#          END OF CONFIGURATION FILE                                                             #
-#                                                                                                              #
+#                                                                                                              
+#          END OF CONFIGURATION FILE                                                             
+#                                                                                                              
 #########################################################

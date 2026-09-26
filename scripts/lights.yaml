@@ -54,7 +54,7 @@
                light.k_1
             {% elif states.sensor.lr_radar_illuminance.state | float <= 0.15 %}
                light.k_1, light.k_3
-            {% elif states.sensor.lr_radar_illuminance.state | float <= 0.20 %} 
+            {% elif states.sensor.lr_radar_illuminance.state | float <= 0.20 %}
                light.k_1, light.k_2, light.k_3
             {% elif states.sensor.lr_radar_illuminance.state | float <= 0.25 %}
                light.k_1, light.k_3, light.k_5

@@ -6,7 +6,7 @@
 
   lr_ac_normal_heat:
     sequence:
-      - service: remote.send_command 
+      - service: remote.send_command
         data:
           entity_id: remote.rm4_remote
           device: Living Room Aircon
@@ -16,7 +16,7 @@
 
   lr_ac_powerful_heat:
     sequence:
-      - service: remote.send_command 
+      - service: remote.send_command
         data:
           entity_id: remote.rm4_remote
           device: Living Room Aircon
@@ -26,7 +26,7 @@
 
   lr_ac_silent_heat:
     sequence:
-      - service: remote.send_command 
+      - service: remote.send_command
         data:
           entity_id: remote.rm4_remote
           device: Living Room Aircon
@@ -214,8 +214,8 @@
       data:
         entity_id: remote.rm31_remote
         device: Master Room Aircon
-        command: cool # 23        
-        
+        command: cool # 23
+
   mr_ac_powerful_cool:
     sequence:
     - service: remote.send_command
@@ -314,7 +314,7 @@
     sequence:
      - service: switch.turn_on
        entity_id: switch.bed_sensor_sr_ac # 23
-       
+
   sr_ac_powerful_cool:
     sequence:
      - service: switch.turn_on

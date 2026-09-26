@@ -12,11 +12,11 @@
 #     brightness_start: 0-255 ; default: current
 #     brightness_end: 0-255 ; default: current
 #     brightness_curve: 'linear' or 'exp2' or 'exp5' or 'smooth' ; default: exp5
-#     temperature_start: 154-370 ; default: current 
+#     temperature_start: 154-370 ; default: current
 #     temperature_end: 154-370 ; default: current
 #     temperature_curve: 'linear' or 'exp2' or 'exp5' or 'smooth' ; default: exp2
 #
-#  When light is off, and brighness_start or brighness_end is not defined, the light 
+#  When light is off, and brighness_start or brighness_end is not defined, the light
 #  will remain off.
 #  When light is off, and temperature_start or temperature_end is not defined, the
 #  min/max mireds average will be default.
@@ -125,7 +125,7 @@ else :
 
     if (debug_report > 1) : logger.info("x: %s, b_cur: %s, b_last: %s, b_lag: %s, b_new: %s, t_cur: %s, t_last: %s, t_lag: %s, t_new: %s", x, b_cur, b_last, lag[xlag]["b"], b_new, t_cur, t_last, lag[xlag]["t"], t_new)
     if (x > 0 and b_cur > 24 and ((b_cur - lag[xlag]["b"]) * b_dir < 0 or (b_cur - b_last) * b_dir * -1 < 0 or (t_cur - lag[xlag]["t"]) * t_dir < 0 or (t_cur - t_last) * t_dir * -1 < 0) and b_cur != b_initial and t_cur != t_initial) :
-      if ((b_cur - lag[xlag]["b"]) * b_dir < 0 or (t_cur - lag[xlag]["t"]) * t_dir < 0) :          
+      if ((b_cur - lag[xlag]["b"]) * b_dir < 0 or (t_cur - lag[xlag]["t"]) * t_dir < 0) :
         logger.error ("Curved fader: Break because system_lag_time is set to low, please increase value. The larger the difference between cur and lag, the larger the increment will be.")
         logger.error ("Lag_steps_allowed: %s, x: %s, b_cur: %s, b_lag: %s, t_cur: %s, t_lag: %s", lag_steps_allowed, x, b_cur, lag[xlag]["b"], t_cur, lag[xlag]["t"])
       else :

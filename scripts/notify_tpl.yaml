@@ -53,7 +53,7 @@
                 title: '{{ title }}'
                 message: '{{ message }}'
                 target: !secret whatsapp_hass
-                
+
         - conditions:
           - condition: template
             value_template: '{{ who == "whatsapp_jcb"}}'

@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Testing Script                                                                               
-#                                                                                                              
+#
+#             Testing Script
+#
 #########################################################
 
 
@@ -20,14 +20,14 @@
       - service: media_player.play_media
         data_template:
           entity_id: media_player.plex_plex_for_ios_id
-          media_content_type: 'music'  
+          media_content_type: 'music'
           media_content_id: '{ "library_name": "Music", "artist_name": "Debbie Gibson", "album_name": "Electric Youth" }'
 
 
 #########################################################
-#                                                                                                              
-#             Shelly EM                                                                                    
-#                                                                                                              
+#
+#             Shelly EM
+#
 #########################################################
 
   reset_cumulative_cost:
@@ -42,9 +42,9 @@
         date: "{{ as_timestamp(now())|timestamp_custom('%Y-%m-%d') }}"
 
 #########################################################
-#                                                                                                              
-#            Earthquake Daily Count                                                  
-#                                                                                                              
+#
+#            Earthquake Daily Count
+#
 #########################################################
 
   update_earthquake_daily_count:
@@ -78,9 +78,9 @@
           payload: '{"reset": true}'
 
 #########################################################
-#                                                                                                              
-#             Mailbox                                                                                    
-#                                                                                                              
+#
+#             Mailbox
+#
 #########################################################
 
 # automation in telegram_bot.yaml in automation
@@ -96,7 +96,7 @@
 
 
 #########################################################
-#                                                                                                              
-#          END OF CONFIGURATION FILE                                                             
-#                                                                                                              
+#
+#          END OF CONFIGURATION FILE
+#
 #########################################################

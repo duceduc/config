@@ -3,7 +3,7 @@
 
 # calling the script
 #- service: python_script.lightfader
-#  data: 
+#  data:
 #    entity_id: light.bedroom_lights
 #    transition: 20
 #    brightness: 100
