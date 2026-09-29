@@ -187,6 +187,17 @@ class GatewayClient:
             raise GatewayClientError("Gateway returned an invalid camera response")
         return camera
 
+    async def set_camera_guard_mode(self, serial: str, mode: int) -> dict[str, Any]:
+        """Set a standalone camera guard mode and return confirmed state."""
+        camera = await self._json(
+            f"/api/cameras/{serial}/guard-mode",
+            method="POST",
+            payload={"mode": mode},
+        )
+        if not isinstance(camera.get("serial"), str):
+            raise GatewayClientError("Gateway returned an invalid camera response")
+        return camera
+
     async def set_camera_night_vision(
         self, serial: str, mode: int
     ) -> dict[str, Any]:
@@ -212,6 +223,46 @@ class GatewayClient:
         """Send a momentary manual-light action without inventing persistent state."""
         await self._json(
             f"/api/cameras/{serial}/light",
+            method="POST",
+            payload={"enabled": enabled},
+        )
+
+    async def camera_preset_positions(self, serial: str) -> list[dict[str, Any]]:
+        """Return enabled-slot metadata without retaining names or thumbnails."""
+        payload = await self._json(f"/api/cameras/{serial}/preset-positions")
+        positions = payload.get("positions")
+        if not isinstance(positions, list):
+            raise GatewayClientError("Gateway returned invalid preset positions")
+        return [
+            position
+            for position in positions
+            if isinstance(position, dict)
+            and isinstance(position.get("index"), int)
+            and not isinstance(position.get("index"), bool)
+            and isinstance(position.get("enabled"), bool)
+            and isinstance(position.get("isDefault"), bool)
+        ]
+
+    async def select_camera_preset_position(self, serial: str, index: int) -> None:
+        """Move once to a gateway-validated stored camera position."""
+        await self._json(
+            f"/api/cameras/{serial}/preset-position",
+            method="POST",
+            payload={"index": index},
+        )
+
+    async def set_camera_ai_tracking(self, serial: str, enabled: bool) -> None:
+        """Send the physically verified AI-tracking action without local state."""
+        await self._json(
+            f"/api/cameras/{serial}/ai-tracking",
+            method="POST",
+            payload={"enabled": enabled},
+        )
+
+    async def set_camera_auto_cruise(self, serial: str, enabled: bool) -> None:
+        """Send the physically verified automatic-cruise action without state."""
+        await self._json(
+            f"/api/cameras/{serial}/auto-cruise",
             method="POST",
             payload={"enabled": enabled},
         )
