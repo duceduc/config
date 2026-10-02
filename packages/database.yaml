@@ -14,8 +14,8 @@ recorder:
       - sensor.homeft24*
       - sensor.jcbft24*
     domains:
+#      - automation    
       - group
-      - automation
       - camera
       - media_player
       - scene

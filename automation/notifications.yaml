@@ -11,7 +11,6 @@
         - sensor.az_switchbot_sensor
         - sensor.az_withings_sleep
         - sensor.az_homebase_s380
-        - sensor.soundcorea30
       not_to:
         - unknown
         - unavailable
@@ -23,10 +22,10 @@
         else none %} {% set threshold =
         trigger.to_state.attributes.alert_threshold | float(none) %} {{ price is
         not none
-             and old_price is not none
-             and threshold is not none
-             and price < old_price
-             and price <= threshold }}
+          and old_price is not none
+          and threshold is not none
+          and price < old_price
+          and price <= threshold }}
   actions:
     - action: script.text_notify
       data:
