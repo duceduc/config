@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -58,6 +59,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: EufyGatewayConfigEntry) 
     await coordinator.async_config_entry_first_refresh()
     await _refresh_standalone_alarm_capabilities(coordinator)
     _remove_t817l_battery_entities(hass, coordinator)
+    _hide_legacy_event_cameras(hass, coordinator)
     entry.runtime_data = GatewayRuntimeData(coordinator)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     coordinator.start_event_listener()
@@ -94,6 +96,23 @@ async def _refresh_standalone_alarm_capabilities(
     await asyncio.gather(*(refresh(serial) for serial in serials))
 
 
+def _hide_legacy_event_cameras(hass: HomeAssistant, coordinator: EufyGatewayCoordinator) -> None:
+    """Hide old event-camera tiles once while preserving their stable references.
+
+    Run before concurrent platform setup can register the replacement images.
+    Once an image exists, later user visibility choices are left untouched.
+    No registry entries, custom names, or automation references are removed.
+    """
+    registry = er.async_get(hass)
+    for serial in coordinator.cameras:
+        legacy_id = registry.async_get_entity_id("camera", DOMAIN, f"{serial}_event_image")
+        image_id = registry.async_get_entity_id("image", DOMAIN, f"{serial}_event_image")
+        if legacy_id is not None and image_id is None:
+            legacy = registry.async_get(legacy_id)
+            if legacy is not None and legacy.hidden_by is None:
+                registry.async_update_entity(legacy_id, hidden_by=er.RegistryEntryHider.INTEGRATION)
+
+
 def _remove_t817l_battery_entities(
     hass: HomeAssistant, coordinator: EufyGatewayCoordinator
 ) -> None:
@@ -128,3 +147,35 @@ async def async_unload_entry(
     """Cancel entry-owned background work and unload all entity platforms."""
     await entry.runtime_data.coordinator.async_shutdown()
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant,
+    config_entry: EufyGatewayConfigEntry,
+    device_entry: dr.DeviceEntry,
+) -> bool:
+    """Allow user removal only after a successful refresh proves the device absent.
+
+    The gateway owns account inventory. Home Assistant owns the registry and
+    performs the requested deletion after this callback approves it. A failed
+    inventory refresh, an unloaded entry, or any matching camera, station, or
+    sensor keeps the registry association intact.
+    """
+    runtime_data = getattr(config_entry, "runtime_data", None)
+    if runtime_data is None:
+        return False
+    identifiers = {
+        identifier
+        for domain, identifier in device_entry.identifiers
+        if domain == DOMAIN
+    }
+    if not identifiers:
+        return False
+    coordinator = runtime_data.coordinator
+    await coordinator.async_refresh()
+    if not coordinator.last_update_success or coordinator.data is None:
+        return False
+    current_devices = set(coordinator.cameras) | set(coordinator.stations) | set(
+        coordinator.sensors
+    )
+    return identifiers.isdisjoint(current_devices)
