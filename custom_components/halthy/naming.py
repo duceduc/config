@@ -91,9 +91,13 @@ _FRIENDLY_TOKEN_EXPANSIONS = {
 
 _FRIENDLY_KEY_OVERRIDES = {
     "body_mass": "weight",
+    "first_pickup_time": "first pickup time",
     "last_full_sync": "last full sync",
     "last_update": "last update",
     "oxygen_saturation": "blood oxygen",
+    "longest_activity_session": "longest activity session",
+    "pickups_without_app_use": "pickups without app use",
+    "screen_time": "screen time",
     "blood_oxygen_saturation": "blood oxygen",
     "blood_oxygen": "blood oxygen",
     "sleep_score": "sleep efficiency estimated",
@@ -251,6 +255,14 @@ def metric_icon(metric_key: str, provided_icon: str | None) -> str:
         return icon
 
     key = sanitize_identifier(metric_key)
+    digital_health_icons = {
+        "screen_time": "mdi:cellphone",
+        "longest_activity_session": "mdi:timer-outline",
+        "first_pickup_time": "mdi:cellphone-arrow-down",
+        "pickups_without_app_use": "mdi:gesture-tap",
+    }
+    if key in digital_health_icons:
+        return digital_health_icons[key]
     if key == "go_to_bed_time":
         return "mdi:bed-clock"
     if key == "wake_up_time":

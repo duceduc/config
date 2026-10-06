@@ -48,6 +48,9 @@ _UNIT_ALIASES = {
 }
 
 _METRIC_UNIT_OVERRIDES = {
+    "screen_time": "min",
+    "longest_activity_session": "min",
+    "pickups_without_app_use": "count",
     "blood_pressure_diastolic": "mmHg",
     "blood_pressure_systolic": "mmHg",
     "bp_diastolic": "mmHg",
@@ -77,6 +80,8 @@ _METRIC_UNIT_OVERRIDES = {
 _DURATION_UNITS = {"d", "h", "min", "s", "ms", "µs"}
 
 _DURATION_METRIC_KEYS = {
+    "screen_time",
+    "longest_activity_session",
     "exercise_time",
     "stand_time",
     "move_time",
@@ -93,6 +98,7 @@ _DURATION_METRIC_KEYS = {
 }
 
 _TIMESTAMP_METRIC_KEYS = {
+    "first_pickup_time",
     "go_to_bed_time",
     "fall_asleep_time",
     "wake_up_time",

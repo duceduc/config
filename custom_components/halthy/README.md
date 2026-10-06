@@ -65,6 +65,19 @@ Full timestamps are displayed using Home Assistant's timestamp handling. Values 
 
 Height is reported in centimetres by default. Body mass is displayed as **Weight**. Both sensors suggest one decimal place and support Home Assistant's unit conversion and display precision settings: open the sensor, select the settings cog, and adjust **Unit of measurement** and **Display precision**. Your choices are kept across uploads. Existing entity IDs stay the same, including `sensor.<username>_body_mass`.
 
+### Digital health sensors
+
+On an eligible iPhone with Digital health data-access permission, select the metrics in the Halthy app's Digital health settings. This is separate from HealthKit permission. The feature requires iOS 26.4 or later and an eligible EU device and Apple Account.
+
+| Sensor | Value |
+|---|---|
+| `sensor.<username>_screen_time` | Current day's screen time in minutes |
+| `sensor.<username>_longest_activity_session` | Current day's longest activity session in minutes |
+| `sensor.<username>_first_pickup_time` | Time of the first pickup, shown in Home Assistant's local time |
+| `sensor.<username>_pickups_without_app_use` | Current day's count of pickups without app use |
+
+The app sends the current-day snapshot to Home Assistant and can export the past seven days to InfluxDB. These are device-level aggregates: no app identities or website history are sent. Update both the app and integration, then run a sync. Deselecting a Digital health metric removes its sensor on the next selection-pruning upload.
+
 ## Built-in Workout Card
 
 Halthy includes a bundled Lovelace card: `custom:halthy-workout-card`.

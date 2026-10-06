@@ -125,6 +125,17 @@ class UnitHelpersTests(unittest.TestCase):
         self.assertTrue(UNITS.is_timestamp_metric("workout_route_end"))
         self.assertFalse(UNITS.is_timestamp_metric("workout_duration"))
 
+    def test_digital_health_units_and_classes(self) -> None:
+        for key in ("screen_time", "longest_activity_session"):
+            with self.subTest(key=key):
+                self.assertEqual(UNITS.canonical_unit(key, None), "min")
+                self.assertTrue(UNITS.is_duration_metric(key, "min"))
+                self.assertEqual(UNITS.duration_suggested_display_precision(key, "min"), 1)
+        self.assertEqual(UNITS.canonical_unit("pickups_without_app_use", None), "count")
+        self.assertFalse(UNITS.is_duration_metric("pickups_without_app_use", "count"))
+        self.assertIsNone(UNITS.canonical_unit("first_pickup_time", ""))
+        self.assertTrue(UNITS.is_timestamp_metric("first_pickup_time"))
+
 
 if __name__ == "__main__":
     unittest.main()

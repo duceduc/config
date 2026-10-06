@@ -75,6 +75,19 @@ class NamingHelpersTests(unittest.TestCase):
                 self.assertEqual(NAMING.friendly_metric_name(key, None), name)
                 self.assertTrue(NAMING.is_selection_managed_metric(key))
 
+    def test_digital_health_names_icons_and_keys(self) -> None:
+        for key, name, icon in (
+            ("screen_time", "Screen time", "mdi:cellphone"),
+            ("longest_activity_session", "Longest activity session", "mdi:timer-outline"),
+            ("first_pickup_time", "First pickup time", "mdi:cellphone-arrow-down"),
+            ("pickups_without_app_use", "Pickups without app use", "mdi:gesture-tap"),
+        ):
+            with self.subTest(key=key):
+                self.assertEqual(NAMING.normalize_metric_key(key), key)
+                self.assertEqual(NAMING.friendly_metric_name(key, None), name)
+                self.assertEqual(NAMING.metric_icon(key, None), icon)
+                self.assertTrue(NAMING.is_selection_managed_metric(key))
+
     def test_selection_management_includes_regular_metric(self) -> None:
         self.assertTrue(NAMING.is_selection_managed_metric("steps"))
 

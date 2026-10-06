@@ -151,7 +151,7 @@ class HalthySensor(SensorEntity):
             )
         elif is_timestamp_metric(state.metric_key):
             parsed_timestamp = _parse_timestamp_state(state.state)
-            if metric_key in {"go_to_bed_time", "fall_asleep_time", "wake_up_time"}:
+            if metric_key in {"go_to_bed_time", "fall_asleep_time", "wake_up_time", "first_pickup_time"}:
                 self._attr_native_value = parsed_timestamp
                 self._attr_native_unit_of_measurement = None
                 self._attr_device_class = SensorDeviceClass.TIMESTAMP

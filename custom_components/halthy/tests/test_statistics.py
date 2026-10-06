@@ -262,6 +262,76 @@ BRIDGE, ARCHIVE, STATISTICS, TIMESTAMPS = _load_integration_module()
 
 
 class StatisticsHelpersTests(unittest.TestCase):
+    def test_digital_health_upload_survives_selection_pruning(self):
+        import json
+        from unittest.mock import AsyncMock, patch
+
+        async def exercise():
+            directory = tempfile.TemporaryDirectory()
+            self.addCleanup(directory.cleanup)
+
+            async def async_add_executor_job(function, *args):
+                return function(*args)
+
+            runtime = BRIDGE.IntegrationRuntime(
+                configured_username="tester", app_username="tester", display_name="Tester",
+                statistics_enabled=False,
+            )
+            hass = types.SimpleNamespace(
+                data={BRIDGE.DOMAIN: {"entries": {"entry": runtime}}},
+                config=types.SimpleNamespace(
+                    units=types.SimpleNamespace(temperature_unit="°C"),
+                    path=lambda relative: str(pathlib.Path(directory.name) / relative),
+                ),
+                async_add_executor_job=async_add_executor_job,
+            )
+            registry = types.SimpleNamespace(async_get_entity_id=lambda *args: None)
+
+            async def upload(sensors, selected, prune=False):
+                payload = {
+                    "username": "tester", "device_id": "phone",
+                    "prune_unselected_metrics": prune, "selected_metric_keys": selected,
+                    "sensors": sensors,
+                }
+                body = json.dumps(payload).encode()
+                request = types.SimpleNamespace(
+                    app={BRIDGE.KEY_HASS: hass}, content_length=len(body),
+                    read=AsyncMock(return_value=body),
+                    get=lambda key: types.SimpleNamespace(id="owner"),
+                )
+                return await BRIDGE.HalthyPushView().post(request)
+
+            keys = ["screen_time", "longest_activity_session", "first_pickup_time",
+                    "pickups_without_app_use"]
+            sensors = [
+                {"key": "screen_time", "state": 125.5, "unit": "min", "attributes": {"category": "Digital health"}},
+                {"key": "longest_activity_session", "state": 42, "unit": "min"},
+                {"key": "first_pickup_time", "state": "2026-09-08T07:30:00Z", "unit": ""},
+                {"key": "pickups_without_app_use", "state": 4, "unit": "count"},
+            ]
+            with patch.object(BRIDGE, "_schedule_store_save"), \
+                 patch.object(BRIDGE, "_async_emit_activity_log_entries", new=AsyncMock()), \
+                 patch.object(BRIDGE.er, "async_get", return_value=registry):
+                response = await upload(sensors, keys)
+                self.assertTrue(response["args"][0]["ok"])
+                received = {state.metric_key: state for state in runtime.sensors.values()}
+                for key in keys:
+                    self.assertIn(key, received)
+                    self.assertEqual(received[key].name, BRIDGE._friendly_metric_name(key, None))
+                    self.assertTrue(received[key].icon.startswith("mdi:"))
+                self.assertIsNone(received["first_pickup_time"].unit)
+
+                await upload([], keys, prune=True)
+                remaining = {state.metric_key for state in runtime.sensors.values()}
+                self.assertTrue(set(keys).issubset(remaining))
+
+                await upload([], keys[:-1], prune=True)
+                remaining = {state.metric_key for state in runtime.sensors.values()}
+                self.assertNotIn("pickups_without_app_use", remaining)
+                self.assertTrue(set(keys[:-1]).issubset(remaining))
+
+        asyncio.run(exercise())
+
     def test_push_uses_receipt_time_and_imports_older_and_duplicate_samples(self):
         import json
         from unittest.mock import AsyncMock, patch
