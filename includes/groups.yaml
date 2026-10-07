@@ -140,6 +140,7 @@
     - binary_sensor.living_airfreshener_moving_target
     - binary_sensor.mr_human_sensor_moving_target
     - binary_sensor.shion_airfreshener_moving_target
+    - binary_sensor.lr_radar_moving_target
 
   server_status:
     all: true
