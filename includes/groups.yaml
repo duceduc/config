@@ -118,7 +118,7 @@
 
   motion_shion_occupancy:
     entities:
-      - binary_sensor.sr_radar_moving_target
+#      - binary_sensor.sr_radar_moving_target
       - binary_sensor.shion_airfreshener_moving_target
 
   occupancy:
