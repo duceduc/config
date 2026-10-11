@@ -159,6 +159,10 @@ class GatewayClient:
         except (ClientError, TimeoutError) as error:
             raise GatewayClientError("Recording gateway request failed") from error
 
+    async def diagnostic_summary(self) -> dict[str, Any]:
+        """Fetch the gateway's projected cross-device metadata without private media."""
+        return await self._json("/api/diagnostics/summary")
+
     async def catalogue_evidence(self) -> dict[str, Any]:
         """Fetch the gateway's privacy-safe device catalogue evidence."""
         return await self._json("/api/diagnostics/catalogue-evidence")
@@ -269,6 +273,13 @@ class GatewayClient:
             method="POST",
             payload={"enabled": enabled},
         )
+        if not isinstance(camera.get("serial"), str):
+            raise GatewayClientError("Gateway returned an invalid camera response")
+        return camera
+
+    async def set_camera_preference(self, serial: str, name: str, value: int) -> dict[str, Any]:
+        """Write an admitted preference and return the gateway's fresh confirmed state."""
+        camera = await self._json(f"/api/cameras/{serial}/preferences", method="POST", payload={"preference": name, "value": value}, timeout=120)
         if not isinstance(camera.get("serial"), str):
             raise GatewayClientError("Gateway returned an invalid camera response")
         return camera
@@ -387,6 +398,24 @@ class GatewayClient:
             method="POST",
             payload={"enabled": enabled},
         )
+
+    async def play_audio(self, serial: str, data: bytes) -> None:
+        """Submit a bounded AAC clip without sending local filenames to the gateway."""
+        if not data or len(data) > 320_000:
+            raise GatewayClientError("Speaker audio exceeds its size limit")
+        try:
+            async with self._session.post(
+                self._url(f"/api/cameras/{serial}/speaker-audio"),
+                headers={**self._headers, "Content-Type": "audio/aac"},
+                data=data,
+                timeout=ClientTimeout(total=70),
+            ) as response:
+                self._raise_for_status(response)
+                result = await response.json(content_type=None)
+                if not isinstance(result, dict) or result.get("ok") is not True:
+                    raise GatewayClientError("Gateway did not complete speaker playback")
+        except (ClientError, TimeoutError, ValueError) as error:
+            raise GatewayClientError("Speaker playback failed") from error
 
     async def record_clip(self, serial: str, duration: int) -> bytes:
         """Request a bounded MP4 and reject a response that is not an MP4 file."""

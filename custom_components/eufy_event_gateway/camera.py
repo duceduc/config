@@ -82,6 +82,11 @@ async def async_setup_entry(
         "async_capture_snapshot",
     )
     platform.async_register_entity_service(
+        "play_audio",
+        {vol.Required(CONF_FILENAME): cv.string},
+        "async_play_audio",
+    )
+    platform.async_register_entity_service(
         "record_clip",
         {
             vol.Required(CONF_FILENAME): cv.string,
@@ -282,6 +287,13 @@ class EufyGatewayCamera(EufyGatewayEntity, Camera):
         # pipeline consumes it without receiving the gateway bearer token.
         if not self.camera.get("streamSupported"):
             return None
+
+        # Inventory can admit AAC after entity construction. Home Assistant
+        # reads these options after obtaining this source, so choose its clock
+        # from the same current capability that selects the gateway transport.
+        self.stream_options[CONF_USE_WALLCLOCK_AS_TIMESTAMPS] = (
+            self.camera.get("liveAudioSupported") is not True
+        )
         return await self.coordinator.client.stream_url(self.serial)
 
     async def async_get_stream_url(self) -> dict[str, str]:
@@ -322,6 +334,18 @@ class EufyGatewayCamera(EufyGatewayEntity, Camera):
             {ATTR_ENTITY_ID: self.entity_id, CONF_FILENAME: filename},
             blocking=True,
         )
+
+    async def async_play_audio(self, filename: str) -> None:
+        """Play a short native AAC file from a Home Assistant allowlisted path."""
+        if self.camera.get("talkbackSupported") is not True:
+            raise HomeAssistantError("Speaker playback is unavailable for this camera")
+        if not self.hass.config.is_allowed_path(filename):
+            raise HomeAssistantError("Speaker audio must use a Home Assistant allowlisted path")
+        try:
+            data = await self.hass.async_add_executor_job(_read_speaker_audio, filename)
+            await self.coordinator.client.play_audio(self.serial, data)
+        except (GatewayClientError, OSError, ValueError) as error:
+            raise HomeAssistantError(f"Could not play speaker audio: {error}") from error
 
     async def async_record_clip(self, filename: str, duration: int) -> None:
         """Request a bounded MP4 and replace the destination only when complete."""
@@ -410,3 +434,12 @@ def _atomic_write(filename: str, data: bytes) -> None:
         except FileNotFoundError:
             pass
         raise
+
+
+def _read_speaker_audio(filename: str) -> bytes:
+    """Read at most one bounded clip, leaving all caller-owned files untouched."""
+    with open(filename, "rb") as source:
+        data = source.read(320_001)
+    if not data or len(data) > 320_000:
+        raise ValueError("Speaker audio exceeds its size limit")
+    return data
