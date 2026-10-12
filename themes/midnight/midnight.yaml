@@ -1,13 +1,13 @@
 #################################################################
-#                                                                                                                              
-#                          MIDNIGHT                                                                                       
-#                                                                                                                               
+#
+#                          MIDNIGHT
+#
 #################################################################
 # to reload theme using services 'frontend.reload_themes'
 
 midnight:
 # revert back to blue header after 2026.2 update changed it
-  app-header-background-color: "#1E88E5" 
+  app-header-background-color: "#1E88E5"
   app-header-text-color: "#FFFFFF"
 
   background-image: "center / cover no-repeat url('/local/lovelace/wallpaper/midnight.jpg') fixed"
@@ -19,7 +19,7 @@ midnight:
   label-badge-background-color: "#21252b"
   sidebar-background-color: "#000000"
   sidebar-icon-color: "#03a9f4"
-  
+
 #  switch-checked-color: "#03a9f4"
 #  switch-unchecked-color: "#7f848e"
 #  switch-unchecked-button-color: "#7f848e"
@@ -43,7 +43,7 @@ midnight:
   ha-switch-checked-thumb-border-color-hover: "#096dcf"
   ha-switch-checked-thumb-box-shadow: none
 
-  
+
   table-row-background-color: "#2c3139"
   table-row-alternative-background-color: "#424a56"
   code-editor-background-color: "#2c3139" # (main code page background)
@@ -54,12 +54,11 @@ midnight:
   input-ink-color: 'var(--primary-text-color)'
   input-disabled-ink-color: 'var(--primary-text-color)'
   input-label-ink-color: 'var(--primary-text-color)'
-  input-disabled-fill-color: '#424A56'  
+  input-disabled-fill-color: '#424A56'
   input-hover-line-color: 'var(--primary-text-color)'
   input-dropdown-icon-color: 'var(--primary-text-color)'
 #  input-hover-line-color: 'var(--primary-text-color)'
   input-idle-line-color: 'var(--secondary-text-color)'
-
 
 # Core 2026.4 White over white background fix
   ha-color-form-background: "rgba(128, 128, 128, 0.1)"
@@ -75,15 +74,18 @@ midnight:
   ha-color-on-primary: "var(--primary-text-color)"
 
   ha-color-on-neutral-normal: "#8f8f8f"
-  wa-color-neutral-fill-normal: "#474747"
+
+  ha-color-fill-neutral-quiet-resting: "#474747"
+#  wa-color-neutral-fill-normal: "#474747"
+
 
   # Web Awesome (wa-*) text colors
 #  wa-color-text-normal: var(--primary-text-color)
 #  wa-color-text-quiet: var(--secondary-text-color)
 
 
-  # The items below are some of the default values from 
-  # https://github.com/home-assistant/frontend/blob/master/src/resources/ha-style.ts 
+  # The items below are some of the default values from
+  # https://github.com/home-assistant/frontend/blob/master/src/resources/ha-style.ts
   # Where the default value isn't changed, its noted.
 
   #Text
@@ -170,7 +172,7 @@ midnight:
 
 
 #################################################################
-#                                                                                                                              
-#                          END OF CONFIGURATION FILE                                                             
-#                                                                                                                               
+#
+#                          END OF CONFIGURATION FILE
+#
 #################################################################
