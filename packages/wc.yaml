@@ -21,7 +21,6 @@ template:
          {% else %} off {% endif %}
         icon: mdi:calendar-multiple-check
 
-
   - switch:
       - name: wc auto flush
         state: "{{ is_state('input_boolean.wc_auto_flush', 'on') }}"
@@ -203,6 +202,10 @@ automation:
     triggers:
       - trigger: state
         entity_id: sensor.aio_human_sensor_entrance_temperature
+        not_to:
+          - unknown
+          - unavailable
+
     conditions:
 #      - condition: template # Is not summer or temp is below 20
 #        value_template: "{{ not is_state('sensor.season', 'summer') or states('sensor.aio_human_sensor_entrance_temperature') | int(0) <= 19 }}"
