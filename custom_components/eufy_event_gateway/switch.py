@@ -17,6 +17,8 @@ from .client import GatewayClientError
 from .coordinator import EufyGatewayCoordinator
 from .entity import EufyGatewayEntity
 from .preferences import camera_preference_value
+from homeassistant.helpers.entity import EntityCategory
+from .lock import EufyLockSettingEntity
 
 
 async def async_setup_entry(
@@ -26,6 +28,8 @@ async def async_setup_entry(
 ) -> None:
     """Create reported camera switches as supported devices enter inventory."""
     coordinator = entry.runtime_data.coordinator
+    known_lock_settings: set[tuple[str, str]] = set()
+    known_chimes: set[str] = set()
     known_preferences: set[tuple[str, str]] = set()
     known_enabled: set[str] = set()
     known_motion: set[str] = set()
@@ -33,7 +37,17 @@ async def async_setup_entry(
     known_auto_night_vision: set[str] = set()
 
     def add_new() -> None:
+        for serial, lock in getattr(coordinator, "locks", {}).items():
+            for setting in ("autoLock", "notifications", "lockedNotifications", "unlockedNotifications"):
+                key = (serial, setting)
+                if key not in known_lock_settings and type(lock.get("settings", {}).get(setting)) is bool:
+                    known_lock_settings.add(key)
+                    async_add_entities([EufyLockSettingSwitch(coordinator, serial, setting)])
         for serial, camera in coordinator.cameras.items():
+            settings = camera.get("reportedSettings")
+            if serial not in known_chimes and camera.get("homebaseChimeControlSupported") is True and isinstance(settings, dict) and type(settings.get("homebaseChimeEnabled")) is bool:
+                known_chimes.add(serial)
+                async_add_entities([EufyDoorbellChimeSwitch(coordinator, serial)])
             for name in ("microphone", "speaker", "imageFlipped", "preRecording", "soundDetection", "statusLed", "soundRoundLook", "enhanceLighting", "continuousRecording", "rtspPublication"):
                 key = (serial, name)
                 if key not in known_preferences and camera_preference_value(camera, name) is not None:
@@ -283,3 +297,80 @@ class EufyCameraPreferenceSwitch(EufyGatewayEntity, SwitchEntity):
             self.coordinator.async_set_camera(camera)
         except GatewayClientError as error:
             raise HomeAssistantError(f"Could not change camera preference: {error}") from error
+
+
+class EufyLockSettingSwitch(EufyLockSettingEntity, SwitchEntity):
+    """Expose confirmed E30 booleans without owning vendor connections or retries."""
+
+    def __init__(self, coordinator: EufyGatewayCoordinator, serial: str, setting: str) -> None:
+        """Give each switch a distinct name under the same lock device."""
+        super().__init__(coordinator, serial, setting)
+        self._attr_translation_key = {"autoLock": "lock_auto_lock", "notifications": "lock_notifications",
+                                      "lockedNotifications": "lock_locked_notifications",
+                                      "unlockedNotifications": "lock_unlocked_notifications"}[setting]
+
+    @property
+    def is_on(self) -> bool | None:
+        """Preserve unknown values instead of displaying them as off."""
+        value = self.setting_value
+        return value if type(value) is bool else None
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Request and await an independently confirmed enable."""
+        await self.async_set_setting(True)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Request and await an independently confirmed disable."""
+        await self.async_set_setting(False)
+
+
+class EufyDoorbellChimeSwitch(EufyGatewayEntity, SwitchEntity):
+    """Control the reviewed HomeBase doorbell chime without altering detection.
+
+    The coordinator owns confirmed state. Quiet-hours automations identify this
+    exact control using its fixed attribute and never infer it from an entity name.
+    """
+
+    _attr_translation_key = "doorbell_homebase_chime"
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(self, coordinator: EufyGatewayCoordinator, serial: str) -> None:
+        """Group the independent chime control under its physical doorbell."""
+        EufyGatewayEntity.__init__(self, coordinator, serial)
+        SwitchEntity.__init__(self)
+        self._attr_unique_id = f"{serial}_homebase_chime"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, str]:
+        """Allow the quiet-hours blueprint to reject other integration switches."""
+        return {"eufy_control": "homebase_doorbell_chime"}
+
+    @property
+    def is_on(self) -> bool | None:
+        """Return only confirmed boolean chime state."""
+        settings = self.camera.get("reportedSettings")
+        value = settings.get("homebaseChimeEnabled") if isinstance(settings, dict) else None
+        return value if type(value) is bool else None
+
+    @property
+    def available(self) -> bool:
+        """Reject unknown chime state or a route no longer admitted by the gateway."""
+        return super().available and self.camera.get("homebaseChimeControlSupported") is True and self.is_on is not None
+
+    async def async_turn_on(self, **kwargs: object) -> None:
+        """Enable the HomeBase chime and await fresh readback."""
+        await self._async_set(True)
+
+    async def async_turn_off(self, **kwargs: object) -> None:
+        """Silence the HomeBase chime while preserving recording and detection."""
+        await self._async_set(False)
+
+    async def _async_set(self, enabled: bool) -> None:
+        try:
+            camera = await self.coordinator.client.set_camera_setting(self.serial, "homebaseChime", enabled)
+            self.coordinator.async_set_camera(camera)
+        except GatewayClientError as error:
+            if error.code == "outcome_unknown":
+                camera = {**self.camera, "reportedSettings": {**(self.camera.get("reportedSettings") or {}), "homebaseChimeEnabled": None}}
+                self.coordinator.async_set_camera(camera)
+            raise HomeAssistantError(str(error)) from error

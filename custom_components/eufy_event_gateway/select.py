@@ -21,6 +21,7 @@ from .const import ALARM_TONES, DOMAIN, GUARD_MODES
 from .coordinator import EufyGatewayCoordinator
 from .guard_mode_options import guard_mode_label, guard_mode_options
 from .preferences import camera_preference_value
+from .lock import EufyLockSettingEntity
 from .entity import EufyGatewayEntity, EufyStationEntity
 
 
@@ -40,9 +41,19 @@ async def async_setup_entry(
 ) -> None:
     """Create reported night-vision and managed HomeBase selects."""
     coordinator = entry.runtime_data.coordinator
+    known_lock_volumes: set[str] = set()
+    known_lock_delays: set[str] = set()
     known_preferences: set[tuple[str, str]] = set()
 
     def add_preferences() -> None:
+        for serial, lock in getattr(coordinator, "locks", {}).items():
+            volume = lock.get("settings", {}).get("volume")
+            if serial not in known_lock_volumes and type(volume) is int and 0 <= volume <= 3:
+                known_lock_volumes.add(serial)
+                async_add_entities([EufyLockVolumeSelect(coordinator, serial)])
+            if serial not in known_lock_delays and "autoLockDelaySeconds" in lock.get("settings", {}):
+                known_lock_delays.add(serial)
+                async_add_entities([EufyLockAutoLockDelaySelect(coordinator, serial)])
         for serial, camera in coordinator.cameras.items():
             for name in ("watermark", "recordingQuality", "soundType"):
                 key = (serial, name)
@@ -372,3 +383,63 @@ class EufyCameraPreferenceSelect(EufyGatewayEntity, SelectEntity):
             self.coordinator.async_set_camera(camera)
         except GatewayClientError as error:
             raise HomeAssistantError(f"Could not change camera preference: {error}") from error
+
+
+class EufyLockVolumeSelect(EufyLockSettingEntity, SelectEntity):
+    """Expose audible E30 levels while leaving native mute outside write authority."""
+
+    _attr_translation_key = "lock_volume"
+    _attr_options = ["low", "medium", "high"]
+
+    def __init__(self, coordinator: EufyGatewayCoordinator, serial: str) -> None:
+        """Bind the volume control to the lock's shared settings observation."""
+        super().__init__(coordinator, serial, "volume")
+
+    @property
+    def available(self) -> bool:
+        """Keep the select unavailable while the native app has sound disabled."""
+        return super().available and type(self.setting_value) is int and self.setting_value in (1, 2, 3)
+
+    @property
+    def current_option(self) -> str | None:
+        """Translate only a reported audible enum."""
+        value = self.setting_value
+        return self._attr_options[value - 1] if type(value) is int and 1 <= value <= 3 else None
+
+    async def async_select_option(self, option: str) -> None:
+        """Await confirmed volume instead of optimistically changing the label."""
+        if option not in self._attr_options:
+            raise HomeAssistantError("Unsupported lock sound level")
+        await self.async_set_setting(self._attr_options.index(option) + 1)
+
+
+class EufyLockAutoLockDelaySelect(EufyLockSettingEntity, SelectEntity):
+    """Expose reviewed E30 timer choices without changing automatic-lock enablement.
+
+    The coordinator owns observations and expiry. The gateway preserves schedules
+    and confirms each change before this entity publishes a selected option.
+    """
+
+    _attr_translation_key = "lock_auto_lock_delay"
+    _attr_options = ["30", "60", "90", "120", "150", "180", "300"]
+
+    def __init__(self, coordinator: EufyGatewayCoordinator, serial: str) -> None:
+        """Bind the delay to the lock's device-settings observation lifetime."""
+        super().__init__(coordinator, serial, "autoLockDelaySeconds")
+
+    @property
+    def available(self) -> bool:
+        """Require fresh settings and a value represented by the reviewed choices."""
+        return super().available and self.current_option is not None
+
+    @property
+    def current_option(self) -> str | None:
+        """Keep unknown and unoffered native timers unavailable rather than rounding."""
+        value = self.setting_value
+        return str(value) if type(value) is int and str(value) in self._attr_options else None
+
+    async def async_select_option(self, option: str) -> None:
+        """Request a mapped integer and await the gateway's independent confirmation."""
+        if option not in self._attr_options:
+            raise HomeAssistantError("Unsupported auto-lock delay")
+        await self.async_set_setting(int(option))
