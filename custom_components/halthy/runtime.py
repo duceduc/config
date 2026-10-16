@@ -5,7 +5,10 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import (
     DEFAULT_ACTIVITY_LOG_MODE,
@@ -13,6 +16,7 @@ from .const import (
     DEFAULT_TEMPERATURE_UNIT,
     DEFAULT_WORKOUT_ARCHIVE_RETENTION,
     DOMAIN,
+    MANUFACTURER,
 )
 
 
@@ -82,7 +86,10 @@ class IntegrationRuntime:
     last_force_upload_ack_status: str | None = None
     daily_upload_count: int = 0
     daily_upload_count_day: str = ""
+    map_journal_scope: dict[str, str] | None = None
+    map_journal_error: str | None = None
     lock: asyncio.Lock | None = None
+    integration_version: str | None = None
 
 
 def runtime_lock(runtime: IntegrationRuntime) -> asyncio.Lock:
@@ -100,6 +107,20 @@ def runtime_device_identifiers(runtime: IntegrationRuntime) -> set[tuple[str, st
     if runtime.previous_configured_username:
         usernames.add(runtime.previous_configured_username)
     return {(DOMAIN, f"user:{username}") for username in usernames if username}
+
+
+def runtime_device_info(runtime: IntegrationRuntime) -> DeviceInfo:
+    """Keep metadata consistent across every platform sharing this device."""
+    info: DeviceInfo = {
+        "identifiers": runtime_device_identifiers(runtime),
+        "manufacturer": MANUFACTURER,
+        "model": "iOS App",
+        "name": runtime.display_name,
+    }
+    if runtime.integration_version:
+        # This is integration software, not the connected iPhone's iOS version.
+        info["sw_version"] = f"Integration {runtime.integration_version}"
+    return info
 
 
 @dataclass(slots=True)

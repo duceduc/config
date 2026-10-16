@@ -267,7 +267,7 @@
     - action: script.standby
     - action: select.select_option
       target:
-        entity_id: select.balcony_guard_mode
+        entity_id: select.lions_guard_mode
       data:
         option: Home
 
@@ -300,7 +300,7 @@
       entity_id: input_boolean.sentry_mode
     - action: select.select_option
       target:
-        entity_id: select.balcony_guard_mode
+        entity_id: select.lions_guard_mode
       data:
         option: Away
 

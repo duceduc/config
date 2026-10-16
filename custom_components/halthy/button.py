@@ -14,9 +14,9 @@ from . import (
     FORCE_UPLOAD_COMMAND_TYPE,
     async_queue_remote_command,
 )
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN
 from .naming import sanitize_identifier
-from .runtime import IntegrationRuntime, runtime_device_identifiers
+from .runtime import IntegrationRuntime, runtime_device_info
 
 
 async def async_setup_entry(
@@ -74,12 +74,7 @@ class HalthyCommandButton(ButtonEntity):
 
     @property
     def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
-            identifiers=runtime_device_identifiers(self._runtime),
-            manufacturer=MANUFACTURER,
-            model="iOS App",
-            name=self._runtime.display_name,
-        )
+        return runtime_device_info(self._runtime)
 
     async def async_press(self) -> None:
         await async_queue_remote_command(

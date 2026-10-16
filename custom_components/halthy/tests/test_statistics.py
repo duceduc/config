@@ -25,6 +25,7 @@ def _install_homeassistant_stubs() -> None:
     if "aiohttp" not in sys.modules:
         aiohttp_module = types.ModuleType("aiohttp")
         web_module = types.SimpleNamespace(
+            HTTPRequestEntityTooLarge=type("HTTPRequestEntityTooLarge", (Exception,), {}),
             Request=type("Request", (), {}),
             Response=type("Response", (), {}),
             json_response=lambda *args, **kwargs: {"args": args, "kwargs": kwargs},
@@ -59,6 +60,24 @@ def _install_homeassistant_stubs() -> None:
         http_module.KEY_HASS = "hass"
     if not hasattr(http_module, "HomeAssistantView"):
         http_module.HomeAssistantView = type("HomeAssistantView", (), {})
+
+    http_const_module = sys.modules.setdefault("homeassistant.components.http.const", types.ModuleType("homeassistant.components.http.const"))
+    http_const_module.KEY_HASS_USER = "hass_user"
+    http_const_module.KEY_HASS_REFRESH_TOKEN_ID = "hass_refresh_token_id"
+    auth_util_module = sys.modules.setdefault("homeassistant.components.http.auth_util", types.ModuleType("homeassistant.components.http.auth_util"))
+    auth_util_module.async_user_not_allowed_do_auth = lambda _hass, user, request: (
+        None if user.is_active and (not user.local_only or request.remote == "127.0.0.1") else "denied"
+    )
+    webhook_module = sys.modules.setdefault("homeassistant.components.webhook", types.ModuleType("homeassistant.components.webhook"))
+
+    def register_webhook(hass, domain, name, secret, handler, **kwargs):
+        hooks = hass.data.setdefault("test_webhooks", {})
+        if secret in hooks:
+            raise ValueError("already registered")
+        hooks[secret] = (handler, kwargs)
+
+    webhook_module.async_register = register_webhook
+    webhook_module.async_unregister = lambda hass, secret: hass.data.setdefault("test_webhooks", {}).pop(secret, None)
 
     recorder_statistics_module = sys.modules.setdefault(
         "homeassistant.components.recorder.statistics",
@@ -160,6 +179,12 @@ def _install_homeassistant_stubs() -> None:
     if not hasattr(config_entries_module, "ConfigEntry"):
         config_entries_module.ConfigEntry = type("ConfigEntry", (), {})
 
+    loader_module = sys.modules.setdefault("homeassistant.loader", types.ModuleType("homeassistant.loader"))
+    if not hasattr(loader_module, "async_get_integration"):
+        async def _integration(_hass, _domain):
+            return types.SimpleNamespace(version="test-installed-version")
+        loader_module.async_get_integration = _integration
+
     core_module = sys.modules.setdefault(
         "homeassistant.core",
         types.ModuleType("homeassistant.core"),
@@ -197,8 +222,10 @@ def _load_integration_module():
         "units",
         "runtime",
         "timestamps",
+        "daily_reset",
         "statistics",
         "workout_archive",
+        "paired_webhook",
     ):
         module_name = f"{package_name}.{module_base}"
         if module_name in sys.modules:
@@ -337,12 +364,22 @@ class StatisticsHelpersTests(unittest.TestCase):
         from unittest.mock import AsyncMock, patch
 
         async def exercise():
+            directory = tempfile.TemporaryDirectory()
+            self.addCleanup(directory.cleanup)
+
+            async def async_add_executor_job(function, *args):
+                return function(*args)
+
             runtime = BRIDGE.IntegrationRuntime(
                 configured_username="tester", app_username="tester", display_name="Tester"
             )
             hass = types.SimpleNamespace(
                 data={BRIDGE.DOMAIN: {"entries": {"entry": runtime}}},
-                config=types.SimpleNamespace(units=types.SimpleNamespace(temperature_unit="°C")),
+                config=types.SimpleNamespace(
+                    units=types.SimpleNamespace(temperature_unit="°C"),
+                    path=lambda relative: str(pathlib.Path(directory.name) / relative),
+                ),
+                async_add_executor_job=async_add_executor_job,
             )
             registry = types.SimpleNamespace(async_get_entity_id=lambda *args: None)
             queued = []
@@ -353,9 +390,9 @@ class StatisticsHelpersTests(unittest.TestCase):
                     STATISTICS.metadata_statistic_id(metadata) for metadata, _ in batches
                 }
 
-            async def upload(timestamp):
+            async def upload(timestamp, prune=True, completed=False):
                 payload = {"username": "tester", "device_id": "phone",
-                           "prune_unselected_metrics": True, "selected_metric_keys": ["heart_rate"],
+                           "prune_unselected_metrics": prune, "sync_completed": completed, "selected_metric_keys": ["heart_rate"],
                            "sensors": [{"key": "heart_rate", "state": 65, "unit": "bpm",
                                         "attributes": {"measurement_timestamp": timestamp}}]}
                 body = json.dumps(payload).encode()
@@ -372,17 +409,37 @@ class StatisticsHelpersTests(unittest.TestCase):
                  patch.object(BRIDGE.er, "async_get", return_value=registry), \
                  patch.object(BRIDGE, "_async_import_statistics_batches", side_effect=importer):
                 before = datetime.now(timezone.utc)
-                await upload("2099-09-09T12:00:00Z")
+                await upload("2099-09-09T12:00:00Z", prune=False, completed=True)
                 after = datetime.now(timezone.utc)
                 diagnostics = {state.metric_key: state for state in runtime.sensors.values()}
                 for key in ("last_update", "last_full_sync"):
                     timestamp = datetime.fromisoformat(diagnostics[key].state.replace("Z", "+00:00"))
                     self.assertLessEqual(before, timestamp)
                     self.assertLessEqual(timestamp, after)
+                self.assertEqual(runtime.daily_upload_count, 1)
+                previous_sync = diagnostics["last_full_sync"].state
+                response = await upload("2099-09-09T12:00:00Z", prune=False, completed=True)
+                self.assertEqual(response["args"][0]["duplicates"], 1)
+                self.assertIs(response["args"][0]["sync_completed"], True)
+                self.assertEqual(runtime.daily_upload_count, 2)
+                diagnostics = {state.metric_key: state for state in runtime.sensors.values()}
+                self.assertGreater(diagnostics["last_full_sync"].state, previous_sync)
+                self.assertEqual(diagnostics["heart_rate"].state, 65)
                 await upload("2026-09-08T10:15:00Z")
                 await upload("2026-09-08T10:15:00Z")
-                self.assertEqual(len(queued), 3)
+                self.assertEqual(len(queued), 4)
+                self.assertEqual(runtime.daily_upload_count, 2)
                 self.assertEqual(queued[-1][1][0].start, datetime(2026, 9, 8, 10, tzinfo=timezone.utc))
+                with patch.object(
+                    BRIDGE,
+                    "_async_import_statistics_batches",
+                    new=AsyncMock(return_value=(0, set())),
+                ):
+                    response = await upload("2026-09-08T11:15:00Z", prune=False, completed=True)
+                    self.assertEqual(response["kwargs"]["status"], 503)
+                    self.assertEqual(runtime.daily_upload_count, 2)
+                    self.assertEqual({state.metric_key: state for state in runtime.sensors.values()}["last_full_sync"].state,
+                                     diagnostics["last_full_sync"].state)
 
         asyncio.run(exercise())
 
@@ -867,6 +924,65 @@ class StatisticsHelpersTests(unittest.TestCase):
         self.assertEqual(start.minute, 0)
         self.assertEqual(start.second, 0)
         self.assertEqual(start.microsecond, 0)
+
+    def test_separate_uploads_rebuild_the_same_hour_without_double_counting(self) -> None:
+        runtime = BRIDGE.IntegrationRuntime(
+            configured_username="tester",
+            app_username="tester",
+            display_name="Tester",
+        )
+        statistic_id = STATISTICS.statistics_id_for_metric("tester", "heart_rate")
+        first = {
+            "statistic_id": statistic_id,
+            "name": "Heart rate",
+            "unit": "bpm",
+            "start": datetime(2026, 9, 1, 10, 5, tzinfo=timezone.utc),
+            "value": 60.0,
+        }
+        second = {
+            **first,
+            "start": datetime(2026, 9, 1, 10, 35, tzinfo=timezone.utc),
+            "value": 90.0,
+        }
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = pathlib.Path(directory) / "samples.sqlite"
+            STATISTICS.prepare_statistics_imports_for_runtime(runtime, [first], store)
+            batches, _ = STATISTICS.prepare_statistics_imports_for_runtime(
+                runtime, [second], store
+            )
+            _metadata, rows = batches[0]
+            self.assertEqual(rows[0].state, 90.0)
+            self.assertEqual(rows[0].mean, 75.0)
+            self.assertEqual(rows[0].min, 60.0)
+            self.assertEqual(rows[0].max, 90.0)
+
+            retry_batches, _ = STATISTICS.prepare_statistics_imports_for_runtime(
+                runtime, [second], store
+            )
+            self.assertEqual(retry_batches[0][1][0].mean, 75.0)
+
+    def test_historical_daily_snapshot_replaces_corrected_value(self) -> None:
+        runtime = BRIDGE.IntegrationRuntime(
+            configured_username="tester", app_username="tester", display_name="Tester"
+        )
+        point = {
+            "statistic_id": STATISTICS.statistics_id_for_metric("tester", "steps"),
+            "name": "Steps",
+            "unit": "steps",
+            "start": datetime(2026, 9, 1, 21, 59, 59, tzinfo=timezone.utc),
+            "value": 4000.0,
+            "replace_at_timestamp": True,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            store = pathlib.Path(directory) / "samples.sqlite"
+            STATISTICS.prepare_statistics_imports_for_runtime(runtime, [point], store)
+            batches, _ = STATISTICS.prepare_statistics_imports_for_runtime(
+                runtime, [{**point, "value": 5000.0}], store
+            )
+            row = batches[0][1][0]
+            self.assertEqual(row.state, 5000.0)
+            self.assertEqual(row.mean, 5000.0)
 
     def test_statistics_candidates_disabled_per_runtime(self) -> None:
         runtime = BRIDGE.IntegrationRuntime(

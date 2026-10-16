@@ -15,9 +15,9 @@ from . import (
     force_upload_interval_label,
     force_upload_interval_seconds_from_label,
 )
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN
 from .naming import sanitize_identifier
-from .runtime import IntegrationRuntime, runtime_device_identifiers
+from .runtime import IntegrationRuntime, runtime_device_info
 
 
 async def async_setup_entry(
@@ -52,12 +52,7 @@ class HalthyForceUploadIntervalSelect(SelectEntity):
 
     @property
     def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
-            identifiers=runtime_device_identifiers(self._runtime),
-            manufacturer=MANUFACTURER,
-            model="iOS App",
-            name=self._runtime.display_name,
-        )
+        return runtime_device_info(self._runtime)
 
     async def async_select_option(self, option: str) -> None:
         if option not in self.options:

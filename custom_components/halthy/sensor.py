@@ -18,10 +18,9 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.unit_conversion import DistanceConverter, MassConverter
 
-from .runtime import HalthySensorState, IntegrationRuntime, runtime_device_identifiers
+from .runtime import HalthySensorState, IntegrationRuntime, runtime_device_info
 from .const import (
     DOMAIN,
-    MANUFACTURER,
     new_sensor_signal,
     remove_sensor_signal,
     update_sensor_signal,
@@ -110,11 +109,7 @@ class HalthySensor(SensorEntity):
     def _apply_state(self, state: HalthySensorState) -> None:
         self._sensor_state = state
         metric_key = normalize_metric_key(state.metric_key)
-        self._attr_name = (
-            friendly_metric_name(metric_key, state.name)
-            if metric_key in {"body_mass", "weight"}
-            else state.name
-        )
+        self._attr_name = friendly_metric_name(metric_key, state.name)
         self._attr_native_value = state.state
         self._attr_native_unit_of_measurement = state.unit
         self._attr_suggested_unit_of_measurement = None
@@ -183,17 +178,15 @@ class HalthySensor(SensorEntity):
         attrs.setdefault("metric_key", state.metric_key)
         attrs.setdefault("username", state.username)
         attrs.setdefault("device_id", state.device_id)
-        attrs["last_pushed"] = state.updated_at.isoformat()
+        attrs["last_pushed"] = (
+            attrs.get("last_source_pushed", state.updated_at.isoformat())
+            if attrs.get("daily_reset") is True else state.updated_at.isoformat()
+        )
         self._attr_extra_state_attributes = attrs
 
     @property
     def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
-            identifiers=runtime_device_identifiers(self._runtime),
-            manufacturer=MANUFACTURER,
-            model="iOS App",
-            name=self._runtime.display_name,
-        )
+        return runtime_device_info(self._runtime)
 
     async def async_added_to_hass(self) -> None:
         """Register update callback."""

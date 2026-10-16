@@ -368,6 +368,10 @@ def _store_workout_archive_file(
 ) -> int:
     archive_dir.mkdir(parents=True, exist_ok=True)
     target_path = archive_dir / file_name
+    temp_path = target_path.with_name(f".{target_path.name}.tmp")
+    with temp_path.open("wb") as handle:
+        handle.write(image_bytes)
+    temp_path.replace(target_path)
     replaced_count = 0
     for existing in archive_dir.iterdir():
         if (
@@ -396,10 +400,6 @@ def _store_workout_archive_file(
         except OSError:
             _LOGGER.debug("Failed to remove older workout archive file: %s", existing)
 
-    temp_path = target_path.with_name(f".{target_path.name}.tmp")
-    with temp_path.open("wb") as handle:
-        handle.write(image_bytes)
-    temp_path.replace(target_path)
     return replaced_count
 
 
@@ -516,6 +516,7 @@ async def _async_archive_workout_image(
     image_bytes: bytes,
     attributes: dict[str, Any],
     retention_limit: int,
+    require_success: bool = False,
 ) -> dict[str, Any]:
     if _normalize_metric_key(metric_key) != WORKOUT_IMAGE_METRIC_KEY:
         return attributes
@@ -549,6 +550,8 @@ async def _async_archive_workout_image(
             retention_limit,
         )
     except Exception as err:  # noqa: BLE001
+        if require_success:
+            raise OSError("archive_write_failed") from None
         _LOGGER.warning(
             "Failed to archive workout image for '%s' (%s): %s",
             username,

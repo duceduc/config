@@ -4,6 +4,12 @@ from __future__ import annotations
 
 import re
 
+_DISPLAY_REPAIR_WORDS = frozenset({
+    "country", "cross", "handwashing", "inhaler", "insulin", "rowing", "skiing", "skating", "swimming",
+    "minute", "steadiness", "toothbrushing", "bleeding", "during", "intermenstrual", "changes",
+    "bloating", "coughing", "fainting", "pounding", "fluttering", "heartbeat", "vomiting", "wheezing",
+})
+
 _METRIC_WORDS = tuple(
     sorted(
         {
@@ -23,6 +29,8 @@ _METRIC_WORDS = tuple(
             "climbed",
             "core",
             "count",
+            "country",
+            "cross",
             "cycling",
             "deep",
             "diastolic",
@@ -38,7 +46,10 @@ _METRIC_WORDS = tuple(
             "ground",
             "heart",
             "height",
+            "handwashing",
             "in",
+            "inhaler",
+            "insulin",
             "lean",
             "mass",
             "max",
@@ -51,11 +62,15 @@ _METRIC_WORDS = tuple(
             "respiratory",
             "resting",
             "running",
+            "rowing",
             "saturation",
             "score",
             "sdnn",
             "sleep",
             "sleeping",
+            "skiing",
+            "skating",
+            "swimming",
             "speed",
             "stand",
             "steps",
@@ -70,11 +85,15 @@ _METRIC_WORDS = tuple(
             "walking",
             "weight",
             "workout",
-        },
+        }.union(_DISPLAY_REPAIR_WORDS),
         key=len,
         reverse=True,
     )
 )
+
+# Preserve historical metric/statistics identities. Display repairs must not
+# rename an entity or start a new long-term-statistics series.
+_IDENTITY_WORDS = tuple(word for word in _METRIC_WORDS if word not in _DISPLAY_REPAIR_WORDS)
 
 _FRIENDLY_TOKEN_EXPANSIONS = {
     "avg": "average",
@@ -91,6 +110,7 @@ _FRIENDLY_TOKEN_EXPANSIONS = {
 
 _FRIENDLY_KEY_OVERRIDES = {
     "body_mass": "weight",
+    "daily_upload_count": "daily uploads",
     "first_pickup_time": "first pickup time",
     "last_full_sync": "last full sync",
     "last_update": "last update",
@@ -169,14 +189,22 @@ def _split_compound_word(part: str) -> list[str]:
             idx += len(match)
             continue
 
-        next_idx = idx + 1
-        while next_idx < len(part):
-            if any(part.startswith(word, next_idx) for word in _METRIC_WORDS):
-                break
-            next_idx += 1
-        words.append(part[idx:next_idx])
-        idx = next_idx
+        # Never split an ordinary word around a coincidental embedded token.
+        # Unknown words remain intact; legacy compound keys split only fully.
+        return [part]
     return words
+
+
+def _repair_legacy_fragments(tokens: list[str]) -> list[str]:
+    repaired: list[str] = []
+    index = 0
+    while index < len(tokens):
+        width = next((width for width in range(min(6, len(tokens) - index), 1, -1)
+                      if "".join(tokens[index:index + width]) in _METRIC_WORDS
+                      and any(token not in _METRIC_WORDS for token in tokens[index:index + width])), 1)
+        repaired.append("".join(tokens[index:index + width]))
+        index += width
+    return repaired
 
 
 def _tokenize_metric_key(metric_key: str) -> list[str]:
@@ -193,7 +221,30 @@ def _tokenize_metric_key(metric_key: str) -> list[str]:
             tokens.extend(_split_compound_word(lowered))
         else:
             tokens.append(lowered)
-    return [token for token in tokens if token]
+    return _repair_legacy_fragments([token for token in tokens if token])
+
+
+def _identity_tokens(metric_key: str) -> list[str]:
+    prepared = _strip_metric_prefix(metric_key)
+    prepared = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", prepared)
+    prepared = re.sub(r"[^a-zA-Z0-9]+", " ", prepared).strip()
+    tokens: list[str] = []
+    for chunk in prepared.split():
+        part = chunk.lower()
+        if not part.isalpha() or len(part) < 6:
+            tokens.append(part)
+            continue
+        index = 0
+        while index < len(part):
+            match = next((word for word in _IDENTITY_WORDS if part.startswith(word, index)), None)
+            if match:
+                tokens.append(match); index += len(match)
+                continue
+            end = index + 1
+            while end < len(part) and not any(part.startswith(word, end) for word in _IDENTITY_WORDS):
+                end += 1
+            tokens.append(part[index:end]); index = end
+    return tokens
 
 
 def _sentence_case(text: str) -> str:
@@ -204,7 +255,7 @@ def _sentence_case(text: str) -> str:
 
 
 def normalize_metric_key(metric_key: str) -> str:
-    tokens = _tokenize_metric_key(metric_key)
+    tokens = _identity_tokens(metric_key)
     if not tokens:
         normalized = sanitize_identifier(metric_key)
         return _METRIC_KEY_ALIASES.get(normalized, normalized)

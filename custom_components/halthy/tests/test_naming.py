@@ -33,6 +33,42 @@ NAMING = _load_naming_module()
 
 
 class NamingHelpersTests(unittest.TestCase):
+    def test_ordinary_words_are_not_split_at_embedded_short_tokens(self) -> None:
+        for key, name in {
+            "handwashing_event": "Handwashing event",
+            "distance_cross_country_skiing": "Distance cross country skiing",
+            "distance_rowing": "Distance rowing",
+            "distance_skating_sports": "Distance skating sports",
+            "distance_swimming": "Distance swimming",
+            "inhaler_usage": "Inhaler usage",
+            "insulin_delivery": "Insulin delivery",
+            "heart_rate_recovery_one_minute": "Heart rate recovery one minute",
+            "six_minute_walk_test_distance": "Six minute walk test distance",
+            "walking_steadiness_event": "Walking steadiness event",
+            "toothbrushing_event": "Toothbrushing event",
+            "rapid_pounding_or_fluttering_heartbeat": "Rapid pounding or fluttering heartbeat",
+            "sleep_changes": "Sleep changes",
+            "bleeding_during_pregnancy": "Bleeding during pregnancy",
+            "persistent_intermenstrual_bleeding": "Persistent intermenstrual bleeding",
+            "fainting": "Fainting",
+        }.items():
+            with self.subTest(key=key):
+                self.assertEqual(NAMING.friendly_metric_name(key, None), name)
+
+    def test_persisted_fragmented_keys_repair_without_losing_compact_identity(self) -> None:
+        for old, canonical in {
+            "handwash_in_g_event": "handwashing_event",
+            "distance_cross_count_ry_ski_in_g": "distance_cross_country_skiing",
+            "distance_row_in_g": "distance_rowing",
+            "distance_skat_in_g_sports": "distance_skating_sports",
+            "distance_swimm_in_g": "distance_swimming",
+            "in_haler_usage": "inhaler_usage",
+            "in_sul_in_delivery": "insulin_delivery",
+        }.items():
+            with self.subTest(old=old):
+                self.assertEqual(NAMING.normalize_metric_key(old), NAMING.normalize_metric_key(canonical))
+                self.assertEqual(NAMING.friendly_metric_name(old, None), NAMING.friendly_metric_name(canonical, None))
+                self.assertEqual(old.replace("_", ""), canonical.replace("_", ""))
     def test_body_mass_display_name_preserves_metric_identity(self) -> None:
         for key in ("body_mass", "bodyMass", "HKQuantityTypeIdentifierBodyMass"):
             self.assertEqual(NAMING.friendly_metric_name(key, "Body mass"), "Weight")

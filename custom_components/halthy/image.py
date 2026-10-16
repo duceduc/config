@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import Any
 
 from homeassistant.components.image import ImageEntity
@@ -13,10 +14,9 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .runtime import HalthyImageState, IntegrationRuntime, runtime_device_identifiers
+from .runtime import HalthyImageState, IntegrationRuntime, runtime_device_info
 from .const import (
     DOMAIN,
-    MANUFACTURER,
     new_image_signal,
     remove_image_signal,
     update_image_signal,
@@ -361,6 +361,8 @@ class HalthyImage(ImageEntity):
 
     @callback
     def _apply_state(self, state: HalthyImageState) -> None:
+        self._attr_available = True
+        self._attr_image_last_updated = state.updated_at
         self._image_state = state
         self._attr_name = state.name
         self._attr_content_type = state.content_type
@@ -379,16 +381,21 @@ class HalthyImage(ImageEntity):
             self._workout_state = "Workout"
         self._attr_extra_state_attributes = attrs
 
+    @callback
+    def _clear_state(self) -> None:
+        self._attr_available = False
+        self._attr_extra_state_attributes = {}
+        self._attr_image_last_updated = datetime.now(timezone.utc)
+        self._cached_image = None
+        self._workout_state = "Workout"
+
     @property
     def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
-            identifiers=runtime_device_identifiers(self._runtime),
-            manufacturer=MANUFACTURER,
-            model="iOS App",
-            name=self._runtime.display_name,
-        )
+        return runtime_device_info(self._runtime)
 
     async def async_image(self) -> bytes | None:
+        if not self.available:
+            return None
         return self._image_state.image_bytes
 
     @property
@@ -406,6 +413,8 @@ class HalthyImage(ImageEntity):
         def async_handle_image_update() -> None:
             state = self._runtime.images.get(self._image_unique_id)
             if state is None:
+                self._clear_state()
+                self.async_write_ha_state()
                 return
             self._apply_state(state)
             self.async_write_ha_state()

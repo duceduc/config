@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import asyncio
 import base64
 import binascii
 import hashlib
@@ -14,6 +15,14 @@ from pathlib import Path
 import re
 from typing import Any
 from uuid import uuid4
+
+from .command_receipts import load_receipts, receipt_path, save_receipt, valid_command_id
+from .paired_webhook import HalthyWebhookManager, HalthyWebhookPairingView, MANAGER_KEY
+from .workout_map_state import HalthyWorkoutMapStateView
+from .workout_map_transactions import (
+    HalthyWorkoutMapTransactionView, MapTransactionError,
+    async_restore_current_map, async_legacy_map_write,
+)
 
 from aiohttp import web
 import voluptuous as vol
@@ -27,6 +36,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_change, async_track_time_interval
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
+from homeassistant.loader import async_get_integration
 
 try:
     from homeassistant.components.recorder.statistics import async_add_external_statistics
@@ -82,6 +92,7 @@ from .naming import (
     sanitize_identifier,
 )
 from .units import canonical_unit, resolve_temperature_state
+from .daily_reset import prepare_daily_attributes, rollover_daily_sensors
 from .runtime import (
     HalthyImageState,
     HalthySensorState,
@@ -93,6 +104,7 @@ from .runtime import (
 from .statistics import (
     commit_statistics_cursor_updates as _commit_statistics_cursor_updates,
     import_statistics_batches,
+    metadata_statistic_id,
     prepare_statistics_imports_for_runtime as _prepare_statistics_imports_for_runtime,
     statistics_candidates_from_sensor as _statistics_candidates_from_sensor,
 )
@@ -1060,6 +1072,7 @@ def _serialize_entries(entries: dict[str, IntegrationRuntime]) -> dict[str, Any]
             "app_username": runtime.app_username,
             "display_name": runtime.display_name,
             "owner_user_id": runtime.owner_user_id,
+            "map_journal_scope": _json_safe(runtime.map_journal_scope),
             "force_upload_interval_seconds": runtime.force_upload_interval_seconds,
             "pending_force_upload_command": _json_safe(runtime.pending_force_upload_command),
             "last_force_upload_ack_at": runtime.last_force_upload_ack_at,
@@ -1251,8 +1264,20 @@ async def _async_reset_daily_upload_counter_for_entry(
     did_reset = False
     async with _runtime_lock(runtime):
         did_reset = _reset_daily_upload_counter_if_needed(hass, runtime, entry_id)
+        did_reset = _reset_daily_health_sensors(hass, runtime, entry_id) or did_reset
     if did_reset:
         _schedule_store_save(hass)
+
+
+def _daily_reporting_timezone(hass: HomeAssistant) -> str:
+    return getattr(getattr(hass, "config", None), "time_zone", "UTC") or "UTC"
+
+
+def _reset_daily_health_sensors(hass: HomeAssistant, runtime: IntegrationRuntime, entry_id: str) -> bool:
+    changed = rollover_daily_sensors(runtime.sensors, datetime.now(timezone.utc), _daily_reporting_timezone(hass))
+    for unique_id in changed:
+        async_dispatcher_send(hass, update_sensor_signal(entry_id, unique_id))
+    return bool(changed)
 
 
 def _reschedule_daily_upload_reset(hass: HomeAssistant, entry_id: str) -> None:
@@ -1266,8 +1291,8 @@ def _reschedule_daily_upload_reset(hass: HomeAssistant, entry_id: str) -> None:
     domain_data.setdefault("daily_upload_reset_timers", {})[entry_id] = async_track_time_change(
         hass,
         _midnight_callback,
-        hour=0,
-        minute=0,
+        # Minute-boundary checks also cover valid source reporting timezones
+        # that differ from HA's timezone, without relying on a 24-hour delay.
         second=0,
     )
 
@@ -1344,7 +1369,7 @@ class HalthyPushView(HomeAssistantView):
     name = ENDPOINT_NAME
     requires_auth = True
 
-    async def post(self, request: web.Request) -> web.Response:
+    async def post(self, request: web.Request, *, require_archive: bool = False) -> web.Response:
         hass: HomeAssistant = request.app[KEY_HASS]
         domain_data = hass.data.get(DOMAIN, {})
         entries: dict[str, IntegrationRuntime] = domain_data.get("entries", {})
@@ -1382,6 +1407,14 @@ class HalthyPushView(HomeAssistantView):
         if not isinstance(payload, dict):
             return web.json_response({"error": "invalid_payload"}, status=400)
 
+        archive_only = payload.get("archive_only", False)
+        if type(archive_only) is not bool or (require_archive and not archive_only):
+            return web.json_response({"error": "invalid_archive_mode"}, status=400)
+        if archive_only and (set(payload) != {"username", "device_id", "archive_only", "prune_unselected_metrics", "workouts", "images"}
+                or payload.get("prune_unselected_metrics") is not False or payload.get("workouts") != []
+                or not isinstance(payload.get("images"), list) or len(payload["images"]) != 1):
+            return web.json_response({"error": "invalid_archive_payload"}, status=400)
+
         username = str(payload.get("username", "")).strip()
         if not username:
             return web.json_response({"error": "missing_username"}, status=400)
@@ -1391,6 +1424,9 @@ class HalthyPushView(HomeAssistantView):
         connection_test = payload.get("connection_test") is True
 
         prune_unselected_metrics = payload.get("prune_unselected_metrics") is True
+        sync_completed = payload.get("sync_completed", False)
+        if type(sync_completed) is not bool:
+            return web.json_response({"error": "invalid_sync_completed"}, status=400)
         selected_metric_keys_payload = payload.get("selected_metric_keys")
         selected_metric_keys: set[str] | None = None
         if selected_metric_keys_payload is not None:
@@ -1491,6 +1527,11 @@ class HalthyPushView(HomeAssistantView):
                     },
                     status=413,
                 )
+
+            try:
+                prepare_daily_attributes(metric_key, attributes, datetime.now(timezone.utc), _daily_reporting_timezone(hass))
+            except ValueError as error:
+                return web.json_response({"error": str(error)}, status=400)
 
             prepared_sensors.append(
                 {
@@ -1630,11 +1671,63 @@ class HalthyPushView(HomeAssistantView):
                 {
                     "ok": True,
                     "connection_test": True,
+                    "sync_completion_supported": True,
+                    "sync_completion_receipts": True,
                     "entry_id": target_entries[0][0],
                 }
             )
 
+        if archive_only:
+            if (len(target_entries) != 1 or len(prepared_images) != 1 or not raw_device_id
+                    or target_entries[0][1].owner_user_id != request_user_id):
+                return web.json_response({"error": "archive_scope_mismatch"}, status=403)
+            image = prepared_images[0]
+            raw_id = image["attributes"].get("workout_uuid")
+            if (image["metric_key"] != WORKOUT_IMAGE_METRIC_KEY or not isinstance(raw_id, str)
+                    or re.fullmatch(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", raw_id) is None
+                    or _workout_record_from_attributes(image["attributes"]) is None):
+                return web.json_response({"error": "invalid_archive_workout"}, status=400)
+            entry_id, runtime = target_entries[0]
+            async with _runtime_lock(runtime):
+                if entries.get(entry_id) is not runtime or runtime.owner_user_id != request_user_id or runtime.configured_username != normalized_username:
+                    return web.json_response({"error": "archive_scope_mismatch"}, status=403)
+                # Join disk work before a disconnected request releases the lock.
+                work = asyncio.ensure_future(_async_archive_workout_image(
+                    hass=hass, username=normalized_username, metric_key=image["metric_key"],
+                    content_type=image["content_type"], image_bytes=image["image_bytes"], attributes=image["attributes"],
+                    retention_limit=runtime.workout_archive_retention, require_success=True))
+                cancelled = False
+                while True:
+                    try:
+                        await asyncio.shield(work)
+                        break
+                    except asyncio.CancelledError:
+                        if work.cancelled():
+                            raise
+                        cancelled = True
+                    except Exception:
+                        if cancelled:
+                            raise asyncio.CancelledError from None
+                        return web.json_response({"error": "archive_write_failed"}, status=503)
+                if cancelled:
+                    raise asyncio.CancelledError
+            return web.json_response({"ok": True, "archive_only": True, "accepted": 1, "duplicates": 0,
+                "ignored_older": 0, "workouts_created": 0, "workouts_updated": 0,
+                "accepted_sensor_unique_ids": [], "accepted_image_unique_ids": [], "archived_workout_uuids": [raw_id.lower()]})
+
         for prepared_image in prepared_images:
+            if prepared_image["metric_key"] == WORKOUT_IMAGE_METRIC_KEY:
+                try:
+                    managed = False
+                    for entry_id, runtime in target_entries:
+                        async with _runtime_lock(runtime):
+                            document = await async_restore_current_map(hass, entry_id, runtime, notify=True)
+                            managed = managed or document is not None
+                    if managed:
+                        # Managed maps are committed/archived under the same gate below.
+                        continue
+                except MapTransactionError as error:
+                    return web.json_response({"error": error.code}, status=error.status)
             retention_limit = max(
                 runtime.workout_archive_retention for _, runtime in target_entries
             )
@@ -1659,6 +1752,7 @@ class HalthyPushView(HomeAssistantView):
         accepted_image_ids: list[str] = []
         removed_sensors_by_entry: list[tuple[str, str]] = []
         removed_images_by_entry: list[tuple[str, str]] = []
+        completed_sessions: list[tuple[str, IntegrationRuntime]] = []
         statistics_jobs: list[
             tuple[
                 IntegrationRuntime,
@@ -1674,17 +1768,50 @@ class HalthyPushView(HomeAssistantView):
             pending_image_updates: list[str] = []
             workout_calendar_changed = False
             async with _runtime_lock(runtime):
+                current_entries = hass.data.get(DOMAIN, {}).get("entries", {})
+                if (current_entries.get(entry_id) is not runtime or runtime.configured_username != normalized_username
+                        or (runtime.owner_user_id is not None and runtime.owner_user_id != request_user_id)):
+                    return web.json_response({"error": "username_not_owned_by_user"}, status=403)
                 if runtime.owner_user_id is None:
                     runtime.owner_user_id = request_user_id
+                _reset_daily_health_sensors(hass, runtime, entry_id)
+
+                managed_image_ids: set[int] = set()
+                try:
+                    if prune_unselected_metrics and selected_metric_keys is not None and WORKOUT_IMAGE_METRIC_KEY not in selected_metric_keys:
+                        if await async_restore_current_map(hass, entry_id, runtime, notify=True) is not None:
+                            return web.json_response({"error": "conditional_map_write_required"}, status=409)
+                    incoming_maps = [item for item in prepared_images if item["metric_key"] == WORKOUT_IMAGE_METRIC_KEY]
+                    if runtime.map_journal_scope is not None and (len(incoming_maps) > 1 or len(target_entries) != 1):
+                        return web.json_response({"error": "map_batch_unsupported"}, status=409)
+                    for image in incoming_maps:
+                        managed_result = await async_legacy_map_write(hass, entry_id, runtime, device_id, image)
+                        if managed_result is None:
+                            continue
+                        unique_id, changed = managed_result
+                        managed_image_ids.add(id(image))
+                        accepted_image_ids.append(unique_id)
+                        if changed:
+                            updated += 1
+                        else:
+                            duplicates += 1
+                        from .paired_webhook import _join
+                        image["attributes"], cancelled = await _join(_async_archive_workout_image(
+                            hass=hass, username=username, metric_key=image["metric_key"], content_type=image["content_type"],
+                            image_bytes=image["image_bytes"], attributes=image["attributes"], retention_limit=runtime.workout_archive_retention))
+                        if cancelled:
+                            raise asyncio.CancelledError
+                except MapTransactionError as error:
+                    return web.json_response({"error": error.code}, status=error.status)
 
                 accepted_sensor_count_before = len(accepted_sensor_ids)
-                accepted_image_count_before = len(accepted_image_ids)
+                accepted_image_count_before = len(accepted_image_ids) - len(managed_image_ids)
                 deleted_count_before = deleted
 
                 metric_lookup = _build_metric_lookup(runtime)
                 image_metric_lookup = _build_image_metric_lookup(runtime)
                 runtime_statistics_candidates: list[dict[str, Any]] = []
-                entry_has_state_update = False
+                entry_has_state_update = bool(managed_image_ids)
                 workout_inputs = list(prepared_workouts)
                 workout_inputs.extend(
                     prepared_image["attributes"]
@@ -1724,6 +1851,18 @@ class HalthyPushView(HomeAssistantView):
                     )
                     incoming_measurement_raw = _measurement_timestamp_value(attributes)
                     incoming_measurement = _parse_measurement_timestamp(incoming_measurement_raw)
+
+                    # Import old-day corrections without replacing today's live
+                    # counter. Do this before any older/duplicate short-circuit.
+                    runtime_statistics_candidates.extend(
+                        _statistics_candidates_from_sensor(runtime=runtime, metric_key=metric_key,
+                            metric_name=name, state=_coerce_state(state), unit=unit, attributes=attributes)
+                    )
+                    attributes, current_day_value = prepare_daily_attributes(
+                        metric_key, attributes, datetime.now(timezone.utc), _daily_reporting_timezone(hass))
+                    if not current_day_value:
+                        ignored_older += 1
+                        continue
 
                     matching_unique_ids = _matching_metric_unique_ids(runtime, metric_key, metric_lookup)
                     if matching_unique_ids:
@@ -1798,20 +1937,10 @@ class HalthyPushView(HomeAssistantView):
                         pending_sensor_new.append(unique_id)
                         pending_sensor_updates.append(unique_id)
 
-                    # Historical/retried samples still belong in recorder even when
-                    # they must not replace the latest live sensor state.
-                    runtime_statistics_candidates.extend(
-                        _statistics_candidates_from_sensor(
-                            runtime=runtime,
-                            metric_key=metric_key,
-                            metric_name=name,
-                            state=_coerce_state(state),
-                            unit=unit,
-                            attributes=attributes,
-                        )
-                    )
 
                 for prepared_image in prepared_images:
+                    if id(prepared_image) in managed_image_ids:
+                        continue
                     metric_key = prepared_image["metric_key"]
                     name = prepared_image["name"]
                     content_type = prepared_image["content_type"]
@@ -1904,27 +2033,18 @@ class HalthyPushView(HomeAssistantView):
                     (len(accepted_sensor_ids) - accepted_sensor_count_before)
                     + (len(accepted_image_ids) - accepted_image_count_before)
                 )
-                if prune_unselected_metrics and (accepted_count_delta > 0 or deleted_count_delta > 0):
-                    _upsert_last_full_sync_sensor(
-                        hass=hass,
-                        runtime=runtime,
-                        entry_id=entry_id,
-                        metric_lookup=metric_lookup,
-                        source_device_id=device_id,
-                        updated_at=received_at,
-                    )
-                # Count session-level uploads only. Single-point incremental pushes can issue
-                # many HTTP requests per sync cycle and would inflate this diagnostic metric.
-                if prune_unselected_metrics and (accepted_count_delta > 0 or deleted_count_delta > 0):
-                    _increment_daily_upload_counter(
-                        hass=hass,
-                        runtime=runtime,
-                        entry_id=entry_id,
-                        source_device_id=device_id,
-                        updated_at=received_at,
-                    )
-                runtime_statistics_batches, runtime_cursor_updates = (
-                    _prepare_statistics_imports_for_runtime(runtime, runtime_statistics_candidates)
+                completed_session = (
+                    sync_completed and bool(prepared_sensors or prepared_images or prepared_workouts)
+                ) or (prune_unselected_metrics and (accepted_count_delta > 0 or deleted_count_delta > 0))
+                # A completed read/upload pass can contain only duplicates. That
+                # still confirms a sync, but must not alter measurement values.
+                if completed_session:
+                    completed_sessions.append((entry_id, runtime))
+                runtime_statistics_batches, runtime_cursor_updates = await hass.async_add_executor_job(
+                    _prepare_statistics_imports_for_runtime,
+                    runtime,
+                    runtime_statistics_candidates,
+                    Path(hass.config.path(".storage/halthy_statistics.sqlite")),
                 )
                 if runtime_statistics_batches:
                     statistics_jobs.append(
@@ -1942,12 +2062,19 @@ class HalthyPushView(HomeAssistantView):
                 async_dispatcher_send(hass, workout_calendar_updated_signal(entry_id))
 
         imported_statistics_samples = 0
+        failed_statistic_ids: set[str] = set()
         for runtime, runtime_statistics_batches, runtime_cursor_updates in statistics_jobs:
             imported_count, successful_statistic_ids = await _async_import_statistics_batches(
                 hass,
                 runtime_statistics_batches,
             )
             imported_statistics_samples += imported_count
+            failed_statistic_ids.update(
+                statistic_id
+                for metadata, _rows in runtime_statistics_batches
+                if (statistic_id := metadata_statistic_id(metadata))
+                and statistic_id not in successful_statistic_ids
+            )
             if successful_statistic_ids and runtime_cursor_updates:
                 async with _runtime_lock(runtime):
                     _commit_statistics_cursor_updates(
@@ -1956,6 +2083,32 @@ class HalthyPushView(HomeAssistantView):
                         successful_statistic_ids,
                     )
         _schedule_store_save(hass)
+
+        if failed_statistic_ids:
+            return web.json_response(
+                {
+                    "error": "statistics_import_failed",
+                    "failed_statistic_ids": sorted(failed_statistic_ids),
+                },
+                status=503,
+            )
+
+        # A failed statistics import is not a completed session. Refresh these
+        # diagnostics only after every part of this request has succeeded.
+        for entry_id, runtime in completed_sessions:
+            async with _runtime_lock(runtime):
+                completed_at = datetime.now(timezone.utc)
+                _upsert_last_full_sync_sensor(
+                    hass=hass, runtime=runtime, entry_id=entry_id,
+                    metric_lookup=_build_metric_lookup(runtime), source_device_id=device_id,
+                    updated_at=completed_at,
+                )
+                _increment_daily_upload_counter(
+                    hass=hass, runtime=runtime, entry_id=entry_id,
+                    source_device_id=device_id, updated_at=completed_at,
+                )
+        if completed_sessions:
+            _schedule_store_save(hass)
 
         accepted_total = (
             len(accepted_sensor_ids)
@@ -1985,6 +2138,7 @@ class HalthyPushView(HomeAssistantView):
                         "image_entity_ids": [],
                         "deleted_entity_ids": [],
                         "statistics_imported": imported_statistics_samples,
+                        "sync_completed": bool(completed_sessions),
                     }
                 )
             if duplicates > 0 or ignored_older > 0:
@@ -2006,6 +2160,7 @@ class HalthyPushView(HomeAssistantView):
                         "image_entity_ids": [],
                         "deleted_entity_ids": [],
                         "statistics_imported": imported_statistics_samples,
+                        "sync_completed": bool(completed_sessions),
                     }
                 )
             return web.json_response({"error": "no_valid_sensors"}, status=400)
@@ -2082,6 +2237,7 @@ class HalthyPushView(HomeAssistantView):
                 "image_entity_ids": image_entity_ids,
                 "deleted_entity_ids": deleted_entity_ids,
                 "statistics_imported": imported_statistics_samples,
+                "sync_completed": bool(completed_sessions),
             }
         )
 
@@ -2092,6 +2248,80 @@ def _request_user_id_from_request(request: web.Request) -> str | None:
     if not isinstance(request_user_id, str) or not request_user_id.strip():
         return None
     return request_user_id.strip()
+
+
+async def _async_command_receipt_job(hass: HomeAssistant, function: Any, *args: Any) -> Any:
+    """Join started file IO even if the HTTP client disconnects/cancels."""
+    work = asyncio.ensure_future(hass.async_add_executor_job(function, *args))
+    cancelled = False
+    while True:
+        try:
+            value = await asyncio.shield(work)
+            break
+        except asyncio.CancelledError:
+            cancelled = True
+            if work.cancelled():
+                raise
+            continue
+        except Exception:
+            if cancelled:
+                raise asyncio.CancelledError from None
+            raise
+    if cancelled:
+        raise asyncio.CancelledError
+    return value
+
+
+class HalthyWorkoutArchiveWriteView(HomeAssistantView):
+    """Archive repairs cannot enter the current-map/calendar write path."""
+
+    url = "/api/halthy/workout_archive/write"
+    name = "api:halthy:workout_archive_write"
+    requires_auth = True
+
+    async def post(self, request: web.Request) -> web.Response:
+        return await HalthyPushView().post(request, require_archive=True)
+
+
+class HalthyConnectionsView(HomeAssistantView):
+    """Read-only discovery of unambiguous profiles owned by the current HA user.
+
+    Never claims ownerless entries or exposes another account's profiles. Profiles
+    sharing a normalized username are excluded because the legacy push endpoint
+    routes by username, not entry ID.
+    """
+
+    url = "/api/halthy/connections"
+    name = "api:halthy:connections"
+    requires_auth = True
+
+    async def get(self, request: web.Request) -> web.Response:
+        request_user_id = _request_user_id_from_request(request)
+        if request_user_id is None:
+            return web.json_response({"error": "missing_user_context"}, status=403)
+        hass: HomeAssistant = request.app[KEY_HASS]
+        entries: dict[str, IntegrationRuntime] = hass.data.get(DOMAIN, {}).get("entries", {})
+        if not entries:
+            return web.json_response({"error": "integration_not_configured"}, status=503)
+        counts: dict[str, int] = {}
+        for runtime in entries.values():
+            counts[runtime.configured_username] = counts.get(runtime.configured_username, 0) + 1
+        profiles = []
+        for entry_id, runtime in sorted(entries.items()):
+            if runtime.owner_user_id != request_user_id or counts[runtime.configured_username] != 1:
+                continue
+            values = [entry_id, runtime.configured_username, runtime.display_name]
+            if any(not isinstance(value, str) or not value or len(value.encode()) > 256
+                   or value != value.strip() or any(ord(char) < 32 or ord(char) == 127 for char in value)
+                   for value in values):
+                return web.json_response({"error": "invalid_profile_configuration"}, status=409)
+            if not re.fullmatch(r"[a-z0-9_]+", runtime.configured_username):
+                return web.json_response({"error": "invalid_profile_configuration"}, status=409)
+            profiles.append({"entry_id": entry_id, "username": runtime.configured_username,
+                             "display_name": runtime.display_name})
+        if len(profiles) > 128:
+            return web.json_response({"error": "too_many_profiles"}, status=409)
+        return web.json_response({"ok": True, "version": 1, "account_id": request_user_id, "profiles": profiles})
 
 
 class HalthyCommandView(HomeAssistantView):
@@ -2147,12 +2377,28 @@ class HalthyCommandView(HomeAssistantView):
         entry_id, runtime = target_entries[0]
         should_save = False
         async with _runtime_lock(runtime):
+            if runtime.owner_user_id and runtime.owner_user_id != request_user_id:
+                return web.json_response({"error": "username_not_owned_by_user"}, status=403)
+
+            pending_command = _normalize_pending_force_upload_command(runtime.pending_force_upload_command)
+            if pending_command is not None:
+                path = receipt_path(hass.config.path(".storage"), entry_id, request_user_id)
+                try:
+                    receipts = await _async_command_receipt_job(hass, load_receipts, path, datetime.now(timezone.utc))
+                except (OSError, ValueError, KeyError, TypeError):
+                    return web.json_response({"error": "command_receipt_unavailable"}, status=503)
+                receipt = receipts.get(pending_command["id"])
+                if receipt is not None:
+                    # Delayed entity storage may restore a command whose ACK was
+                    # already durable. Do not deliver it for execution again.
+                    runtime.last_force_upload_ack_at = receipt["acknowledged_at"]
+                    runtime.last_force_upload_ack_status = receipt["status"]
+                    pending_command = None
+                    should_save = True
+            runtime.pending_force_upload_command = pending_command
             if runtime.owner_user_id is None:
                 runtime.owner_user_id = request_user_id
                 should_save = True
-
-            pending_command = _normalize_pending_force_upload_command(runtime.pending_force_upload_command)
-            runtime.pending_force_upload_command = pending_command
             if pending_command is not None and "delivered_at" not in pending_command:
                 pending_command["delivered_at"] = _utc_now_iso()
                 runtime.pending_force_upload_command = pending_command
@@ -2232,24 +2478,43 @@ class HalthyCommandAckView(HomeAssistantView):
                 status=403,
             )
 
-        _, runtime = target_entries[0]
+        entry_id, runtime = target_entries[0]
         acknowledged = False
         should_save = False
         pending_id: str | None = None
         async with _runtime_lock(runtime):
-            if runtime.owner_user_id is None:
-                runtime.owner_user_id = request_user_id
-                should_save = True
-
+            if runtime.owner_user_id and runtime.owner_user_id != request_user_id:
+                return web.json_response({"error": "username_not_owned_by_user"}, status=403)
             pending = _normalize_pending_force_upload_command(runtime.pending_force_upload_command)
-            runtime.pending_force_upload_command = pending
             pending_id = str(pending.get("id")) if pending is not None else None
-            if pending is not None and pending_id == command_id:
+            if not valid_command_id(command_id):
+                return web.json_response({"error": "invalid_command_id"}, status=400)
+            path = receipt_path(hass.config.path(".storage"), entry_id, request_user_id)
+            now = datetime.now(timezone.utc)
+            try:
+                receipts = await _async_command_receipt_job(hass, load_receipts, path, now)
+                prior = receipts.get(command_id)
+                if prior is not None:
+                    if prior["status"] != status_value:
+                        return web.json_response({"error": "command_result_conflict"}, status=409)
+                    acknowledged = True
+                elif pending is not None and pending_id == command_id:
+                    # The journal must finish its atomic write BEFORE HA forgets
+                    # the command or reports a positive acknowledgment.
+                    await _async_command_receipt_job(hass, save_receipt, path, receipts, command_id, status_value, now)
+                    acknowledged = True
+            except (OSError, ValueError, KeyError, TypeError):
+                _LOGGER.error("Halthy command receipt persistence failed for entry %s", entry_id)
+                return web.json_response({"error": "command_receipt_unavailable"}, status=503)
+            if acknowledged and pending_id == command_id:
+                if runtime.owner_user_id is None:
+                    runtime.owner_user_id = request_user_id
                 runtime.pending_force_upload_command = None
                 runtime.last_force_upload_ack_at = _utc_now_iso()
                 runtime.last_force_upload_ack_status = status_value
-                acknowledged = True
                 should_save = True
+            if acknowledged:
+                pending_id = command_id
 
         if should_save:
             _schedule_store_save(hass)
@@ -2583,6 +2848,22 @@ def _lovelace_resource_exists(resources: list[dict[str, Any]], module_url: str) 
     return False
 
 
+async def _async_ensure_webhook_manager(hass: HomeAssistant, domain_data: dict[str, Any]) -> HalthyWebhookManager:
+    """Join a single storage load; webhook failure must not disable legacy uploads."""
+    manager = domain_data.get(MANAGER_KEY)
+    if manager is None:
+        manager = HalthyWebhookManager(hass, HalthyPushView().post)
+        domain_data[MANAGER_KEY] = manager
+        domain_data["webhook_pairing_load"] = asyncio.create_task(manager.load())
+    task = domain_data.get("webhook_pairing_load")
+    if task is not None:
+        try:
+            await asyncio.shield(task)
+        except Exception:
+            _LOGGER.warning("Halthy webhook pairing storage unavailable; authenticated uploads remain enabled")
+    return manager
+
+
 def _ensure_http_views_registered(
     hass: HomeAssistant,
     domain_data: dict[str, Any],
@@ -2590,7 +2871,12 @@ def _ensure_http_views_registered(
     """Register HTTP views idempotently."""
 
     view_specs: tuple[tuple[str, type[HomeAssistantView]], ...] = (
+        ("connections_view_registered", HalthyConnectionsView),
+        ("webhook_pairing_view_registered", HalthyWebhookPairingView),
         ("push_view_registered", HalthyPushView),
+        ("workout_archive_write_view_registered", HalthyWorkoutArchiveWriteView),
+        ("workout_map_state_view_registered", HalthyWorkoutMapStateView),
+        ("workout_map_transaction_view_registered", HalthyWorkoutMapTransactionView),
         ("command_view_registered", HalthyCommandView),
         ("command_ack_view_registered", HalthyCommandAckView),
         ("workout_archive_view_registered", HalthyWorkoutArchiveView),
@@ -2673,6 +2959,7 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
         "force_upload_timers": {},
         "daily_upload_reset_timers": {},
     }
+    await _async_ensure_webhook_manager(hass, hass.data[DOMAIN])
     await _async_register_workout_card_module(hass)
 
     async def _async_handle_force_upload_service(call: ServiceCall) -> None:
@@ -2811,6 +3098,8 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up from config entry."""
+    integration = await async_get_integration(hass, DOMAIN)
+    integration_version = integration.version
     domain_data = hass.data.setdefault(
         DOMAIN,
         {
@@ -2938,6 +3227,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         last_force_upload_ack_status=last_force_upload_ack_status,
         daily_upload_count=daily_upload_count,
         daily_upload_count_day=daily_upload_count_day,
+        map_journal_scope=stored_entry.get("map_journal_scope"),
+        integration_version=str(integration_version) if integration_version is not None else None,
     )
 
     stored_sensors = stored_entry.get("sensors", {})
@@ -3035,10 +3326,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     for unique_id in legacy_route_location_image_ids:
         runtime.images.pop(unique_id, None)
 
-    entries[entry.entry_id] = runtime
+    webhook_manager = await _async_ensure_webhook_manager(hass, domain_data)
+    async with webhook_manager.lock:
+        webhook_manager.suspend_entry(entry.entry_id)
+        previous_runtime = entries.get(entry.entry_id)
+        async def install_runtime() -> None:
+            try:
+                await async_restore_current_map(hass, entry.entry_id, runtime)
+            except MapTransactionError as error:
+                _LOGGER.warning("Halthy current map recovery unavailable: %s", error.code)
+            entries[entry.entry_id] = runtime
+        if previous_runtime is None:
+            await install_runtime()
+        else:
+            async with _runtime_lock(previous_runtime):
+                await install_runtime()
+        webhook_manager.restore_entry(entry.entry_id)
 
     _ensure_http_views_registered(hass, domain_data)
 
+    # Restore a missed calendar rollover before entity platforms publish state.
+    if _reset_daily_health_sensors(hass, runtime, entry.entry_id):
+        _schedule_store_save(hass)
     _upsert_daily_upload_count_sensor(
         hass=hass,
         runtime=runtime,
@@ -3082,12 +3391,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        domain_data = hass.data.get(DOMAIN, {})
+    domain_data = hass.data.get(DOMAIN, {})
+    manager = await _async_ensure_webhook_manager(hass, domain_data)
+    async with manager.lock:
         entries: dict[str, IntegrationRuntime] = domain_data.get("entries", {})
-        entries.pop(entry.entry_id, None)
-        _clear_force_upload_timer(hass, entry.entry_id)
-        _clear_daily_upload_reset_timer(hass, entry.entry_id)
-        _schedule_store_save(hass)
+        runtime = entries.get(entry.entry_id)
+        async def unload_runtime() -> bool:
+            unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+            if unload_ok:
+                manager.suspend_entry(entry.entry_id)
+                entries.pop(entry.entry_id, None)
+                _clear_force_upload_timer(hass, entry.entry_id)
+                _clear_daily_upload_reset_timer(hass, entry.entry_id)
+                _schedule_store_save(hass)
+            return unload_ok
+        if runtime is None:
+            unload_ok = await unload_runtime()
+        else:
+            async with _runtime_lock(runtime):
+                unload_ok = await unload_runtime()
     return unload_ok

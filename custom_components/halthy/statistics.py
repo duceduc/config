@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from contextlib import closing
 from datetime import datetime
 import inspect
 import logging
 import math
 import re
+import sqlite3
+from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 try:
@@ -176,6 +179,67 @@ def statistics_hour_bucket(measured_at: datetime) -> datetime:
     return measured_at.replace(minute=0, second=0, microsecond=0)
 
 
+def _stored_hourly_samples(
+    database_path: Path, candidates: list[dict[str, Any]]
+) -> dict[str, dict[datetime, dict[str, float]]]:
+    """Keep accepted samples so separate uploads can rebuild a complete hour."""
+
+    database_path.parent.mkdir(parents=True, exist_ok=True)
+    affected: dict[str, set[tuple[str, datetime]]] = {}
+    # SQLite's transaction context commits/rolls back but does not close.
+    with closing(sqlite3.connect(database_path, timeout=30)) as connection, connection:
+        connection.execute("PRAGMA busy_timeout=30000")
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS samples ("
+            "statistic_id TEXT NOT NULL, unit TEXT NOT NULL, "
+            "timestamp_us INTEGER NOT NULL, value REAL NOT NULL, "
+            "PRIMARY KEY (statistic_id, unit, timestamp_us, value))"
+        )
+        for candidate in candidates:
+            statistic_id = candidate["statistic_id"]
+            unit = candidate["unit"] or ""
+            measured_at = candidate["start"]
+            timestamp_us = round(measured_at.timestamp() * 1_000_000)
+            if candidate.get("replace_at_timestamp"):
+                connection.execute(
+                    "DELETE FROM samples WHERE statistic_id=? AND unit=? AND timestamp_us=?",
+                    (statistic_id, unit, timestamp_us),
+                )
+            connection.execute(
+                "INSERT OR IGNORE INTO samples VALUES (?, ?, ?, ?)",
+                (statistic_id, unit, timestamp_us, float(candidate["value"])),
+            )
+            affected.setdefault(statistic_id, set()).add(
+                (unit, statistics_hour_bucket(measured_at))
+            )
+
+        result: dict[str, dict[datetime, dict[str, float]]] = {}
+        for statistic_id, hours in affected.items():
+            for unit, hour_start in hours:
+                start_us = round(hour_start.timestamp() * 1_000_000)
+                end_us = start_us + 3_600_000_000
+                aggregate = connection.execute(
+                    "SELECT AVG(value), MIN(value), MAX(value) FROM samples "
+                    "WHERE statistic_id=? AND unit=? AND timestamp_us>=? AND timestamp_us<?",
+                    (statistic_id, unit, start_us, end_us),
+                ).fetchone()
+                latest = connection.execute(
+                    "SELECT value FROM samples WHERE statistic_id=? AND unit=? "
+                    "AND timestamp_us>=? AND timestamp_us<? "
+                    "ORDER BY timestamp_us DESC, rowid DESC LIMIT 1",
+                    (statistic_id, unit, start_us, end_us),
+                ).fetchone()
+                if aggregate is None or latest is None:
+                    continue
+                result.setdefault(statistic_id, {})[hour_start] = {
+                    "state": latest[0],
+                    "mean": aggregate[0],
+                    "min": aggregate[1],
+                    "max": aggregate[2],
+                }
+    return result
+
+
 def statistics_candidates_from_sensor(
     runtime: IntegrationRuntime,
     metric_key: str,
@@ -208,13 +272,19 @@ def statistics_candidates_from_sensor(
         "unit": unit,
         "start": measurement_at,
         "value": numeric_state,
+        "replace_at_timestamp": attributes.get("historical_daily_snapshot") is True,
     }]
 
 
 def prepare_statistics_imports_for_runtime(
     runtime: IntegrationRuntime,
     candidates: list[dict[str, Any]],
+    sample_store_path: Path | None = None,
 ) -> tuple[list[tuple[Any, list[Any]]], dict[str, StatisticsCursorUpdate]]:
+    stored_hours = (
+        _stored_hourly_samples(sample_store_path, candidates)
+        if sample_store_path is not None and candidates else {}
+    )
     grouped: dict[str, list[dict[str, Any]]] = {}
     for candidate in candidates:
         statistic_id = candidate["statistic_id"]
@@ -269,17 +339,24 @@ def prepare_statistics_imports_for_runtime(
 
         import_rows: list[Any] = []
         for hour_start in sorted(hourly_rows):
-            bucket_rows = sorted(hourly_rows[hour_start], key=lambda item: item["start"])
-            values = [float(item["value"]) for item in bucket_rows]
-            if not values:
-                continue
-            latest_value = float(bucket_rows[-1]["value"])
+            stored = stored_hours.get(statistic_id, {}).get(hour_start)
+            if stored is None:
+                bucket_rows = sorted(hourly_rows[hour_start], key=lambda item: item["start"])
+                values = [float(item["value"]) for item in bucket_rows]
+                if not values:
+                    continue
+                stored = {
+                    "state": values[-1],
+                    "mean": sum(values) / len(values),
+                    "min": min(values),
+                    "max": max(values),
+                }
             statistic = statistics_data(
                 start=hour_start,
-                state=latest_value,
-                mean=sum(values) / len(values),
-                min_value=min(values),
-                max_value=max(values),
+                state=stored["state"],
+                mean=stored["mean"],
+                min_value=stored["min"],
+                max_value=stored["max"],
             )
             if statistic is not None:
                 import_rows.append(statistic)
