@@ -31,7 +31,6 @@ from .const import (
     FIELD_VALIDTIMEUTC,
     FIELD_VISIBILITY,
     FIELD_WINDDIR,
-    FIELD_WINDDIRECTIONCARDINAL,
     FIELD_WINDGUST,
     FIELD_WINDSPEED,
 
@@ -40,7 +39,6 @@ from .const import (
     RESULTS_FORECAST_DAILY,
     RESULTS_FORECAST_HOURLY,
 )
-from .store import WeatherDotComStorage
 
 import logging
 
@@ -187,7 +185,7 @@ class WeatherDotComForecast(WeatherDotCom):
         )
         self._attr_unique_id = f"{coordinator.location_name},{WEATHER_DOMAIN}".lower()
         self._attr_device_info = coordinator.device_info
-        self._store = WeatherDotComStorage(self.hass, coordinator.location_name)
+        self._store = coordinator._store
         self._stored_data = {}
 
     @property
@@ -208,7 +206,7 @@ class WeatherDotComForecast(WeatherDotCom):
             return []
 
         days = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
-        if self.coordinator.get_forecast_daily('temperature', 0) is None:
+        if self.coordinator.get_forecast_daily(FIELD_TEMP, 0) is None:
             days[0] += 1
 
         forecast = []
@@ -217,7 +215,7 @@ class WeatherDotComForecast(WeatherDotCom):
             # high temperature. When this happens, return the last known high
             # temperature instead of None.
             temperature_max = self.coordinator.get_forecast_daily(FIELD_TEMPERATUREMAX, period)
-            if period in [0, 1] and temperature_max == None:
+            if period in [0, 1] and temperature_max is None:
                 # This is 14 hours in seconds.
                 max_time_difference = 14 * 60 * 60
                 # If the API returns None, attempt to use the value that's in

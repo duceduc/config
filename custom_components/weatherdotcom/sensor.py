@@ -6,12 +6,15 @@ https://github.com/jaydeethree/Home-Assistant-weatherdotcom
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util.unit_system import METRIC_SYSTEM
 
@@ -22,13 +25,15 @@ from .const import (
     CONF_EXTRA_ATTRIBUTES,
     DOMAIN,
     FIELD_DAYPART,
+    FIELD_VALIDTIMEUTC,
     FIELD_WINDGUST,
     FIELD_WINDSPEED,
     RESULTS_CURRENT,
-    RESULTS_FORECAST_DAILY,
-    RESULTS_FORECAST_HOURLY
 )
-from .weather_current_conditions_sensors import *
+from .weather_current_conditions_sensors import (
+    WeatherSensorEntityDescription,
+    current_condition_sensor_descriptions,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -80,9 +85,9 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
         )
         self._unit_system = coordinator.unit_system
         self._attr_device_info = coordinator.device_info
-        if description.key == 'latitude':
+        if description.key == CONF_LATITUDE:
             self._sensor_data = coordinator._get_coordinates()[0]
-        elif description.key == 'longitude':
+        elif description.key == CONF_LONGITUDE:
             self._sensor_data = coordinator._get_coordinates()[1]
         else:
             self._sensor_data = _get_sensor_data(
@@ -93,7 +98,7 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
     @property
     def entity_registry_enabled_default(self) -> bool:
         """Return if the entity should be enabled when first added to the registry."""
-        if self.entity_description.key == "validTimeUtc":
+        if self.entity_description.key == FIELD_VALIDTIMEUTC:
             return bool(self._extra_attributes)
         return self.entity_description.entity_registry_enabled_default
 
@@ -133,9 +138,9 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
-        if self.entity_description.key == 'latitude':
+        if self.entity_description.key == CONF_LATITUDE:
             self._sensor_data = getattr(self.coordinator, "current_latitude", getattr(self.coordinator, "_latitude", None))
-        elif self.entity_description.key == 'longitude':
+        elif self.entity_description.key == CONF_LONGITUDE:
             self._sensor_data = getattr(self.coordinator, "current_longitude", getattr(self.coordinator, "_longitude", None))
         else:
             self._sensor_data = _get_sensor_data(
@@ -145,15 +150,14 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
 
 
 def _get_sensor_data(
-        sensors: dict[str, Any],
+        sensors: dict[str, Any] | None,
         kind: str,
         unit_system: str
 ) -> Any:
     """Get sensor data."""
     # windGust is often null. When it is, set it to windSpeed instead.
-    if sensors[RESULTS_CURRENT] == None:
+    if not sensors or sensors.get(RESULTS_CURRENT) is None:
         return None
-    if kind == FIELD_WINDGUST and sensors[RESULTS_CURRENT][kind] == None:
-        return sensors[RESULTS_CURRENT][FIELD_WINDSPEED]
-    else:
-        return sensors[RESULTS_CURRENT][kind]
+    if kind == FIELD_WINDGUST and sensors[RESULTS_CURRENT].get(kind) is None:
+        return sensors[RESULTS_CURRENT].get(FIELD_WINDSPEED)
+    return sensors[RESULTS_CURRENT].get(kind)

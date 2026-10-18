@@ -76,7 +76,7 @@ mqtt:
 
 
 template:
-  - fan: # Testing fan template. 
+  - fan: # Testing fan template.
       - name: 24hr fan
         state: "{{ states('input_boolean.washroom_fan') }}"
         percentage: "{{ states('input_number.24hr_fan_speed_status') }}"
@@ -270,6 +270,7 @@ template:
 
   - cover:
       - name: fr curtains
+        unique_id: fr_curtains
         state: "{{is_state('sensor.fr_curtains', 'open')}}"
         open_cover:
           - action: script.fr_curtains
@@ -595,7 +596,7 @@ automation:
     actions:
       - action: fan.set_percentage
         target:
-          entity_id: fan.24hr_fan      
+          entity_id: fan.24hr_fan
         data:
           percentage: "{{ '100' if is_state('sensor.period_of_the_day', 'dusklight') else '50' }}"
 

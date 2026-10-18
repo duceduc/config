@@ -9,13 +9,25 @@ PPCS packets, or camera media work inside the gateway process.
 
 from __future__ import annotations
 
+import calendar
 import json
 import re
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from collections.abc import AsyncIterator
 from typing import Any
 
 from aiohttp import ClientError, ClientResponseError, ClientSession, ClientTimeout
+
+
+def _cloud_offset_valid(value: Any) -> bool:
+    """Admit only whole-minute UTC offsets, including negative offsets."""
+    return type(value) is int and abs(value) <= 50400 and value % 60 == 0
+
+
+def _cloud_month_valid(value: Any) -> bool:
+    """Reject coerced or non-ASCII calendar inputs before an HTTP request."""
+    return (type(value) is str and re.fullmatch(r"[0-9]{4}-[0-9]{2}", value) is not None
+            and 2000 <= int(value[:4]) <= 2100 and 1 <= int(value[5:]) <= 12)
 
 
 class GatewayClientError(Exception):
@@ -48,6 +60,70 @@ class GatewayClient:
         self._session = session
         self.base_url = base_url.rstrip("/")
         self._headers = {"Authorization": f"Bearer {api_token}"} if api_token else {}
+
+    async def cloud_recordings(self, serial: str, start: int, end: int, offset: int) -> dict[str, Any]:
+        """Read one local day's metadata, dropping vendor identities and media references."""
+        if (type(serial) is not str or not serial or type(start) is not int
+                or type(end) is not int or not 0 <= start < end <= 2**53 - 1
+                or end - start > 26 * 3600 or not _cloud_offset_valid(offset)):
+            raise GatewayClientError("Invalid cloud metadata request")
+        query = urlencode({"start": start, "end": end, "timezone_offset": offset, "count": 1000})
+        payload = await self._cloud_metadata_request(f"/api/cameras/{quote(serial, safe='')}/cloud-history?{query}")
+        if (not isinstance(payload, dict) or set(payload) != {"records", "mediaPlaybackAvailable"}
+                or payload["mediaPlaybackAvailable"] is not False or not isinstance(payload["records"], list)
+                or len(payload["records"]) > 1000):
+            raise GatewayClientError("Gateway returned invalid cloud metadata")
+        seen: set[str] = set()
+        rows: list[tuple[int, int, str, bool]] = []
+        for row in payload["records"]:
+            if (not isinstance(row, dict) or type(row.get("id")) is not str
+                    or not 1 <= len(row["id"]) <= 128 or row["id"] in seen
+                    or type(row.get("startTime")) is not int or type(row.get("endTime")) is not int
+                    or not 0 <= row["startTime"] <= row["endTime"] <= 2**53 - 1
+                    or type(row.get("hasCloudMedia")) is not bool):
+                raise GatewayClientError("Gateway returned invalid cloud metadata")
+            seen.add(row["id"])
+            if row["startTime"] < end and row["endTime"] >= start:
+                rows.append((row["startTime"], row["endTime"], row["id"], row["hasCloudMedia"]))
+        return {"records": [{"start_time": begin, "end_time": finish, "has_cloud_media": media}
+                            for begin, finish, _identity, media in sorted(rows)],
+                "truncated": len(payload["records"]) == 1000}
+
+    async def cloud_recording_dates(self, serial: str, month: str, offset: int) -> dict[str, Any]:
+        """Read unconfirmed calendar hints without returning recording references."""
+        if type(serial) is not str or not serial or not _cloud_month_valid(month) or not _cloud_offset_valid(offset):
+            raise GatewayClientError("Invalid cloud metadata request")
+        query = urlencode({"month": month, "offset": offset})
+        payload = await self._cloud_metadata_request(f"/api/cameras/{quote(serial, safe='')}/cloud-calendar?{query}")
+        if (not isinstance(payload, dict) or set(payload) != {"month", "days"}
+                or payload["month"] != month or not isinstance(payload["days"], list)):
+            raise GatewayClientError("Gateway returned invalid cloud metadata")
+        maximum = calendar.monthrange(int(month[:4]), int(month[5:]))[1]
+        previous = 0
+        for day in payload["days"]:
+            if type(day) is not int or not previous < day <= maximum:
+                raise GatewayClientError("Gateway returned invalid cloud metadata")
+            previous = day
+        return {"month": month, "days": list(payload["days"])}
+
+    async def _cloud_metadata_request(self, path: str) -> dict[str, Any]:
+        """Keep transport details private while preserving gateway authentication failures."""
+        try:
+            return await self._json(path, timeout=45)
+        except (GatewayClientError, ClientError, TimeoutError, ValueError) as error:
+            status = getattr(error, "status", None)
+            status = status if type(status) is int and 100 <= status <= 599 else None
+            code = getattr(error, "code", None)
+            code = code if code in ("unavailable", "busy", "rate_limited", "outcome_unknown", "disabled") else None
+            if status == 401:
+                raise GatewayAuthenticationError("Gateway rejected the API token", status=401) from None
+            if status in (404, 501) or code == "disabled":
+                message = "Cloud metadata is unavailable on this gateway"
+            elif status in (409, 502) or code in ("busy", "rate_limited"):
+                message = "Cloud metadata is not available now, try again later"
+            else:
+                message = "Cloud metadata request failed"
+            raise GatewayClientError(message, status=status, code=code) from None
 
     async def cameras(self) -> list[dict[str, Any]]:
         """Fetch every normalized camera state used to create or update entities."""
@@ -389,16 +465,16 @@ class GatewayClient:
         return camera
 
     async def set_camera_streaming_quality(
-        self, serial: str, quality: int
+        self, serial: str, quality: int, *, nvr: bool = False
     ) -> dict[str, Any]:
         """Set live quality independently of recorded-video quality, returning confirmed state."""
         camera = await self._json(
             f"/api/cameras/{serial}/streaming-quality",
             method="POST",
-            payload={"quality": quality},
+            payload={"quality": quality}, timeout=120 if nvr else 60, nvr=nvr,
         )
-        if not isinstance(camera.get("serial"), str):
-            raise GatewayClientError("Gateway returned an invalid camera response")
+        if not isinstance(camera.get("serial"), str) or nvr and camera.get("serial") != serial:
+            raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again." if nvr else "Gateway returned an invalid camera response", code="outcome_unknown" if nvr else None)
         return camera
 
     async def set_camera_guard_mode(self, serial: str, mode: int) -> dict[str, Any]:
@@ -422,16 +498,38 @@ class GatewayClient:
         return camera
 
     async def set_camera_night_vision(
-        self, serial: str, mode: int
+        self, serial: str, mode: int, *, nvr: bool = False
     ) -> dict[str, Any]:
         """Set a camera's night-vision mode and return confirmed gateway state."""
         camera = await self._json(
             f"/api/cameras/{serial}/night-vision",
             method="POST",
-            payload={"mode": mode},
+            payload={"mode": mode}, timeout=120 if nvr else 60, nvr=nvr,
         )
-        if not isinstance(camera.get("serial"), str):
-            raise GatewayClientError("Gateway returned an invalid camera response")
+        if not isinstance(camera.get("serial"), str) or nvr and camera.get("serial") != serial:
+            raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again." if nvr else "Gateway returned an invalid camera response", code="outcome_unknown" if nvr else None)
+        return camera
+
+    async def perform_nvr_live_control(self, serial: str, direction: str | None = None, level: int | None = None) -> dict[str, Any]:
+        """Build one finite request, with no retry after an uncertain response."""
+        if direction in ("left", "right", "up", "down") and level is None:
+            payload = {"kind": "pan", "direction": direction}
+        elif direction is None and type(level) is int and level in (1, 2, 3):
+            payload = {"kind": "zoom", "level": level}
+        else:
+            raise GatewayClientError("Unavailable NVR action", code="unavailable")
+        result = await self._json(f"/api/cameras/{serial}/nvr-live-control", method="POST", payload=payload, timeout=120, nvr=True)
+        if result.get("outcome") != "request_accepted" or result.get("physicalConfirmationRequired") is not True:
+            raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again.", code="outcome_unknown")
+        return {"outcome": "request_accepted", "physicalConfirmationRequired": True}
+
+    async def set_nvr_view(self, serial: str, view: int) -> dict[str, Any]:
+        """Change the idle camera's next-stream preference, owned by the gateway."""
+        if type(view) is not int or view not in (0, 1):
+            raise GatewayClientError("Unavailable NVR view", code="unavailable")
+        camera = await self._json(f"/api/cameras/{serial}/nvr-view", method="POST", payload={"view": view}, timeout=120, nvr=True)
+        if camera.get("serial") != serial:
+            raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again.", code="outcome_unknown")
         return camera
 
     async def set_camera_siren(self, serial: str, duration: int) -> None:
@@ -567,7 +665,7 @@ class GatewayClient:
 
     async def _json(
         self, path: str, method: str = "GET", payload: dict[str, Any] | None = None,
-        *, timeout: int = 60,
+        *, timeout: int = 60, nvr: bool = False,
     ) -> dict[str, Any]:
         """Send a JSON request and require an object-shaped response body."""
         try:
@@ -582,6 +680,10 @@ class GatewayClient:
                         error_payload = await response.json()
                     except (ClientError, ValueError):
                         error_payload = None
+                    if nvr:
+                        code = error_payload.get("code") if isinstance(error_payload, dict) else None
+                        code = code if code in ("unavailable", "busy", "rate_limited", "outcome_unknown", "disabled") else "outcome_unknown"
+                        raise GatewayClientError(f"NVR control {code}", status=response.status, code=code) from None
                     detail = (
                         error_payload.get("error")
                         if isinstance(error_payload, dict)
@@ -595,12 +697,19 @@ class GatewayClient:
                 self._raise_for_status(response)
                 payload = await response.json()
                 if not isinstance(payload, dict):
-                    raise GatewayClientError("Gateway returned an invalid response")
+                    raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again." if nvr else "Gateway returned an invalid response", code="outcome_unknown" if nvr else None)
                 return payload
         except (ClientError, TimeoutError) as error:
             if isinstance(error, GatewayClientError):
                 raise
+            if nvr:
+                raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again.", code="outcome_unknown") from None
             raise GatewayClientError(str(error)) from error
+
+        except ValueError:
+            if nvr:
+                raise GatewayClientError("Request outcome is unknown. Check Eufy before trying again.", code="outcome_unknown") from None
+            raise
 
     def _url(self, path: str) -> str:
         """Resolve a gateway-owned absolute API path against the configured URL."""

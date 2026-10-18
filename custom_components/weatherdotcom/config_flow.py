@@ -1,7 +1,9 @@
 """Config Flow to configure Weather.com Integration."""
 from __future__ import annotations
+import asyncio
 import logging
 from http import HTTPStatus
+import aiohttp
 import async_timeout
 import voluptuous as vol
 from homeassistant import config_entries
@@ -57,27 +59,38 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Create the options flow."""
         return WeatherDotComOptionsFlow()
 
+    async def _async_validate_api_key(self, api_key: str | None) -> str | None:
+        """Validate the API key against the Weather.com endpoint."""
+        headers = {
+            'Accept-Encoding': 'gzip',
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+        }
+        session = async_create_clientsession(self.hass)
+        try:
+            async with async_timeout.timeout(10):
+                # Use hardcoded values for the initial test API call. User-supplied values will be used for the created entities.
+                url = 'https://api.weather.com/v3/wx/observations/current?geocode=37.3355,-121.8930&format=json&units=e&apiKey=%s&language=en-US' % api_key
+                response = await session.get(url, headers=headers)
+        except (asyncio.TimeoutError, aiohttp.ClientError) as err:
+            _LOGGER.error("Error connecting to Weather.com during config: %s", err)
+            return "unknown_error"
+
+        if response.status != HTTPStatus.OK:
+            _LOGGER.error("Weather.com config responded with HTTP error %s: %s",
+                          response.status, response.reason,)
+            if response.status == HTTPStatus.UNAUTHORIZED:
+                return "invalid_api_key"
+            return "unknown_error"
+
+        return None
+
     async def async_step_user(self, user_input=None):
         """Handle the first step initiated by the user."""
         errors = {}
         if user_input is not None:
             self._data = user_input
-            headers = {
-                'Accept-Encoding': 'gzip',
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
-            }
-            session = async_create_clientsession(self.hass)
-            async with async_timeout.timeout(10):
-                # Use hardcoded values for the initial test API call. User-supplied values will be used for the created entities.
-                url = 'https://api.weather.com/v3/wx/observations/current?geocode=37.3355,-121.8930&format=json&units=e&apiKey=%s&language=en-US' % user_input.get(CONF_API_KEY)
-                response = await session.get(url, headers=headers)
-            if response.status != HTTPStatus.OK:
-                _LOGGER.error("Weather.com config responded with HTTP error %s: %s",
-                              response.status, response.reason,)
-                if response.status == HTTPStatus.UNAUTHORIZED:
-                    errors["base"] = "invalid_api_key"
-                else:
-                    errors["base"] = "unknown_error"
+            if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
+                errors["base"] = error
             else:
                 if user_input.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
                     return await self.async_step_latlong()
@@ -98,11 +111,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ): vol.All(vol.In(LANG_CODES)),
                     vol.Required(CONF_LOCATION_SOURCE, default=LOCATION_TYPE_LATLONG): selector.SelectSelector(
                         selector.SelectSelectorConfig(
-                            options=[
-                                {"value": LOCATION_TYPE_ENTITY, "label": "Entity (zone, device_tracker, or person)"},
-                                {"value": LOCATION_TYPE_LATLONG, "label": "Latitude/longitude"},
-                            ],
+                            options=[LOCATION_TYPE_LATLONG, LOCATION_TYPE_ENTITY],
                             mode=selector.SelectSelectorMode.LIST,
+                            translation_key="location_source_options"
                         )
                     ),
                 }
@@ -274,10 +285,13 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             self._data = dict(user_input)
             self._data[CONF_NAME] = conf_entry.title
 
-            # Branch based on the selected location source.
-            if user_input.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
-                return await self.async_step_latlong()
-            return await self.async_step_entity()
+            if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
+                errors["base"] = error
+            else:
+                # Branch based on the selected location source.
+                if user_input.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
+                    return await self.async_step_latlong()
+                return await self.async_step_entity()
 
         # Determine default location source from existing config, falling back to lat/long.
         default_source = conf_entry.data.get(CONF_LOCATION_SOURCE, LOCATION_TYPE_LATLONG)
