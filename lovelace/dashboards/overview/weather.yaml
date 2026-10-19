@@ -32,7 +32,7 @@ cards:
         camera_view: live
 
       - type: custom:webrtc-camera
-        entity: camera.balcony
+        entity: camera.balcony_2
         poster: image.balcony_event_image
         ui: true
         shortcuts:

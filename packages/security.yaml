@@ -192,6 +192,32 @@ automation:
     mode: single
 
 
+
+
+
+##### TESTING Doorbell  motion  alerts ####
+  - alias: Doorbell Motion
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.front_door_motion
+        to: 'on'
+    actions:
+      - action: script.text_notify
+        data:
+          who: amber
+          title: 'Front Door Motion'
+          message: >
+            {% set t = as_timestamp(states.binary_sensor.front_door_motion.last_changed) | timestamp_custom('%-I:%M %p') %}
+            Someone is either passing by or at the front door at {{ t }}.
+
+
+
+
+
+
+
+
+
   #############################################
   # When sentry mode is enabled / security armed by any method, check the doors and notify everyone.
   - id: sentry_mode_enabled
