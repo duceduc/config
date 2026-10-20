@@ -205,15 +205,10 @@ automation:
       - action: script.text_notify
         data:
           who: amber
-          title: 'Front Door Motion'
+          title: 'Front Door 🚨'
           message: >
             {% set t = as_timestamp(states.binary_sensor.front_door_motion.last_changed) | timestamp_custom('%-I:%M %p') %}
-            Someone is either passing by or at the front door at {{ t }}.
-
-
-
-
-
+              Someone is either passing by or at the front door at {{ t }}.
 
 
 

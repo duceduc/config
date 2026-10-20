@@ -6,11 +6,8 @@ https://github.com/jaydeethree/Home-Assistant-weatherdotcom
 
 import time
 
-from . import WeatherUpdateCoordinator
-from homeassistant.config_entries import ConfigEntry
+from . import WeatherDotComConfigEntry, WeatherUpdateCoordinator
 from .const import (
-    DOMAIN,
-
     TEMPUNIT,
     LENGTHUNIT,
     SPEEDUNIT,
@@ -73,16 +70,16 @@ ENTITY_ID_FORMAT = WEATHER_DOMAIN + ".{}"
 
 
 async def async_setup_entry(
-        hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+        hass: HomeAssistant, entry: WeatherDotComConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Add weather entity."""
-    coordinator: WeatherUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     async_add_entities([
         WeatherDotComForecast(coordinator),
     ])
 
 
-class WeatherDotCom(SingleCoordinatorWeatherEntity):
+class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
 
     @property
     def native_temperature(self) -> float:
@@ -170,9 +167,6 @@ class WeatherDotCom(SingleCoordinatorWeatherEntity):
         """Return the UV index."""
         return self.coordinator.get_current(FIELD_UV_INDEX)
 
-
-class WeatherDotComForecast(WeatherDotCom):
-
     def __init__(
             self,
             coordinator: WeatherUpdateCoordinator
@@ -205,8 +199,9 @@ class WeatherDotComForecast(WeatherDotCom):
         if not self.coordinator.data or self.coordinator.data.get(RESULTS_FORECAST_DAILY) is None:
             return []
 
-        days = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
-        if self.coordinator.get_forecast_daily(FIELD_TEMP, 0) is None:
+        daily_times = self.coordinator.data[RESULTS_FORECAST_DAILY].get(FIELD_VALIDTIMEUTC) or []
+        days = list(range(0, len(daily_times) * 2, 2))
+        if days and self.coordinator.get_forecast_daily(FIELD_TEMP, 0) is None:
             days[0] += 1
 
         forecast = []
@@ -276,8 +271,9 @@ class WeatherDotComForecast(WeatherDotCom):
         if not self.coordinator.data or self.coordinator.data.get(RESULTS_FORECAST_HOURLY) is None:
             return []
 
+        hourly_times = self.coordinator.data[RESULTS_FORECAST_HOURLY].get(FIELD_VALIDTIMEUTC) or []
         forecast = []
-        for hour in range(0, 360, 1):
+        for hour in range(len(hourly_times)):
             forecast.append(Forecast({
                 ATTR_FORECAST_CLOUD_COVERAGE:
                     self.coordinator.get_forecast_hourly(FIELD_CLOUD_COVER, hour),

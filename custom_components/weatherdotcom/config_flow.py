@@ -4,13 +4,10 @@ import asyncio
 import logging
 from http import HTTPStatus
 import aiohttp
-import async_timeout
 import voluptuous as vol
 from homeassistant import config_entries
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import selector
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_ENTITY_ID,
@@ -19,7 +16,7 @@ from homeassistant.const import (
     CONF_NAME
 )
 from homeassistant.core import callback
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
     DOMAIN,
@@ -36,10 +33,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class InvalidApiKey(HomeAssistantError):
-    """Error to indicate there is an invalid api key."""
 
 
 class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -65,9 +58,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             'Accept-Encoding': 'gzip',
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
         }
-        session = async_create_clientsession(self.hass)
+        session = async_get_clientsession(self.hass)
         try:
-            async with async_timeout.timeout(10):
+            async with asyncio.timeout(10):
                 # Use hardcoded values for the initial test API call. User-supplied values will be used for the created entities.
                 url = 'https://api.weather.com/v3/wx/observations/current?geocode=37.3355,-121.8930&format=json&units=e&apiKey=%s&language=en-US' % api_key
                 response = await session.get(url, headers=headers)
@@ -184,7 +177,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 else:
                     errors["base"] = "unknown_error"
                     _LOGGER.error("Invalid latitude/longitude: %s, %s",
-                                  user_input.get(CONF_LATITUDE), user_input.get(CONF_LONGITUDE),)
+                                  state.attributes.get(CONF_LATITUDE), state.attributes.get(CONF_LONGITUDE),)
 
         default_entity = None
 
@@ -225,20 +218,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         location_name = self._data[CONF_NAME]
         location_source = self._data.get(CONF_LOCATION_SOURCE)
 
-        if location_source == LOCATION_TYPE_LATLONG:
-            latitude = self._data[CONF_LATITUDE]
-            longitude = self._data[CONF_LONGITUDE]
-        else:
-            entity_id = self._data[CONF_ENTITY_ID]
-            state = self.hass.states.get(entity_id)
-            raw_lat = state.attributes[CONF_LATITUDE]
-            raw_long = state.attributes[CONF_LONGITUDE]
-            # Obfuscate location by up to 0.01 degrees (1.1km)
-            latitude, longitude = (
-                round(float(raw_lat), 2),
-                round(float(raw_long), 2)
-            )
-
         entry_data = {
             CONF_API_KEY: api_key,
             CONF_NAME: location_name,
@@ -268,12 +247,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             title=location_name,
             data=entry_data,
         )
-
-    async def _show_appropriate_form(self, errors):
-        """Return the correct form based on user selection when errors occur."""
-        if self._data.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
-            return await self.async_step_latlong()
-        return await self.async_step_entity()
 
 
     async def async_step_reconfigure(self, user_input=None):

@@ -1,6 +1,6 @@
 """The weather.com component."""
 import logging
-import os.path
+from pathlib import Path
 from typing import Final
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -17,8 +17,6 @@ from homeassistant.util import json
 from .coordinator import WeatherUpdateCoordinator, WeatherUpdateCoordinatorConfig
 from .const import (
     CONF_LANG,
-    DOMAIN,
-    
     API_METRIC,
     API_IMPERIAL,
     API_URL_METRIC,
@@ -30,10 +28,11 @@ PLATFORMS: Final = [Platform.WEATHER, Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up the Weather.com component."""
-    hass.data.setdefault(DOMAIN, {})
+type WeatherDotComConfigEntry = ConfigEntry[WeatherUpdateCoordinator]
 
+
+async def async_setup_entry(hass: HomeAssistant, entry: WeatherDotComConfigEntry) -> bool:
+    """Set up the Weather.com component."""
     if hass.config.units is METRIC_SYSTEM:
         unit_system_api = API_URL_METRIC
         unit_system = API_METRIC
@@ -55,32 +54,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     def _load_translation_file() -> dict:
-        tfiledir = f'{hass.config.config_dir}/custom_components/{DOMAIN}/weather_translations/'
+        tfiledir = Path(__file__).parent / "weather_translations"
         tfilename = config.lang.split('-', 1)[0]
-        if os.path.isfile(f'{tfiledir}{tfilename}.json'):
-            return json.load_json(f'{tfiledir}{tfilename}.json')
+        tfilepath = tfiledir / f"{tfilename}.json"
+        if tfilepath.is_file():
+            return json.load_json(tfilepath)
         _LOGGER.warning(
             'Sensor translation file %s.json does not exist. Defaulting to en-US.',
             tfilename,
         )
-        return json.load_json(f'{tfiledir}en.json')
+        return json.load_json(tfiledir / "en.json")
 
     config.tranfile = await hass.async_add_executor_job(_load_translation_file)
 
     weathercoordinator = WeatherUpdateCoordinator(hass, config)
     await weathercoordinator.async_config_entry_first_refresh()
 
-    hass.data[DOMAIN][entry.entry_id] = weathercoordinator
+    entry.runtime_data = weathercoordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: WeatherDotComConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
-
-    return unload_ok
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
