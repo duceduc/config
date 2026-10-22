@@ -29,7 +29,7 @@ from homeassistant.const import (
 from .const import (
     API_URL_METRIC,
     DOMAIN,
-    ICON_CONDITION_MAP,
+    ICON_CODE_MAP,
     FIELD_DAYPART,
     FIELD_HUMIDITY,
     FIELD_TEMPERATUREMAX,
@@ -76,8 +76,6 @@ class WeatherUpdateCoordinatorConfig:
 
 class WeatherUpdateCoordinator(DataUpdateCoordinator):
     """The Weather.com update coordinator."""
-
-    icon_condition_map = ICON_CONDITION_MAP
 
     def __init__(
             self, hass: HomeAssistant, config: WeatherUpdateCoordinatorConfig
@@ -208,18 +206,19 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
             try:
                 async with asyncio.timeout(10):
                     url = self._build_url(resource, latitude, longitude)
-                    response = await self._session.get(url, headers=headers)
-                    response.raise_for_status()
-                    result = await response.json(content_type=None)
+                    async with self._session.get(url, headers=headers) as response:
+                        response.raise_for_status()
+                        result = await response.json(content_type=None)
                     if result is None:
                         raise ValueError('No weather data found')
                     self._check_errors(url, result)
                     return result, False
             except (ValueError, asyncio.TimeoutError, aiohttp.ClientError) as err:
+                err_msg = str(err).replace(self._api_key, "REDACTED")
                 if attempt == 1:
-                    _LOGGER.error('Error getting %s weather. Exception: %s. Details: %s', description, type(err), err)
+                    _LOGGER.error('Error getting %s weather. Exception: %s. Details: %s', description, type(err), err_msg)
                     return None, True
-                _LOGGER.warning('Error getting %s weather, will retry. Exception: %s. Details: %s', description, type(err), err)
+                _LOGGER.warning('Error getting %s weather, will retry. Exception: %s. Details: %s', description, type(err), err_msg)
                 await asyncio.sleep(5)
         return None, True
 
@@ -268,12 +267,12 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
             return None
 
     @classmethod
-    def _iconcode_to_condition(cls, icon_code):
-        for condition, iconcodes in cls.icon_condition_map.items():
-            if icon_code in iconcodes:
-                return condition
-        if icon_code is not None:
-            _LOGGER.warning('Unmapped icon code from Weather.com API: %s', icon_code)
+    def _iconcode_to_condition(cls, icon_code: int | None) -> str | None:
+        if icon_code is None or icon_code == 44:
+            return None
+        if (condition := ICON_CODE_MAP.get(icon_code)) is not None:
+            return condition
+        _LOGGER.warning('Unmapped icon code from Weather.com API: %s', icon_code)
         return None
 
     @classmethod

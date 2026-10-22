@@ -29,6 +29,7 @@ NIGHT_VISION_MODE_KEYS = {
     "Off": "off",
     "Colour": "colour",
     "Infrared": "infrared",
+    "Auto night vision": "auto_night_vision",
     "Infrared on": "infrared_on",
     "Spotlight": "spotlight",
     "Standard": "standard",
@@ -57,7 +58,7 @@ async def async_setup_entry(
                 known_lock_delays.add(serial)
                 async_add_entities([EufyLockAutoLockDelaySelect(coordinator, serial)])
         for serial, camera in coordinator.cameras.items():
-            for name in ("watermark", "recordingQuality", "soundType"):
+            for name in ("watermark", "recordingQuality", "soundType", "streamingQuality"):
                 key = (serial, name)
                 if key not in known_preferences and camera_preference_value(camera, name) is not None:
                     known_preferences.add(key)
@@ -380,6 +381,9 @@ class EufyCameraPreferenceSelect(EufyGatewayEntity, SelectEntity):
             "recordingQuality": ([2, 3], ["medium", "high"], "camera_recording_quality"),
             "soundType": ([128, 256], ["all_sound", "crying"], "camera_sound_type"),
         }
+        if coordinator.cameras.get(serial, {}).get("careMonitor") is True:
+            choices["recordingQuality"] = ([1, 2, 3, 4], ["hd_720p", "full_hd_1080p", "two_k", "four_k"], "care_recording_quality")
+            choices["streamingQuality"] = ([0, 1, 2, 3, 4], ["auto", "hd_720p", "full_hd_1080p", "two_k", "four_k"], "care_streaming_quality")
         self._values, self._attr_options, self._attr_translation_key = choices[name]
 
     @property

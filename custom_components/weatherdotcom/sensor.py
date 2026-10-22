@@ -10,7 +10,7 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -36,12 +36,6 @@ from .weather_current_conditions_sensors import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# Declaration of supported Weather.com observation/condition sensors
-SENSOR_DESCRIPTIONS: tuple[WeatherSensorEntityDescription, ...] = (
-    current_condition_sensor_descriptions
-)
-
-
 async def async_setup_entry(
         hass: HomeAssistant, entry: WeatherDotComConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -52,7 +46,7 @@ async def async_setup_entry(
             coordinator, 
             description, 
             entry.options.get(CONF_EXTRA_ATTRIBUTES),
-            ) for description in SENSOR_DESCRIPTIONS
+            ) for description in current_condition_sensor_descriptions
     ]
 
     async_add_entities(sensors)
@@ -82,15 +76,7 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
         self.entity_id = generate_entity_id(
             entity_id_format, f"{self.coordinator.location_name}_{description.name}", hass=coordinator.hass
         )
-        self._unit_system = coordinator.unit_system
         self._attr_device_info = coordinator.device_info
-        if description.key == CONF_LATITUDE:
-            self._sensor_data = coordinator._get_coordinates()[0]
-        elif description.key == CONF_LONGITUDE:
-            self._sensor_data = coordinator._get_coordinates()[1]
-        else:
-            self._sensor_data = _get_sensor_data(
-                coordinator.data, description.key, self._unit_system)
         self._attr_native_unit_of_measurement = self.entity_description.unit_fn(
             self.coordinator.hass.config.units is METRIC_SYSTEM)
 
@@ -122,7 +108,15 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> StateType:
         """Return the state."""
-        return self.entity_description.value_fn(self._sensor_data, self._unit_system)
+        if self.entity_description.key == CONF_LATITUDE:
+            data = getattr(self.coordinator, "current_latitude", getattr(self.coordinator, "_latitude", None))
+        elif self.entity_description.key == CONF_LONGITUDE:
+            data = getattr(self.coordinator, "current_longitude", getattr(self.coordinator, "_longitude", None))
+        else:
+            data = _get_sensor_data(
+                self.coordinator.data, self.entity_description.key
+            )
+        return self.entity_description.value_fn(data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
@@ -134,24 +128,10 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
             self._extra_attributes,
         ) or None
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data update."""
-        if self.entity_description.key == CONF_LATITUDE:
-            self._sensor_data = getattr(self.coordinator, "current_latitude", getattr(self.coordinator, "_latitude", None))
-        elif self.entity_description.key == CONF_LONGITUDE:
-            self._sensor_data = getattr(self.coordinator, "current_longitude", getattr(self.coordinator, "_longitude", None))
-        else:
-            self._sensor_data = _get_sensor_data(
-                self.coordinator.data, self.entity_description.key, self._unit_system
-            )
-        self.async_write_ha_state()
-
 
 def _get_sensor_data(
         sensors: dict[str, Any] | None,
         kind: str,
-        unit_system: str
 ) -> Any:
     """Get sensor data."""
     # windGust is often null. When it is, set it to windSpeed instead.

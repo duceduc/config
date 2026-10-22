@@ -209,24 +209,13 @@
 #
 ####################################################
 
-## POSSIBLE NOT USING ANYMORE
-#      - name: kt illuminance
-#        state: >
-#          {% if states.sensor.lr_radar_illuminance.state | float(0) == 0.10 %}
-#            on
-#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.15 %}
-#            on
-#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.20 %}
-#            on
-#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.25 %}
-#            on
-#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.30 %}
-#            on
-#          {% elif states.sensor.lr_radar_illuminance.state | float(0) == 0.45 %}
-#            on
-#          {% else %}
-#            off
-#          {% endif %}
+      - name: LR Radar Illuminance Actual
+        state: >
+          {% if is_state('sensor.four_seasons_astronomical_daylight_trend', 'days_getting_shorter') %} 0.21
+          {% elif is_state('sensor.four_seasons_astronomical_daylight_trend', 'days_getting_longer') %} 0.26
+          {% else %} 0.21
+          {% endif %}
+
 
 
 

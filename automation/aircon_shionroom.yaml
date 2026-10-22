@@ -1,7 +1,7 @@
 #########################################################
-#                                                                                                              
-#             Auto Mode Lights On/Off                                                                
-#                                                                                                              
+#
+#             Auto Mode Lights On/Off
+#
 #########################################################
 # usb plug order. Top -> bottom -> right [bermuda,radar,monitor]
 
@@ -18,7 +18,7 @@
       to: 'on'
   conditions:
     - condition: template # disable motion light
-      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   actions:
     - action: python_script.room_occupancy
       data:
@@ -33,7 +33,7 @@
           - input_boolean.shionroom_mcl
           - binary_sensor.sr_study_occupancy
 
-- alias: Shionroom Light 
+- alias: Shionroom Light
   description: 'toggle light depending on timer state'
   mode: single
   triggers:
@@ -53,7 +53,7 @@
       id: 'off'
       from: 'on'
       to: 'off'
-    - trigger: state # lights off if not occupied. presence_sensors.yaml
+    - trigger: state # lights off if not occupied. tpl, presence.yaml
       entity_id: binary_sensor.sr_occupancy_lights
       id: 'off'
       from: 'on'
@@ -62,7 +62,7 @@
 
   conditions:
     - condition: template # disable motion light
-      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
@@ -84,7 +84,7 @@
 #                entity_id: light.shion
 #              data:
 #                brightness: '{% if states.sensor.aio_human_sensor_illuminance.state | float(0) < 0.15 %} 160 {% else %} 255 {% endif %}'
-                
+
         - conditions:
             - condition: trigger
               id: 'off'
@@ -104,14 +104,19 @@
 
 #### TEST for above removal #####
 
-- alias: Shionroom Auto-on 
+- alias: Shionroom Auto-on
   mode: single
   triggers:
     - trigger: state
       entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.shionroom_occupied
+      to: 'on'
+    - trigger: state
+      entity_id: binary_sensor.sr_occupancy_lights
+      to: 'off'
+
   conditions:
     - condition: template # disable motion light
-      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"  
+      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
     - condition: template # Someone is home
       value_template: "{{ is_state('input_select.home_mode', 'Home') }}"
     - condition: template # switch between weekday(7-8pm) / weekend time(9:30-8pm)
@@ -120,7 +125,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.shionroom_occupied
+              entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.shionroom_occupied, binary_sensor.sr_occupancy_lights
               state: "on"
           sequence:
             - action: script.tradfri_transition
@@ -139,9 +144,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Override Auto Mode Lights On/Off                                                    
-#                                                                                                              
+#
+#             Override Auto Mode Lights On/Off
+#
 #########################################################
 
 - alias: 'SR light turned off'
@@ -195,9 +200,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Shion Airfreshener                                                            
-#                                                                                                              
+#
+#             Shion Airfreshener
+#
 #########################################################
 
 - alias: Squirt Shion Airfreshener
@@ -220,9 +225,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             Shion Room Air Conditioning                                                            
-#                                                                                                              
+#
+#             Shion Room Air Conditioning
+#
 #########################################################
 # binary_sensor.sr_ac_flaps battery start 6/30
 
@@ -276,9 +281,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             AM Schedule Auto Timer                                                                 
-#                                                                                                              
+#
+#             AM Schedule Auto Timer
+#
 #########################################################
 
 - alias: 'SR Aircon AM Schedule'
@@ -332,9 +337,9 @@
           {% endif %}
 
 #########################################################
-#                                                                                                              
-#             PM Schedule Auto Timer                                                                 
-#                                                                                                              
+#
+#             PM Schedule Auto Timer
+#
 #########################################################
 
 - alias: 'SR Aircon PM Schedule'
@@ -388,9 +393,9 @@
           {% endif %}
 
 #########################################################
-#                                                                                                              
-#             Turn Aircon Off At Time                                                                  
-#                                                                                                              
+#
+#             Turn Aircon Off At Time
+#
 #########################################################
 
 - alias: 'SR Aircon AM Off'
@@ -434,9 +439,9 @@
         option: 'Off'
 
 #########################################################
-#                                                                                                              
-#             Manual Adjust Temperature / Humidity       
-#                                                                                                              
+#
+#             Manual Adjust Temperature / Humidity
+#
 #########################################################
 
 - alias: 'SR Aircon Cool Temperature Adjust'
@@ -489,9 +494,9 @@
 
 
 #########################################################
-#                                                                                                              
-#             END OF CONFIGURATION FILE                                                          
-#                                                                                                              
+#
+#             END OF CONFIGURATION FILE
+#
 #########################################################
 
 

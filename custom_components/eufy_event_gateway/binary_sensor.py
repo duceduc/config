@@ -48,20 +48,11 @@ async def async_setup_entry(
                     )
                     if stale_entity_id:
                         registry.async_remove(stale_entity_id)
+                supported = coordinator.cameras[serial].get("supportedDetections")
+                kinds = ("motion", "person", "stranger", "pet", "vehicle", "dog", "crying", "sound", "packageDelivered", "packageTaken", "packageStranded")
                 entities.extend(
-                    [
-                        EufyDetectionSensor(coordinator, serial, "motion"),
-                        EufyDetectionSensor(coordinator, serial, "person"),
-                        EufyDetectionSensor(coordinator, serial, "stranger"),
-                        EufyDetectionSensor(coordinator, serial, "pet"),
-                        EufyDetectionSensor(coordinator, serial, "vehicle"),
-                        EufyDetectionSensor(coordinator, serial, "dog"),
-                        EufyDetectionSensor(coordinator, serial, "crying"),
-                        EufyDetectionSensor(coordinator, serial, "sound"),
-                        EufyDetectionSensor(coordinator, serial, "packageDelivered"),
-                        EufyDetectionSensor(coordinator, serial, "packageTaken"),
-                        EufyDetectionSensor(coordinator, serial, "packageStranded"),
-                    ]
+                    EufyDetectionSensor(coordinator, serial, kind)
+                    for kind in kinds if not isinstance(supported, list) or kind in supported
                 )
                 if coordinator.cameras[serial].get("doorbellSupported"):
                     entities.append(
@@ -94,10 +85,9 @@ async def async_setup_entry(
                     entities.append(
                         EufyStandaloneBinarySensor(coordinator, serial, "contact")
                     )
-                if "motion" in capabilities:
-                    entities.append(
-                        EufyStandaloneBinarySensor(coordinator, serial, "motion")
-                    )
+                for kind in ("motion", "crying", "sound", "pet", "babyLeft", "babyEntered", "temperatureHigh", "temperatureLow", "careAreaLeft", "careAreaEntered", "babyActivity"):
+                    if kind in capabilities:
+                        entities.append(EufyStandaloneBinarySensor(coordinator, serial, kind))
             async_add_entities(entities)
 
     add_new()
@@ -184,9 +174,9 @@ class EufyCameraChargingSensor(EufyGatewayEntity, BinarySensorEntity):
 class EufyStandaloneBinarySensor(EufySecuritySensorEntity, BinarySensorEntity):
     """Expose one capability-backed state for a standalone security sensor.
 
-    Contact state remains active until the next settled open/closed event;
-    motion state is transient and expires in the gateway. Separate instances
-    are created only for capabilities advertised by that sensor.
+    Contact state remains active until the next settled open/closed event.
+    Care states are recent notifications that expire in the gateway. Off means
+    no recent notification is retained, rather than a continuous room reading.
     """
 
     def __init__(
@@ -197,19 +187,33 @@ class EufyStandaloneBinarySensor(EufySecuritySensorEntity, BinarySensorEntity):
         BinarySensorEntity.__init__(self)
         self.kind = kind
         self._attr_unique_id = f"{serial}_{kind}"
-        self._attr_translation_key = (
-            "contact_sensor" if kind == "contact" else "motion_detection"
-        )
-        self._attr_device_class = (
-            BinarySensorDeviceClass.OPENING
-            if kind == "contact"
-            else BinarySensorDeviceClass.MOTION
-        )
+        self._attr_translation_key = {
+            "contact": "contact_sensor",
+            "motion": "motion_detection",
+            "crying": "crying_detection",
+            "sound": "sound_detection",
+            "pet": "pet_detection", "babyLeft": "baby_left", "babyEntered": "baby_entered",
+            "temperatureHigh": "temperature_high", "temperatureLow": "temperature_low",
+            "careAreaLeft": "care_area_left", "careAreaEntered": "care_area_entered", "babyActivity": "baby_activity",
+        }[kind]
+        self._attr_device_class = {
+            "contact": BinarySensorDeviceClass.OPENING,
+            "motion": BinarySensorDeviceClass.MOTION,
+            "crying": BinarySensorDeviceClass.SOUND,
+            "sound": BinarySensorDeviceClass.SOUND,
+            "pet": BinarySensorDeviceClass.OCCUPANCY, "babyLeft": None, "babyEntered": None,
+            "temperatureHigh": None, "temperatureLow": None, "careAreaLeft": None, "careAreaEntered": None, "babyActivity": None,
+        }[kind]
+
+    @property
+    def available(self) -> bool:
+        """Withdraw care entities when inventory no longer advertises the kind."""
+        return super().available and self.kind in self.sensor.get("capabilities", [])
 
     @property
     def is_on(self) -> bool | None:
         """Return normalized open or motion state without inventing unknown values."""
-        field = "contactOpen" if self.kind == "contact" else "motionDetected"
+        field = "contactOpen" if self.kind == "contact" else f"{self.kind}Detected"
         value = self.sensor.get(field)
         return value if isinstance(value, bool) else None
 
