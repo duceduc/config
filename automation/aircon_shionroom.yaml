@@ -141,6 +141,35 @@
 
 
 
+- alias: 'Turn on manual lights default params'
+  trigger:
+    - platform: state
+      entity_id: light.shion
+      to: 'on'
+  conditions:
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: "{%- set trig = (now() - states.event.shion_room_action.last_changed).seconds -%}
+          {{  trig > 1 }}"
+          
+        - condition: template
+          value_template: "{%- set trig = (now() - states.event.shion_dimmer_action.last_changed).seconds -%}
+          {{  trig > 1 }}"
+
+      
+  action:
+    - action: script.tradfri_transition
+      data:
+        entity_id: light.shion
+        color_temp: 143
+        transition: 2
+        brightness: '{% if states.sensor.aio_human_sensor_illuminance.state | float(0) < 0.15 %} 160 {% else %} 255 {% endif %}'
+  mode: single
+
+
+
+
 
 
 #########################################################
