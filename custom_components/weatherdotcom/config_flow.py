@@ -2,10 +2,13 @@
 from __future__ import annotations
 import asyncio
 import logging
+import random
 from http import HTTPStatus
+from typing import Any
 import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import selector
 from homeassistant.const import (
@@ -56,18 +59,29 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Validate the API key against the Weather.com endpoint."""
         headers = {
             'Accept-Encoding': 'gzip',
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
         }
         session = async_get_clientsession(self.hass)
         try:
             async with asyncio.timeout(10):
                 # Use hardcoded values for the initial test API call. User-supplied values will be used for the created entities.
-                url = 'https://api.weather.com/v3/wx/observations/current?geocode=37.3355,-121.8930&format=json&units=e&apiKey=%s&language=en-US' % api_key
-                async with session.get(url, headers=headers) as response:
+                url = "https://api.weather.com/v3/wx/observations/current"
+                random_latitude = round(random.uniform(36.0, 41.0), 6)
+                random_longitude = round(random.uniform(-120.0, -78.0), 6)
+                random_latlong = f"{random_latitude},{random_longitude}"
+                params = {
+                    "geocode": random_latlong,
+                    "format": "json",
+                    "units": "e",
+                    "apiKey": api_key or "",
+                    "language": "en-US",
+                }
+                async with session.get(url, params=params, headers=headers) as response:
                     status = response.status
                     reason = response.reason
         except (asyncio.TimeoutError, aiohttp.ClientError) as err:
-            _LOGGER.error("Error connecting to Weather.com during config: %s", err)
+            err_msg = str(err).replace(api_key, "REDACTED") if api_key else str(err)
+            _LOGGER.error("Error connecting to Weather.com during config: %s", err_msg)
             return "unknown_error"
 
         if status != HTTPStatus.OK:
@@ -79,7 +93,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return None
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle the first step initiated by the user."""
         errors = {}
         if user_input is not None:
@@ -116,13 +132,15 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_latlong(self, user_input=None):
+    async def async_step_latlong(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle the second step for latitude/longitude."""
         errors = {}
 
         if user_input is not None:
             self._data.update(user_input)
-            if await self._async_validate_latlong(lat=user_input.get(CONF_LATITUDE), long=user_input.get(CONF_LONGITUDE)):
+            if self._validate_latlong(lat=user_input.get(CONF_LATITUDE), long=user_input.get(CONF_LONGITUDE)):
                 return await self._async_validate_and_create()
             else:
                 errors["base"] = "unknown_error"
@@ -160,7 +178,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_entity(self, user_input=None):
+    async def async_step_entity(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle the second step for tracking entities."""
         errors = {}
 
@@ -174,7 +194,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "invalid_location_entity"
             else:
                 self._data.update(user_input)
-                if await self._async_validate_latlong(entity=state):
+                if self._validate_latlong(entity=state):
                     return await self._async_validate_and_create()
                 else:
                     errors["base"] = "unknown_error"
@@ -204,7 +224,8 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def _async_validate_latlong(self, lat=None, long=None, entity=None):
+    @staticmethod
+    def _validate_latlong(lat=None, long=None, entity=None) -> bool:
         """Check if the provided lat/long is valid."""
         if entity:
             lat = entity.attributes[CONF_LATITUDE]
@@ -214,7 +235,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 return True
         return False
 
-    async def _async_validate_and_create(self):
+    async def _async_validate_and_create(self) -> ConfigFlowResult:
         """Validate API key and lat/long, then create the config entry."""
         api_key = self._data[CONF_API_KEY]
         location_name = self._data[CONF_NAME]
@@ -236,10 +257,13 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         unique_id = str(f"{DOMAIN}-{location_name}")
 
         if self.source == config_entries.SOURCE_RECONFIGURE:
+            # Replace (rather than merge) the entry data so that keys from the
+            # previous location source (e.g. a stale entity_id after switching
+            # to lat/long) do not linger and take precedence. The title is left
+            # unchanged so that a user-customized title is preserved.
             return self.async_update_reload_and_abort(
                 self._get_reconfigure_entry(),
-                title=location_name,
-                data_updates=entry_data,
+                data=entry_data,
             )
 
         await self.async_set_unique_id(unique_id)
@@ -251,14 +275,20 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-    async def async_step_reconfigure(self, user_input=None):
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle a reconfiguration flow initialized by the user."""
         errors = {}
         conf_entry = self._get_reconfigure_entry()
 
         if user_input is not None:
             self._data = dict(user_input)
-            self._data[CONF_NAME] = conf_entry.title
+            # Use the stored location name, not the entry title. The title can
+            # be renamed by the user, but the location name is used for unique
+            # IDs, the device identifier, and the storage key, so it must not
+            # change.
+            self._data[CONF_NAME] = conf_entry.data[CONF_NAME]
 
             if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
                 errors["base"] = error
@@ -304,11 +334,15 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 class WeatherDotComOptionsFlow(config_entries.OptionsFlowWithReload):
     """Handle Weather.com options for sensor.forecast_details attribute."""
 
-    async def async_step_init(self, user_input=None):
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle the options flow."""
         return await self.async_step_extra_attributes(user_input)
 
-    async def async_step_extra_attributes(self, user_input=None):
+    async def async_step_extra_attributes(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle the extra weather attributes options."""
         if user_input is not None:
             selected_attributes = (

@@ -82,6 +82,9 @@ async def async_setup_entry(
 
 class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     _attr_attribution = CONF_ATTRIBUTION
+    # Use the device (location) name as the entity's friendly name.
+    _attr_has_entity_name = True
+    _attr_name = None
     _attr_supported_features = (
         WeatherEntityFeature.FORECAST_DAILY | WeatherEntityFeature.FORECAST_HOURLY
     )
@@ -95,19 +98,9 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
         return self.coordinator.get_current(FIELD_TEMP)
 
     @property
-    def native_temperature_unit(self) -> str:
-        """Return the native unit of measurement for temperature."""
-        return self.coordinator.units_of_measurement[TEMPUNIT]
-
-    @property
     def native_pressure(self) -> float | None:
         """Return the pressure in native units."""
         return self.coordinator.get_current(FIELD_PRESSURE)
-
-    @property
-    def native_pressure_unit(self) -> str:
-        """Return the native unit of measurement for pressure."""
-        return self.coordinator.units_of_measurement[PRESSUREUNIT]
 
     @property
     def humidity(self) -> float | None:
@@ -120,11 +113,6 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
         return self.coordinator.get_current(FIELD_WINDSPEED)
 
     @property
-    def native_wind_speed_unit(self) -> str:
-        """Return the native unit of measurement for wind speed."""
-        return self.coordinator.units_of_measurement[SPEEDUNIT]
-
-    @property
     def wind_bearing(self) -> float | str | None:
         """Return the wind bearing."""
         return self.coordinator.get_current(FIELD_WINDDIR)
@@ -133,18 +121,6 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     def native_visibility(self) -> float | None:
         """Return the visibility in native units."""
         return self.coordinator.get_current(FIELD_VISIBILITY)
-
-    @property
-    def native_visibility_unit(self) -> str:
-        """Return the native unit of measurement for visibility."""
-        return self.coordinator.visibility_unit
-
-    @property
-    def native_precipitation_unit(self) -> str:
-        """
-        Return the native unit of measurement for accumulated precipitation.
-        """
-        return self.coordinator.units_of_measurement[LENGTHUNIT]
 
     @property
     def condition(self) -> str | None:
@@ -178,27 +154,24 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     ):
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self.hass = coordinator.hass
         self.entity_id = generate_entity_id(
-            ENTITY_ID_FORMAT, f"{coordinator.location_name}", hass=self.hass
+            ENTITY_ID_FORMAT, f"{coordinator.location_name}", hass=coordinator.hass
         )
         self._attr_unique_id = f"{coordinator.location_name},{WEATHER_DOMAIN}".lower()
         self._attr_device_info = coordinator.device_info
+        self._attr_native_temperature_unit = coordinator.units_of_measurement[TEMPUNIT]
+        self._attr_native_pressure_unit = coordinator.units_of_measurement[PRESSUREUNIT]
+        self._attr_native_wind_speed_unit = coordinator.units_of_measurement[SPEEDUNIT]
+        self._attr_native_visibility_unit = coordinator.visibility_unit
+        self._attr_native_precipitation_unit = coordinator.units_of_measurement[LENGTHUNIT]
         self._store = coordinator._store
-        self._stored_data = {}
 
     async def async_forecast_daily(self) -> list[Forecast] | None:
-        self._stored_data = await self._store.async_load()
-        return self.forecast_daily
-
-    async def async_forecast_hourly(self) -> list[Forecast] | None:
-        return self.forecast_hourly
-    
-    @property
-    def forecast_daily(self) -> list[Forecast]:
         """Return the daily forecast in native units."""
         if not self.coordinator.data or self.coordinator.data.get(RESULTS_FORECAST_DAILY) is None:
             return []
+
+        stored_data = await self._store.async_load()
 
         daily_times = self.coordinator.data[RESULTS_FORECAST_DAILY].get(FIELD_VALIDTIMEUTC) or []
         days = list(range(0, len(daily_times) * 2, 2))
@@ -217,13 +190,13 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 # If the API returns None, attempt to use the value that's in
                 # storage.
                 if (
-                    HIGH_TEMP_TODAY_TIMESTAMP_STORAGE in self._stored_data
+                    HIGH_TEMP_TODAY_TIMESTAMP_STORAGE in stored_data
                     and
-                    HIGH_TEMP_TODAY_STORAGE in self._stored_data
+                    HIGH_TEMP_TODAY_STORAGE in stored_data
                     and
-                    round(time.time()) - self._stored_data[HIGH_TEMP_TODAY_TIMESTAMP_STORAGE] < max_time_difference
+                    round(time.time()) - stored_data[HIGH_TEMP_TODAY_TIMESTAMP_STORAGE] < max_time_difference
                 ):
-                    temperature_max = self._stored_data[HIGH_TEMP_TODAY_STORAGE]
+                    temperature_max = stored_data[HIGH_TEMP_TODAY_STORAGE]
                 else:
                     _LOGGER.debug(
                         'Stored value for maximum temperature is old or missing'
@@ -266,8 +239,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
             }))
         return forecast
 
-    @property
-    def forecast_hourly(self) -> list[Forecast]:
+    async def async_forecast_hourly(self) -> list[Forecast] | None:
         """Return the hourly forecast in native units."""
         if not self.coordinator.data or self.coordinator.data.get(RESULTS_FORECAST_HOURLY) is None:
             return []

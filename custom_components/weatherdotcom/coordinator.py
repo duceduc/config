@@ -11,11 +11,11 @@ from typing import Any
 
 import aiohttp
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.util.unit_system import METRIC_SYSTEM
 from homeassistant.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
@@ -31,13 +31,9 @@ from .const import (
     DOMAIN,
     ICON_CODE_MAP,
     FIELD_DAYPART,
-    FIELD_HUMIDITY,
     FIELD_TEMPERATUREMAX,
     FIELD_TEMPERATUREMIN,
     FIELD_VALIDTIMEUTC,
-    FIELD_WINDDIR,
-    FIELD_WINDGUST,
-    FIELD_WINDSPEED,
     RESULTS_CURRENT,
     RESULTS_FORECAST_DAILY,
     RESULTS_FORECAST_HOURLY
@@ -74,28 +70,31 @@ class WeatherUpdateCoordinatorConfig:
     latitude: float | None = None
     longitude: float | None = None
 
-class WeatherUpdateCoordinator(DataUpdateCoordinator):
+class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """The Weather.com update coordinator."""
 
     def __init__(
-            self, hass: HomeAssistant, config: WeatherUpdateCoordinatorConfig
+            self,
+            hass: HomeAssistant,
+            config: WeatherUpdateCoordinatorConfig,
+            entry: ConfigEntry,
     ) -> None:
         """Initialize."""
-        self._hass = hass
         self._api_key = config.api_key
         self._location_name = config.location_name
         self._unit_system_api = config.unit_system_api
         self.unit_system = config.unit_system
         self._lang = config.lang
-        self.data = None
         self._consecutive_failures = 0
-        self._session = async_get_clientsession(self._hass)
+        self._session = async_get_clientsession(hass)
         self._tranfile = config.tranfile
-        self._store = WeatherDotComStorage(self._hass, self._location_name)
+        self._store = WeatherDotComStorage(hass, self._location_name)
 
         self._location_entity_id = config.location_entity_id
         self._latitude = config.latitude
         self._longitude = config.longitude
+        self.current_latitude: float | None = config.latitude
+        self.current_longitude: float | None = config.longitude
 
         self.device_info = _get_device_info(self._location_name)
 
@@ -113,14 +112,10 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(
             hass,
             _LOGGER,
-            name="WeatherUpdateCoordinator",
+            config_entry=entry,
+            name=DOMAIN,
             update_interval=config.update_interval,
         )
-
-    @property
-    def is_metric(self):
-        """Determine if this is the metric unit system."""
-        return self._hass.config.units is METRIC_SYSTEM
 
     @property
     def location_name(self):
@@ -129,22 +124,19 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
 
     def _get_coordinates(self) -> tuple[float | None, float | None]:
         """Fetch current latitude and longitude and obfuscate if needed."""
-        lat, long = None, None
-
         # New configuration attempt
-        if self._location_entity_id and (state := self._hass.states.get(self._location_entity_id)):
+        if self._location_entity_id and (state := self.hass.states.get(self._location_entity_id)):
             raw_lat = state.attributes.get(CONF_LATITUDE)
             raw_long = state.attributes.get(CONF_LONGITUDE)
             if raw_lat is not None and raw_long is not None:
                 return round(float(raw_lat), 2), round(float(raw_long), 2)
 
         # Fallback to legacy config if entity is missing
-        if lat is None or long is None:
-            if self._latitude is not None and self._longitude is not None:
-                return float(self._latitude), float(self._longitude)
-            else:
-                _LOGGER.error("Could not determine latitude/longitude from entity or prior config")
-                return None, None
+        if self._latitude is not None and self._longitude is not None:
+            return float(self._latitude), float(self._longitude)
+
+        _LOGGER.error("Could not determine latitude/longitude from entity or prior config")
+        return None, None
 
     async def _async_update_data(self) -> dict[str, Any]:
         return await self.get_weather()
@@ -158,11 +150,20 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         self.current_latitude = latitude
         self.current_longitude = longitude
 
-        result_current, current_error = await self._async_fetch_data(
-            _RESOURCECURRENT, latitude, longitude, "current"
-        )
-        result_forecast_daily, daily_error = await self._async_fetch_data(
-            _RESOURCEFORECASTDAILY, latitude, longitude, "daily"
+        (
+            (result_current, current_error),
+            (result_forecast_daily, daily_error),
+            (result_forecast_hourly, hourly_error),
+        ) = await asyncio.gather(
+            self._async_fetch_data(
+                _RESOURCECURRENT, latitude, longitude, "current"
+            ),
+            self._async_fetch_data(
+                _RESOURCEFORECASTDAILY, latitude, longitude, "daily"
+            ),
+            self._async_fetch_data(
+                _RESOURCEFORECASTHOURLY, latitude, longitude, "hourly"
+            ),
         )
         if result_forecast_daily is not None:
             # If the result includes max temperature data for today,
@@ -170,10 +171,6 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
             temp_max_list = result_forecast_daily.get(FIELD_TEMPERATUREMAX)
             if temp_max_list and temp_max_list[0] is not None:
                 await self._store.async_save(temp_max_list[0], round(time.time()))
-
-        result_forecast_hourly, hourly_error = await self._async_fetch_data(
-            _RESOURCEFORECASTHOURLY, latitude, longitude, "hourly"
-        )
 
         if current_error and daily_error and hourly_error:
             self._consecutive_failures += 1
@@ -186,13 +183,11 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
             return self.data
 
         self._consecutive_failures = 0
-        result = {
+        return {
             RESULTS_CURRENT: result_current,
             RESULTS_FORECAST_DAILY: result_forecast_daily,
             RESULTS_FORECAST_HOURLY: result_forecast_hourly,
         }
-        self.data = result
-        return result
 
     async def _async_fetch_data(
         self, resource: str, latitude: float, longitude: float, description: str
@@ -200,7 +195,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator):
         """Fetch weather data for a specific resource with retry."""
         headers = {
             'Accept-Encoding': 'gzip',
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
         }
         for attempt in range(2):
             try:

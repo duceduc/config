@@ -80,9 +80,6 @@
   triggers:
     - trigger: template # sensor actual in tpl folder. after mar light shines brightest at < 26 in early mornings. after oct. All other < 21
       value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < states('sensor.lr_radar_illuminance_actual') | float(0) and
-                                       states('sensor.time') >= '05:00' }}"
-    - trigger: template
-      value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < states('sensor.lr_radar_illuminance_actual') | float(0) and
                                        states('sensor.lr_radar_illuminance') != 'unavailable' }}"
   conditions:
     - condition: template  # If guest is present, do not turn off
@@ -117,6 +114,27 @@
         - action: script.turn_off
           data:
             entity_id: script.ashley_fadein
+
+
+
+- alias: 'Turn on manual computer lights default params'
+  trigger:
+    - platform: state
+      entity_id: light.computer
+      to: 'on'
+  conditions:
+    - condition: template
+      value_template: "{%- set trig = (now() - states.automation.shionroom_auto_on.last_changed).seconds -%}
+          {{  trig > 2 }}"
+  action:
+    - action: script.tradfri_transition
+      data:
+        entity_id: light.computer
+        color_temp: 143
+        transition: 1
+        brightness: '{% if states.sensor.lr_radar_illuminance.state | float(0) < 0.21 %} 100 {% else %} 170 {% endif %}'
+  mode: single
+
 
 
 

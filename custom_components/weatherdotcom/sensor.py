@@ -5,7 +5,6 @@ https://github.com/jaydeethree/Home-Assistant-weatherdotcom
 """
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
@@ -34,7 +33,6 @@ from .weather_current_conditions_sensors import (
     current_condition_sensor_descriptions,
 )
 
-_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
         hass: HomeAssistant, entry: WeatherDotComConfigEntry, async_add_entities: AddEntitiesCallback
@@ -79,13 +77,8 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_info = coordinator.device_info
         self._attr_native_unit_of_measurement = self.entity_description.unit_fn(
             self.coordinator.hass.config.units is METRIC_SYSTEM)
-
-    @property
-    def entity_registry_enabled_default(self) -> bool:
-        """Return if the entity should be enabled when first added to the registry."""
-        if self.entity_description.key == FIELD_VALIDTIMEUTC:
-            return bool(self._extra_attributes)
-        return self.entity_description.entity_registry_enabled_default
+        if description.key == FIELD_VALIDTIMEUTC:
+            self._attr_entity_registry_enabled_default = bool(extra_attributes)
 
     @property
     def available(self) -> bool:
@@ -109,9 +102,9 @@ class WeatherSensor(CoordinatorEntity, SensorEntity):
     def native_value(self) -> StateType:
         """Return the state."""
         if self.entity_description.key == CONF_LATITUDE:
-            data = getattr(self.coordinator, "current_latitude", getattr(self.coordinator, "_latitude", None))
+            data = self.coordinator.current_latitude
         elif self.entity_description.key == CONF_LONGITUDE:
-            data = getattr(self.coordinator, "current_longitude", getattr(self.coordinator, "_longitude", None))
+            data = self.coordinator.current_longitude
         else:
             data = _get_sensor_data(
                 self.coordinator.data, self.entity_description.key
