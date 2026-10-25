@@ -6,69 +6,160 @@
 ###############################################################################
 
 automation:
-  - alias: AIO Controller Events
-    id: aio_controller_events
-    triggers:
-      - trigger: state
-        entity_id: event.aio_controller_action
-        to: ~
-    conditions:
-      - condition: template
-        value_template: "{{trigger.from_state.state != 'unavailable'}}"
-    actions:
-      - choose:
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'brightness_up_click'}}"
-          sequence:
-          - action: script.turn_on
-            target:
-              entity_id: script.dining_lights_toggle
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'brightness_down_click'}}"
-          sequence:
-          - action: light.toggle
-            target:
-              entity_id: light.living
+- alias: AIO Controller Events
+  id: aio_controller_events
+  triggers:
+    - trigger: state
+      entity_id: event.aio_controller_action
+      not_from: 'unavailable'
 
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'arrow_left_click'}}"
-          sequence:
-          - action: script.turn_on
-            target:
-              entity_id: script.cr_curtains_toggle
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'arrow_right_click'}}"
-          sequence:
-          - action: script.turn_on
-            target:
-              entity_id: script.lr_curtains_toggle
+  conditions: []
 
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'arrow_left_hold'}}"
-          sequence:
-          - action: script.turn_on
-            target:
-              entity_id: script.lr_ac_cool_toggle # Normal cool
+  actions:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'brightness_up_click'}}"
+        sequence:
+        - action: script.turn_on
+          target:
+            entity_id: script.dining_lights_toggle
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'brightness_down_click'}}"
+        sequence:
+        - action: light.toggle
+          target:
+            entity_id: light.living
 
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'arrow_right_hold'}}"
-          sequence:
-          - action: script.turn_on
-            target:
-              entity_id: script.lr_ac_heat_toggle # Normal heat
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'arrow_left_click'}}"
+        sequence:
+        - action: script.turn_on
+          target:
+            entity_id: script.cr_curtains_toggle
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'arrow_right_click'}}"
+        sequence:
+        - action: script.turn_on
+          target:
+            entity_id: script.lr_curtains_toggle
 
-        - conditions:
-          - condition: template
-            value_template: "{{trigger.to_state.attributes.event_type == 'toggle'}}"
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'arrow_left_hold'}}"
+        sequence:
+        - action: script.turn_on
+          target:
+            entity_id: script.lr_ac_cool_toggle # Normal cool
+
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'arrow_right_hold'}}"
+        sequence:
+        - action: script.turn_on
+          target:
+            entity_id: script.lr_ac_heat_toggle # Normal heat
+
+      - conditions:
+        - condition: template
+          value_template: "{{trigger.to_state.attributes.event_type == 'toggle'}}"
+        sequence:
+        - action: light.turn_off
+          target:
+            entity_id:
+              - light.living
+              - light.ceiling_fan_light
+
+
+
+
+## https://community.home-assistant.io/t/dim-brightness-on-button-hold-ikea-tradfri/876153/6
+- alias: computer room controller
+  id: computer_room_controller
+  mode: single
+  max_exceeded: silent
+
+  variables:
+    interval: 1
+    input_light: light.computer
+    fade_speed: 60
+    fade_off: 3
+    default_brightness: 154
+
+  triggers:
+    - trigger: state
+      entity_id: event.computer_room_action
+      not_from: 'unavailable'
+
+  conditions: []
+
+  actions:
+    - variables:
+        event: "{{ trigger.to_state.attributes.event_type }}"
+    - choose:
+        - conditions: "{{ event == 'toggle' and is_state('light.computer', 'off') }}"
+
           sequence:
-          - action: light.turn_off
-            target:
-              entity_id:
-                - light.living
-                - light.ceiling_fan_light
+            - wait_for_trigger:
+                - platform: state
+                  entity_id: event.computer_room_action
+                  not_from: 'unavailable'
+              timeout: '{{ interval }}'
+
+            - action: light.turn_on
+              target:
+                entity_id: '{{ input_light }}'
+              data:
+                brightness: "{{ 255 if wait.completed and wait.trigger.to_state.attributes.event_type == 'toggle' else default_brightness }}"
+
+        - conditions: "{{ event == 'toggle' and is_state('light.computer', 'on') }}"
+          sequence:
+            - wait_for_trigger:
+                - platform: state
+                  entity_id: event.computer_room_action
+                  not_from: 'unavailable'
+              timeout: '{{ interval }}'
+            - action: light.turn_off
+              target:
+                entity_id: '{{ input_light }}'
+              data:
+                transition: "{{ 0 if wait.completed and wait.trigger.to_state.attributes.event_type == 'toggle' else fade_off }}"
+
+        - conditions: "{{ event in ['brightness_down_hold', 'brightness_up_hold'] }}"
+          sequence:
+            - variables:
+                brightness_from: "{{ state_attr(input_light, 'brightness') | int(0)}}"
+                brightness_target: "{{ iif(event == 'brightness_down_hold', 5, 255) }}"
+                brightness_delta: "{{ (brightness_from - brightness_target) | abs }}"
+                transition_time: "{{ brightness_delta / fade_speed }}"
+                fade_speed: "{{ fade_speed * iif(event == 'brightness_down_hold', -1, 1) }}"
+
+            - action: light.turn_on
+              target:
+                entity_id: '{{ input_light }}'
+              data:
+                transition: '{{ transition_time }}'
+                brightness: '{{ brightness_target }}'
+
+            - wait_for_trigger:
+                - trigger: state
+                  entity_id: event.computer_room_action
+                  not_from: 'unavailable'
+              timeout: '{{ transition_time }}'
+              continue_on_timeout: false
+
+            - if: "{{ wait.trigger.to_state.attributes.event_type == 'brightness_down_release' or wait.trigger.to_state.attributes.event_type == 'brightness_up_release' }}"
+              then:
+                - action: light.turn_on
+                  target:
+                    entity_id: '{{ input_light }}'
+                  data:
+                    brightness: >
+                      {{ (brightness_from + fade_speed * (wait.trigger.to_state.last_changed - trigger.to_state.last_changed).total_seconds()) | round(0) }}
+
+      default: []
+
+

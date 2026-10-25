@@ -24,7 +24,7 @@ from homeassistant.components.weather import (
 )
 
 DOMAIN = 'weatherdotcom'
-CONF_ATTRIBUTION = 'Data provided by the Weather.com weather service'
+ATTRIBUTION: Final = 'Data provided by the Weather.com weather service'
 CONF_LANG = 'lang'
 CONF_LOCATION_SOURCE = 'location_source'
 
@@ -69,8 +69,6 @@ ICON_CODE_MAP: Final[dict[int, str]] = {
 }
 
 DEFAULT_LANG = 'en-US'
-API_IMPERIAL: Final = "imperial"
-API_METRIC: Final = "metric"
 API_URL_IMPERIAL: Final = "e"
 API_URL_METRIC: Final = "m"
 
@@ -174,3 +172,12 @@ EXTRA_ATTRIBUTE_KEYS_DAYPART: Final[list[str]] = [
     "daypart_qualifier_phrase",
     "daypart_narrative",
 ]
+
+HEADERS: Final[dict[str, str]] = {
+    "Accept-Encoding": "gzip",
+    "user-agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/155.0.0.0 Safari/537.36"
+    ),
+}

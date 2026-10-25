@@ -117,28 +117,6 @@
 
 
 
-- alias: 'Turn on manual computer lights default params'
-  trigger:
-    - platform: state
-      entity_id: light.computer
-      to: 'on'
-  conditions:
-    - condition: template
-      value_template: "{%- set trig = (now() - states.automation.shionroom_auto_on.last_changed).seconds -%}
-          {{  trig > 2 }}"
-  action:
-    - action: script.tradfri_transition
-      data:
-        entity_id: light.computer
-        color_temp: 143
-        transition: 1
-        brightness: '{% if states.sensor.lr_radar_illuminance.state | float(0) < 0.21 %} 100 {% else %} 170 {% endif %}'
-  mode: single
-
-
-
-
-
 
 #########################################################
 #

@@ -4,11 +4,36 @@ For more details about this platform, please refer to the documentation at
 https://github.com/jaydeethree/Home-Assistant-weatherdotcom
 """
 
+import logging
 import time
+
+from homeassistant.components.weather import (
+    ATTR_FORECAST_CLOUD_COVERAGE,
+    ATTR_FORECAST_CONDITION,
+    ATTR_FORECAST_HUMIDITY,
+    ATTR_FORECAST_NATIVE_APPARENT_TEMP,
+    ATTR_FORECAST_NATIVE_DEW_POINT,
+    ATTR_FORECAST_NATIVE_PRECIPITATION,
+    ATTR_FORECAST_NATIVE_TEMP,
+    ATTR_FORECAST_NATIVE_TEMP_LOW,
+    ATTR_FORECAST_NATIVE_WIND_GUST_SPEED,
+    ATTR_FORECAST_NATIVE_WIND_SPEED,
+    ATTR_FORECAST_PRECIPITATION_PROBABILITY,
+    ATTR_FORECAST_TIME,
+    ATTR_FORECAST_UV_INDEX,
+    ATTR_FORECAST_WIND_BEARING,
+    SingleCoordinatorWeatherEntity,
+    WeatherEntityFeature,
+    Forecast,
+    DOMAIN as WEATHER_DOMAIN
+)
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import generate_entity_id
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import WeatherDotComConfigEntry, WeatherUpdateCoordinator
 from .const import (
-    CONF_ATTRIBUTION,
+    ATTRIBUTION,
     TEMPUNIT,
     LENGTHUNIT,
     SPEEDUNIT,
@@ -38,33 +63,6 @@ from .const import (
     RESULTS_FORECAST_HOURLY,
 )
 
-import logging
-
-from homeassistant.components.weather import (
-    ATTR_FORECAST_CLOUD_COVERAGE,
-    ATTR_FORECAST_CONDITION,
-    ATTR_FORECAST_HUMIDITY,
-    ATTR_FORECAST_NATIVE_APPARENT_TEMP,
-    ATTR_FORECAST_NATIVE_DEW_POINT,
-    ATTR_FORECAST_NATIVE_PRECIPITATION,
-    ATTR_FORECAST_NATIVE_TEMP,
-    ATTR_FORECAST_NATIVE_TEMP_LOW,
-    ATTR_FORECAST_NATIVE_WIND_GUST_SPEED,
-    ATTR_FORECAST_NATIVE_WIND_SPEED,
-    ATTR_FORECAST_PRECIPITATION_PROBABILITY,
-    ATTR_FORECAST_TIME,
-    ATTR_FORECAST_UV_INDEX,
-    ATTR_FORECAST_WIND_BEARING,
-    SingleCoordinatorWeatherEntity,
-    WeatherEntityFeature,
-    Forecast,
-    DOMAIN as WEATHER_DOMAIN
-)
-
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import generate_entity_id
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 _LOGGER = logging.getLogger(__name__)
 
 ENTITY_ID_FORMAT = WEATHER_DOMAIN + ".{}"
@@ -81,13 +79,31 @@ async def async_setup_entry(
 
 
 class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
-    _attr_attribution = CONF_ATTRIBUTION
+    _attr_attribution = ATTRIBUTION
     # Use the device (location) name as the entity's friendly name.
     _attr_has_entity_name = True
     _attr_name = None
     _attr_supported_features = (
         WeatherEntityFeature.FORECAST_DAILY | WeatherEntityFeature.FORECAST_HOURLY
     )
+
+    def __init__(
+            self,
+            coordinator: WeatherUpdateCoordinator
+    ):
+        """Initialize the sensor."""
+        super().__init__(coordinator)
+        self.entity_id = generate_entity_id(
+            ENTITY_ID_FORMAT, f"{coordinator.location_name}", hass=coordinator.hass
+        )
+        self._attr_unique_id = f"{coordinator.location_name},{WEATHER_DOMAIN}".lower()
+        self._attr_device_info = coordinator.device_info
+        self._attr_native_temperature_unit = coordinator.units_of_measurement[TEMPUNIT]
+        self._attr_native_pressure_unit = coordinator.units_of_measurement[PRESSUREUNIT]
+        self._attr_native_wind_speed_unit = coordinator.units_of_measurement[SPEEDUNIT]
+        self._attr_native_visibility_unit = coordinator.visibility_unit
+        self._attr_native_precipitation_unit = coordinator.units_of_measurement[LENGTHUNIT]
+        self._store = coordinator._store
 
     @property
     def native_temperature(self) -> float | None:
@@ -147,24 +163,6 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     def uv_index(self) -> float | None:
         """Return the UV index."""
         return self.coordinator.get_current(FIELD_UV_INDEX)
-
-    def __init__(
-            self,
-            coordinator: WeatherUpdateCoordinator
-    ):
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self.entity_id = generate_entity_id(
-            ENTITY_ID_FORMAT, f"{coordinator.location_name}", hass=coordinator.hass
-        )
-        self._attr_unique_id = f"{coordinator.location_name},{WEATHER_DOMAIN}".lower()
-        self._attr_device_info = coordinator.device_info
-        self._attr_native_temperature_unit = coordinator.units_of_measurement[TEMPUNIT]
-        self._attr_native_pressure_unit = coordinator.units_of_measurement[PRESSUREUNIT]
-        self._attr_native_wind_speed_unit = coordinator.units_of_measurement[SPEEDUNIT]
-        self._attr_native_visibility_unit = coordinator.visibility_unit
-        self._attr_native_precipitation_unit = coordinator.units_of_measurement[LENGTHUNIT]
-        self._store = coordinator._store
 
     async def async_forecast_daily(self) -> list[Forecast] | None:
         """Return the daily forecast in native units."""

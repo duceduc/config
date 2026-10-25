@@ -6,6 +6,7 @@ from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
+from homeassistant.util import slugify
 
 from .const import (
     DOMAIN,
@@ -25,7 +26,7 @@ class WeatherDotComStorage:
         self._store = Store(
             hass,
             STORAGE_VERSION,
-            STORAGE_KEY.format(domain=DOMAIN, location_name=location_name.lower()),
+            STORAGE_KEY.format(domain=DOMAIN, location_name=slugify(location_name)),
         )
         self._data: dict[str, Any] | None = None
 
@@ -35,6 +36,12 @@ class WeatherDotComStorage:
         return self._data
 
     async def async_save(self, high_temp_today, high_temp_today_timestamp) -> None:
+        current = await self.async_load()
+        if (
+            current.get(HIGH_TEMP_TODAY_STORAGE) == high_temp_today
+            and high_temp_today_timestamp - current.get(HIGH_TEMP_TODAY_TIMESTAMP_STORAGE, 0) < 7200
+        ):
+            return
         data_to_save = {
             HIGH_TEMP_TODAY_STORAGE: high_temp_today,
             HIGH_TEMP_TODAY_TIMESTAMP_STORAGE: high_temp_today_timestamp,

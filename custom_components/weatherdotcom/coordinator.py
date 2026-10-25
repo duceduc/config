@@ -29,6 +29,7 @@ from homeassistant.const import (
 from .const import (
     API_URL_METRIC,
     DOMAIN,
+    HEADERS,
     ICON_CODE_MAP,
     FIELD_DAYPART,
     FIELD_TEMPERATUREMAX,
@@ -42,13 +43,9 @@ from .store import WeatherDotComStorage
 
 _LOGGER = logging.getLogger(__name__)
 
-_RESOURCESHARED = '&format=json&apiKey={apiKey}&units={units}'
-_RESOURCECURRENT = ('https://api.weather.com/v3/wx/observations/current'
-                    '?geocode={latitude},{longitude}')
-_RESOURCEFORECASTDAILY = ('https://api.weather.com/v3/wx/forecast/daily/15day'
-                          '?geocode={latitude},{longitude}')
-_RESOURCEFORECASTHOURLY = ('https://api.weather.com/v3/wx/forecast/hourly/15day'
-                           '?geocode={latitude},{longitude}')
+_RESOURCECURRENT = 'https://api.weather.com/v3/wx/observations/current'
+_RESOURCEFORECASTDAILY = 'https://api.weather.com/v3/wx/forecast/daily/15day'
+_RESOURCEFORECASTHOURLY = 'https://api.weather.com/v3/wx/forecast/hourly/15day'
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=20)
 
@@ -60,9 +57,8 @@ class WeatherUpdateCoordinatorConfig:
     api_key: str
     location_name: str
     unit_system_api: str
-    unit_system: str
     lang: str
-    tranfile: dict[str, Any] | str
+    tranfile: dict[str, Any]
 
     update_interval: timedelta = MIN_TIME_BETWEEN_UPDATES
     location_entity_id: str | None = None
@@ -83,7 +79,6 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._api_key = config.api_key
         self._location_name = config.location_name
         self._unit_system_api = config.unit_system_api
-        self.unit_system = config.unit_system
         self._lang = config.lang
         self._consecutive_failures = 0
         self._session = async_get_clientsession(hass)
@@ -131,9 +126,15 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             if raw_lat is not None and raw_long is not None:
                 return round(float(raw_lat), 2), round(float(raw_long), 2)
 
-        # Fallback to legacy config if entity is missing
+        # Fallback to legacy config or last known coordinates if entity is missing
         if self._latitude is not None and self._longitude is not None:
             return float(self._latitude), float(self._longitude)
+        if self.current_latitude is not None and self.current_longitude is not None:
+            _LOGGER.warning(
+                "Could not determine latitude/longitude from %s; using last known coordinates",
+                self._location_entity_id,
+            )
+            return self.current_latitude, self.current_longitude
 
         _LOGGER.error("Could not determine latitude/longitude from entity or prior config")
         return None, None
@@ -183,30 +184,39 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return self.data
 
         self._consecutive_failures = 0
+        prev_data = self.data or {}
         return {
-            RESULTS_CURRENT: result_current,
-            RESULTS_FORECAST_DAILY: result_forecast_daily,
-            RESULTS_FORECAST_HOURLY: result_forecast_hourly,
+            RESULTS_CURRENT: (
+                prev_data.get(RESULTS_CURRENT) if current_error else result_current
+            ),
+            RESULTS_FORECAST_DAILY: (
+                prev_data.get(RESULTS_FORECAST_DAILY) if daily_error else result_forecast_daily
+            ),
+            RESULTS_FORECAST_HOURLY: (
+                prev_data.get(RESULTS_FORECAST_HOURLY) if hourly_error else result_forecast_hourly
+            ),
         }
 
     async def _async_fetch_data(
         self, resource: str, latitude: float, longitude: float, description: str
     ) -> tuple[dict[str, Any] | None, bool]:
         """Fetch weather data for a specific resource with retry."""
-        headers = {
-            'Accept-Encoding': 'gzip',
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
+        params = {
+            "geocode": f"{latitude},{longitude}",
+            "language": self._lang,
+            "format": "json",
+            "apiKey": self._api_key,
+            "units": self._unit_system_api,
         }
         for attempt in range(2):
             try:
                 async with asyncio.timeout(10):
-                    url = self._build_url(resource, latitude, longitude)
-                    async with self._session.get(url, headers=headers) as response:
+                    async with self._session.get(resource, params=params, headers=HEADERS) as response:
                         response.raise_for_status()
                         result = await response.json(content_type=None)
                     if result is None:
                         raise ValueError('No weather data found')
-                    self._check_errors(url, result)
+                    self._check_errors(result)
                     return result, False
             except (ValueError, asyncio.TimeoutError, aiohttp.ClientError) as err:
                 err_msg = str(err).replace(self._api_key, "REDACTED")
@@ -217,20 +227,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 await asyncio.sleep(5)
         return None, True
 
-    def _build_url(self, baseurl: str, latitude: float, longitude: float) -> str:
-        baseurl += '&language={language}'
-        baseurl += _RESOURCESHARED
-
-        return baseurl.format(
-            apiKey=self._api_key,
-            language=self._lang,
-            latitude=latitude,
-            longitude=longitude,
-            units=self._unit_system_api
-        )
-
-    def _check_errors(self, url: str, response: dict):
-        # _LOGGER.debug(f'Checking errors from {url} in {response}')
+    def _check_errors(self, response: dict):
         if 'errors' not in response:
             return
         if errors := response['errors']:
@@ -238,9 +235,9 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             raise ValueError(f'Weather.com API error: {messages}')
 
     def get_current(self, field):
-        if self.data[RESULTS_CURRENT] is None:
+        if not self.data or self.data.get(RESULTS_CURRENT) is None:
             return None
-        return self.data[RESULTS_CURRENT][field]
+        return self.data[RESULTS_CURRENT].get(field)
 
     def get_forecast_daily(self, field, period=0):
         try:
@@ -252,13 +249,13 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 # Those fields exist per-day, rather than per dayPart, so the period is halved
                 return self.data[RESULTS_FORECAST_DAILY][field][int(period / 2)]
             return self.data[RESULTS_FORECAST_DAILY][FIELD_DAYPART][0][field][period]
-        except (IndexError, TypeError):
+        except (IndexError, KeyError, TypeError):
             return None
 
     def get_forecast_hourly(self, field, hour):
         try:
             return self.data[RESULTS_FORECAST_HOURLY][field][hour]
-        except (IndexError, TypeError):
+        except (IndexError, KeyError, TypeError):
             return None
 
     @classmethod

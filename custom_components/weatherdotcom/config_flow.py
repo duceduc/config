@@ -26,14 +26,17 @@ from .const import (
     CONF_LANG,
     CONF_LOCATION_SOURCE,
     DEFAULT_LANG,
+    HEADERS,
     LANG_CODES,
     LOCATION_TYPE_ENTITY,
     LOCATION_TYPE_LATLONG,
     EXTRA_ATTRIBUTE_KEYS_DAILY,
     EXTRA_ATTRIBUTE_KEYS_DAY,
     EXTRA_ATTRIBUTE_KEYS_DAYPART,
+    FIELD_VALIDTIMEUTC,
     CONF_EXTRA_ATTRIBUTES
 )
+from .sensor import get_sensor_unique_id
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,10 +60,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _async_validate_api_key(self, api_key: str | None) -> str | None:
         """Validate the API key against the Weather.com endpoint."""
-        headers = {
-            'Accept-Encoding': 'gzip',
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
-        }
         session = async_get_clientsession(self.hass)
         try:
             async with asyncio.timeout(10):
@@ -76,7 +75,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     "apiKey": api_key or "",
                     "language": "en-US",
                 }
-                async with session.get(url, params=params, headers=headers) as response:
+                async with session.get(url, params=params, headers=HEADERS) as response:
                     status = response.status
                     reason = response.reason
         except (asyncio.TimeoutError, aiohttp.ClientError) as err:
@@ -119,7 +118,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(
                         CONF_LANG,
                         default=DEFAULT_LANG,
-                    ): vol.All(vol.In(LANG_CODES)),
+                    ): vol.In(LANG_CODES),
                     vol.Required(CONF_LOCATION_SOURCE, default=LOCATION_TYPE_LATLONG): selector.SelectSelector(
                         selector.SelectSelectorConfig(
                             options=[LOCATION_TYPE_LATLONG, LOCATION_TYPE_ENTITY],
@@ -141,11 +140,11 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             self._data.update(user_input)
             if self._validate_latlong(lat=user_input.get(CONF_LATITUDE), long=user_input.get(CONF_LONGITUDE)):
-                return await self._async_validate_and_create()
+                return await self._async_create_entry()
             else:
-                errors["base"] = "unknown_error"
-                _LOGGER.error("Invalid latitude/longitude: %s, %s",
-                              user_input.get(CONF_LATITUDE), user_input.get(CONF_LONGITUDE),)
+                errors["base"] = "invalid_coordinates"
+                _LOGGER.warning("Invalid latitude/longitude: %s, %s",
+                                user_input.get(CONF_LATITUDE), user_input.get(CONF_LONGITUDE),)
 
         default_latitude = self.hass.config.latitude
         default_longitude = self.hass.config.longitude
@@ -195,11 +194,11 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 self._data.update(user_input)
                 if self._validate_latlong(entity=state):
-                    return await self._async_validate_and_create()
+                    return await self._async_create_entry()
                 else:
-                    errors["base"] = "unknown_error"
-                    _LOGGER.error("Invalid latitude/longitude: %s, %s",
-                                  state.attributes.get(CONF_LATITUDE), state.attributes.get(CONF_LONGITUDE),)
+                    errors["base"] = "invalid_coordinates"
+                    _LOGGER.warning("Invalid latitude/longitude: %s, %s",
+                                    state.attributes.get(CONF_LATITUDE), state.attributes.get(CONF_LONGITUDE),)
 
         default_entity = None
 
@@ -235,8 +234,8 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 return True
         return False
 
-    async def _async_validate_and_create(self) -> ConfigFlowResult:
-        """Validate API key and lat/long, then create the config entry."""
+    async def _async_create_entry(self) -> ConfigFlowResult:
+        """Create or update the config entry."""
         api_key = self._data[CONF_API_KEY]
         location_name = self._data[CONF_NAME]
         location_source = self._data.get(CONF_LOCATION_SOURCE)
@@ -315,7 +314,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             CONF_LANG,
                             DEFAULT_LANG,
                         ),
-                    ): vol.All(vol.In(LANG_CODES)),
+                    ): vol.In(LANG_CODES),
                     vol.Required(
                         CONF_LOCATION_SOURCE,
                         default=default_source,
@@ -354,7 +353,7 @@ class WeatherDotComOptionsFlow(config_entries.OptionsFlowWithReload):
             # Auto-enable / disable Forecast Details sensor based on whether attributes are selected
             ent_reg = er.async_get(self.hass)
             location_name = self.config_entry.data.get(CONF_NAME, "")
-            unique_id = f"{location_name},validtimeutc".lower()
+            unique_id = get_sensor_unique_id(location_name, FIELD_VALIDTIMEUTC)
             if entity_id := ent_reg.async_get_entity_id("sensor", DOMAIN, unique_id):
                 entity_entry = ent_reg.async_get(entity_id)
                 if entity_entry:
