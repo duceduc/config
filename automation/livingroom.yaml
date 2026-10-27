@@ -117,6 +117,33 @@
 
 
 
+- alias: 'Turn on manual computer lights default params'
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: light.computer
+      to: 'on'
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: > # 13 sec is script delay of when lights turns on.
+                {%- set trig = (now() - states.automation.computer_room_lights_auto_on.last_updated).seconds -%}
+                  {{ trig > 13 }}
+          sequence:
+            - action: script.tradfri_transition
+              data:
+                entity_id: light.computer
+                color_temp: 143
+                transition: 2
+                brightness: 152
+
+      default: []
+
+
+
+
+
 
 #########################################################
 #
