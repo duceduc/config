@@ -25,7 +25,7 @@
               entity_id: light.shower
       default:
         - action: light.turn_on
-          entity_id: light.laundry, light.sink, light.vanity
+          entity_id: light.laundry, light.sink, light.vanity # sink color_temp_kelvin: 6535, brightness: 255; vanity color_temp_kelvin: 2702, brightness: 255, 3 secs ha detects on
 
 - alias: 'motion washroom auto-off'
   mode: parallel
@@ -38,8 +38,6 @@
   conditions:
     - condition: template
       value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
-#    - condition: template # disable motion light
-#      value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
   actions:
     - choose:
         - conditions:
@@ -48,20 +46,13 @@
           sequence: # possibly don't need the template of attr being true #
             - service_template: light.turn_{{ 'off' if state_attr('binary_sensor.wash_occupied', 'nightlight') == true else 'on' }}
               entity_id: light.laundry
-
-#        - conditions:
-#            - condition: template # auto off at 11pm and  between 11pm - 7pm
-#              value_template: "{{ state_attr('binary_sensor.wash_occupied', 'nightlight') == true or not is_state('input_boolean.disable_motion_lights', 'on') and (now().hour > 22 or now().hour < 7) }}"
-#          sequence:
-#            - action: light.turn_off
-#              entity_id: light.laundry
-
       default:
         - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
           entity_id: light.laundry
         - delay: 10
         - service_template: light.turn_{{ 'on' if is_state('light.shower', 'on') else 'off' }}
           entity_id: light.sink, light.vanity
+
 
 
 #########################################################

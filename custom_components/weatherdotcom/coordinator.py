@@ -19,12 +19,10 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    PERCENTAGE,
     UnitOfPressure,
     UnitOfTemperature,
     UnitOfLength,
     UnitOfSpeed,
-    UnitOfVolumetricFlux
 )
 from .const import (
     API_URL_METRIC,
@@ -48,6 +46,40 @@ _RESOURCEFORECASTDAILY = 'https://api.weather.com/v3/wx/forecast/daily/15day'
 _RESOURCEFORECASTHOURLY = 'https://api.weather.com/v3/wx/forecast/hourly/15day'
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=20)
+MAX_CONSECUTIVE_FAILURES = 3
+
+
+@dataclass(frozen=True, kw_only=True)
+class WeatherUnits:
+    """Units of measurement for a unit system."""
+
+    temperature: str
+    precipitation: str
+    snow: str
+    distance: str
+    speed: str
+    pressure: str
+    visibility: str
+
+
+METRIC_UNITS = WeatherUnits(
+    temperature=UnitOfTemperature.CELSIUS,
+    precipitation=UnitOfLength.MILLIMETERS,
+    snow=UnitOfLength.CENTIMETERS,
+    distance=UnitOfLength.METERS,
+    speed=UnitOfSpeed.KILOMETERS_PER_HOUR,
+    pressure=UnitOfPressure.MBAR,
+    visibility=UnitOfLength.KILOMETERS,
+)
+IMPERIAL_UNITS = WeatherUnits(
+    temperature=UnitOfTemperature.FAHRENHEIT,
+    precipitation=UnitOfLength.INCHES,
+    snow=UnitOfLength.INCHES,
+    distance=UnitOfLength.FEET,
+    speed=UnitOfSpeed.MILES_PER_HOUR,
+    pressure=UnitOfPressure.INHG,
+    visibility=UnitOfLength.MILES,
+)
 
 
 @dataclass
@@ -80,10 +112,14 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._location_name = config.location_name
         self._unit_system_api = config.unit_system_api
         self._lang = config.lang
-        self._consecutive_failures = 0
+        self._consecutive_failures: dict[str, int] = {
+            RESULTS_CURRENT: 0,
+            RESULTS_FORECAST_DAILY: 0,
+            RESULTS_FORECAST_HOURLY: 0,
+        }
         self._session = async_get_clientsession(hass)
-        self._tranfile = config.tranfile
-        self._store = WeatherDotComStorage(hass, self._location_name)
+        self.tranfile = config.tranfile
+        self.store = WeatherDotComStorage(hass, self._location_name)
 
         self._location_entity_id = config.location_entity_id
         self._latitude = config.latitude
@@ -92,28 +128,20 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.current_longitude: float | None = config.longitude
 
         self.device_info = _get_device_info(self._location_name)
-
-        if self._unit_system_api == API_URL_METRIC:
-            self.units_of_measurement = (UnitOfTemperature.CELSIUS, UnitOfLength.MILLIMETERS, UnitOfLength.METERS,
-                                         UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfPressure.MBAR,
-                                         UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR, PERCENTAGE)
-            self.visibility_unit = UnitOfLength.KILOMETERS
-        else:
-            self.units_of_measurement = (UnitOfTemperature.FAHRENHEIT, UnitOfLength.INCHES, UnitOfLength.FEET,
-                                         UnitOfSpeed.MILES_PER_HOUR, UnitOfPressure.INHG,
-                                         UnitOfVolumetricFlux.INCHES_PER_HOUR, PERCENTAGE)
-            self.visibility_unit = UnitOfLength.MILES
+        self.units = (
+            METRIC_UNITS if self._unit_system_api == API_URL_METRIC else IMPERIAL_UNITS
+        )
 
         super().__init__(
             hass,
             _LOGGER,
             config_entry=entry,
-            name=DOMAIN,
+            name=f"{DOMAIN} ({self._location_name})",
             update_interval=config.update_interval,
         )
 
     @property
-    def location_name(self):
+    def location_name(self) -> str:
         """Return the location used for data."""
         return self._location_name
 
@@ -124,7 +152,10 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             raw_lat = state.attributes.get(CONF_LATITUDE)
             raw_long = state.attributes.get(CONF_LONGITUDE)
             if raw_lat is not None and raw_long is not None:
-                return round(float(raw_lat), 2), round(float(raw_long), 2)
+                try:
+                    return round(float(raw_lat), 2), round(float(raw_long), 2)
+                except (TypeError, ValueError):
+                    pass
 
         # Fallback to legacy config or last known coordinates if entity is missing
         if self._latitude is not None and self._longitude is not None:
@@ -142,7 +173,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def _async_update_data(self) -> dict[str, Any]:
         return await self.get_weather()
 
-    async def get_weather(self):
+    async def get_weather(self) -> dict[str, Any]:
         """Get weather data."""
         latitude, longitude = self._get_coordinates()
         if latitude is None or longitude is None:
@@ -171,31 +202,42 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             # update that data in storage.
             temp_max_list = result_forecast_daily.get(FIELD_TEMPERATUREMAX)
             if temp_max_list and temp_max_list[0] is not None:
-                await self._store.async_save(temp_max_list[0], round(time.time()))
+                try:
+                    await self.store.async_save(temp_max_list[0], round(time.time()))
+                except OSError as err:
+                    _LOGGER.warning(
+                        "Failed to save high temperature to storage: %s", err
+                    )
+
+        prev_data = self.data or {}
+        results: dict[str, Any] = {}
+        for key, result, has_error in (
+            (RESULTS_CURRENT, result_current, current_error),
+            (RESULTS_FORECAST_DAILY, result_forecast_daily, daily_error),
+            (RESULTS_FORECAST_HOURLY, result_forecast_hourly, hourly_error),
+        ):
+            if has_error:
+                self._consecutive_failures[key] += 1
+                results[key] = (
+                    prev_data.get(key)
+                    if self._consecutive_failures[key] < MAX_CONSECUTIVE_FAILURES
+                    else None
+                )
+            else:
+                self._consecutive_failures[key] = 0
+                results[key] = result
 
         if current_error and daily_error and hourly_error:
-            self._consecutive_failures += 1
-            if self._consecutive_failures >= 3 or self.data is None:
+            min_failures = min(self._consecutive_failures.values())
+            if min_failures >= MAX_CONSECUTIVE_FAILURES or self.data is None:
                 raise UpdateFailed('Failed to get weather data')
             _LOGGER.warning(
-                'Failed to get weather data (failure %s of 3); retaining previous data',
-                self._consecutive_failures,
+                'Failed to get weather data (failure %s of %s); retaining previous data',
+                min_failures,
+                MAX_CONSECUTIVE_FAILURES,
             )
-            return self.data
 
-        self._consecutive_failures = 0
-        prev_data = self.data or {}
-        return {
-            RESULTS_CURRENT: (
-                prev_data.get(RESULTS_CURRENT) if current_error else result_current
-            ),
-            RESULTS_FORECAST_DAILY: (
-                prev_data.get(RESULTS_FORECAST_DAILY) if daily_error else result_forecast_daily
-            ),
-            RESULTS_FORECAST_HOURLY: (
-                prev_data.get(RESULTS_FORECAST_HOURLY) if hourly_error else result_forecast_hourly
-            ),
-        }
+        return results
 
     async def _async_fetch_data(
         self, resource: str, latitude: float, longitude: float, description: str
@@ -214,32 +256,40 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     async with self._session.get(resource, params=params, headers=HEADERS) as response:
                         response.raise_for_status()
                         result = await response.json(content_type=None)
-                    if result is None:
+                    if not isinstance(result, dict):
                         raise ValueError('No weather data found')
                     self._check_errors(result)
                     return result, False
-            except (ValueError, asyncio.TimeoutError, aiohttp.ClientError) as err:
+            except (ValueError, TimeoutError, aiohttp.ClientError) as err:
                 err_msg = str(err).replace(self._api_key, "REDACTED")
-                if attempt == 1:
+                is_client_error = (
+                    isinstance(err, aiohttp.ClientResponseError)
+                    and 400 <= err.status < 500
+                    and err.status != 429
+                )
+                if attempt == 1 or is_client_error:
                     _LOGGER.error('Error getting %s weather. Exception: %s. Details: %s', description, type(err), err_msg)
                     return None, True
                 _LOGGER.warning('Error getting %s weather, will retry. Exception: %s. Details: %s', description, type(err), err_msg)
                 await asyncio.sleep(5)
         return None, True
 
-    def _check_errors(self, response: dict):
+    def _check_errors(self, response: dict[str, Any]) -> None:
         if 'errors' not in response:
             return
         if errors := response['errors']:
-            messages = '; '.join([e['message'] for e in errors])
+            messages = '; '.join([
+                e.get('message', str(e)) if isinstance(e, dict) else str(e)
+                for e in errors
+            ])
             raise ValueError(f'Weather.com API error: {messages}')
 
-    def get_current(self, field):
+    def get_current(self, field: str) -> Any:
         if not self.data or self.data.get(RESULTS_CURRENT) is None:
             return None
         return self.data[RESULTS_CURRENT].get(field)
 
-    def get_forecast_daily(self, field, period=0):
+    def get_forecast_daily(self, field: str, period: int = 0) -> Any:
         try:
             if field in [
                 FIELD_TEMPERATUREMAX,
@@ -247,19 +297,19 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 FIELD_VALIDTIMEUTC,
             ]:
                 # Those fields exist per-day, rather than per dayPart, so the period is halved
-                return self.data[RESULTS_FORECAST_DAILY][field][int(period / 2)]
+                return self.data[RESULTS_FORECAST_DAILY][field][period // 2]
             return self.data[RESULTS_FORECAST_DAILY][FIELD_DAYPART][0][field][period]
         except (IndexError, KeyError, TypeError):
             return None
 
-    def get_forecast_hourly(self, field, hour):
+    def get_forecast_hourly(self, field: str, hour: int) -> Any:
         try:
             return self.data[RESULTS_FORECAST_HOURLY][field][hour]
         except (IndexError, KeyError, TypeError):
             return None
 
-    @classmethod
-    def _iconcode_to_condition(cls, icon_code: int | None) -> str | None:
+    @staticmethod
+    def iconcode_to_condition(icon_code: int | None) -> str | None:
         if icon_code is None or icon_code == 44:
             return None
         if (condition := ICON_CODE_MAP.get(icon_code)) is not None:
@@ -267,8 +317,8 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         _LOGGER.warning('Unmapped icon code from Weather.com API: %s', icon_code)
         return None
 
-    @classmethod
-    def _format_timestamp(cls, timestamp_secs):
+    @staticmethod
+    def format_timestamp(timestamp_secs: int | float | None) -> str | None:
         if timestamp_secs is None:
             return None
         return datetime.fromtimestamp(timestamp_secs, tz=UTC).strftime('%Y-%m-%dT%H:%M:%SZ')

@@ -284,10 +284,6 @@ automation:
       - trigger: state # dryer
         entity_id: sensor.gosund_washer_state
         from:
-          - 'run'        
-#          - 'fill'
-#          - 'wash'
-#          - 'wash'
         to: 'pulse'
 
     conditions:
@@ -304,7 +300,13 @@ automation:
             state: complete
     actions:
       - action: script.washer_running
-      - action: script.washer_monitor
+      - action: script.washer_monitor ###
+
+### normal wash: 400w reach
+#### light wash: 80w
+
+
+
 
 
   - alias: Washer Complete
@@ -319,11 +321,11 @@ automation:
 # TESTING
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"
-        for: 52
+        for: 54
         id: 'filter'
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"
-        for: 52
+        for: 54
         id: 'filter'
 
 #      - trigger: template
@@ -351,12 +353,12 @@ automation:
             sequence:
               - condition: template
                 value_template: "{{ is_state('sensor.washer_status_m', 'running') and is_state('timer.washer_monitor', 'idle') }}"
+              - action: script.washer_complete
               - action: script.speech_engine
                 data:
                   who: '{{ states(''sensor.room_audio'') }}'
                   voice: "{{ states('input_select.jarvis_voice') }}"
                   message: 'It appears the washing machine check filter warning lamp is on.'
-              - action: script.washer_complete
 
           - conditions:
               - condition: trigger

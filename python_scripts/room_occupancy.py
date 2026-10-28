@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# https://community.home-assistant.io/t/another-take-on-room-occupancy/382671
 roomname = data.get("roomname")
 entities_toggle = data.get("entities_toggle",[])
 entities_keep = data.get("entities_keep",[])

@@ -2,7 +2,6 @@
 from __future__ import annotations
 import asyncio
 import logging
-import random
 from http import HTTPStatus
 from typing import Any
 import aiohttp
@@ -20,6 +19,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.util import slugify
 
 from .const import (
     DOMAIN,
@@ -36,7 +36,7 @@ from .const import (
     FIELD_VALIDTIMEUTC,
     CONF_EXTRA_ATTRIBUTES
 )
-from .sensor import get_sensor_unique_id
+from .helpers import get_sensor_unique_id
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,11 +65,8 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             async with asyncio.timeout(10):
                 # Use hardcoded values for the initial test API call. User-supplied values will be used for the created entities.
                 url = "https://api.weather.com/v3/wx/observations/current"
-                random_latitude = round(random.uniform(36.0, 41.0), 6)
-                random_longitude = round(random.uniform(-120.0, -78.0), 6)
-                random_latlong = f"{random_latitude},{random_longitude}"
                 params = {
-                    "geocode": random_latlong,
+                    "geocode": "37.3355,-121.8930",
                     "format": "json",
                     "units": "e",
                     "apiKey": api_key or "",
@@ -78,7 +75,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 async with session.get(url, params=params, headers=HEADERS) as response:
                     status = response.status
                     reason = response.reason
-        except (asyncio.TimeoutError, aiohttp.ClientError) as err:
+        except (TimeoutError, aiohttp.ClientError) as err:
             err_msg = str(err).replace(api_key, "REDACTED") if api_key else str(err)
             _LOGGER.error("Error connecting to Weather.com during config: %s", err_msg)
             return "unknown_error"
@@ -98,13 +95,29 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the first step initiated by the user."""
         errors = {}
         if user_input is not None:
-            self._data = user_input
-            if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
-                errors["base"] = error
-            else:
-                if user_input.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
-                    return await self.async_step_latlong()
-                return await self.async_step_entity()
+            location_name = user_input[CONF_NAME]
+            unique_id = f"{DOMAIN}-{location_name.lower()}"
+            for entry in self._async_current_entries():
+                existing_name = entry.data.get(CONF_NAME, "")
+                if (
+                    (entry.unique_id and entry.unique_id.lower() == unique_id)
+                    or existing_name.lower() == location_name.lower()
+                    or slugify(existing_name) == slugify(location_name)
+                ):
+                    errors[CONF_NAME] = "already_configured"
+                    break
+
+            if not errors:
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
+
+                self._data = user_input
+                if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
+                    errors["base"] = error
+                else:
+                    if user_input.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
+                        return await self.async_step_latlong()
+                    return await self.async_step_entity()
 
         return self.async_show_form(
             step_id="user",
@@ -253,8 +266,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         else:
             entry_data[CONF_ENTITY_ID] = self._data[CONF_ENTITY_ID]
 
-        unique_id = str(f"{DOMAIN}-{location_name}")
-
         if self.source == config_entries.SOURCE_RECONFIGURE:
             # Replace (rather than merge) the entry data so that keys from the
             # previous location source (e.g. a stale entity_id after switching
@@ -264,9 +275,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 self._get_reconfigure_entry(),
                 data=entry_data,
             )
-
-        await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
 
         return self.async_create_entry(
             title=location_name,

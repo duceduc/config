@@ -1,3 +1,19 @@
+assign_profile_owner:
+  name: Assign profile owner
+  description: Assign an active Home Assistant user to an ownerless Halthy profile. Requires administrator access. Existing ownership cannot be transferred.
+  fields:
+    entry_id:
+      name: Halthy integration entry
+      required: true
+      selector:
+        config_entry:
+          integration: halthy
+    owner_user_id:
+      name: Profile owner
+      required: true
+      selector:
+        text:
+
 force_upload:
   name: Request force upload
   description: Queue a force-upload command for the Halthy iOS app.

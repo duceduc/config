@@ -190,7 +190,10 @@ class GatewayClient:
             f"/api/locks/{quote(serial, safe='')}/state", method="POST",
             payload={"locked": locked}, timeout=60,
         )
-        return self._lock_state(payload.get("lock"))
+        state = self._lock_state(payload.get("lock"))
+        if state.get("readOnly") is True:
+            raise GatewayClientError("Read-only lock observations cannot confirm a motor command")
+        return state
 
     async def set_lock_setting(self, serial: str, setting: str, value: bool | int) -> dict[str, Any]:
         """Wait for the gateway's independent setting readback, without optimistic state."""
@@ -217,13 +220,26 @@ class GatewayClient:
     def _lock_state(value: Any) -> dict[str, Any]:
         """Project only normalized public facts, rejecting ambiguous command results."""
         if (not isinstance(value, dict) or not isinstance(value.get("serial"), str)
-                or value.get("model") != "T85F1"
+                or value.get("model") not in ("T85F1", "T8520", "T8520J11", "T8520S")
                 or value.get("state") not in ("locked", "unlocked", "unknown")
                 or not isinstance(value.get("available"), bool)):
             raise GatewayClientError("Gateway returned invalid lock state")
         state = {key: value.get(key) for key in (
             "serial", "name", "model", "state", "available", "batteryPercent", "stateObservedAt"
         )}
+        if value["model"] != "T85F1":
+            if value.get("readOnly") is not True or value.get("observationSource") != "cloud_inventory":
+                raise GatewayClientError("Gateway returned an invalid read-only lock profile")
+            battery = state["batteryPercent"]
+            if battery is not None and (type(battery) is not int or not 0 <= battery <= 100):
+                raise GatewayClientError("Gateway returned an invalid reported lock battery")
+            if state["stateObservedAt"] is not None and not isinstance(state["stateObservedAt"], str):
+                raise GatewayClientError("Gateway returned an invalid lock observation time")
+            state["readOnly"] = True
+            state["observationSource"] = "cloud_inventory"
+            return state
+        if value.get("readOnly") is not None or value.get("observationSource") is not None:
+            raise GatewayClientError("Gateway returned an invalid E30 lock profile")
         settings = value.get("settings")
         if isinstance(settings, dict):
             booleans = ("autoLock", "notifications", "lockedNotifications", "unlockedNotifications")
@@ -461,6 +477,9 @@ class GatewayClient:
 
     async def set_camera_setting(self, serial: str, setting: str, value: bool | int) -> dict[str, Any]:
         """Await an independently confirmed setting within the gateway's 90-second deadline."""
+        field = {"motionSensitivity": "motionSensitivityStep", "homebaseChime": "homebaseChimeEnabled", "lightBrightness": "lightBrightness", "manualFloodlight": "manualFloodlightEnabled"}.get(setting)
+        if field is None:
+            raise GatewayClientError("Unsupported camera setting", code="unavailable")
         try:
             camera = await self._json(
                 f"/api/cameras/{quote(serial, safe='')}/settings", method="POST",
@@ -470,7 +489,6 @@ class GatewayClient:
             if error.status is None and error.code is None:
                 raise GatewayClientError("Camera setting outcome is unknown", code="outcome_unknown") from error
             raise
-        field = "motionSensitivityStep" if setting == "motionSensitivity" else "homebaseChimeEnabled"
         observed = camera.get("reportedSettings", {}).get(field) if isinstance(camera, dict) and isinstance(camera.get("reportedSettings"), dict) else None
         if not isinstance(camera, dict) or camera.get("serial") != serial or type(observed) is not type(value) or observed != value:
             raise GatewayClientError("Gateway did not confirm the camera setting", code="outcome_unknown")

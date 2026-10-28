@@ -1101,14 +1101,60 @@ def _serialize_entries(entries: dict[str, IntegrationRuntime]) -> dict[str, Any]
     return payload
 
 
+def _current_store_payload(hass: HomeAssistant) -> dict[str, Any]:
+    """Merge live entries into the retained snapshot, including unloaded entries."""
+    domain_data = hass.data[DOMAIN]
+    stored = domain_data.setdefault("stored_entries", {})
+    stored.update(_serialize_entries(domain_data.get("entries", {}))["entries"])
+    # A save must own its snapshot while subsequent uploads mutate runtime state.
+    return {"entries": dict(stored)}
+
+
+async def _async_flush_store(hass: HomeAssistant) -> None:
+    domain_data = hass.data.get(DOMAIN, {})
+    store = domain_data.get("store")
+    if isinstance(store, Store):
+        async with domain_data.setdefault("store_lock", asyncio.Lock()):
+            await store.async_save(_current_store_payload(hass))
+
+
+async def _async_assign_profile_owner(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Repair an ownerless entry. Registered through HA's admin-only wrapper."""
+    from homeassistant.exceptions import ServiceValidationError
+
+    entry_id = call.data["entry_id"]
+    owner_id = call.data[CONF_OWNER_USER_ID]
+    user = await hass.auth.async_get_user(owner_id)
+    entry = hass.config_entries.async_get_entry(entry_id)
+    if user is None or not user.is_active or entry is None or entry.domain != DOMAIN:
+        raise ServiceValidationError("Select an active Home Assistant user and a Halthy entry.")
+    manager = await _async_ensure_webhook_manager(hass, hass.data[DOMAIN])
+    async with manager.lock:
+        runtime = hass.data.get(DOMAIN, {}).get("entries", {}).get(entry_id)
+        if runtime is None:
+            raise ServiceValidationError("Load the Halthy entry before assigning its owner.")
+        async with _runtime_lock(runtime):
+            if runtime.owner_user_id not in (None, owner_id):
+                raise ServiceValidationError("This profile already belongs to another user.")
+            previous = runtime.owner_user_id
+            runtime.owner_user_id = owner_id
+            try:
+                await _async_flush_store(hass)
+            except Exception:
+                runtime.owner_user_id = previous
+                _schedule_store_save(hass)
+                raise
+            hass.config_entries.async_update_entry(entry, data={**entry.data, CONF_OWNER_USER_ID: owner_id})
+
+
 def _schedule_store_save(hass: HomeAssistant) -> None:
     domain_data = hass.data.get(DOMAIN, {})
     store = domain_data.get("store")
-    entries: dict[str, IntegrationRuntime] = domain_data.get("entries", {})
     if not isinstance(store, Store):
         return
 
-    store.async_delay_save(lambda: _serialize_entries(entries), SAVE_DELAY_SECONDS)
+    _current_store_payload(hass)
+    store.async_delay_save(lambda: _current_store_payload(hass), SAVE_DELAY_SECONDS)
 
 
 def _resolve_activity_log_mode(target_entries: list[tuple[str, IntegrationRuntime]]) -> str:
@@ -2962,6 +3008,16 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     await _async_ensure_webhook_manager(hass, hass.data[DOMAIN])
     await _async_register_workout_card_module(hass)
 
+    if not hass.services.has_service(DOMAIN, "assign_profile_owner"):
+        from homeassistant.helpers.service import async_register_admin_service
+
+        async def assign_profile_owner(call: ServiceCall) -> None:
+            await _async_assign_profile_owner(hass, call)
+
+        async_register_admin_service(hass, DOMAIN, "assign_profile_owner", assign_profile_owner,
+            schema=vol.Schema({vol.Required("entry_id"): cv.string,
+                               vol.Required(CONF_OWNER_USER_ID): cv.string}))
+
     async def _async_handle_force_upload_service(call: ServiceCall) -> None:
         domain_data = hass.data.get(DOMAIN, {})
         entries: dict[str, IntegrationRuntime] = domain_data.get("entries", {})
@@ -3397,6 +3453,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entries: dict[str, IntegrationRuntime] = domain_data.get("entries", {})
         runtime = entries.get(entry.entry_id)
         async def unload_runtime() -> bool:
+            # Flush before removing the runtime. Delayed saves must not turn a
+            # temporary unload into deletion of workouts or another profile.
+            await _async_flush_store(hass)
             unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
             if unload_ok:
                 manager.suspend_entry(entry.entry_id)
@@ -3411,3 +3470,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async with _runtime_lock(runtime):
                 unload_ok = await unload_runtime()
     return unload_ok
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Only permanent removal deletes a retained entry from runtime storage."""
+    domain_data = hass.data.get(DOMAIN, {})
+    domain_data.get("entries", {}).pop(entry.entry_id, None)
+    domain_data.get("stored_entries", {}).pop(entry.entry_id, None)
+    await _async_flush_store(hass)

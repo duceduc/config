@@ -22,6 +22,7 @@ from homeassistant.components.weather import (
     ATTR_FORECAST_TIME,
     ATTR_FORECAST_UV_INDEX,
     ATTR_FORECAST_WIND_BEARING,
+    ENTITY_ID_FORMAT,
     SingleCoordinatorWeatherEntity,
     WeatherEntityFeature,
     Forecast,
@@ -29,16 +30,12 @@ from homeassistant.components.weather import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import generate_entity_id
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import WeatherDotComConfigEntry, WeatherUpdateCoordinator
+from . import WeatherDotComConfigEntry
+from .coordinator import WeatherUpdateCoordinator
 from .const import (
     ATTRIBUTION,
-    TEMPUNIT,
-    LENGTHUNIT,
-    SPEEDUNIT,
-    PRESSUREUNIT,
-
     FIELD_CLOUD_COVER,
     FIELD_DEW_POINT,
     FIELD_FEELS_LIKE,
@@ -65,11 +62,11 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-ENTITY_ID_FORMAT = WEATHER_DOMAIN + ".{}"
+MAX_HIGH_TEMP_AGE_SECONDS = 14 * 60 * 60
 
 
 async def async_setup_entry(
-        hass: HomeAssistant, entry: WeatherDotComConfigEntry, async_add_entities: AddEntitiesCallback
+        hass: HomeAssistant, entry: WeatherDotComConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     """Add weather entity."""
     coordinator = entry.runtime_data
@@ -79,6 +76,8 @@ async def async_setup_entry(
 
 
 class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
+    """Implementation of a Weather.com weather entity."""
+
     _attr_attribution = ATTRIBUTION
     # Use the device (location) name as the entity's friendly name.
     _attr_has_entity_name = True
@@ -90,7 +89,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     def __init__(
             self,
             coordinator: WeatherUpdateCoordinator
-    ):
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.entity_id = generate_entity_id(
@@ -98,12 +97,12 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
         )
         self._attr_unique_id = f"{coordinator.location_name},{WEATHER_DOMAIN}".lower()
         self._attr_device_info = coordinator.device_info
-        self._attr_native_temperature_unit = coordinator.units_of_measurement[TEMPUNIT]
-        self._attr_native_pressure_unit = coordinator.units_of_measurement[PRESSUREUNIT]
-        self._attr_native_wind_speed_unit = coordinator.units_of_measurement[SPEEDUNIT]
-        self._attr_native_visibility_unit = coordinator.visibility_unit
-        self._attr_native_precipitation_unit = coordinator.units_of_measurement[LENGTHUNIT]
-        self._store = coordinator._store
+        self._attr_native_temperature_unit = coordinator.units.temperature
+        self._attr_native_pressure_unit = coordinator.units.pressure
+        self._attr_native_wind_speed_unit = coordinator.units.speed
+        self._attr_native_visibility_unit = coordinator.units.visibility
+        self._attr_native_precipitation_unit = coordinator.units.precipitation
+        self._store = coordinator.store
 
     @property
     def native_temperature(self) -> float | None:
@@ -142,7 +141,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     def condition(self) -> str | None:
         """Return the current condition."""
         icon = self.coordinator.get_current(FIELD_ICONCODE)
-        return self.coordinator._iconcode_to_condition(icon)
+        return self.coordinator.iconcode_to_condition(icon)
 
     @property
     def native_apparent_temperature(self) -> float | None:
@@ -183,8 +182,6 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
             # temperature instead of None.
             temperature_max = self.coordinator.get_forecast_daily(FIELD_TEMPERATUREMAX, period)
             if period in [0, 1] and temperature_max is None:
-                # This is 14 hours in seconds.
-                max_time_difference = 14 * 60 * 60
                 # If the API returns None, attempt to use the value that's in
                 # storage.
                 if (
@@ -192,7 +189,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                     and
                     HIGH_TEMP_TODAY_STORAGE in stored_data
                     and
-                    round(time.time()) - stored_data[HIGH_TEMP_TODAY_TIMESTAMP_STORAGE] < max_time_difference
+                    round(time.time()) - stored_data[HIGH_TEMP_TODAY_TIMESTAMP_STORAGE] < MAX_HIGH_TEMP_AGE_SECONDS
                 ):
                     temperature_max = stored_data[HIGH_TEMP_TODAY_STORAGE]
                 else:
@@ -206,7 +203,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_CLOUD_COVERAGE:
                     self.coordinator.get_forecast_daily(FIELD_CLOUD_COVER, period),
                 ATTR_FORECAST_CONDITION:
-                    self.coordinator._iconcode_to_condition(
+                    self.coordinator.iconcode_to_condition(
                         self.coordinator.get_forecast_daily(
                             FIELD_ICONCODE, period)
                     ),
@@ -224,7 +221,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                         FIELD_TEMPERATUREMIN, period),
 
                 ATTR_FORECAST_TIME:
-                    self.coordinator._format_timestamp(
+                    self.coordinator.format_timestamp(
                         self.coordinator.get_forecast_daily(
                             FIELD_VALIDTIMEUTC, period)),
                 ATTR_FORECAST_UV_INDEX:
@@ -249,7 +246,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_CLOUD_COVERAGE:
                     self.coordinator.get_forecast_hourly(FIELD_CLOUD_COVER, hour),
                 ATTR_FORECAST_CONDITION:
-                    self.coordinator._iconcode_to_condition(
+                    self.coordinator.iconcode_to_condition(
                         self.coordinator.get_forecast_hourly(
                             FIELD_ICONCODE, hour)
                     ),
@@ -268,7 +265,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_NATIVE_TEMP:
                     self.coordinator.get_forecast_hourly(FIELD_TEMP, hour),
                 ATTR_FORECAST_TIME:
-                    self.coordinator._format_timestamp(
+                    self.coordinator.format_timestamp(
                         self.coordinator.get_forecast_hourly(
                             FIELD_VALIDTIMEUTC, hour)),
                 ATTR_FORECAST_UV_INDEX:

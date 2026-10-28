@@ -39,9 +39,15 @@ class OAuthClientPageTests(unittest.TestCase):
         self.assertNotIn("script", self.page.tags)
         self.assertIn("form-action 'none'", self.raw.decode("utf-8"))
 
-    def test_pages_source_is_static_and_identifies_development_status(self):
+    def test_pages_source_is_static_and_documents_optional_connections(self):
         self.assertTrue((self.directory / ".nojekyll").exists())
-        self.assertIn("currently released app uses manual-token setup", self.raw.decode("utf-8"))
+        self.assertIn("Both connections are optional.", self.raw.decode("utf-8"))
+        guide = (self.directory / "documentation.html").read_text(encoding="utf-8")
+        self.assertIn("Home Assistant sign-in", guide)
+        self.assertIn("Access token", guide)
+
+    def test_page_fits_ios_client_identity_response_limit(self):
+        self.assertLess(len(self.raw), 32 * 1024)
 
 
 if __name__ == "__main__":

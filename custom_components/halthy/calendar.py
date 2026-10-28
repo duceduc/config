@@ -55,6 +55,10 @@ def _format_duration(seconds: float) -> str:
 def _workout_description(record: HalthyWorkoutRecord) -> str | None:
     metadata = record.metadata
     lines: list[str] = []
+    equipment = [metadata.get(key) for key in ("workout_device_name", "workout_device_model")]
+    equipment = list(dict.fromkeys(value.strip() for value in equipment if isinstance(value, str) and value.strip()))
+    if equipment:
+        lines.append("Equipment: " + " · ".join(equipment))
 
     duration = _first_number(
         metadata,
@@ -66,6 +70,9 @@ def _workout_description(record: HalthyWorkoutRecord) -> str | None:
     if duration is None:
         duration = (record.end - record.start).total_seconds()
     lines.append(f"Duration: {_format_duration(duration)}")
+    machine_duration = _first_number(metadata, "workout_machine_duration_s")
+    if machine_duration is not None:
+        lines.append(f"Machine duration: {_format_duration(machine_duration)}")
 
     distance = _first_number(metadata, "workout_distance_m", "distance_m", "distance")
     if distance is not None and distance > 0:
@@ -91,7 +98,14 @@ def _workout_description(record: HalthyWorkoutRecord) -> str | None:
 
     cadence = _first_number(metadata, "cadence_spm", "avg_cadence_spm")
     if cadence is not None and cadence > 0:
-        lines.append(f"Average cadence: {cadence:.0f} spm")
+        cadence_unit = "rpm" if metadata.get("workout_cadence_unit") == "rpm" else "spm"
+        lines.append(f"Average cadence: {cadence:.0f} {cadence_unit}")
+
+    for key, label, unit in (("workout_step_count", "Steps", ""), ("total_flights_climbed", "Flights climbed", ""),
+                             ("power_w", "Average power", " W"), ("workout_elevation_gain_m", "Elevation gain", " m")):
+        value = _first_number(metadata, key)
+        if value is not None:
+            lines.append(f"{label}: {value:.0f}{unit}")
 
     speed = _first_number(
         metadata,

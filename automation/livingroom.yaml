@@ -127,7 +127,7 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: > # 13 sec is script delay of when lights turns on.
+              value_template: > # 13 sec needed for script delay of when lights turns on.
                 {%- set trig = (now() - states.automation.computer_room_lights_auto_on.last_updated).seconds -%}
                   {{ trig > 13 }}
           sequence:

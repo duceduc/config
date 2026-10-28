@@ -94,6 +94,12 @@ WORKOUT_ARCHIVE_IMAGE_SUFFIXES: tuple[str, ...] = (
     ".avif",
 )
 WORKOUT_ARCHIVE_METADATA_KEYS: tuple[str, ...] = (
+    "workout_machine_duration_s",
+    "workout_step_count",
+    "workout_device_name",
+    "workout_device_model",
+    "workout_device_manufacturer",
+    "workout_cadence_unit",
     "title",
     "name",
     "workout_uuid",
