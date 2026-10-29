@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, tzinfo
 import asyncio
 import base64
 import binascii
@@ -92,7 +92,10 @@ from .naming import (
     sanitize_identifier,
 )
 from .units import canonical_unit, resolve_temperature_state
-from .daily_reset import prepare_daily_attributes, rollover_daily_sensors
+from .daily_reset import (
+    fixed_reporting_zone, prepare_daily_attributes, reporting_zone_name,
+    reset_kind, rollover_daily_sensors,
+)
 from .runtime import (
     HalthyImageState,
     HalthySensorState,
@@ -1310,7 +1313,7 @@ async def _async_reset_daily_upload_counter_for_entry(
     did_reset = False
     async with _runtime_lock(runtime):
         did_reset = _reset_daily_upload_counter_if_needed(hass, runtime, entry_id)
-        did_reset = _reset_daily_health_sensors(hass, runtime, entry_id) or did_reset
+        did_reset = await _async_reset_daily_health_sensors(hass, runtime, entry_id) or did_reset
     if did_reset:
         _schedule_store_save(hass)
 
@@ -1319,8 +1322,41 @@ def _daily_reporting_timezone(hass: HomeAssistant) -> str:
     return getattr(getattr(hass, "config", None), "time_zone", "UTC") or "UTC"
 
 
-def _reset_daily_health_sensors(hass: HomeAssistant, runtime: IntegrationRuntime, entry_id: str) -> bool:
-    changed = rollover_daily_sensors(runtime.sensors, datetime.now(timezone.utc), _daily_reporting_timezone(hass))
+async def _async_reporting_zone(attributes: dict[str, Any], fallback: str) -> tzinfo:
+    """Load dynamic zones off the event loop, retaining fixed-offset support."""
+    name = reporting_zone_name(attributes, fallback)
+    try:
+        zone = await dt_util.async_get_time_zone(name)
+    except ValueError:
+        zone = None
+    if zone is None:
+        zone = fixed_reporting_zone(name)
+    if zone is not None:
+        return zone
+    if "reporting_time_zone" in attributes:
+        raise ValueError("invalid_reporting_time_zone")
+    return timezone.utc
+
+
+async def _async_reset_daily_health_sensors(
+    hass: HomeAssistant, runtime: IntegrationRuntime, entry_id: str,
+) -> bool:
+    fallback_name = _daily_reporting_timezone(hass)
+    fallback_zone = await _async_reporting_zone({}, fallback_name)
+    zones: dict[str, tzinfo] = {}
+    resolved = {fallback_name: fallback_zone}
+    for unique_id, sensor in runtime.sensors.items():
+        if reset_kind(sensor.metric_key, sensor.attributes) is None:
+            continue
+        try:
+            name = reporting_zone_name(sensor.attributes, fallback_name)
+            if name not in resolved:
+                resolved[name] = await _async_reporting_zone(sensor.attributes, fallback_name)
+            zones[unique_id] = resolved[name]
+        except ValueError:
+            # Invalid legacy zones must not prevent a missed daily reset.
+            zones[unique_id] = fallback_zone
+    changed = rollover_daily_sensors(runtime.sensors, datetime.now(timezone.utc), fallback_zone, zones)
     for unique_id in changed:
         async_dispatcher_send(hass, update_sensor_signal(entry_id, unique_id))
     return bool(changed)
@@ -1575,7 +1611,11 @@ class HalthyPushView(HomeAssistantView):
                 )
 
             try:
-                prepare_daily_attributes(metric_key, attributes, datetime.now(timezone.utc), _daily_reporting_timezone(hass))
+                zone = (
+                    await _async_reporting_zone(attributes, _daily_reporting_timezone(hass))
+                    if reset_kind(metric_key, attributes) is not None else timezone.utc
+                )
+                prepare_daily_attributes(metric_key, attributes, datetime.now(timezone.utc), zone)
             except ValueError as error:
                 return web.json_response({"error": str(error)}, status=400)
 
@@ -1587,6 +1627,7 @@ class HalthyPushView(HomeAssistantView):
                     "unit": unit,
                     "icon": _metric_icon(metric_key, raw_sensor.get("icon")),
                     "attributes": attributes,
+                    "reporting_zone": zone,
                 }
             )
 
@@ -1820,7 +1861,7 @@ class HalthyPushView(HomeAssistantView):
                     return web.json_response({"error": "username_not_owned_by_user"}, status=403)
                 if runtime.owner_user_id is None:
                     runtime.owner_user_id = request_user_id
-                _reset_daily_health_sensors(hass, runtime, entry_id)
+                await _async_reset_daily_health_sensors(hass, runtime, entry_id)
 
                 managed_image_ids: set[int] = set()
                 try:
@@ -1905,7 +1946,7 @@ class HalthyPushView(HomeAssistantView):
                             metric_name=name, state=_coerce_state(state), unit=unit, attributes=attributes)
                     )
                     attributes, current_day_value = prepare_daily_attributes(
-                        metric_key, attributes, datetime.now(timezone.utc), _daily_reporting_timezone(hass))
+                        metric_key, attributes, datetime.now(timezone.utc), prepared_sensor["reporting_zone"])
                     if not current_day_value:
                         ignored_older += 1
                         continue
@@ -3401,9 +3442,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     _ensure_http_views_registered(hass, domain_data)
 
-    # Restore a missed calendar rollover before entity platforms publish state.
-    if _reset_daily_health_sensors(hass, runtime, entry.entry_id):
-        _schedule_store_save(hass)
+    # Serialize startup recovery with uploads while time zones load asynchronously.
+    async with _runtime_lock(runtime):
+        if await _async_reset_daily_health_sensors(hass, runtime, entry.entry_id):
+            _schedule_store_save(hass)
     _upsert_daily_upload_count_sensor(
         hass=hass,
         runtime=runtime,

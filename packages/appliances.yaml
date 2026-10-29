@@ -356,7 +356,7 @@ automation:
               - action: script.washer_complete
               - action: script.speech_engine
                 data:
-                  who: '{{ states(''sensor.room_audio'') }}'
+                  who: "{{ states('sensor.room_audio') }}"
                   voice: "{{ states('input_select.jarvis_voice') }}"
                   message: 'It appears the washing machine check filter warning lamp is on.'
 
@@ -368,7 +368,7 @@ automation:
                 value_template: "{{ is_state('sensor.washer_status_m', 'running') and is_state('timer.washer_monitor', 'active') }}"
               - action: script.speech_engine
                 data:
-                  who: '{{ states(''sensor.room_audio'') }}'
+                  who: "{{ states('sensor.room_audio') }}"
                   message: 'It seems the washing machine ended with an error. Please verify.'
                   voice: "{{ states('input_select.jarvis_voice') }}"
         default: []
@@ -385,7 +385,7 @@ automation:
         entity_id: input_boolean.washer_finished # For alerts notifications via whatsapp at interval mins
       - action: script.speech_engine
         data:
-          who: '{{ states(''sensor.room_audio'') }}'
+          who: "{{ states('sensor.room_audio') }}"
           voice: "{{ states('input_select.jarvis_voice') }}"
           message: 'Just a quick heads up, It appears the washing machine has completed its cycle.'
       - action: script.turn_on
@@ -418,7 +418,7 @@ automation:
             sequence:
               - action: script.status_annc
                 data:
-                  who: '{{ states(''sensor.room_audio'') }}'
+                  who: "{{ states('sensor.room_audio') }}"
                   call_interuption: 1
                   call_secure_dish: 1
         default: []
@@ -443,7 +443,7 @@ automation:
 #                value_template: "{{ is_state('binary_sensor.dish_cabinet_contact', 'on') }}"
 #              - action: script.status_annc
 #                data:
-#                  who: '{{ states(''sensor.room_audio'') }}'
+#                  who: "{{ states('sensor.room_audio') }}"
 #                  call_interuption: 1
 #                  call_secure_dish: 1
 #        default:

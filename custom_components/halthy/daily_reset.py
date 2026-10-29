@@ -6,7 +6,6 @@ from dataclasses import replace
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 import re
 from typing import Any
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .naming import normalize_metric_key
 from .timestamps import measurement_timestamp_value, parse_measurement_timestamp
@@ -125,24 +124,24 @@ def reset_kind(metric_key: str, attributes: dict[str, Any]) -> str | None:
     return "zero" if key in DAILY_COUNTER_KEYS or (isinstance(semantics, str) and semantics in _DAILY_SEMANTICS) else None
 
 
-def reporting_zone(attributes: dict[str, Any], fallback: str) -> tzinfo:
+def reporting_zone_name(attributes: dict[str, Any], fallback: str) -> str:
+    """Validate the identifier without loading the time-zone database."""
     name = attributes.get("reporting_time_zone", fallback)
     if not isinstance(name, str):
         raise ValueError("invalid_reporting_time_zone")
-    try:
-        return ZoneInfo(name)
-    except (ZoneInfoNotFoundError, ValueError):
-        # Foundation also permits fixed-offset identifiers such as GMT+0530.
-        fixed = re.fullmatch(r"(?:GMT|UTC)([+-])(\d{2}):?(\d{2})(?::?(\d{2}))?", name)
-        if fixed:
-            sign, hours, minutes, seconds = fixed.groups()
-            hours, minutes, seconds = int(hours), int(minutes), int(seconds or 0)
-            if hours < 24 and minutes < 60 and seconds < 60:
-                offset = timedelta(hours=hours, minutes=minutes, seconds=seconds)
-                return timezone(offset if sign == "+" else -offset)
-        if "reporting_time_zone" in attributes:
-            raise ValueError("invalid_reporting_time_zone") from None
-        return timezone.utc
+    return name
+
+
+def fixed_reporting_zone(name: str) -> tzinfo | None:
+    """Parse Foundation's fixed offsets without disk access."""
+    fixed = re.fullmatch(r"(?:GMT|UTC)([+-])(\d{2}):?(\d{2})(?::?(\d{2}))?", name)
+    if fixed:
+        sign, hours, minutes, seconds = fixed.groups()
+        hours, minutes, seconds = int(hours), int(minutes), int(seconds or 0)
+        if hours < 24 and minutes < 60 and seconds < 60:
+            offset = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+            return timezone(offset if sign == "+" else -offset)
+    return None
 
 
 def _date_value(value: Any) -> date | None:
@@ -182,7 +181,7 @@ def source_day(attributes: dict[str, Any], zone: tzinfo, *, stored: bool = False
 
 
 def prepare_daily_attributes(metric_key: str, attributes: dict[str, Any], now: datetime,
-                             fallback_zone: str) -> tuple[dict[str, Any], bool]:
+                             zone: tzinfo) -> tuple[dict[str, Any], bool]:
     """Return server-owned freshness metadata and whether this may update live state.
 
     Old-day/historical values still go to statistics; they never resurrect today's
@@ -191,7 +190,6 @@ def prepare_daily_attributes(metric_key: str, attributes: dict[str, Any], now: d
     """
     if reset_kind(metric_key, attributes) is None:
         return attributes, True
-    zone = reporting_zone(attributes, fallback_zone)
     day = source_day(attributes, zone)
     today = now.astimezone(zone).date()
     if day is not None and day > today:
@@ -213,7 +211,10 @@ def prepare_daily_attributes(metric_key: str, attributes: dict[str, Any], now: d
     return clean, True
 
 
-def rollover_daily_sensors(sensors: dict[str, Any], now: datetime, fallback_zone: str) -> list[str]:
+def rollover_daily_sensors(
+    sensors: dict[str, Any], now: datetime, fallback_zone: tzinfo,
+    reporting_zones: dict[str, tzinfo],
+) -> list[str]:
     """Reset in-place, retaining IDs and original source/receipt timestamps."""
     changed = []
     for unique_id, sensor in list(sensors.items()):
@@ -221,11 +222,11 @@ def rollover_daily_sensors(sensors: dict[str, Any], now: datetime, fallback_zone
         if kind is None:
             continue
         try:
-            zone = reporting_zone(sensor.attributes, fallback_zone)
+            zone = reporting_zones.get(unique_id, fallback_zone)
             day = source_day(sensor.attributes, zone, stored=True)
         except ValueError:
             # A malformed legacy period is not allowed to keep an old value forever.
-            zone = reporting_zone({}, fallback_zone)
+            zone = fallback_zone
             day = sensor.updated_at.astimezone(zone).date()
         today = now.astimezone(zone).date()
         if day is None:

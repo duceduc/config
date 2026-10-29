@@ -185,13 +185,17 @@ class HalthySensor(SensorEntity):
         self._attr_extra_state_attributes = attrs
 
     @property
+    def suggested_object_id(self) -> str:
+        """Suggest a username-prefixed ID only when HA creates a new entity."""
+        return self._attr_suggested_object_id
+
+    @property
     def device_info(self) -> DeviceInfo:
         return runtime_device_info(self._runtime)
 
     async def async_added_to_hass(self) -> None:
         """Register update callback."""
         await super().async_added_to_hass()
-        await self._async_migrate_entity_id_if_needed()
 
         @callback
         def async_handle_sensor_update() -> None:
@@ -200,8 +204,6 @@ class HalthySensor(SensorEntity):
                 return
             self._apply_state(state)
             self.async_write_ha_state()
-            # Metric key normalization can change suggested object id; migrate opportunistically.
-            self.hass.async_create_task(self._async_migrate_entity_id_if_needed())
 
         self.async_on_remove(
             async_dispatcher_connect(
@@ -222,27 +224,6 @@ class HalthySensor(SensorEntity):
                 async_handle_sensor_remove,
             )
         )
-
-    async def _async_migrate_entity_id_if_needed(self) -> None:
-        if self.entity_id is None:
-            return
-
-        desired_entity_id = (
-            f"sensor.{sanitize_identifier(self._runtime.configured_username)}_"
-            f"{sanitize_identifier(self._sensor_state.metric_key)}"
-        )
-        if self.entity_id == desired_entity_id:
-            return
-
-        registry = er.async_get(self.hass)
-        if registry.async_get(desired_entity_id) is not None:
-            return
-
-        try:
-            registry.async_update_entity(self.entity_id, new_entity_id=desired_entity_id)
-        except ValueError:
-            # Ignore conflicts and keep current id if HA rejects rename.
-            return
 
     async def _async_remove_entity_if_present(self) -> None:
         if self.entity_id is not None:

@@ -202,6 +202,14 @@ def _install_homeassistant_stubs() -> None:
         "homeassistant.util.dt",
         types.ModuleType("homeassistant.util.dt"),
     )
+    if not hasattr(dt_module, "async_get_time_zone"):
+        async def async_get_time_zone(name):
+            from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+            try:
+                return ZoneInfo(name)
+            except (ZoneInfoNotFoundError, ValueError):
+                return None
+        dt_module.async_get_time_zone = async_get_time_zone
     if not hasattr(dt_module, "now"):
         dt_module.now = lambda: datetime.now(timezone.utc)
 

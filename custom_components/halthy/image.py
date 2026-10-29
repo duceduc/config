@@ -390,6 +390,11 @@ class HalthyImage(ImageEntity):
         self._workout_state = "Workout"
 
     @property
+    def suggested_object_id(self) -> str:
+        """Suggest a username-prefixed ID only when HA creates a new entity."""
+        return self._attr_suggested_object_id
+
+    @property
     def device_info(self) -> DeviceInfo:
         return runtime_device_info(self._runtime)
 
@@ -407,7 +412,6 @@ class HalthyImage(ImageEntity):
     async def async_added_to_hass(self) -> None:
         """Register update callback."""
         await super().async_added_to_hass()
-        await self._async_migrate_entity_id_if_needed()
 
         @callback
         def async_handle_image_update() -> None:
@@ -418,7 +422,6 @@ class HalthyImage(ImageEntity):
                 return
             self._apply_state(state)
             self.async_write_ha_state()
-            self.hass.async_create_task(self._async_migrate_entity_id_if_needed())
 
         self.async_on_remove(
             async_dispatcher_connect(
@@ -439,38 +442,6 @@ class HalthyImage(ImageEntity):
                 async_handle_image_remove,
             )
         )
-
-    async def _async_migrate_entity_id_if_needed(self) -> None:
-        if self.entity_id is None:
-            return
-
-        desired_entity_id = (
-            f"image.{sanitize_identifier(self._runtime.configured_username)}_"
-            f"{sanitize_identifier(self._image_state.metric_key)}"
-        )
-        if self.entity_id == desired_entity_id:
-            return
-
-        registry = er.async_get(self.hass)
-        existing_target = registry.async_get(desired_entity_id)
-        if existing_target is not None:
-            # If canonical id is occupied by an orphan entry from this integration
-            # (no matching runtime image), remove it and reclaim the stable id.
-            is_same_entry = existing_target.config_entry_id == self._entry_id
-            is_halthy_image = (
-                existing_target.domain == "image"
-                and (existing_target.unique_id or "").startswith(f"{DOMAIN}_")
-            )
-            is_orphan = (existing_target.unique_id or "") not in self._runtime.images
-            if is_same_entry and is_halthy_image and is_orphan:
-                registry.async_remove(desired_entity_id)
-            else:
-                return
-
-        try:
-            registry.async_update_entity(self.entity_id, new_entity_id=desired_entity_id)
-        except ValueError:
-            return
 
     async def _async_remove_entity_if_present(self) -> None:
         if self.entity_id is not None:

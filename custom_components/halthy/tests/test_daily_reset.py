@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 import types
 import unittest
 from unittest.mock import AsyncMock, patch
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from test_statistics import BRIDGE
 
@@ -34,12 +34,41 @@ def period(day="2026-10-15", measured="2026-10-15T06:00:00Z", **extra):
             "reporting_time_zone": "Europe/Berlin", "measurement_timestamp": measured, **extra}
 
 
+def resolve_zone(attributes, fallback):
+    """Resolve fixture zones outside the pure calculation helpers."""
+    name = DAILY.reporting_zone_name(attributes, fallback)
+    try:
+        return ZoneInfo(name)
+    except (ZoneInfoNotFoundError, ValueError):
+        zone = DAILY.fixed_reporting_zone(name)
+        if zone is not None:
+            return zone
+        if "reporting_time_zone" in attributes:
+            raise ValueError("invalid_reporting_time_zone")
+        return timezone.utc
+
+
+def prepare(key, attributes, now, fallback):
+    zone = resolve_zone(attributes, fallback) if DAILY.reset_kind(key, attributes) else timezone.utc
+    return DAILY.prepare_daily_attributes(key, attributes, now, zone)
+
+
+def rollover(sensors, now, fallback):
+    zones = {}
+    for unique_id, value in sensors.items():
+        try:
+            zones[unique_id] = resolve_zone(value.attributes, fallback)
+        except ValueError:
+            pass
+    return DAILY.rollover_daily_sensors(sensors, now, resolve_zone({}, fallback), zones)
+
+
 class DailyResetPolicyTests(unittest.TestCase):
     def test_entire_explicit_catalog_resets_without_renaming(self):
         keys = DAILY.DAILY_COUNTER_KEYS
         self.assertGreater(len(keys), 130)
         sensors = {key: sensor(key) for key in keys}
-        self.assertEqual(set(DAILY.rollover_daily_sensors(sensors, NOW, "Europe/Berlin")), set(keys))
+        self.assertEqual(set(rollover(sensors, NOW, "Europe/Berlin")), set(keys))
         for key, value in sensors.items():
             self.assertEqual(value.state, 0, key)
             self.assertEqual(value.unique_id, "unchanged_" + key)
@@ -52,20 +81,20 @@ class DailyResetPolicyTests(unittest.TestCase):
     def test_midnight_is_not_an_upload_or_new_source_measurement(self):
         old = sensor("steps", attributes=period("2026-10-14", "2026-10-14T18:00:00Z"))
         sensors = {old.unique_id: old}
-        DAILY.rollover_daily_sensors(sensors, NOW, "UTC")
+        rollover(sensors, NOW, "UTC")
         reset = sensors[old.unique_id]
         self.assertEqual(reset.attributes["source_measurement_timestamp"], "2026-10-14T18:00:00Z")
         self.assertEqual(reset.attributes["last_source_pushed"], YESTERDAY.isoformat())
         self.assertNotIn("measurement_timestamp", reset.attributes)
         self.assertEqual(reset.attributes["daily_period_start"], "2026-10-15T00:00:00+02:00")
-        self.assertEqual(DAILY.rollover_daily_sensors(sensors, NOW, "UTC"), [])
+        self.assertEqual(rollover(sensors, NOW, "UTC"), [])
 
     def test_first_pickup_clears_to_unknown_but_last_sessions_and_measurements_survive(self):
         preserved = ["sleep_duration", "sleep_in_bed", "sleep_core", "sleep_score", "sleep_change",
                      "fall_asleep_time", "go_to_bed_time", "wake_up_time", "heart_rate", "body_mass",
                      "six_minute_walk_test_distance", "workout_start", "workout_end", "last_full_sync"]
         sensors = {key: sensor(key) for key in preserved + ["first_pickup_time"]}
-        self.assertEqual(DAILY.rollover_daily_sensors(sensors, NOW, "Europe/Berlin"), ["first_pickup_time"])
+        self.assertEqual(rollover(sensors, NOW, "Europe/Berlin"), ["first_pickup_time"])
         self.assertEqual(sensors["first_pickup_time"].state, "unknown")
         for key in preserved:
             self.assertEqual(sensors[key].state, 42)
@@ -80,15 +109,15 @@ class DailyResetPolicyTests(unittest.TestCase):
         instant = at("2026-10-14T22:00:00Z")
         values = {"source": sensor("steps", attributes={"reporting_time_zone": "Europe/Berlin"}),
                   "legacy": sensor("steps"), "west": sensor("steps", attributes={"reporting_time_zone": "America/New_York"})}
-        self.assertEqual(DAILY.rollover_daily_sensors(values, instant, "Europe/Berlin"), ["source", "legacy"])
+        self.assertEqual(rollover(values, instant, "Europe/Berlin"), ["source", "legacy"])
         self.assertEqual(values["west"].state, 42)
 
     def test_foundation_fixed_offset_zones_survive_storage_round_trip(self):
         for zone in ("GMT+0530", "UTC+05:30", "GMT-0330"):
-            attrs, live = DAILY.prepare_daily_attributes("steps", {"reporting_time_zone": zone}, NOW, "UTC")
+            attrs, live = prepare("steps", {"reporting_time_zone": zone}, NOW, "UTC")
             self.assertTrue(live)
-            self.assertEqual(DAILY.reporting_zone(attrs, "UTC").utcoffset(NOW),
-                             DAILY.reporting_zone({"reporting_time_zone": zone}, "UTC").utcoffset(NOW))
+            self.assertEqual(resolve_zone(attrs, "UTC").utcoffset(NOW),
+                             resolve_zone({"reporting_time_zone": zone}, "UTC").utcoffset(NOW))
 
     def test_calendar_midnight_on_short_and_long_dst_days(self):
         zone = ZoneInfo("Europe/Berlin")
@@ -100,13 +129,13 @@ class DailyResetPolicyTests(unittest.TestCase):
                 value = sensor("screen_time", attributes=attrs)
                 sensors = {"digital": value}
                 before = at(end).timestamp() - 1
-                self.assertEqual(DAILY.rollover_daily_sensors(sensors, datetime.fromtimestamp(before, timezone.utc), "UTC"), [])
-                self.assertEqual(DAILY.rollover_daily_sensors(sensors, at(end), "UTC"), ["digital"])
+                self.assertEqual(rollover(sensors, datetime.fromtimestamp(before, timezone.utc), "UTC"), [])
+                self.assertEqual(rollover(sensors, at(end), "UTC"), ["digital"])
                 self.assertEqual(sensors["digital"].attributes["daily_period_start"], at(end).astimezone(zone).isoformat())
 
     def test_current_values_are_totals_not_additions_and_cannot_forge_reset_provenance(self):
         for value in (0, 10, 4):
-            attrs, live = DAILY.prepare_daily_attributes("steps", period(daily_reset=True, daily_source_fresh=False,
+            attrs, live = prepare("steps", period(daily_reset=True, daily_source_fresh=False,
                 daily_reporting_date="1990-01-01", last_source_pushed="forged"), NOW, "UTC")
             self.assertTrue(live)
             self.assertIs(attrs["daily_reset"], False)
@@ -117,8 +146,8 @@ class DailyResetPolicyTests(unittest.TestCase):
     def test_old_day_and_history_never_replace_current_day(self):
         for attrs in (period("2026-10-14"), period(historical_daily_snapshot=True),
                       {"measurement_timestamp": "2026-10-14T10:00:00Z"}):
-            self.assertFalse(DAILY.prepare_daily_attributes("steps", attrs, NOW, "Europe/Berlin")[1])
-        self.assertTrue(DAILY.prepare_daily_attributes("heart_rate", period("2026-10-14"), NOW, "Europe/Berlin")[1])
+            self.assertFalse(prepare("steps", attrs, NOW, "Europe/Berlin")[1])
+        self.assertTrue(prepare("heart_rate", period("2026-10-14"), NOW, "Europe/Berlin")[1])
 
     def test_invalid_periods_rejected_and_corrupt_old_storage_does_not_block_rollover(self):
         invalid = [{"reporting_time_zone": "invalid"}, {"reporting_time_zone": []},
@@ -126,17 +155,17 @@ class DailyResetPolicyTests(unittest.TestCase):
                    period(healthkit_daily_end="2026-10-17T00:00:00Z"), period("2026-10-16")]
         for attrs in invalid:
             with self.subTest(attrs=attrs), self.assertRaises(ValueError):
-                DAILY.prepare_daily_attributes("steps", attrs, NOW, "UTC")
+                prepare("steps", attrs, NOW, "UTC")
         sensors = {"steps": sensor("steps", attributes={"day_start": "broken"})}
-        self.assertEqual(DAILY.rollover_daily_sensors(sensors, NOW, "UTC"), ["steps"])
+        self.assertEqual(rollover(sensors, NOW, "UTC"), ["steps"])
 
     def test_saved_restart_state_keeps_reset_idempotent_and_offline_days_catch_up(self):
         sensors = {"steps": sensor("steps", attributes=period("2026-10-14"))}
-        DAILY.rollover_daily_sensors(sensors, NOW, "UTC")
+        rollover(sensors, NOW, "UTC")
         saved = BRIDGE._sensor_to_storage(sensors["steps"])
         restored = {"steps": BRIDGE._sensor_from_storage("steps", saved)}
-        self.assertEqual(DAILY.rollover_daily_sensors(restored, NOW, "UTC"), [])
-        self.assertEqual(DAILY.rollover_daily_sensors(restored, at("2026-10-18T06:00:00Z"), "UTC"), ["steps"])
+        self.assertEqual(rollover(restored, NOW, "UTC"), [])
+        self.assertEqual(rollover(restored, at("2026-10-18T06:00:00Z"), "UTC"), ["steps"])
         self.assertEqual(restored["steps"].attributes["daily_reporting_date"], "2026-10-18")
 
 
@@ -217,3 +246,35 @@ class DailyResetBridgeTests(unittest.IsolatedAsyncioTestCase):
         response = await self.push(1, period(reporting_time_zone="not-a-zone"))
         self.assertEqual(response["kwargs"]["status"], 400)
         self.assertEqual(self.runtime.sensors["unchanged_steps"].state, 9000)
+
+    async def test_upload_awaits_source_zone_before_calculating_daily_attributes(self):
+        resolver = AsyncMock(return_value=ZoneInfo("America/Chicago"))
+        with patch.object(BRIDGE.dt_util, "async_get_time_zone", resolver):
+            result = await self.push(12, {"reporting_time_zone": "America/Chicago"})
+        self.assertTrue(result["args"][0]["ok"])
+        self.assertIn(unittest.mock.call("America/Chicago"), resolver.await_args_list)
+        stored = next(value for value in self.runtime.sensors.values() if value.metric_key == "steps")
+        self.assertEqual(stored.attributes["daily_period_start"], "2026-10-15T00:00:00-05:00")
+
+    async def test_rollover_awaits_distinct_source_zones_and_repairs_invalid_legacy_zone(self):
+        self.runtime.sensors = {
+            "a": sensor("steps", attributes={"reporting_time_zone": "America/Chicago"}),
+            "b": sensor("screen_time", attributes={"reporting_time_zone": "America/Chicago"}),
+            "legacy": sensor("flights", attributes={"reporting_time_zone": "missing-zone"}),
+        }
+        async def resolve(name):
+            return None if name == "missing-zone" else ZoneInfo(name)
+        resolver = AsyncMock(side_effect=resolve)
+        with patch.object(BRIDGE.dt_util, "async_get_time_zone", resolver):
+            await BRIDGE._async_reset_daily_upload_counter_for_entry(self.hass, "entry")
+        self.assertEqual(resolver.await_args_list.count(unittest.mock.call("America/Chicago")), 1)
+        self.assertEqual(self.runtime.sensors["a"].attributes["daily_period_start"], "2026-10-15T00:00:00-05:00")
+        self.assertEqual(self.runtime.sensors["legacy"].attributes["daily_period_start"], "2026-10-15T00:00:00+02:00")
+        self.assertTrue(all(value.state == 0 for value in self.runtime.sensors.values()))
+
+    async def test_non_daily_metrics_do_not_resolve_untrusted_reporting_zone(self):
+        resolver = AsyncMock(return_value=ZoneInfo("Europe/Berlin"))
+        with patch.object(BRIDGE.dt_util, "async_get_time_zone", resolver):
+            result = await self.push(60, {"reporting_time_zone": []}, key="heart_rate")
+        self.assertTrue(result["args"][0]["ok"])
+        self.assertEqual(resolver.await_args_list, [unittest.mock.call("Europe/Berlin")])
