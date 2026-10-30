@@ -131,10 +131,23 @@ class UnitHelpersTests(unittest.TestCase):
                 self.assertEqual(UNITS.canonical_unit(key, None), "min")
                 self.assertTrue(UNITS.is_duration_metric(key, "min"))
                 self.assertEqual(UNITS.duration_suggested_display_precision(key, "min"), 1)
-        self.assertEqual(UNITS.canonical_unit("pickups_without_app_use", None), "count")
+        self.assertIsNone(UNITS.canonical_unit("pickups_without_app_use", None))
         self.assertFalse(UNITS.is_duration_metric("pickups_without_app_use", "count"))
         self.assertIsNone(UNITS.canonical_unit("first_pickup_time", ""))
         self.assertTrue(UNITS.is_timestamp_metric("first_pickup_time"))
+
+    def test_counts_are_unitless_without_removing_rates_or_named_units(self) -> None:
+        for key in ("workout_count", "handwashing_event", "high_heart_rate_event", "inhaler_usage",
+                    "pickups_without_app_use"):
+            for unit in ("count", "Counts", None):
+                with self.subTest(key=key, unit=unit):
+                    self.assertIsNone(UNITS.canonical_unit(key, unit))
+        for key, unit, expected in (
+            ("steps", "count", "steps"), ("flights_climbed", "count", "floors"),
+            ("heart_rate", "count/min", "bpm"), ("cadence", "count/min", "/min"),
+            ("screen_time", "min", "min"),
+        ):
+            self.assertEqual(UNITS.canonical_unit(key, unit), expected)
 
 
 if __name__ == "__main__":

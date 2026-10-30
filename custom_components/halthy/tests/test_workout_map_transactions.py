@@ -392,6 +392,13 @@ class WorkoutMapTransactionTests(unittest.IsolatedAsyncioTestCase):
         recovered = (await self.state())["args"][0]
         self.assertEqual(recovered["state"], cleared["state"])
         self.assertEqual(self.runtime.images, {})
+        self.assertEqual(self.runtime.workout_image_unique_id, restored["slot_id"])
+
+    async def test_first_replacement_reuses_registered_empty_entity_slot(self):
+        self.runtime.workout_image_unique_id = "halthy_tester_old_phone_workout_existing"
+        initial = await self.activate()
+        await self.post(self.mutation(initial))
+        self.assertEqual(set(self.runtime.images), {"halthy_tester_old_phone_workout_existing"})
 
     async def test_stale_changed_operation_and_other_device_replays_fail_without_mutation(self):
         initial = await self.activate()

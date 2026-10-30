@@ -27,6 +27,7 @@ from .const import (
 )
 from .naming import friendly_metric_name, normalize_metric_key, sanitize_identifier
 from .units import (
+    canonical_unit,
     duration_suggested_display_precision,
     is_duration_metric,
     is_timestamp_metric,
@@ -111,7 +112,7 @@ class HalthySensor(SensorEntity):
         metric_key = normalize_metric_key(state.metric_key)
         self._attr_name = friendly_metric_name(metric_key, state.name)
         self._attr_native_value = state.state
-        self._attr_native_unit_of_measurement = state.unit
+        self._attr_native_unit_of_measurement = canonical_unit(state.metric_key, state.unit)
         self._attr_suggested_unit_of_measurement = None
         self._attr_entity_category = (
             EntityCategory.DIAGNOSTIC

@@ -78,6 +78,7 @@ class IntegrationRuntime:
     workout_archive_retention: int = DEFAULT_WORKOUT_ARCHIVE_RETENTION
     sensors: dict[str, HalthySensorState] = field(default_factory=dict)
     images: dict[str, HalthyImageState] = field(default_factory=dict)
+    workout_image_unique_id: str | None = None
     workouts: dict[str, HalthyWorkoutRecord] = field(default_factory=dict)
     statistics_cursors: dict[str, str] = field(default_factory=dict)
     force_upload_interval_seconds: int = 0

@@ -1,3 +1,19 @@
+migrate_counter_statistics:
+  name: Migrate counter statistics
+  description: Repair legacy count units for Halthy counters without changing numbers, deleting history or renaming entities. Runs automatically on load. Administrator access required. Leave entry empty to repair all loaded profiles.
+  fields:
+    entry_id:
+      name: Halthy integration entry
+      selector:
+        config_entry:
+          integration: halthy
+    dry_run:
+      name: Preview only
+      description: List affected statistics without making changes. Enable action response to see the list.
+      default: false
+      selector:
+        boolean:
+
 assign_profile_owner:
   name: Assign profile owner
   description: Assign an active Home Assistant user to an ownerless Halthy profile. Requires administrator access. Existing ownership cannot be transferred.

@@ -87,7 +87,7 @@
   triggers:
     - trigger: template # sensor actual in tpl folder. after mar light shines brightest at < 26 in early mornings. after oct. All other < 21
       value_template: "{{ states('sensor.lr_radar_illuminance') | float(0) < states('sensor.lr_radar_illuminance_actual') | float(0) and
-                                       states('sensor.lr_radar_illuminance') != 'unknown' }}"
+                                       not states('sensor.lr_radar_illuminance') in ['unknown','unavailable'] }}"
   conditions:
     - condition: template  # If guest is present, do not turn off
       value_template: "{{ not is_state('input_boolean.guest_mode', 'on') }}"
@@ -126,7 +126,7 @@
             entity_id: script.ashley_fadein
 
 
-
+### possibly not working as expected. can delete
 - alias: 'Turn on manual computer lights default params'
   mode: single
   trigger:

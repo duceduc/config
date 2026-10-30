@@ -14,7 +14,6 @@ _UNIT_ALIASES = {
     "%": "%",
     "/min": "/min",
     "breaths/min": "breaths/min",
-    "count": "count",
     "count/min": "/min",
     "count/minute": "/min",
     "counts/min": "/min",
@@ -50,7 +49,7 @@ _UNIT_ALIASES = {
 _METRIC_UNIT_OVERRIDES = {
     "screen_time": "min",
     "longest_activity_session": "min",
-    "pickups_without_app_use": "count",
+    "pickups_without_app_use": None,
     "blood_pressure_diastolic": "mmHg",
     "blood_pressure_systolic": "mmHg",
     "bp_diastolic": "mmHg",
@@ -118,6 +117,11 @@ def canonical_unit(metric_key: str, provided_unit: Any) -> str | None:
     if key in _METRIC_UNIT_OVERRIDES:
         return _METRIC_UNIT_OVERRIDES[key]
 
+    unit = str(provided_unit).strip() if provided_unit is not None else ""
+    compact_unit = re.sub(r"\s+", "", unit).lower().replace("\N{DEGREE SIGN}", "deg")
+    if compact_unit in {"count", "counts"} or key.endswith(("_count", "_event")):
+        return None
+
     if "flight" in key or "floor" in key:
         return "floors"
     if ({"step", "steps"} & tokens) and not ({"length", "speed", "stride"} & tokens):
@@ -134,11 +138,9 @@ def canonical_unit(metric_key: str, provided_unit: Any) -> str | None:
     if key.startswith("bp_") or ("blood" in tokens and "pressure" in tokens):
         return "mmHg"
 
-    unit = str(provided_unit).strip() if provided_unit is not None else ""
     if not unit:
         return None
 
-    compact_unit = re.sub(r"\s+", "", unit).lower().replace("\N{DEGREE SIGN}", "deg")
     return _UNIT_ALIASES.get(compact_unit, unit)
 
 

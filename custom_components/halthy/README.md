@@ -75,17 +75,19 @@ For UTC-looking timestamps, absolute date formatting, missing statistics, or HAC
 
 Select a sleep metric for upload in the updated iOS app to create three timestamp sensors per user:
 
-- **Go to bed time** (`sensor.<username>_go_to_bed_time`): start of the matching recorded in-bed interval. Missing in-bed data is shown as **unknown**, never estimated.
+- **Go to bed time** (`sensor.<username>_go_to_bed_time`): start of the matching recorded in-bed interval. When those records are missing, the app uses the selected sleep session's start as an **estimate**.
 - **Fall asleep time** (`sensor.<username>_fall_asleep_time`): first recorded asleep stage.
 - **Wake up time** (`sensor.<username>_wake_up_time`): end of the final asleep stage, not the time you left bed.
 
-All three use the same latest main sleep session from the past 48 hours. Stages and gaps up to 90 minutes are grouped, and overlapping samples are merged. Sessions lasting at least two hours take priority over short naps; if none exists, the app falls back to sessions lasting at least 20 minutes. These are recorded boundaries, not live sleep detection.
+All three use the same latest main sleep session from the past 48 hours. Stages and gaps up to 90 minutes are grouped, and overlapping samples are merged. Sessions lasting at least two hours take priority over short naps; if none exists, the app falls back to sessions lasting at least 20 minutes. These summarize available sleep records, with an explicitly labelled bedtime estimate when needed; they are not live sleep detection.
 
-Full timestamps are displayed using Home Assistant's timestamp handling. Values refresh on the next app upload even when sleep duration is unchanged. A new session without in-bed data clears the previous bedtime to unknown; an unreadable or missing session leaves existing values unchanged. Both the app and integration must be updated, and the app needs access to sleep data.
+Full timestamps are displayed using Home Assistant's timestamp handling. Values refresh on the next app upload even when sleep duration is unchanged. **Go to bed time** and **Sleep in bed** share the same calculation: recorded in-bed intervals take priority; otherwise the selected sleep session's boundaries, including awakenings and gaps, provide an estimate. Both expose `estimated`, `value_source` (`healthkit_in_bed` or `sleep_session_estimate`), `in_bed_start`, and `in_bed_end` attributes. An estimate cannot determine your actual physical bedtime. An unreadable or missing session leaves existing values unchanged. Update both the app and integration to receive this behaviour and source information; the app needs access to sleep data.
 
 ### Height and Weight sensor settings
 
 Height is reported in centimetres by default. Body mass is displayed as **Weight**. Both sensors suggest one decimal place and support Home Assistant's unit conversion and display precision settings: open the sensor, select the settings cog, and adjust **Unit of measurement** and **Display precision**. Your choices are kept across uploads. Existing entity IDs stay the same, including `sensor.<username>_body_mass`.
+
+Counters and event totals are shown as numbers without the literal `count` unit. Steps, floors, heart rate, duration, and other measurements retain their meaningful units.
 
 ### Digital health sensors
 
@@ -172,9 +174,15 @@ Unlock the iPhone and perform a foreground upload or **Force upload** once after
 
 The calendar is read-only; workout changes must be made in Apple Health or the app that originally recorded the workout.
 
+**Workout start** and **Workout end** follow the most recent stored workout, even when it has no uploaded route map. Existing `workout_route_start` and `workout_route_end` entity IDs are preserved. These timestamps describe the last workout; daily workout totals can be zero today while the last workout was yesterday.
+
 ## Workout Image Archive
 
 When the app uploads a workout route image, Halthy archives it in Home Assistant media storage.
+
+The workout image entity retains its identity across restarts. If its current picture cannot be restored or has been explicitly cleared, the entity is unavailable until a replacement is uploaded; a historical archive image is not silently restored as the current picture.
+
+Its state shows the workout finish timestamp when provided, otherwise the image upload timestamp. The workout type is available in `workout_type`. Re-rendering a map refreshes its picture URL without changing the workout's recorded finish time.
 
 - Folder: `/config/media/halthy/workouts/<app_username>/`
 - Filename format: `<workout_timestamp>_<workout_fingerprint>.<ext>`
@@ -203,6 +211,18 @@ Workout image entity attributes include:
 ## Integration Options
 
 Open **Settings -> Devices & Services -> Halthy -> Configure**.
+
+### Upload controls on the device page
+
+| Control | Effect |
+|---|---|
+| **Force upload** | Queues a request for the iPhone app to run an upload pass when it next polls Home Assistant. |
+| **Update InfluxDB** | Queues an InfluxDB backfill/export request for the app. InfluxDB must be configured in the app; this does not copy Home Assistant's recorder database. |
+| **Upload interval** | Schedules periodic force-upload requests in Home Assistant. It does not change the iPhone's own upload timer or wake the app. |
+
+For example, **10 minutes** requests an upload every ten minutes. The app retrieves the pending command on a later active or permitted background run, so the upload may happen later. Only one command is pending per person; missed intervals do not accumulate a queue of duplicate uploads.
+
+**Off** disables these periodic requests only. The app's foreground uploads, HealthKit-triggered work, manual uploads, and permitted background tasks continue. A selected interval is neither a maximum upload frequency nor a guarantee of background timing on iOS.
 
 ### Username and Display Name
 
@@ -294,6 +314,7 @@ These are external Home Assistant long-term statistics, so `halthy:*` statistic 
 
 ## Troubleshooting
 
+- **Unit-change repairs after v0.2.7**: the updated integration automatically migrates counter-unit metadata while preserving history and entity IDs. Administrators can preview or retry with `halthy.migrate_counter_statistics`. See [migration instructions](https://github.com/Mosher23/Halthy/blob/main/docs/troubleshooting.md#unit-change-repairs-after-v027).
 - **Config flow does not open**: restart Home Assistant and check integration logs for config flow errors.
 - **`401` / `403` on upload**: verify long-lived token and user ownership for configured username.
 - **Entities not updating**: verify the app username exactly matches **Username** in the integration entry.

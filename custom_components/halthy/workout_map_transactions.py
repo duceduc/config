@@ -106,6 +106,8 @@ def _publish(runtime: Any, document: dict[str, Any]) -> tuple[list[str], list[st
     after = {} if restored is None else {restored.unique_id: restored}
     runtime.images = {key: value for key, value in runtime.images.items() if normalize_metric_key(value.metric_key) != "workout"}
     runtime.images.update(after)
+    if document["slot_id"] is not None:
+        runtime.workout_image_unique_id = document["slot_id"]
     runtime.map_journal_scope = deepcopy(document["scope"])
     runtime.map_journal_error = None
     return list(before.keys() - after.keys()), list(after.keys() - before.keys()), [
@@ -172,7 +174,8 @@ def _baseline(entry_id: str, runtime: Any) -> dict[str, Any] | None:
 def _replacement(scope: dict[str, str], runtime: Any, device_id: str, image: dict[str, Any], *, existing_id: str | None = None) -> dict[str, Any]:
     from . import _unique_image_id
     current = next((value for value in runtime.images.values() if normalize_metric_key(value.metric_key) == "workout"), None)
-    unique_id = existing_id or (current.unique_id if current is not None else _unique_image_id(scope["username"], device_id, "workout"))
+    unique_id = existing_id or (current.unique_id if current is not None else (
+        runtime.workout_image_unique_id or _unique_image_id(scope["username"], device_id, "workout")))
     return {"unique_id": unique_id, "metric_key": "workout", "name": image["name"],
             "content_type": image["content_type"], "image_base64": image["image_base64"],
             "attributes": deepcopy(image["attributes"]), "username": runtime.app_username,
@@ -270,7 +273,9 @@ class HalthyWorkoutMapTransactionView(HomeAssistantView):
                     if payload["baseline_revision"] != (None if current is None else current["revision"]):
                         raise MapTransactionError("map_revision_conflict", 409)
                     try:
-                        document, cancelled = await _io(hass, journal.initialize_journal, path, scope, _baseline(payload["entry_id"], runtime))
+                        baseline = _baseline(payload["entry_id"], runtime)
+                        slot_id = baseline["unique_id"] if baseline is not None else runtime.workout_image_unique_id
+                        document, cancelled = await _io(hass, journal.initialize_journal, path, scope, baseline, slot_id)
                     except journal.MapJournalError as error:
                         runtime.map_journal_error = error.code
                         raise

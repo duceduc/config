@@ -854,6 +854,55 @@ def _upsert_workout_record(
     return "created" if existing is None else "updated"
 
 
+def _upsert_latest_workout_sensors(
+    hass: HomeAssistant, runtime: IntegrationRuntime, entry_id: str,
+) -> bool:
+    """Keep workout boundaries current independently of route-map delivery."""
+    if not runtime.workouts:
+        return False
+    workout = max(runtime.workouts.values(), key=lambda item: (item.end, item.start, item.record_id))
+    measured_at = workout.end.astimezone(timezone.utc)
+    measurement = measured_at.isoformat().replace("+00:00", "Z")
+    lookup = _build_metric_lookup(runtime)
+    changed = False
+    for metric_key, alias, boundary in (
+        ("workout_route_start", "workout_start", workout.start),
+        ("workout_route_end", "workout_end", workout.end),
+    ):
+        matches = list(dict.fromkeys(
+            _matching_metric_unique_ids(runtime, metric_key, lookup)
+            + _matching_metric_unique_ids(runtime, alias, lookup)
+        ))
+        value = boundary.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+        for unique_id in matches or [_unique_sensor_id(runtime.configured_username, "workout", metric_key)]:
+            previous = runtime.sensors.get(unique_id)
+            attributes = dict(previous.attributes) if previous is not None else {}
+            previous_measurement = _parse_measurement_timestamp(_measurement_timestamp_value(attributes))
+            if (previous_measurement is not None and previous_measurement > measured_at
+                    and str(attributes.get("workout_uuid", "")).casefold() != workout.uid.casefold()):
+                continue
+            attributes.update({
+                "measurement_timestamp": measurement,
+                "workout_uuid": workout.uid,
+                "workout_type": workout.summary,
+                "derived_from": "workout_history",
+            })
+            if previous is not None and previous.state == value and previous.attributes == attributes:
+                continue
+            key = previous.metric_key if previous is not None else metric_key
+            runtime.sensors[unique_id] = HalthySensorState(
+                unique_id=unique_id, metric_key=key,
+                name=_friendly_metric_name(key, None), state=value, unit=None,
+                icon=_metric_icon(key, None), attributes=attributes,
+                username=runtime.app_username, device_id=previous.device_id if previous is not None else "workout",
+            )
+            if previous is None:
+                async_dispatcher_send(hass, new_sensor_signal(entry_id), unique_id)
+            async_dispatcher_send(hass, update_sensor_signal(entry_id, unique_id))
+            changed = True
+    return changed
+
+
 def _prune_runtime_workouts(runtime: IntegrationRuntime, retention_limit: int) -> int:
     """Keep persisted calendar metadata bounded to the configured retention."""
 
@@ -1982,6 +2031,10 @@ class HalthyPushView(HomeAssistantView):
                                     and incoming_measurement_raw == existing_measurement_raw
                                     and existing_state.state == state
                                     and existing_state.unit == unit
+                                    and all(
+                                        existing_state.attributes.get(key) == attributes.get(key)
+                                        for key in ("estimated", "value_source", "in_bed_start", "in_bed_end")
+                                    )
                                 ):
                                     duplicates += 1
                                     continue
@@ -2059,7 +2112,11 @@ class HalthyPushView(HomeAssistantView):
                             entry_has_state_update = True
                             pending_image_updates.append(target_unique_id)
                     else:
-                        unique_id = _unique_image_id(username, device_id, metric_key)
+                        unique_id = (
+                            runtime.workout_image_unique_id
+                            if metric_key == WORKOUT_IMAGE_METRIC_KEY and runtime.workout_image_unique_id is not None
+                            else _unique_image_id(username, device_id, metric_key)
+                        )
                         runtime.images[unique_id] = HalthyImageState(
                             unique_id=unique_id,
                             metric_key=metric_key,
@@ -2079,6 +2136,9 @@ class HalthyPushView(HomeAssistantView):
                             image_metric_lookup.setdefault(compact_metric, []).append(unique_id)
                         pending_image_new.append(unique_id)
                         pending_image_updates.append(unique_id)
+
+                if _upsert_latest_workout_sensors(hass, runtime, entry_id):
+                    entry_has_state_update = True
 
                 if prune_unselected_metrics and selected_metric_keys is not None:
                     removed_sensor_ids = [
@@ -3049,6 +3109,10 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     await _async_ensure_webhook_manager(hass, hass.data[DOMAIN])
     await _async_register_workout_card_module(hass)
 
+    from .counter_unit_migration import async_register_migration_service
+
+    await async_register_migration_service(hass)
+
     if not hass.services.has_service(DOMAIN, "assign_profile_owner"):
         from homeassistant.helpers.service import async_register_admin_service
 
@@ -3354,6 +3418,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     if isinstance(stored_images, dict):
         media_root = Path(hass.config.path("media"))
+        workout_image_ids = [
+            unique_id for unique_id, raw_image in stored_images.items()
+            if isinstance(raw_image, dict)
+            and _normalize_metric_key(str(raw_image.get("metric_key", ""))) == WORKOUT_IMAGE_METRIC_KEY
+        ]
+        if len(workout_image_ids) == 1:
+            runtime.workout_image_unique_id = workout_image_ids[0]
         for unique_id, raw_image in stored_images.items():
             if not isinstance(raw_image, dict):
                 continue
@@ -3444,7 +3515,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Serialize startup recovery with uploads while time zones load asynchronously.
     async with _runtime_lock(runtime):
-        if await _async_reset_daily_health_sensors(hass, runtime, entry.entry_id):
+        reset_daily = await _async_reset_daily_health_sensors(hass, runtime, entry.entry_id)
+        repaired_workout_sensors = _upsert_latest_workout_sensors(hass, runtime, entry.entry_id)
+        if reset_daily or repaired_workout_sensors:
             _schedule_store_save(hass)
     _upsert_daily_upload_count_sensor(
         hass=hass,
@@ -3482,6 +3555,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry_on_update))
 
+    if "recorder" in getattr(hass.config, "components", set()):
+        from .counter_unit_migration import async_migrate_counter_statistics_on_setup
+
+        await async_migrate_counter_statistics_on_setup(hass, entry)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     _schedule_store_save(hass)
     return True

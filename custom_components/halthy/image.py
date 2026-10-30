@@ -22,6 +22,7 @@ from .const import (
     update_image_signal,
 )
 from .naming import sanitize_identifier
+from .timestamps import parse_measurement_timestamp
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -293,35 +294,45 @@ async def async_setup_entry(
     runtime: IntegrationRuntime = domain_data["entries"][entry.entry_id]
     entities: dict[str, HalthyImage] = {}
 
-    # Clean up stale image entities that were left in the registry but are no longer
-    # present in runtime storage (for example after unique-id or routing changes).
+    # Missing image bytes are an availability issue, not an entity deletion.
     registry = er.async_get(hass)
+    registered_names: dict[str, str] = {}
     for registry_entry in er.async_entries_for_config_entry(registry, entry.entry_id):
         if registry_entry.domain != "image":
             continue
         unique_id = registry_entry.unique_id or ""
         if not unique_id.startswith(f"{DOMAIN}_"):
             continue
-        if unique_id in runtime.images:
-            continue
-        registry.async_remove(registry_entry.entity_id)
+        registered_names[unique_id] = registry_entry.original_name or "Workout"
+
+    if runtime.workout_image_unique_id is None:
+        workout_ids = {
+            unique_id for unique_id, state in runtime.images.items()
+            if _is_workout_metric(state.metric_key)
+        } or {unique_id for unique_id in registered_names if "_workout_" in unique_id}
+        if len(workout_ids) == 1:
+            runtime.workout_image_unique_id = next(iter(workout_ids))
+    known_ids = set(runtime.images) | set(registered_names)
+    if runtime.workout_image_unique_id is not None:
+        known_ids.add(runtime.workout_image_unique_id)
 
     @callback
     def async_add_image(unique_id: str) -> None:
         if unique_id in entities:
             return
-        if unique_id not in runtime.images:
+        if unique_id not in runtime.images and unique_id not in known_ids:
             return
         entity = HalthyImage(
             hass=hass,
             runtime=runtime,
             entry_id=entry.entry_id,
             unique_id=unique_id,
+            name=registered_names.get(unique_id),
         )
         entities[unique_id] = entity
         async_add_entities([entity])
 
-    for unique_id in sorted(runtime.images):
+    for unique_id in sorted(known_ids):
         async_add_image(unique_id)
 
     remove_listener = async_dispatcher_connect(hass, new_image_signal(entry.entry_id), async_add_image)
@@ -340,6 +351,7 @@ class HalthyImage(ImageEntity):
         runtime: IntegrationRuntime,
         entry_id: str,
         unique_id: str,
+        name: str | None = None,
     ) -> None:
         # HA ImageEntity signature differs across versions.
         try:
@@ -349,20 +361,28 @@ class HalthyImage(ImageEntity):
         self._runtime = runtime
         self._entry_id = entry_id
         self._image_unique_id = unique_id
-        self._image_state = runtime.images[unique_id]
-        self._workout_state = "Workout"
+        self._image_state = runtime.images.get(unique_id)
 
         self._attr_unique_id = unique_id
+        metric_key = self._image_state.metric_key if self._image_state is not None else "workout"
         self._attr_suggested_object_id = (
             f"{sanitize_identifier(self._runtime.configured_username)}_"
-            f"{sanitize_identifier(self._image_state.metric_key)}"
+            f"{sanitize_identifier(metric_key)}"
         )
-        self._apply_state(self._image_state)
+        if self._image_state is not None:
+            self._apply_state(self._image_state)
+        else:
+            self._attr_name = name or "Workout"
+            self._clear_state()
 
     @callback
     def _apply_state(self, state: HalthyImageState) -> None:
         self._attr_available = True
-        self._attr_image_last_updated = state.updated_at
+        workout_end = (
+            parse_measurement_timestamp(state.attributes.get("workout_end"))
+            if _is_workout_metric(state.metric_key) else None
+        )
+        self._attr_image_last_updated = workout_end or state.updated_at
         self._image_state = state
         self._attr_name = state.name
         self._attr_content_type = state.content_type
@@ -371,14 +391,13 @@ class HalthyImage(ImageEntity):
             attrs["username"] = state.username
             attrs["device_id"] = state.device_id
             attrs["last_pushed"] = state.updated_at.isoformat()
-            self._workout_state = _workout_type_from_attributes(state.attributes)
+            attrs["workout_type"] = _workout_type_from_attributes(state.attributes)
         else:
             attrs = dict(state.attributes)
             attrs.setdefault("metric_key", state.metric_key)
             attrs.setdefault("username", state.username)
             attrs.setdefault("device_id", state.device_id)
             attrs["last_pushed"] = state.updated_at.isoformat()
-            self._workout_state = "Workout"
         self._attr_extra_state_attributes = attrs
 
     @callback
@@ -387,7 +406,6 @@ class HalthyImage(ImageEntity):
         self._attr_extra_state_attributes = {}
         self._attr_image_last_updated = datetime.now(timezone.utc)
         self._cached_image = None
-        self._workout_state = "Workout"
 
     @property
     def suggested_object_id(self) -> str:
@@ -404,10 +422,14 @@ class HalthyImage(ImageEntity):
         return self._image_state.image_bytes
 
     @property
-    def state(self) -> str:
-        if _is_workout_metric(self._image_state.metric_key):
-            return self._workout_state
-        return "idle"
+    def entity_picture(self) -> str | None:
+        url = super().entity_picture
+        if url is None or self._image_state is None:
+            return url
+        # A newly rendered map can have the same workout finish timestamp.
+        revision = int(self._image_state.updated_at.timestamp() * 1_000_000)
+        separator = "&" if "?" in url else "?"
+        return f"{url}{separator}v={revision}"
 
     async def async_added_to_hass(self) -> None:
         """Register update callback."""
