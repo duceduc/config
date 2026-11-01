@@ -30,9 +30,13 @@ from .const import (
     HEADERS,
     ICON_CODE_MAP,
     FIELD_DAYPART,
+    FIELD_QPF,
     FIELD_TEMPERATUREMAX,
     FIELD_TEMPERATUREMIN,
     FIELD_VALIDTIMEUTC,
+    RESOURCE_CURRENT,
+    RESOURCE_FORECAST_DAILY,
+    RESOURCE_FORECAST_HOURLY,
     RESULTS_CURRENT,
     RESULTS_FORECAST_DAILY,
     RESULTS_FORECAST_HOURLY
@@ -40,10 +44,6 @@ from .const import (
 from .store import WeatherDotComStorage
 
 _LOGGER = logging.getLogger(__name__)
-
-_RESOURCECURRENT = 'https://api.weather.com/v3/wx/observations/current'
-_RESOURCEFORECASTDAILY = 'https://api.weather.com/v3/wx/forecast/daily/15day'
-_RESOURCEFORECASTHOURLY = 'https://api.weather.com/v3/wx/forecast/hourly/15day'
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=20)
 MAX_CONSECUTIVE_FAILURES = 3
@@ -90,7 +90,6 @@ class WeatherUpdateCoordinatorConfig:
     location_name: str
     unit_system_api: str
     lang: str
-    tranfile: dict[str, Any]
 
     update_interval: timedelta = MIN_TIME_BETWEEN_UPDATES
     location_entity_id: str | None = None
@@ -118,7 +117,6 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             RESULTS_FORECAST_HOURLY: 0,
         }
         self._session = async_get_clientsession(hass)
-        self.tranfile = config.tranfile
         self.store = WeatherDotComStorage(hass, self._location_name)
 
         self._location_entity_id = config.location_entity_id
@@ -171,13 +169,17 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return None, None
 
     async def _async_update_data(self) -> dict[str, Any]:
-        return await self.get_weather()
-
-    async def get_weather(self) -> dict[str, Any]:
         """Get weather data."""
         latitude, longitude = self._get_coordinates()
         if latitude is None or longitude is None:
-            raise UpdateFailed(f"Could not retrieve location coordinates {self._location_entity_id}")
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="cannot_retrieve_coordinates",
+                translation_placeholders={
+                    "location_entity_id": self._location_entity_id
+                    or self._location_name
+                },
+            )
 
         self.current_latitude = latitude
         self.current_longitude = longitude
@@ -188,13 +190,13 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             (result_forecast_hourly, hourly_error),
         ) = await asyncio.gather(
             self._async_fetch_data(
-                _RESOURCECURRENT, latitude, longitude, "current"
+                RESOURCE_CURRENT, latitude, longitude, "current"
             ),
             self._async_fetch_data(
-                _RESOURCEFORECASTDAILY, latitude, longitude, "daily"
+                RESOURCE_FORECAST_DAILY, latitude, longitude, "daily"
             ),
             self._async_fetch_data(
-                _RESOURCEFORECASTHOURLY, latitude, longitude, "hourly"
+                RESOURCE_FORECAST_HOURLY, latitude, longitude, "hourly"
             ),
         )
         if result_forecast_daily is not None:
@@ -230,7 +232,10 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if current_error and daily_error and hourly_error:
             min_failures = min(self._consecutive_failures.values())
             if min_failures >= MAX_CONSECUTIVE_FAILURES or self.data is None:
-                raise UpdateFailed('Failed to get weather data')
+                raise UpdateFailed(
+                    translation_domain=DOMAIN,
+                    translation_key="update_failed",
+                )
             _LOGGER.warning(
                 'Failed to get weather data (failure %s of %s); retaining previous data',
                 min_failures,
@@ -289,13 +294,15 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
         return self.data[RESULTS_CURRENT].get(field)
 
-    def get_forecast_daily(self, field: str, period: int = 0) -> Any:
+    def get_forecast_daily(
+        self, field: str, period: int = 0, is_daypart: bool = True
+    ) -> Any:
         try:
             if field in [
                 FIELD_TEMPERATUREMAX,
                 FIELD_TEMPERATUREMIN,
                 FIELD_VALIDTIMEUTC,
-            ]:
+            ] or (field == FIELD_QPF and not is_daypart):
                 # Those fields exist per-day, rather than per dayPart, so the period is halved
                 return self.data[RESULTS_FORECAST_DAILY][field][period // 2]
             return self.data[RESULTS_FORECAST_DAILY][FIELD_DAYPART][0][field][period]

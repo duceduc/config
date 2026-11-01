@@ -11,6 +11,7 @@ from homeassistant.components.weather import (
     ATTR_FORECAST_CLOUD_COVERAGE,
     ATTR_FORECAST_CONDITION,
     ATTR_FORECAST_HUMIDITY,
+    ATTR_FORECAST_IS_DAYTIME,
     ATTR_FORECAST_NATIVE_APPARENT_TEMP,
     ATTR_FORECAST_NATIVE_DEW_POINT,
     ATTR_FORECAST_NATIVE_PRECIPITATION,
@@ -59,10 +60,12 @@ from .const import (
     RESULTS_FORECAST_DAILY,
     RESULTS_FORECAST_HOURLY,
 )
+from .helpers import get_first_daypart_index
 
 _LOGGER = logging.getLogger(__name__)
 
 MAX_HIGH_TEMP_AGE_SECONDS = 14 * 60 * 60
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
@@ -83,7 +86,9 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     _attr_has_entity_name = True
     _attr_name = None
     _attr_supported_features = (
-        WeatherEntityFeature.FORECAST_DAILY | WeatherEntityFeature.FORECAST_HOURLY
+        WeatherEntityFeature.FORECAST_DAILY
+        | WeatherEntityFeature.FORECAST_HOURLY
+        | WeatherEntityFeature.FORECAST_TWICE_DAILY
     )
 
     def __init__(
@@ -156,7 +161,9 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     @property
     def native_wind_gust_speed(self) -> float | None:
         """Return the wind gust speed."""
-        return self.coordinator.get_current(FIELD_WINDGUST)
+        if (wind_gust := self.coordinator.get_current(FIELD_WINDGUST)) is not None:
+            return wind_gust
+        return self.coordinator.get_current(FIELD_WINDSPEED)
 
     @property
     def uv_index(self) -> float | None:
@@ -170,10 +177,11 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
 
         stored_data = await self._store.async_load()
 
-        daily_times = self.coordinator.data[RESULTS_FORECAST_DAILY].get(FIELD_VALIDTIMEUTC) or []
+        daily_data = self.coordinator.data[RESULTS_FORECAST_DAILY]
+        daily_times = daily_data.get(FIELD_VALIDTIMEUTC) or []
         days = list(range(0, len(daily_times) * 2, 2))
-        if days and self.coordinator.get_forecast_daily(FIELD_TEMP, 0) is None:
-            days[0] += 1
+        if days:
+            days[0] = get_first_daypart_index(daily_data)
 
         forecast = []
         for period in days:
@@ -199,6 +207,18 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                         ' temperature data in the daily forecast will be'
                         ' missing for today for: %s', self.entity_id)
 
+            precip_chance = self.coordinator.get_forecast_daily(
+                FIELD_PRECIPCHANCE, period
+            )
+            if period % 2 == 0:
+                night_precip_chance = self.coordinator.get_forecast_daily(
+                    FIELD_PRECIPCHANCE, period + 1
+                )
+                if precip_chance is not None and night_precip_chance is not None:
+                    precip_chance = max(precip_chance, night_precip_chance)
+                elif precip_chance is None:
+                    precip_chance = night_precip_chance
+
             forecast.append(Forecast({
                 ATTR_FORECAST_CLOUD_COVERAGE:
                     self.coordinator.get_forecast_daily(FIELD_CLOUD_COVER, period),
@@ -210,9 +230,11 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_HUMIDITY:
                     self.coordinator.get_forecast_daily(FIELD_HUMIDITY, period),
                 ATTR_FORECAST_NATIVE_PRECIPITATION:
-                    self.coordinator.get_forecast_daily(FIELD_QPF, period),
+                    self.coordinator.get_forecast_daily(
+                        FIELD_QPF, period, is_daypart=False
+                    ),
                 ATTR_FORECAST_PRECIPITATION_PROBABILITY:
-                    self.coordinator.get_forecast_daily(FIELD_PRECIPCHANCE, period),
+                    precip_chance,
 
                 ATTR_FORECAST_NATIVE_TEMP:
                     temperature_max,
@@ -224,6 +246,55 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                     self.coordinator.format_timestamp(
                         self.coordinator.get_forecast_daily(
                             FIELD_VALIDTIMEUTC, period)),
+                ATTR_FORECAST_UV_INDEX:
+                    self.coordinator.get_forecast_daily(FIELD_UV_INDEX, period),
+                ATTR_FORECAST_WIND_BEARING:
+                    self.coordinator.get_forecast_daily(
+                        FIELD_WINDDIR, period),
+                ATTR_FORECAST_NATIVE_WIND_SPEED: self.coordinator.get_forecast_daily(
+                    FIELD_WINDSPEED, period)
+            }))
+        return forecast
+
+    async def async_forecast_twice_daily(self) -> list[Forecast] | None:
+        """Return the twice daily forecast in native units."""
+        if not self.coordinator.data or self.coordinator.data.get(RESULTS_FORECAST_DAILY) is None:
+            return []
+
+        daily_data = self.coordinator.data[RESULTS_FORECAST_DAILY]
+        daily_times = daily_data.get(FIELD_VALIDTIMEUTC) or []
+        start_period = get_first_daypart_index(daily_data) if daily_times else 0
+
+        forecast = []
+        for period in range(start_period, len(daily_times) * 2):
+            is_daytime = period % 2 == 0
+            timestamp = self.coordinator.get_forecast_daily(FIELD_VALIDTIMEUTC, period)
+            # FIELD_VALIDTIMEUTC is only once-daily while the other fields are
+            # twice-daily, so adjust the night-time timestamp to fake it being
+            # twice-daily.
+            if timestamp is not None and not is_daytime:
+                timestamp += 12 * 3600
+
+            forecast.append(Forecast({
+                ATTR_FORECAST_CLOUD_COVERAGE:
+                    self.coordinator.get_forecast_daily(FIELD_CLOUD_COVER, period),
+                ATTR_FORECAST_CONDITION:
+                    self.coordinator.iconcode_to_condition(
+                        self.coordinator.get_forecast_daily(
+                            FIELD_ICONCODE, period)
+                    ),
+                ATTR_FORECAST_HUMIDITY:
+                    self.coordinator.get_forecast_daily(FIELD_HUMIDITY, period),
+                ATTR_FORECAST_IS_DAYTIME:
+                    is_daytime,
+                ATTR_FORECAST_NATIVE_PRECIPITATION:
+                    self.coordinator.get_forecast_daily(FIELD_QPF, period),
+                ATTR_FORECAST_PRECIPITATION_PROBABILITY:
+                    self.coordinator.get_forecast_daily(FIELD_PRECIPCHANCE, period),
+                ATTR_FORECAST_NATIVE_TEMP:
+                    self.coordinator.get_forecast_daily(FIELD_TEMP, period),
+                ATTR_FORECAST_TIME:
+                    self.coordinator.format_timestamp(timestamp),
                 ATTR_FORECAST_UV_INDEX:
                     self.coordinator.get_forecast_daily(FIELD_UV_INDEX, period),
                 ATTR_FORECAST_WIND_BEARING:

@@ -34,11 +34,56 @@ from .const import (
     EXTRA_ATTRIBUTE_KEYS_DAY,
     EXTRA_ATTRIBUTE_KEYS_DAYPART,
     FIELD_VALIDTIMEUTC,
-    CONF_EXTRA_ATTRIBUTES
+    CONF_EXTRA_ATTRIBUTES,
+    RESOURCE_CURRENT,
 )
 from .helpers import get_sensor_unique_id
 
 _LOGGER = logging.getLogger(__name__)
+
+
+_PREFERRED_LANG_DEFAULTS: dict[str, str] = {
+    "en": "en-US",
+    "es": "es-ES",
+    "fr": "fr-FR",
+    "nb": "no-NO",
+    "nn": "no-NO",
+    "pa": "pa-IN",
+    "pt": "pt-PT",
+    "sr": "sr-RS",
+    "ta": "ta-IN",
+    "ti": "ti-ET",
+    "zh": "zh-CN",
+    "zh-hans": "zh-CN",
+    "zh-hant": "zh-TW",
+}
+
+
+def _get_default_lang(
+    hass_lang: str | None, hass_country: str | None = None
+) -> str:
+    """Return the best matching language code from LANG_CODES."""
+    if not hass_lang:
+        return DEFAULT_LANG
+    hass_lang_lower = hass_lang.lower()
+    for code in LANG_CODES:
+        if code.lower() == hass_lang_lower:
+            return code
+    base_lang = hass_lang_lower.split("-")[0]
+    if hass_country:
+        country_match = f"{base_lang}-{hass_country.lower()}"
+        for code in LANG_CODES:
+            if code.lower() == country_match:
+                return code
+    if preferred := _PREFERRED_LANG_DEFAULTS.get(hass_lang_lower):
+        return preferred
+    if preferred := _PREFERRED_LANG_DEFAULTS.get(base_lang):
+        return preferred
+    lang_prefix = f"{base_lang}-"
+    for code in LANG_CODES:
+        if code.lower().startswith(lang_prefix):
+            return code
+    return DEFAULT_LANG
 
 
 class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -64,7 +109,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             async with asyncio.timeout(10):
                 # Use hardcoded values for the initial test API call. User-supplied values will be used for the created entities.
-                url = "https://api.weather.com/v3/wx/observations/current"
                 params = {
                     "geocode": "37.3355,-121.8930",
                     "format": "json",
@@ -72,7 +116,7 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     "apiKey": api_key or "",
                     "language": "en-US",
                 }
-                async with session.get(url, params=params, headers=HEADERS) as response:
+                async with session.get(RESOURCE_CURRENT, params=params, headers=HEADERS) as response:
                     status = response.status
                     reason = response.reason
         except (TimeoutError, aiohttp.ClientError) as err:
@@ -130,8 +174,15 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ): str,
                     vol.Required(
                         CONF_LANG,
-                        default=DEFAULT_LANG,
-                    ): vol.In(LANG_CODES),
+                        default=_get_default_lang(
+                            self.hass.config.language, self.hass.config.country
+                        ),
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=LANG_CODES,
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
                     vol.Required(CONF_LOCATION_SOURCE, default=LOCATION_TYPE_LATLONG): selector.SelectSelector(
                         selector.SelectSelectorConfig(
                             options=[LOCATION_TYPE_LATLONG, LOCATION_TYPE_ENTITY],
@@ -180,11 +231,11 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(
                         CONF_LATITUDE,
                         default=default_latitude,
-                    ): float,
+                    ): vol.Coerce(float),
                     vol.Required(
                         CONF_LONGITUDE,
                         default=default_longitude,
-                    ): float,
+                    ): vol.Coerce(float),
                 }
             ),
             errors=errors,
@@ -206,12 +257,13 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "invalid_location_entity"
             else:
                 self._data.update(user_input)
-                if self._validate_latlong(entity=state):
+                lat = state.attributes.get(CONF_LATITUDE)
+                long = state.attributes.get(CONF_LONGITUDE)
+                if self._validate_latlong(lat=lat, long=long):
                     return await self._async_create_entry()
                 else:
                     errors["base"] = "invalid_coordinates"
-                    _LOGGER.warning("Invalid latitude/longitude: %s, %s",
-                                    state.attributes.get(CONF_LATITUDE), state.attributes.get(CONF_LONGITUDE),)
+                    _LOGGER.warning("Invalid latitude/longitude: %s, %s", lat, long)
 
         default_entity = None
 
@@ -237,12 +289,13 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    def _validate_latlong(lat=None, long=None, entity=None) -> bool:
+    def _validate_latlong(lat: Any, long: Any) -> bool:
         """Check if the provided lat/long is valid."""
-        if entity:
-            lat = entity.attributes[CONF_LATITUDE]
-            long = entity.attributes[CONF_LONGITUDE]
         if lat is not None and long is not None:
+            try:
+                lat, long = float(lat), float(long)
+            except (TypeError, ValueError):
+                return False
             if -90 <= lat <= 90 and -180 <= long <= 180:
                 return True
         return False
@@ -322,7 +375,12 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             CONF_LANG,
                             DEFAULT_LANG,
                         ),
-                    ): vol.In(LANG_CODES),
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=LANG_CODES,
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
                     vol.Required(
                         CONF_LOCATION_SOURCE,
                         default=default_source,
