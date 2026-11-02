@@ -26,14 +26,13 @@
   triggers:
     - trigger: time
       at: input_datetime.morning_report
-  actions:
+  actions:  
     - action: script.email_notify_image
       data:
         who: duc
         title: 'Morning Briefing'
         message: '{{ msg }}'
         media_content_id: 'media-source://media_source/local/img/family/{{ range(1, 25) | random }}.jpg'
-
 
     - action: script.text_notify
       data:

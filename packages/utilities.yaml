@@ -18,7 +18,7 @@ script:
         data:
           object_id: "critical_batteries"
           entities: []
-      # Add Battery in the Critical Battery Group
+      # Add Battery to the Critical Batteries area
       - service: group.set
         data:
           object_id: "critical_batteries"

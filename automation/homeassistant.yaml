@@ -36,6 +36,7 @@
         - sensor.genkan_door_battery
         - sensor.24hr_fan_battery
         - sensor.washer_door_battery
+        - sensor.front_door_battery
 
         - sensor.master_dimmer_battery
         - sensor.shion_dimmer_battery

@@ -181,6 +181,9 @@
 #  conditions:
 #    - "{{ trigger.calendar_event.summary == 'Units Arriving' }}"
   actions:
+    - variables:
+        date: "{{ as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) }}"    
+  
     - action: script.text_notify
       data:
         who: discord_eta
@@ -189,7 +192,7 @@
 
           **Today is {{ now().strftime( '%B %d, %Y') }}**
 
-          List of Containers | Roro arriving on _{{ today }}_.
+          List of Containers | Roro arriving on _{{ date }}_.
 
           Please make arrangements to have BL docs send to customers.
 
@@ -202,15 +205,12 @@
         title: Today is {{ now().strftime( '%B %d, %Y') }}
         message: >
           {% set today = as_timestamp(now() + timedelta(days = 12))|timestamp_custom('%-m/%d/%Y', true ) %}
-           List of Containers | Roro arriving on _{{ today }}_.
+           List of Containers | Roro arriving on _{{ date }}_.
            Please make arrangements to have BL docs send to customers.
 
           {{ state_attr('sensor.units_arriving', 'description') }}
 #          {{ states('sensor.units_arriving') }}
 #          {{ trigger.calendar_event.description }}
-
-
-
 
 
 ## delete when testing for discord is ok or use for MACK
