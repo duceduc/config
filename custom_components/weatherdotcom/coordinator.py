@@ -6,7 +6,6 @@ import asyncio
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 import logging
-import time
 from typing import Any
 
 import aiohttp
@@ -53,13 +52,13 @@ MAX_CONSECUTIVE_FAILURES = 3
 class WeatherUnits:
     """Units of measurement for a unit system."""
 
-    temperature: str
-    precipitation: str
-    snow: str
-    distance: str
-    speed: str
-    pressure: str
-    visibility: str
+    temperature: UnitOfTemperature
+    precipitation: UnitOfLength
+    snow: UnitOfLength
+    distance: UnitOfLength
+    speed: UnitOfSpeed
+    pressure: UnitOfPressure
+    visibility: UnitOfLength
 
 
 METRIC_UNITS = WeatherUnits(
@@ -97,6 +96,9 @@ class WeatherUpdateCoordinatorConfig:
     latitude: float | None = None
     longitude: float | None = None
 
+type WeatherDotComConfigEntry = ConfigEntry[WeatherUpdateCoordinator]
+
+
 class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """The Weather.com update coordinator."""
 
@@ -104,7 +106,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             self,
             hass: HomeAssistant,
             config: WeatherUpdateCoordinatorConfig,
-            entry: ConfigEntry,
+            entry: WeatherDotComConfigEntry,
     ) -> None:
         """Initialize."""
         self._api_key = config.api_key
@@ -203,9 +205,15 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             # If the result includes max temperature data for today,
             # update that data in storage.
             temp_max_list = result_forecast_daily.get(FIELD_TEMPERATUREMAX)
-            if temp_max_list and temp_max_list[0] is not None:
+            valid_time_list = result_forecast_daily.get(FIELD_VALIDTIMEUTC)
+            if (
+                temp_max_list
+                and temp_max_list[0] is not None
+                and valid_time_list
+                and valid_time_list[0] is not None
+            ):
                 try:
-                    await self.store.async_save(temp_max_list[0], round(time.time()))
+                    await self.store.async_save(temp_max_list[0], valid_time_list[0])
                 except OSError as err:
                     _LOGGER.warning(
                         "Failed to save high temperature to storage: %s", err
@@ -280,6 +288,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return None, True
 
     def _check_errors(self, response: dict[str, Any]) -> None:
+        """Raise ValueError if the API response contains errors."""
         if 'errors' not in response:
             return
         if errors := response['errors']:
@@ -290,6 +299,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             raise ValueError(f'Weather.com API error: {messages}')
 
     def get_current(self, field: str) -> Any:
+        """Return a field from the current observations data."""
         if not self.data or self.data.get(RESULTS_CURRENT) is None:
             return None
         return self.data[RESULTS_CURRENT].get(field)
@@ -297,6 +307,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def get_forecast_daily(
         self, field: str, period: int = 0, is_daypart: bool = True
     ) -> Any:
+        """Return a field from the daily or daypart forecast data."""
         try:
             if field in [
                 FIELD_TEMPERATUREMAX,
@@ -310,6 +321,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
 
     def get_forecast_hourly(self, field: str, hour: int) -> Any:
+        """Return a field from the hourly forecast data for a given hour."""
         try:
             return self.data[RESULTS_FORECAST_HOURLY][field][hour]
         except (IndexError, KeyError, TypeError):
@@ -317,6 +329,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     @staticmethod
     def iconcode_to_condition(icon_code: int | None) -> str | None:
+        """Map a Weather.com icon code to a Home Assistant weather condition."""
         if icon_code is None or icon_code == 44:
             return None
         if (condition := ICON_CODE_MAP.get(icon_code)) is not None:
@@ -326,6 +339,7 @@ class WeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     @staticmethod
     def format_timestamp(timestamp_secs: int | float | None) -> str | None:
+        """Format a UTC timestamp in seconds as an ISO 8601 string."""
         if timestamp_secs is None:
             return None
         return datetime.fromtimestamp(timestamp_secs, tz=UTC).strftime('%Y-%m-%dT%H:%M:%SZ')

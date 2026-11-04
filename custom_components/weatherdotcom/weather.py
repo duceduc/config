@@ -5,7 +5,6 @@ https://github.com/jaydeethree/Home-Assistant-weatherdotcom
 """
 
 import logging
-import time
 
 from homeassistant.components.weather import (
     ATTR_FORECAST_CLOUD_COVERAGE,
@@ -33,8 +32,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import generate_entity_id
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import WeatherDotComConfigEntry
-from .coordinator import WeatherUpdateCoordinator
+from .coordinator import WeatherDotComConfigEntry, WeatherUpdateCoordinator
 from .const import (
     ATTRIBUTION,
     FIELD_CLOUD_COVER,
@@ -52,6 +50,7 @@ from .const import (
     FIELD_VALIDTIMEUTC,
     FIELD_VISIBILITY,
     FIELD_WINDDIR,
+    FIELD_WINDDIRECTIONCARDINAL,
     FIELD_WINDGUST,
     FIELD_WINDSPEED,
 
@@ -60,11 +59,10 @@ from .const import (
     RESULTS_FORECAST_DAILY,
     RESULTS_FORECAST_HOURLY,
 )
-from .helpers import get_first_daypart_index
+from .helpers import clean_wind_bearing, get_first_daypart_index
 
 _LOGGER = logging.getLogger(__name__)
 
-MAX_HIGH_TEMP_AGE_SECONDS = 14 * 60 * 60
 PARALLEL_UPDATES = 0
 
 
@@ -97,6 +95,8 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
+        # Explicitly generate entity_id from location_name for consistency
+        # with the sensor entities.
         self.entity_id = generate_entity_id(
             ENTITY_ID_FORMAT, f"{coordinator.location_name}", hass=coordinator.hass
         )
@@ -135,7 +135,11 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     @property
     def wind_bearing(self) -> float | str | None:
         """Return the wind bearing."""
-        return self.coordinator.get_current(FIELD_WINDDIR)
+        return clean_wind_bearing(
+            self.coordinator.get_current(FIELD_WINDDIR),
+            cardinal=self.coordinator.get_current(FIELD_WINDDIRECTIONCARDINAL),
+            speed=self.coordinator.get_current(FIELD_WINDSPEED),
+        )
 
     @property
     def native_visibility(self) -> float | None:
@@ -161,9 +165,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
     @property
     def native_wind_gust_speed(self) -> float | None:
         """Return the wind gust speed."""
-        if (wind_gust := self.coordinator.get_current(FIELD_WINDGUST)) is not None:
-            return wind_gust
-        return self.coordinator.get_current(FIELD_WINDSPEED)
+        return self.coordinator.get_current(FIELD_WINDGUST)
 
     @property
     def uv_index(self) -> float | None:
@@ -197,7 +199,7 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                     and
                     HIGH_TEMP_TODAY_STORAGE in stored_data
                     and
-                    round(time.time()) - stored_data[HIGH_TEMP_TODAY_TIMESTAMP_STORAGE] < MAX_HIGH_TEMP_AGE_SECONDS
+                    stored_data[HIGH_TEMP_TODAY_TIMESTAMP_STORAGE] == daily_times[0]
                 ):
                     temperature_max = stored_data[HIGH_TEMP_TODAY_STORAGE]
                 else:
@@ -249,8 +251,10 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_UV_INDEX:
                     self.coordinator.get_forecast_daily(FIELD_UV_INDEX, period),
                 ATTR_FORECAST_WIND_BEARING:
-                    self.coordinator.get_forecast_daily(
-                        FIELD_WINDDIR, period),
+                    clean_wind_bearing(
+                        self.coordinator.get_forecast_daily(FIELD_WINDDIR, period),
+                        speed=self.coordinator.get_forecast_daily(FIELD_WINDSPEED, period),
+                    ),
                 ATTR_FORECAST_NATIVE_WIND_SPEED: self.coordinator.get_forecast_daily(
                     FIELD_WINDSPEED, period)
             }))
@@ -298,8 +302,10 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_UV_INDEX:
                     self.coordinator.get_forecast_daily(FIELD_UV_INDEX, period),
                 ATTR_FORECAST_WIND_BEARING:
-                    self.coordinator.get_forecast_daily(
-                        FIELD_WINDDIR, period),
+                    clean_wind_bearing(
+                        self.coordinator.get_forecast_daily(FIELD_WINDDIR, period),
+                        speed=self.coordinator.get_forecast_daily(FIELD_WINDSPEED, period),
+                    ),
                 ATTR_FORECAST_NATIVE_WIND_SPEED: self.coordinator.get_forecast_daily(
                     FIELD_WINDSPEED, period)
             }))
@@ -342,8 +348,10 @@ class WeatherDotComForecast(SingleCoordinatorWeatherEntity):
                 ATTR_FORECAST_UV_INDEX:
                     self.coordinator.get_forecast_hourly(FIELD_UV_INDEX, hour),
                 ATTR_FORECAST_WIND_BEARING:
-                    self.coordinator.get_forecast_hourly(
-                        FIELD_WINDDIR, hour),
+                    clean_wind_bearing(
+                        self.coordinator.get_forecast_hourly(FIELD_WINDDIR, hour),
+                        speed=self.coordinator.get_forecast_hourly(FIELD_WINDSPEED, hour),
+                    ),
                 ATTR_FORECAST_NATIVE_WIND_SPEED: self.coordinator.get_forecast_hourly(
                     FIELD_WINDSPEED, hour)
             }))

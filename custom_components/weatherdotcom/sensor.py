@@ -15,8 +15,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import WeatherDotComConfigEntry
-from .coordinator import WeatherUpdateCoordinator
+from .coordinator import WeatherDotComConfigEntry, WeatherUpdateCoordinator
 
 from .const import (
     ATTRIBUTION,
@@ -25,13 +24,14 @@ from .const import (
     EXTRA_ATTRIBUTE_KEYS_DAY,
     EXTRA_ATTRIBUTE_KEYS_DAYPART,
     FIELD_VALIDTIMEUTC,
-    FIELD_WINDGUST,
+    FIELD_WINDDIR,
+    FIELD_WINDDIRECTIONCARDINAL,
     FIELD_WINDSPEED,
     RESULTS_CURRENT,
     RESULTS_FORECAST_DAILY,
 )
-from .helpers import get_sensor_unique_id
-from .weather_current_conditions_sensors import (
+from .helpers import clean_wind_bearing, get_sensor_unique_id
+from .sensor_descriptions import (
     WeatherSensorEntityDescription,
     current_condition_sensor_descriptions,
 )
@@ -77,6 +77,8 @@ class WeatherSensor(CoordinatorEntity[WeatherUpdateCoordinator], SensorEntity):
         self._attr_unique_id = get_sensor_unique_id(
             self.coordinator.location_name, description.key
         )
+        # Explicitly generate entity_id from translation_key to keep stable
+        # English entity IDs regardless of the Home Assistant UI language.
         self.entity_id = generate_entity_id(
             ENTITY_ID_FORMAT, f"{self.coordinator.location_name}_{description.translation_key}", hass=coordinator.hass
         )
@@ -134,9 +136,13 @@ def _get_sensor_data(
         if not daily or not (valid_times := daily.get(FIELD_VALIDTIMEUTC)):
             return None
         return valid_times[0]
-    # windGust is often null. When it is, set it to windSpeed instead.
     if sensors.get(RESULTS_CURRENT) is None:
         return None
-    if kind == FIELD_WINDGUST and sensors[RESULTS_CURRENT].get(kind) is None:
-        return sensors[RESULTS_CURRENT].get(FIELD_WINDSPEED)
-    return sensors[RESULTS_CURRENT].get(kind)
+    current = sensors[RESULTS_CURRENT]
+    if kind == FIELD_WINDDIR:
+        return clean_wind_bearing(
+            current.get(FIELD_WINDDIR),
+            cardinal=current.get(FIELD_WINDDIRECTIONCARDINAL),
+            speed=current.get(FIELD_WINDSPEED),
+        )
+    return current.get(kind)
