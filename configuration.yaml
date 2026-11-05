@@ -11,6 +11,9 @@ wake_on_lan:
 lovelace_gen:
 momentary:
   yaml_config: True
+  
+#withings:
+#  use_webhook: true
 
 homeassistant:
   name: Home

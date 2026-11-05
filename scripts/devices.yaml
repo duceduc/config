@@ -17,6 +17,8 @@
     sequence:
       - condition: template
         value_template: "{{ states('input_select.home_mode') != 'Home' }}"
+      - condition: template
+        value_template: "{{ states('sensor.n_people_home') == '0' }}"
       - service: script.aclr_off
         data_template:
           room: 'lr'
