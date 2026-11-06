@@ -8,14 +8,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 from homeassistant.util import slugify
 
-from .const import (
-    DOMAIN,
+from .const import DOMAIN, HIGH_TEMP_TODAY_STORAGE, HIGH_TEMP_TODAY_TIMESTAMP_STORAGE
 
-    HIGH_TEMP_TODAY_STORAGE,
-    HIGH_TEMP_TODAY_TIMESTAMP_STORAGE
-)
-
-STORAGE_KEY = '{domain}.{location_name}'
+STORAGE_KEY = "{domain}.{location_name}"
 STORAGE_VERSION = 1
 
 
@@ -23,12 +18,17 @@ class WeatherDotComStorage:
     """Persistent storage for Weather.com data."""
 
     def __init__(self, hass: HomeAssistant, location_name: str) -> None:
-        self._store = Store(
+        self._store: Store[dict[str, Any]] = Store(
             hass,
             STORAGE_VERSION,
             STORAGE_KEY.format(domain=DOMAIN, location_name=slugify(location_name)),
         )
         self._data: dict[str, Any] | None = None
+
+    @property
+    def data(self) -> dict[str, Any]:
+        """Return cached storage data."""
+        return self._data or {}
 
     async def async_load(self) -> dict[str, Any]:
         if self._data is None:
@@ -41,7 +41,8 @@ class WeatherDotComStorage:
         current = await self.async_load()
         if (
             current.get(HIGH_TEMP_TODAY_STORAGE) == high_temp_today
-            and current.get(HIGH_TEMP_TODAY_TIMESTAMP_STORAGE) == high_temp_today_timestamp
+            and current.get(HIGH_TEMP_TODAY_TIMESTAMP_STORAGE)
+            == high_temp_today_timestamp
         ):
             return
         data_to_save = {

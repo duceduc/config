@@ -1,40 +1,43 @@
 """Config Flow to configure Weather.com Integration."""
+
 from __future__ import annotations
+
 import asyncio
 import logging
 from http import HTTPStatus
 from typing import Any
+
 import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers import selector
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_ENTITY_ID,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_NAME
+    CONF_NAME,
 )
 from homeassistant.core import callback
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import slugify
 
 from .const import (
-    DOMAIN,
+    CONF_EXTRA_ATTRIBUTES,
     CONF_LANG,
     CONF_LOCATION_SOURCE,
     DEFAULT_LANG,
-    HEADERS,
-    LANG_CODES,
-    LOCATION_TYPE_ENTITY,
-    LOCATION_TYPE_LATLONG,
+    DOMAIN,
     EXTRA_ATTRIBUTE_KEYS_DAILY,
     EXTRA_ATTRIBUTE_KEYS_DAY,
     EXTRA_ATTRIBUTE_KEYS_DAYPART,
     FIELD_VALIDTIMEUTC,
-    CONF_EXTRA_ATTRIBUTES,
+    HEADERS,
+    LANG_CODES,
+    LOCATION_TYPE_ENTITY,
+    LOCATION_TYPE_LATLONG,
     RESOURCE_CURRENT,
 )
 from .helpers import get_sensor_unique_id
@@ -59,9 +62,7 @@ _PREFERRED_LANG_DEFAULTS: dict[str, str] = {
 }
 
 
-def _get_default_lang(
-    hass_lang: str | None, hass_country: str | None = None
-) -> str:
+def _get_default_lang(hass_lang: str | None, hass_country: str | None = None) -> str:
     """Return the best matching language code from LANG_CODES."""
     if not hass_lang:
         return DEFAULT_LANG
@@ -116,7 +117,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     "apiKey": api_key or "",
                     "language": "en-US",
                 }
-                async with session.get(RESOURCE_CURRENT, params=params, headers=HEADERS) as response:
+                async with session.get(
+                    RESOURCE_CURRENT, params=params, headers=HEADERS
+                ) as response:
                     status = response.status
                     reason = response.reason
         except (TimeoutError, aiohttp.ClientError) as err:
@@ -125,8 +128,11 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             return "cannot_connect"
 
         if status != HTTPStatus.OK:
-            _LOGGER.error("Weather.com config responded with HTTP error %s: %s",
-                          status, reason,)
+            _LOGGER.error(
+                "Weather.com config responded with HTTP error %s: %s",
+                status,
+                reason,
+            )
             if status == HTTPStatus.UNAUTHORIZED:
                 return "invalid_api_key"
             return "unknown_error"
@@ -156,7 +162,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 self._abort_if_unique_id_configured()
 
                 self._data = user_input
-                if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
+                if error := await self._async_validate_api_key(
+                    user_input.get(CONF_API_KEY)
+                ):
                     errors["base"] = error
                 else:
                     if user_input.get(CONF_LOCATION_SOURCE) == LOCATION_TYPE_LATLONG:
@@ -183,11 +191,13 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             mode=selector.SelectSelectorMode.DROPDOWN,
                         )
                     ),
-                    vol.Required(CONF_LOCATION_SOURCE, default=LOCATION_TYPE_LATLONG): selector.SelectSelector(
+                    vol.Required(
+                        CONF_LOCATION_SOURCE, default=LOCATION_TYPE_LATLONG
+                    ): selector.SelectSelector(
                         selector.SelectSelectorConfig(
                             options=[LOCATION_TYPE_LATLONG, LOCATION_TYPE_ENTITY],
                             mode=selector.SelectSelectorMode.LIST,
-                            translation_key="location_source_options"
+                            translation_key="location_source_options",
                         )
                     ),
                 }
@@ -203,12 +213,17 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._data.update(user_input)
-            if self._validate_latlong(lat=user_input.get(CONF_LATITUDE), long=user_input.get(CONF_LONGITUDE)):
+            if self._validate_latlong(
+                lat=user_input.get(CONF_LATITUDE), long=user_input.get(CONF_LONGITUDE)
+            ):
                 return await self._async_create_entry()
             else:
                 errors["base"] = "invalid_coordinates"
-                _LOGGER.warning("Invalid latitude/longitude: %s, %s",
-                                user_input.get(CONF_LATITUDE), user_input.get(CONF_LONGITUDE),)
+                _LOGGER.warning(
+                    "Invalid latitude/longitude: %s, %s",
+                    user_input.get(CONF_LATITUDE),
+                    user_input.get(CONF_LONGITUDE),
+                )
 
         default_latitude = self.hass.config.latitude
         default_longitude = self.hass.config.longitude
@@ -334,7 +349,6 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             data=entry_data,
         )
 
-
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -350,7 +364,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             # change.
             self._data[CONF_NAME] = conf_entry.data[CONF_NAME]
 
-            if error := await self._async_validate_api_key(user_input.get(CONF_API_KEY)):
+            if error := await self._async_validate_api_key(
+                user_input.get(CONF_API_KEY)
+            ):
                 errors["base"] = error
             else:
                 # Branch based on the selected location source.
@@ -359,7 +375,9 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_entity()
 
         # Determine default location source from existing config, falling back to lat/long.
-        default_source = conf_entry.data.get(CONF_LOCATION_SOURCE, LOCATION_TYPE_LATLONG)
+        default_source = conf_entry.data.get(
+            CONF_LOCATION_SOURCE, LOCATION_TYPE_LATLONG
+        )
 
         return self.async_show_form(
             step_id="reconfigure",
@@ -388,13 +406,14 @@ class WeatherFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                         selector.SelectSelectorConfig(
                             options=[LOCATION_TYPE_LATLONG, LOCATION_TYPE_ENTITY],
                             mode=selector.SelectSelectorMode.LIST,
-                            translation_key="location_source_options"
+                            translation_key="location_source_options",
                         )
                     ),
                 }
             ),
             errors=errors,
         )
+
 
 class WeatherDotComOptionsFlow(config_entries.OptionsFlowWithReload):
     """Handle Weather.com options for sensor.forecast_details attribute."""
@@ -423,7 +442,11 @@ class WeatherDotComOptionsFlow(config_entries.OptionsFlowWithReload):
             if entity_id := ent_reg.async_get_entity_id("sensor", DOMAIN, unique_id):
                 entity_entry = ent_reg.async_get(entity_id)
                 if entity_entry:
-                    if selected_attributes and entity_entry.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
+                    if (
+                        selected_attributes
+                        and entity_entry.disabled_by
+                        == er.RegistryEntryDisabler.INTEGRATION
+                    ):
                         ent_reg.async_update_entity(entity_id, disabled_by=None)
                     elif not selected_attributes and not entity_entry.disabled_by:
                         ent_reg.async_update_entity(

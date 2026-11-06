@@ -3,8 +3,10 @@ Sensor Support for Weather.com weather service.
 For more details about this platform, please refer to the documentation at
 https://github.com/jaydeethree/Home-Assistant-weatherdotcom
 """
+
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, SensorEntity
@@ -14,8 +16,6 @@ from homeassistant.helpers.entity import generate_entity_id
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-
-from .coordinator import WeatherDotComConfigEntry, WeatherUpdateCoordinator
 
 from .const import (
     ATTRIBUTION,
@@ -30,6 +30,7 @@ from .const import (
     RESULTS_CURRENT,
     RESULTS_FORECAST_DAILY,
 )
+from .coordinator import WeatherDotComConfigEntry, WeatherUpdateCoordinator
 from .helpers import clean_wind_bearing, get_sensor_unique_id
 from .sensor_descriptions import (
     WeatherSensorEntityDescription,
@@ -40,7 +41,9 @@ PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-        hass: HomeAssistant, entry: WeatherDotComConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
+    hass: HomeAssistant,
+    entry: WeatherDotComConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Add Weather.com entities from a config_entry."""
     coordinator = entry.runtime_data
@@ -49,7 +52,8 @@ async def async_setup_entry(
             coordinator,
             description,
             entry.options.get(CONF_EXTRA_ATTRIBUTES),
-            ) for description in current_condition_sensor_descriptions
+        )
+        for description in current_condition_sensor_descriptions
     ]
 
     async_add_entities(sensors)
@@ -57,18 +61,21 @@ async def async_setup_entry(
 
 class WeatherSensor(CoordinatorEntity[WeatherUpdateCoordinator], SensorEntity):
     """Implementing the Weather.com sensor."""
+
     _attr_has_entity_name = True
     _attr_attribution = ATTRIBUTION
     _unrecorded_attributes = frozenset(
-        EXTRA_ATTRIBUTE_KEYS_DAILY + EXTRA_ATTRIBUTE_KEYS_DAY + EXTRA_ATTRIBUTE_KEYS_DAYPART
+        EXTRA_ATTRIBUTE_KEYS_DAILY
+        + EXTRA_ATTRIBUTE_KEYS_DAY
+        + EXTRA_ATTRIBUTE_KEYS_DAYPART
     )
     entity_description: WeatherSensorEntityDescription
 
     def __init__(
-            self,
-            coordinator: WeatherUpdateCoordinator,
-            description: WeatherSensorEntityDescription,
-            extra_attributes: list[str] | None = None,
+        self,
+        coordinator: WeatherUpdateCoordinator,
+        description: WeatherSensorEntityDescription,
+        extra_attributes: list[str] | None = None,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
@@ -80,7 +87,9 @@ class WeatherSensor(CoordinatorEntity[WeatherUpdateCoordinator], SensorEntity):
         # Explicitly generate entity_id from translation_key to keep stable
         # English entity IDs regardless of the Home Assistant UI language.
         self.entity_id = generate_entity_id(
-            ENTITY_ID_FORMAT, f"{self.coordinator.location_name}_{description.translation_key}", hass=coordinator.hass
+            ENTITY_ID_FORMAT,
+            f"{self.coordinator.location_name}_{description.translation_key}",
+            hass=coordinator.hass,
         )
         self._attr_device_info = coordinator.device_info
         self._attr_native_unit_of_measurement = self.entity_description.unit_fn(
@@ -101,16 +110,14 @@ class WeatherSensor(CoordinatorEntity[WeatherUpdateCoordinator], SensorEntity):
         return self.coordinator.data.get(RESULTS_CURRENT) is not None
 
     @property
-    def native_value(self) -> StateType:
+    def native_value(self) -> StateType | datetime:
         """Return the state."""
         if self.entity_description.key == CONF_LATITUDE:
             data = self.coordinator.current_latitude
         elif self.entity_description.key == CONF_LONGITUDE:
             data = self.coordinator.current_longitude
         else:
-            data = _get_sensor_data(
-                self.coordinator.data, self.entity_description.key
-            )
+            data = _get_sensor_data(self.coordinator.data, self.entity_description.key)
         return self.entity_description.value_fn(data)
 
     @property
@@ -118,15 +125,18 @@ class WeatherSensor(CoordinatorEntity[WeatherUpdateCoordinator], SensorEntity):
         """Return the state attributes."""
         if not self.entity_description.attr_fn:
             return None
-        return self.entity_description.attr_fn(
-            self.coordinator.data,
-            self._extra_attributes,
-        ) or None
+        return (
+            self.entity_description.attr_fn(
+                self.coordinator.data,
+                self._extra_attributes,
+            )
+            or None
+        )
 
 
 def _get_sensor_data(
-        sensors: dict[str, Any] | None,
-        kind: str,
+    sensors: dict[str, Any] | None,
+    kind: str,
 ) -> Any:
     """Get sensor data."""
     if not sensors:

@@ -3,9 +3,9 @@
 Halthy is a Home Assistant custom integration that receives health metrics from the Halthy app and creates per-user entities with stable unique identifiers.
 
 > [!NOTE]
-> **Halthy for iPhone is available in beta.**
+> **Halthy for iPhone is available on the App Store.**
 >
-> [Join the TestFlight](https://testflight.apple.com/join/8KWJZZj2) to test the app on an iPhone running iOS 18.5 or later. Beta builds may contain bugs and expire after 90 days. Please send feedback through TestFlight or [GitHub Issues](https://github.com/Mosher23/Halthy/issues).
+> [Get Halthy for iPhone](https://apps.apple.com/app/halthy/id6798250587) on an iPhone running iOS 18.5 or later. The optional [TestFlight beta](https://testflight.apple.com/join/8KWJZZj2) is separate from the App Store release. For integration support, use [GitHub Issues](https://github.com/Mosher23/Halthy/issues).
 
 Project documentation, privacy information, and security reporting instructions are available in the repository root: [`../../README.md`](../../README.md), [`../../PRIVACY.md`](../../PRIVACY.md), and [`../../SECURITY.md`](../../SECURITY.md). For support, use the [GitHub issue tracker](https://github.com/Mosher23/Halthy/issues).
 
@@ -24,8 +24,8 @@ Project documentation, privacy information, and security reporting instructions 
 
 ### Stable release and app compatibility
 
-Version 0.2.1 is a stable integration release. The iPhone app is distributed
-separately through TestFlight. Existing token-authenticated API uploads remain
+The integration and iPhone app are distributed separately. Install the app from
+the App Store, or use the optional TestFlight beta. Existing token-authenticated API uploads remain
 supported; native sign-in and paired webhooks require a compatible updated app.
 
 The app discovers profiles owned by the signed-in Home Assistant account. Optional
@@ -44,16 +44,26 @@ Validation includes real HA 2025.6.3 authentication, loopback HTTP and synthetic
 users/grants in `tests/test_http_authentication.py`. This is not a full supported-
 version matrix or a substitute for checking your own deployment after upgrading.
 
-### HACS (recommended)
+### Home Assistant Marketplace (recommended)
 
-1. Open **HACS**.
-2. Add repository `https://github.com/Mosher23/Halthy` as a custom integration repository if needed.
-3. Install **Halthy**.
-4. Restart Home Assistant.
+On **Home Assistant 2026.11 or later**, Halthy is available in the community catalog under **Settings -> Marketplace**. No custom repository or GitHub sign-in is needed.
+
+1. Open **Settings -> Marketplace** as an administrator.
+2. Search for **Halthy**, open its listing, and select **Install**.
+3. Complete the setup flow that opens automatically, using the username and optional display name for the first person. A first installation does **not** need a restart.
+4. Add more people through **Settings -> Devices & services -> Add integration -> Halthy**.
+
+Updates appear under **Settings -> Updates** and still require a restart when prompted. Existing HACS installations migrate when Home Assistant is upgraded to 2026.11 or later; keep your existing Halthy profiles.
+
+Marketplace is the successor to HACS. See the [Marketplace announcement](https://www.home-assistant.io/blog/2026/11/04/release-202611/#welcome-to-the-marketplace). Halthy remains a community-supported custom integration, not a built-in Home Assistant Core integration.
+
+### Older Home Assistant versions (HACS)
+
+On **Home Assistant 2026.10 or earlier**, search for **Halthy** in your existing HACS installation, download it, restart Home Assistant, then follow the UI setup instructions below.
 
 ### Fix an installation from `v0.1.0-beta`
 
-The `v0.1.0-beta` release archive could install Halthy under an incorrect nested directory. If your installation contains `custom_components/halthy/custom_components/halthy`, remove Halthy in HACS, delete the remaining `custom_components/halthy` directory, install `v0.1.1-beta` or newer, and restart Home Assistant. Removing the HACS files does not remove the person configurations stored by Home Assistant.
+The `v0.1.0-beta` release archive could install Halthy under an incorrect nested directory. If your installation contains `custom_components/halthy/custom_components/halthy`, back up Home Assistant, remove the downloaded Halthy files through Marketplace (or HACS on older versions), and delete only the remaining incorrectly nested `custom_components/halthy` directory. Reinstall the latest release and restart Home Assistant. Removing downloaded files does not remove the person configurations stored by Home Assistant; do not delete your Halthy integration entries under Devices & services.
 
 ### Manual
 
@@ -71,7 +81,7 @@ The `v0.1.0-beta` release archive could install Halthy under an incorrect nested
 
 ### Sleep times
 
-For UTC-looking timestamps, absolute date formatting, missing statistics, or HACS icon placeholders, see [Troubleshooting](https://github.com/Mosher23/Halthy/blob/main/docs/troubleshooting.md).
+For UTC-looking timestamps, absolute date formatting, missing statistics, or Marketplace icon placeholders, see [Troubleshooting](https://github.com/Mosher23/Halthy/blob/main/docs/troubleshooting.md).
 
 Select a sleep metric for upload in the updated iOS app to create three timestamp sensors per user:
 
