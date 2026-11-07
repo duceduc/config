@@ -66,6 +66,7 @@ from .const import (
     METRIC_HEIGHT,
     METRIC_LEAN_BODY_MASS,
     METRIC_SLEEP,
+    METRIC_SLEEP_BREATHING_DISTURBANCES,
     METRIC_TEST,
     METRIC_WAIST_CIRCUMFERENCE,
     METRIC_WEIGHT,
@@ -105,6 +106,16 @@ class HealthSyncData:
     # End date of the newest sample seen per metric, to ignore out-of-order
     # deliveries (the app re-sends whole batches after a failed sync).
     latest_end: dict[str, datetime] = field(default_factory=dict)
+    # Apple's own elevated/not-elevated call
+    # (HKAppleSleepingBreathingDisturbancesClassificationForQuantity) for the
+    # most recent Breathing Disturbances night, plus the published threshold
+    # (events/hour) it was measured against — added 6 Oct 2026 (GitHub #22).
+    # Deliberately Apple's own classification/constant, never a cutoff this
+    # integration computed itself, per Jamie's no-data-manipulation
+    # requirement. Populated from both the snapshot block and the anchored
+    # stream below, same as latest_values.
+    breathing_disturbances_classification: str | None = None
+    breathing_disturbances_threshold: float | None = None
     # Most recent sleep stage + its sample window.
     sleep_stage: str | None = None
     sleep_start: datetime | None = None
@@ -507,6 +518,13 @@ def _make_webhook_handler(entry: HealthSyncConfigEntry):
                     end = _parse_date(sample.get("end_date"))
                     if end:
                         data.latest_end[metric] = end
+                if metric == METRIC_SLEEP_BREATHING_DISTURBANCES:
+                    classification = sample.get("breathing_disturbances_classification")
+                    if isinstance(classification, str):
+                        data.breathing_disturbances_classification = classification
+                    threshold = sample.get("breathing_disturbances_threshold")
+                    if isinstance(threshold, (int, float)):
+                        data.breathing_disturbances_threshold = float(threshold)
                 data.last_sync = dt_util.utcnow()
                 handled += 1
                 continue
@@ -572,6 +590,13 @@ def _make_webhook_handler(entry: HealthSyncConfigEntry):
                 # above and ReadingsStore.async_insert_many.
                 readings_to_archive.append((metric, sample))
             if metric in LATEST_VALUE_METRICS:
+                if metric == METRIC_SLEEP_BREATHING_DISTURBANCES:
+                    classification = sample.get("breathing_disturbances_classification")
+                    if isinstance(classification, str):
+                        data.breathing_disturbances_classification = classification
+                    threshold = sample.get("breathing_disturbances_threshold")
+                    if isinstance(threshold, (int, float)):
+                        data.breathing_disturbances_threshold = float(threshold)
                 # Independent of _ingest_sample's out-of-order guard (which
                 # only protects the *live* "current value" sensor) — every
                 # sample, in whatever order it arrives, belongs in its own
@@ -767,6 +792,24 @@ def _flush_hourly_statistic(
     result (this hour's true min/max/mean across every sample seen so far)
     is identical either way, just computed with far fewer redundant calls.
 
+    IMPORTANT — statistic_id must be lowercased (fixed 15 Sep 2026, v0.21.2,
+    scheduled pipeline check): `entry.entry_id` isn't guaranteed to already
+    be lowercase — HA has generated ULID-format entry ids (uppercase
+    Crockford base32, e.g. `01M0DY5WYRRJP7SW9ZKY79M1PA`) for a while now,
+    and this integration's own config entries are apparently created that
+    way. `async_add_external_statistics` validates `statistic_id` against
+    `^(?!.+__)[a-z0-9_]+:[a-z0-9_]+$` — no uppercase allowed on either side
+    of the colon — so building the id from an uppercase entry_id raised
+    `HomeAssistantError: Invalid statistic_id` on every single hourly flush
+    for this user's install (106 occurrences in the log, one per metric per
+    hour, silently swallowed by the `except Exception` below — best-effort
+    by design, so it never broke the live sensors or the webhook, it just
+    meant the "(hourly history)" external statistics series never actually
+    recorded anything for them). `entity_id`/`unique_id` values built from
+    the same `entry.entry_id` elsewhere in this file are unaffected — HA
+    slugifies/accepts those regardless of case, only `statistic_id` is
+    fussy about it.
+
     IMPORTANT — external statistics only (changed 11 Sep 2026, v0.21.0,
     fixing a serious field report): this used to call
     `async_import_statistics` with `statistic_id = <the sensor's own
@@ -813,7 +856,7 @@ def _flush_hourly_statistic(
     if state is None:
         return
 
-    statistic_id = f"{DOMAIN}:{entry.entry_id}_{_CAMEL_TO_SNAKE.sub('_', metric).lower()}"
+    statistic_id = f"{DOMAIN}:{entry.entry_id.lower()}_{_CAMEL_TO_SNAKE.sub('_', metric).lower()}"
     friendly = state.attributes.get("friendly_name") or entity_id
     metadata: StatisticMetaData = {
         "has_sum": False,

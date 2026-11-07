@@ -44,11 +44,14 @@ from .const import (
     METRIC_RESPIRATORY_RATE,
     METRIC_RESTING_ENERGY,
     METRIC_RESTING_HEART_RATE,
+    METRIC_SLEEP_BREATHING_DISTURBANCES,
+    METRIC_STAND_HOURS,
     METRIC_STEPS,
     METRIC_VO2_MAX,
     METRIC_WAIST_CIRCUMFERENCE,
     METRIC_WALKING_HEART_RATE,
     METRIC_WEIGHT,
+    METRIC_WRIST_TEMPERATURE,
     SIGNAL_UPDATE,
     SIGNAL_WORKOUT,
     WORKOUT_TYPE_ICONS,
@@ -164,6 +167,14 @@ async def async_setup_entry(
                 entry, data, METRIC_BODY_TEMPERATURE, "Body temperature", UnitOfTemperature.CELSIUS,
                 "mdi:thermometer", device_class=SensorDeviceClass.TEMPERATURE,
             ),
+            # Added 3 Nov 2026 -- requested via GitHub #26. A delta-from-
+            # baseline reading, not an absolute temperature, but it shares
+            # bodyTemperature's unit/device_class -- HA has no separate
+            # "temperature delta" device class.
+            LatestValueSensor(
+                entry, data, METRIC_WRIST_TEMPERATURE, "Wrist temperature", UnitOfTemperature.CELSIUS,
+                "mdi:thermometer-low", device_class=SensorDeviceClass.TEMPERATURE,
+            ),
             LatestValueSensor(
                 entry, data, METRIC_BLOOD_GLUCOSE, "Blood glucose", "mg/dL", "mdi:diabetes"
             ),
@@ -185,11 +196,34 @@ async def async_setup_entry(
                 entry, data, METRIC_WAIST_CIRCUMFERENCE, "Waist circumference", "m", "mdi:tape-measure",
                 device_class=SensorDeviceClass.DISTANCE,
             ),
+            # Added 6 Oct 2026 — requested via GitHub #22. Same generic
+            # LatestValueSensor pattern as everything above. Apple's own
+            # "Breathing Disturbances" quantity (events/hour), relayed
+            # unmodified — no device_class fits this well in HA core, so
+            # left unset like respiratory rate/AFib burden above.
+            LatestValueSensor(
+                entry, data, METRIC_SLEEP_BREATHING_DISTURBANCES, "Breathing disturbances", "/hr",
+                "mdi:lungs",
+            ),
+            # Apple's own elevated/not-elevated call for the same night,
+            # as a separate entity from the raw events/hour value above —
+            # see BreathingDisturbancesStatusSensor.
+            BreathingDisturbancesStatusSensor(entry, data),
             # Added 12 Aug 2026 — same generic DailyTotalSensor/
             # LatestValueSensor classes as everything above, just more of
             # them, now that the ingestion pipeline is fully metric-agnostic.
             DailyTotalSensor(
                 entry, data, METRIC_FLIGHTS_CLIMBED, "Flights climbed today", "flights", "mdi:stairs"
+            ),
+            # Added 3 Nov 2026 -- requested via GitHub #27. Count of today's
+            # "stood" hours (HealthKit's third Activity ring), matching Apple's
+            # own Fitness app semantics ("N/12") -- see the iOS app's
+            # HealthMetricType.standHours doc comment for why this is a
+            # category-backed metric rather than a quantity sum, though the
+            # wire format/HA-side handling is identical to every other
+            # DailyTotalSensor here.
+            DailyTotalSensor(
+                entry, data, METRIC_STAND_HOURS, "Stand hours today", "h", "mdi:account-clock-outline"
             ),
             DailyTotalSensor(
                 entry, data, METRIC_EXERCISE_TIME, "Exercise time today", "min", "mdi:timer-outline",
@@ -422,6 +456,52 @@ class LatestValueSensor(HealthSyncSensor, RestoreSensor):
     def native_value(self) -> float | None:
         value = self._data.latest_values.get(self._metric)
         return round(value, 1) if value is not None else None
+
+
+class BreathingDisturbancesStatusSensor(HealthSyncSensor, RestoreSensor):
+    """Apple's own elevated/not-elevated classification
+    (`HKAppleSleepingBreathingDisturbancesClassificationForQuantity`) for
+    the most recent Breathing Disturbances night — added 6 Oct 2026,
+    GitHub #22. Deliberately Apple's own call, never a threshold this
+    integration computed itself.
+
+    State is a string ("elevated"/"notElevated"), not a typed numeric
+    value, so restore goes through the plain `async_get_last_state()`
+    path — same pattern as `WorkoutTypeSensor`/`SleepTimestampSensor`. The
+    published threshold (events/hour) the classification was measured
+    against rides as an attribute, so the classification is always
+    auditable against the actual number rather than taken on faith (this
+    is Jamie's "expose Apple's threshold value too" ask from the GitHub
+    issue discussion).
+    """
+
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = ["notElevated", "elevated"]
+    _attr_icon = "mdi:lungs"
+    _attr_name = "Breathing disturbances status"
+
+    def __init__(self, entry: HealthSyncConfigEntry, data: HealthSyncData) -> None:
+        super().__init__(entry, data)
+        self._attr_unique_id = f"{entry.entry_id}_breathing_disturbances_status"
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if self._data.breathing_disturbances_classification is not None:
+            return
+        last_state = await self.async_get_last_state()
+        if last_state is not None and last_state.state in self._attr_options:
+            self._data.breathing_disturbances_classification = last_state.state
+            threshold = last_state.attributes.get("elevated_threshold")
+            if isinstance(threshold, (int, float)):
+                self._data.breathing_disturbances_threshold = float(threshold)
+
+    @property
+    def native_value(self) -> str | None:
+        return self._data.breathing_disturbances_classification
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {"elevated_threshold": self._data.breathing_disturbances_threshold}
 
 
 STAGE_ATTRIBUTES = {

@@ -40,7 +40,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'homeFT24' and is_state('person.duc', 'home') }}"
               - condition: template
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('yuhi|survey|heli|japan -|rescue|jdl|digital|service|states|airx|ibex|aero|nihon|saxonair|teikyo|secom|hiratagakuen|operation') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('photo|yuhi|survey|heli|japan -|rescue|jdl|digital|service|states|airx|ibex|aero|nihon|saxonair|teikyo|secom|hiratagakuen|operation') }}"
 
             sequence:
               - action: script.text_notify
@@ -70,7 +70,7 @@ automation:
               - condition: or
                 conditions:
                   - condition: template
-                    value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways|photo|misconfigured') }}"
+                    value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways|misconfigured') }}"
                   - condition: template
                     value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_origin_city is undefined }}"
 
@@ -85,7 +85,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.tracked_by_device == 'jcbFT24' and is_state('person.duc', 'jcb') }}"
               - condition: template
-                value_template: "{{ trigger.event.data.airline | lower | regex_search('yuhi|survey|heli|japan -|rescue|jdl|digital|service|states|airx|ibex|aero|nihon|saxonair|teikyo|secom|hiratagakuen|operation') }}"
+                value_template: "{{ trigger.event.data.airline | lower | regex_search('photo|yuhi|survey|heli|japan -|rescue|jdl|digital|service|states|airx|ibex|aero|nihon|saxonair|teikyo|secom|hiratagakuen|operation') }}"
 
             sequence:
               - action: script.text_notify
@@ -118,7 +118,7 @@ automation:
               - condition: or
                 conditions:
                   - condition: template
-                    value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways|photo|misconfigured') }}"
+                    value_template: "{{ trigger.event.data.airline is undefined or trigger.event.data.airline | lower | regex_search('unknown|private owner|honda airways|misconfigured') }}"
                   - condition: template
                     value_template: "{{ trigger.event.data.airline is defined and trigger.event.data.airport_destination_city is undefined }}"
 
