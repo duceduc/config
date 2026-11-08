@@ -32,7 +32,7 @@ input_select:
 timer:
 # washer load filter checks
   washer_monitor:
-    duration: '00:32:00'
+    duration: '00:35:00'
 
 #  dish_cabinet:
 #    duration: '00:02:00'
@@ -303,7 +303,7 @@ automation:
       - action: script.washer_monitor ###
 
 ### normal wash: 400w reach
-#### light wash: 80w
+#### light wash: 200w
 
 
 
@@ -321,11 +321,11 @@ automation:
 # TESTING
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 5 }}"
-        for: 56
+        for: 58
         id: 'filter'
       - trigger: template
         value_template: "{{ states('sensor.gosund_washer_power')| int(0) == 6 }}"
-        for: 56
+        for: 58
         id: 'filter'
 
 #      - trigger: template

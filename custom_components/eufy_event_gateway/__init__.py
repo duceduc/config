@@ -21,8 +21,9 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .client import GatewayClient, GatewayClientError
-from .const import CONF_API_TOKEN, DOMAIN, PLATFORMS
+from .const import CONF_API_TOKEN, CONF_H264_COMPATIBILITY, CONF_LEGACY_NATIVE_VIDEO, DOMAIN, PLATFORMS
 from .coordinator import EufyGatewayCoordinator
+from .live_card import async_register_live_card
 
 _LOGGER = logging.getLogger(__name__)
 _CAPABILITY_REFRESH_TIMEOUT_SECONDS = 45
@@ -43,13 +44,33 @@ class GatewayRuntimeData:
 EufyGatewayConfigEntry = ConfigEntry[GatewayRuntimeData]
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: EufyGatewayConfigEntry) -> bool:
+    """Keep each existing installation's video choice.
+
+    Before minor version 2, cameras sent converted H.264 unless the native-video
+    opt-in was on. Those installations keep the picture they had, so H.264
+    compatibility mode is on unless they had opted in. New installations start
+    with it off.
+    """
+    if entry.version != 1:
+        return False
+    if entry.minor_version < 2:
+        options = {key: value for key, value in entry.options.items() if key != CONF_LEGACY_NATIVE_VIDEO}
+        options[CONF_H264_COMPATIBILITY] = entry.options.get(CONF_LEGACY_NATIVE_VIDEO) is not True
+        hass.config_entries.async_update_entry(entry, options=options, minor_version=2)
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: EufyGatewayConfigEntry) -> bool:
     """Connect once, publish runtime data, and start the entry's platforms.
 
     The initial refresh is deliberately completed before platform forwarding so
     entity factories can make capability decisions from a complete inventory.
     The long-lived event listener starts only after those platforms subscribe.
+    The live view card is served first, so dashboards can load it while the
+    gateway is still connecting.
     """
+    await async_register_live_card(hass)
     client = GatewayClient(
         async_get_clientsession(hass),
         entry.data["url"],
