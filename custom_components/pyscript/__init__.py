@@ -11,6 +11,7 @@ from os.path import isdir as os_path_isdir
 import shutil
 import time
 import traceback
+from types import ModuleType
 from typing import Any
 
 import voluptuous as vol
@@ -74,6 +75,16 @@ PYSCRIPT_SCHEMA = vol.Schema(
 CONFIG_SCHEMA = vol.Schema({DOMAIN: PYSCRIPT_SCHEMA}, extra=vol.ALLOW_EXTRA)
 
 
+def _relative_script_path(path: str, root: str, path_module: ModuleType = os.path) -> str:
+    """Return a slash-separated path relative to the pyscript root."""
+    return path_module.relpath(path, root).replace(path_module.sep, "/")
+
+
+def _is_requirements_file(path: str, path_module: ModuleType = os.path) -> bool:
+    """Match a requirements file using the host path rules."""
+    return path_module.basename(path) == REQUIREMENTS_FILE
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Component setup, run import config flow for each entry in config."""
     await restore_state(hass)
@@ -90,16 +101,20 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def restore_state(hass: HomeAssistant) -> None:
     """Restores the persisted pyscript state."""
     # this is a hack accessing hass internals; should re-implement using RestoreEntity
-    restore_data = hass.data[DATA_RESTORE_STATE]
-    # Home Assistant 2026.11 split last_states by entity id and by registry id;
-    # pyscript states have no registry entry
-    last_states = getattr(restore_data, "last_states_by_entity_id", None)
-    if last_states is None:
-        last_states = restore_data.last_states
-    for entity_id, value in last_states.items():
-        if entity_id.startswith("pyscript."):
-            last_state = value.state
-            hass.states.async_set(entity_id, last_state.state, last_state.attributes)
+    # if hass internals change, log the error rather than failing pyscript setup
+    try:
+        restore_data = hass.data[DATA_RESTORE_STATE]
+        # Home Assistant 2026.11 split last_states by entity id and by registry id;
+        # pyscript states have no registry entry
+        last_states = getattr(restore_data, "last_states_by_entity_id", None)
+        if last_states is None:
+            last_states = restore_data.last_states
+        for entity_id, value in last_states.items():
+            if entity_id.startswith("pyscript."):
+                last_state = value.state
+                hass.states.async_set(entity_id, last_state.state, last_state.attributes)
+    except Exception as exc:
+        _LOGGER.error("Unable to restore persisted pyscript state variables: %s", exc)
 
 
 async def update_yaml_config(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
@@ -225,9 +240,11 @@ async def watchdog_start(
             # also check dest_path: atomic saves (tempfile + os.replace) surface
             # as a moved event whose src_path is an unrelated temp name
             paths = (event.src_path, event.dest_path)
-            for valid_suffix in [".py", ".yaml", "/" + REQUIREMENTS_FILE]:
+            for valid_suffix in [".py", ".yaml"]:
                 if any(path.endswith(valid_suffix) for path in paths):
                     return True
+            if any(_is_requirements_file(path) for path in paths):
+                return True
             return do_reload
 
         while True:
@@ -533,11 +550,11 @@ async def load_scripts(
         for path, match, check_config, autoload in load_paths:
             for this_path in sorted(glob.glob(os.path.join(pyscript_dir, path, match), recursive=True)):
                 rel_import_path = None
-                rel_path = this_path
-                if rel_path.startswith(pyscript_dir):
-                    rel_path = rel_path[len(pyscript_dir) :]
-                if rel_path.startswith("/"):
-                    rel_path = rel_path[1:]
+                try:
+                    rel_path = _relative_script_path(this_path, pyscript_dir)
+                except ValueError as exc:
+                    _LOGGER.error("load_scripts: skipping %s due to exception %s", this_path, exc)
+                    continue
                 if rel_path[0] == "#" or rel_path.find("/#") >= 0:
                     # skip "commented" files and directories
                     continue
