@@ -60,6 +60,7 @@ class GatewayClient:
     ) -> None:
         """Create a client from HA's shared HTTP session and gateway settings."""
         self.live_view_handover_supported = False
+        self.hls_view_idle_supported = False
         self._session = session
         self.base_url = base_url.rstrip("/")
         self._headers = {"Authorization": f"Bearer {api_token}"} if api_token else {}
@@ -135,6 +136,7 @@ class GatewayClient:
         if not isinstance(cameras, list):
             raise GatewayClientError("Gateway returned an invalid camera list")
         self.live_view_handover_supported = payload.get("liveViewHandoverSupported") is True
+        self.hls_view_idle_supported = payload.get("hlsViewIdleSupported") is True
         return [
             camera
             for camera in cameras
@@ -394,6 +396,36 @@ class GatewayClient:
                 return await response.read()
         except (ClientError, TimeoutError) as error:
             raise GatewayClientError(str(error)) from error
+
+    async def shared_lens_snapshot(self, serial: str, lens: str) -> bytes | None:
+        """Read a retained pane without a fallback to a whole-camera image."""
+        if lens not in ("fixed", "movable"):
+            raise GatewayClientError("Invalid shared lens")
+        try:
+            async with self._session.get(
+                self._url(f"/api/cameras/{quote(serial, safe='')}/snapshot-{lens}"), headers=self._headers
+            ) as response:
+                self._raise_for_status(response)
+                return await response.read()
+        except (ClientError, TimeoutError) as error:
+            raise GatewayClientError(str(error)) from error
+
+    async def shared_lens_stream_url(self, serial: str, lens: str) -> str:
+        """Require an explicit pane response, never retrying against a normal stream."""
+        if lens not in ("fixed", "movable"):
+            raise GatewayClientError("Invalid shared lens")
+        payload = await self._json(f"/api/cameras/{quote(serial, safe='')}/stream-token", method="POST",
+                                   payload={"profile": "compatible", "audio": "off", "lens": lens})
+        if not isinstance(payload, dict):
+            raise GatewayClientError("Gateway returned an invalid shared lens path")
+        path = payload.get("path")
+        if not isinstance(path, str) or payload.get("lens") != lens or "\\" in path:
+            raise GatewayClientError("Gateway returned an invalid shared lens path")
+        parts = urlsplit(path)
+        if (parts.scheme or parts.netloc or parts.fragment
+                or parts.path != f"/api/cameras/{quote(serial, safe='')}/live-{lens}.h264"):
+            raise GatewayClientError("Gateway returned an invalid shared lens path")
+        return self._url(path)
 
     async def event_image(self, serial: str) -> bytes | None:
         """Read the latest event picture, returning None before one arrives."""
