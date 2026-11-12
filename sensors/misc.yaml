@@ -5,8 +5,9 @@
 #
 ####################################################
 
-  - platform: folder
-    folder: '/media/music'
+## Moved to integration now
+#  - platform: folder
+#    folder: '/media/music'
 
 
 ####################################################
