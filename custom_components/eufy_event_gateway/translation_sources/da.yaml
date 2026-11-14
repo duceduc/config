@@ -18,6 +18,8 @@ entity:
     event_image:
       name: Seneste hændelsesbillede
   button:
+    quick_response_experimental:
+      name: "Afspil hurtigt svar {reply} (eksperimentel)"
     compatibility_report:
       name: Hjælp med at teste denne enhed
     camera_light_on:
@@ -153,6 +155,18 @@ entity:
         high: Høj
         low: Lav
         highest: Højest
+    camera_streaming_quality_experimental:
+      name: "Streamingkvalitet (eksperimentel)"
+      state:
+        "auto": "Automatisk"
+        "hd": "HD (720p)"
+        "full_hd": "Full HD (1080p)"
+        "2k": "2K"
+        "medium": "Mellem"
+        "high": "Høj"
+        "low": "Lav"
+        "highest": "Højest"
+        "3k": "3K"
     camera_night_vision:
       name: Night vision
       state:

@@ -444,8 +444,9 @@ class GatewayClient:
     async def stream_url(self, serial: str, *, native: bool = False, audio: bool | None = None) -> str:
         """Create a signed viewer URL, validating the opt-in native boundary.
 
-        Compatible calls without an audio choice keep the existing request and
-        response behavior. An audio choice asks for the camera's live audio, or
+        Every returned source must belong to the requested camera and profile.
+        Compatible calls without an audio choice retain the empty POST. An audio
+        choice asks for the camera's live audio, or
         for video only; a gateway that predates it refuses the field, and the
         request is repeated without it. Native responses fail closed when an
         older gateway ignores the profile.
@@ -454,16 +455,29 @@ class GatewayClient:
         if not native:
             if choice:
                 try:
-                    payload = await self._json(f"/api/cameras/{serial}/stream-token", method="POST", payload=choice)
+                    payload = await self._json(f"/api/cameras/{quote(serial, safe='')}/stream-token", method="POST", payload=choice)
                 except GatewayClientError as error:
                     if error.status != 400:
                         raise
-                    payload = await self._json(f"/api/cameras/{serial}/stream-token", method="POST")
+                    payload = await self._json(f"/api/cameras/{quote(serial, safe='')}/stream-token", method="POST")
             else:
-                payload = await self._json(f"/api/cameras/{serial}/stream-token", method="POST")
-            path = payload.get("path")
-            if not isinstance(path, str) or not path.startswith("/"):
-                raise GatewayClientError("Gateway returned an invalid stream path")
+                payload = await self._json(f"/api/cameras/{quote(serial, safe='')}/stream-token", method="POST")
+            try:
+                path = payload.get("path")
+                if not isinstance(path, str) or "\\" in path or "//" in path or ".." in path:
+                    raise ValueError
+                parts = urlsplit(path)
+                if parts.scheme or parts.netloc or parts.fragment or re.search(r"%(?![0-9a-fA-F]{2})", parts.path):
+                    raise ValueError
+                segments = [unquote(segment, errors="strict") for segment in parts.path.split("/")]
+                if segments[:4] != ["", "api", "cameras", serial] or len(segments) != 5 \
+                        or segments[4] not in ("live.h264", "live.ts"):
+                    raise ValueError
+                query = parse_qsl(parts.query, keep_blank_values=True, strict_parsing=True) if parts.query else []
+                if len(query) > 1 or any(key != "access_token" or not value for key, value in query):
+                    raise ValueError
+            except (ValueError, TypeError, AttributeError, UnicodeError):
+                raise GatewayClientError("Gateway returned an invalid compatible stream response") from None
             return self._url(path)
         try:
             token_path = f"/api/cameras/{quote(serial, safe='')}/stream-token"
@@ -657,6 +671,33 @@ class GatewayClient:
             method="POST",
             payload={"enabled": enabled},
         )
+
+    async def quick_responses(self, serial: str) -> list[dict[str, Any]]:
+        """Read saved reply metadata without retrieving audio or storage paths."""
+        result = await self._json(f"/api/cameras/{quote(serial, safe='')}/quick-responses", timeout=65)
+        replies = result.get("replies")
+        if not isinstance(replies, list) or len(replies) > 6:
+            raise GatewayClientError("Saved reply list unavailable")
+        seen: set[int] = set()
+        for reply in replies:
+            if (not isinstance(reply, dict) or set(reply) != {"id", "name", "custom"}
+                    or type(reply["id"]) is not int or reply["id"] not in (1, 2, 3, 100, 101, 102)
+                    or reply["id"] in seen or not isinstance(reply["name"], str)
+                    or not reply["name"].strip() or len(reply["name"]) > 80
+                    or any(ord(char) < 32 or ord(char) == 127 for char in reply["name"])
+                    or type(reply["custom"]) is not bool or reply["custom"] != (reply["id"] >= 100)):
+                raise GatewayClientError("Saved reply list unavailable")
+            seen.add(reply["id"])
+        return replies
+
+    async def play_quick_response(self, serial: str, reply_id: int) -> None:
+        """Dispatch once. A lost acknowledgement must never cause automatic replay."""
+        if type(reply_id) is not int or reply_id not in (1, 2, 3, 100, 101, 102):
+            raise GatewayClientError("Choose one saved reply")
+        result = await self._json(f"/api/cameras/{quote(serial, safe='')}/quick-responses", method="POST",
+                                  payload={"id": reply_id}, timeout=65)
+        if result != {"outcome": "acknowledged", "physicalConfirmationRequired": True}:
+            raise GatewayClientError("Playback outcome is unknown. Check before trying again.")
 
     async def pan_camera(self, serial: str, direction: str) -> None:
         """Send one direct movement click without retrying an unknown outcome."""
