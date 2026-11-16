@@ -825,6 +825,7 @@ async def async_setup_entry(hass, config_entry):
                 "binary_sensor": [],
                 "alarm_control_panel": {},
                 "smart_switch": [],
+                "button": {},
             },
             "excluded": {},
             "new_devices": True,
@@ -835,6 +836,7 @@ async def async_setup_entry(hass, config_entry):
             "http2": None,
             "auth_info": None,
             "amazon_kids": None,
+            "display_states": {},
             "second_account_index": 0,
             "should_get_network": True,
             "first_run": True,
@@ -1503,6 +1505,11 @@ async def setup_alexa(hass, config_entry, login_obj: AlexaLogin):
                     .get(serial)
                     .refresh(device, skip_api=True)
                 )
+        async_dispatcher_send(
+            hass,
+            f"{DOMAIN}_{hide_email(email)}"[0:32],
+            {"availability_update": True},
+        )
         _LOGGER.debug(
             "%s: Existing: %s New: %s;"
             " Filtered out by not being in include: %s "
@@ -3229,7 +3236,11 @@ async def setup_alexa(hass, config_entry, login_obj: AlexaLogin):
 
     # Register services (fast - just registers callbacks)
     hass.data[DATA_ALEXAMEDIA]["services"] = alexa_services = AlexaMediaServices(
-        hass, functions={"update_last_called": update_last_called}
+        hass,
+        functions={
+            "update_last_called": update_last_called,
+            "schedule_notifications_refresh": _schedule_notifications_refresh,
+        },
     )
     await alexa_services.register()
 
@@ -3320,6 +3331,12 @@ async def async_unload_entry(hass, entry) -> bool:
         amazon_kids.async_stop()
         hass.data[DATA_ALEXAMEDIA]["accounts"][email]["amazon_kids"] = None
 
+    for display_state in (
+        hass.data[DATA_ALEXAMEDIA]["accounts"][email].get("display_states", {}).values()
+    ):
+        display_state.async_stop()
+    hass.data[DATA_ALEXAMEDIA]["accounts"][email]["display_states"] = {}
+
     for component in ALEXA_COMPONENTS + DEPENDENT_ALEXA_COMPONENTS:
         try:
             if component == "notify":
@@ -3388,14 +3405,21 @@ async def async_remove_entry(hass, entry) -> bool:
         outputpath=hass.config.path,
     )
     # Delete cookiefile
-    cookiefile = hass.config.path(f".storage/{DOMAIN}.{email}.pickle")
+    cookiefile = hass.config.path(f".storage/{DOMAIN}.{email}.cookies")
     obfuscated_cookiefile = hass.config.path(
-        f".storage/{DOMAIN}.{obfuscated_email}.pickle"
+        f".storage/{DOMAIN}.{obfuscated_email}.cookies"
     )
     if callable(getattr(AlexaLogin, "delete_cookiefile", None)):
         try:
             await login_obj.delete_cookiefile()
-            _LOGGER.debug("Cookiefile %s deleted.", obfuscated_cookiefile)
+            if os.path.exists(cookiefile):
+                _LOGGER.error(
+                    "delete_cookiefile() failed;"
+                    " Manually delete cookiefile before re-adding the integration: %s",
+                    obfuscated_cookiefile,
+                )
+            else:
+                _LOGGER.debug("Cookiefile %s deleted.", obfuscated_cookiefile)
         except Exception as ex:
             _LOGGER.error(
                 "delete_cookiefile() exception: %s;"

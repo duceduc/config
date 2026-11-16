@@ -94,11 +94,17 @@ entity:
       name: Kontakt
     eufy_station_connection:
       name: Forbindelse
+    sensor_connection:
+      name: Forbindelse
+    sensor_battery_low:
+      name: Lavt batteri
     eufy_station_camera_route:
       name: Kamera rute
   number:
     camera_motion_sensitivity:
       name: Bevægelsesfølsomhed
+    camera_motion_sensitivity_experimental:
+      name: "Bevægelsesfølsomhed (experimental)"
     camera_light_brightness:
       name: Lysstyrke
     camera_notification_interval:
@@ -280,6 +286,8 @@ entity:
       name: Lydrundkig
     camera_enhance_lighting:
       name: Forbedret belysning
+    camera_enabled_experimental:
+      name: Kamera aktiveret (eksperimentelt)
     camera_enabled:
       name: Kamera tilsluttet
     camera_motion_detection:
@@ -288,6 +296,8 @@ entity:
       name: Lydoptagelse
     camera_live_audio:
       name: Live lyd
+    camera_live_audio_experimental:
+      name: Live lyd (eksperimentel)
     auto_night_vision:
       name: Auto night vision
     camera_microphone:

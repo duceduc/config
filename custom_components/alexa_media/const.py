@@ -53,6 +53,7 @@ DEPENDENT_ALEXA_COMPONENTS = [
     "binary_sensor",
     "select",
     "number",
+    "button",
 ]
 
 HTTP_COOKIE_HEADER = "# HTTP Cookie File"
@@ -95,6 +96,12 @@ SERVICE_FORCE_LOGOUT = "force_logout"
 SERVICE_ENABLE_NETWORK_DISCOVERY = "enable_network_discovery"
 SERVICE_AMAZON_KIDS_ENABLE = "amazon_kids_enable"
 SERVICE_AMAZON_KIDS_DISABLE = "amazon_kids_disable"
+SERVICE_REPEAT_LAST_MESSAGE = "repeat_last_message"
+SERVICE_CREATE_ALARM = "create_alarm"
+SERVICE_ENABLE_ALARM = "enable_alarm"
+SERVICE_DISABLE_ALARM = "disable_alarm"
+SERVICE_DELETE_ALARM = "delete_alarm"
+SERVICE_SKIP_NEXT_ALARM = "skip_next_alarm"
 
 # Backoff durations for the last-called probe worker
 LAST_CALLED_429_BACKOFF_INITIAL_S = 30.0
@@ -168,6 +175,9 @@ ATTR_EMAIL = "email"
 ATTR_ENTITY_ID = "entity_id"
 ATTR_NUM_ENTRIES = "entries"
 ATTR_CHILD = "child"
+ATTR_ALARM_ID = "alarm_id"
+ATTR_TIME = "time"
+ATTR_DAYS = "days"
 COMMON_BUCKET_COUNTS = (
     "accounts",
     "devices",
@@ -241,8 +251,9 @@ ALEXA_UNIT_CONVERSION = {
 ALEXA_ICON_CONVERSION = {
     "Alexa.AirQuality.CarbonMonoxide": "mdi:molecule-co",
     "Alexa.AirQuality.Humidity": "mdi:water-percent",
-    "Alexa.AirQuality.IndoorAirQuality": "mdi:numeric",
+    "Alexa.AirQuality.IndoorAirQuality": "mdi:gauge",
     "Alexa.AirQuality.ParticulateMatter": "mdi:blur",
+    "Alexa.AirQuality.ParticulateMatterPM10": "mdi:blur",
     "Alexa.AirQuality.VolatileOrganicCompounds": "mdi:air-filter",
 }
 ALEXA_ICON_DEFAULT = "mdi:molecule"
@@ -251,9 +262,11 @@ ALEXA_ICON_DEFAULT = "mdi:molecule"
 # Maps Alexa sensor types to Home Assistant SensorDeviceClass
 ALEXA_AIR_QUALITY_DEVICE_CLASS = {
     "Alexa.AirQuality.ParticulateMatter": "pm25",
+    "Alexa.AirQuality.ParticulateMatterPM10": "pm10",
     "Alexa.AirQuality.CarbonMonoxide": "carbon_monoxide",
     "Alexa.AirQuality.IndoorAirQuality": "aqi",
-    "Alexa.AirQuality.VolatileOrganicCompounds": "aqi",
+    # Amazon reports a unitless VOC index, so no concentration device class applies.
+    "Alexa.AirQuality.VolatileOrganicCompounds": None,
     "Alexa.AirQuality.Humidity": "humidity",
 }
 
@@ -407,7 +420,7 @@ MODEL_IDS = {
     "A3R9S4ZZECZ6YL": "Fire Tablet HD 10",
     "A3RBAYBE7VM004": "Echo Studio",
     "A3RCTOK2V0A4ZG": "LG TV",
-    "A3RMGO6LYLH7YN": "Echo Dot (Gen4)",
+    "A3RMGO6LYLH7YN": "Echo (Gen4)",
     "A3S5BH2HU6VAYF": "Echo Dot (Gen2)",
     "A3SSG6GR8UU7SN": "Echo Sub",
     "A3SSWQ04XYPXBH": "Generic Tablet",

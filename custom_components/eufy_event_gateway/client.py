@@ -12,6 +12,7 @@ from __future__ import annotations
 import calendar
 import json
 import re
+from datetime import datetime
 from urllib.parse import quote, urlencode, urlsplit, unquote, parse_qsl
 from collections.abc import AsyncIterator
 from typing import Any
@@ -233,6 +234,12 @@ class GatewayClient:
         state = {key: value.get(key) for key in (
             "serial", "name", "model", "state", "available", "batteryPercent", "stateObservedAt"
         )}
+        parent = value.get("stationSerial")
+        if isinstance(parent, str) and 0 < len(parent) <= 128 and parent.strip() == parent:
+            state["stationSerial"] = parent
+        if "firmware" in value:
+            version = value["firmware"]
+            state["firmware"] = version.strip() if isinstance(version, str) and len(version) <= 100 and version.strip() else None
         if value["model"] != "T85F1":
             if value.get("readOnly") is not True or value.get("observationSource") != "cloud_inventory":
                 raise GatewayClientError("Gateway returned an invalid read-only lock profile")
@@ -246,6 +253,24 @@ class GatewayClient:
             return state
         if value.get("readOnly") is not None or value.get("observationSource") is not None:
             raise GatewayClientError("Gateway returned an invalid E30 lock profile")
+        event = value.get("lastEvent")
+        if (isinstance(event, dict) and set(event) == {"action", "method", "userName", "receivedAt"}
+                and event.get("action") in ("locked", "unlocked")
+                and event.get("method") in ("manual", "automatic", "keypad", "passcode", "fingerprint",
+                                            "app", "temporary_passcode", "nfc")):
+            name, stamp = event["userName"], event["receivedAt"]
+            valid_name = name is None or (isinstance(name, str) and 0 < len(name) <= 100
+                                         and name.strip() == name
+                                         and not any(ord(char) < 32 or 127 <= ord(char) <= 159 for char in name))
+            try:
+                received = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+                valid_time = received.tzinfo is not None
+            except (TypeError, ValueError, AttributeError):
+                valid_time = False
+            if valid_name and valid_time:
+                state["lastEvent"] = {"action": event["action"], "method": event["method"],
+                                      "userName": None if event["method"] in ("manual", "automatic", "keypad") else name,
+                                      "receivedAt": stamp}
         settings = value.get("settings")
         if isinstance(settings, dict):
             booleans = ("autoLock", "notifications", "lockedNotifications", "unlockedNotifications")
@@ -522,6 +547,48 @@ class GatewayClient:
         """Ask the gateway to wake a supported camera and retain a new JPEG."""
         await self._json(f"/api/cameras/{serial}/capture-snapshot", method="POST")
 
+    async def live_talkback_offer(self, serial: str, sdp: str) -> dict[str, str]:
+        """Negotiate one transient browser peer without retaining its SDP."""
+        if not isinstance(sdp, str) or len(sdp.encode()) > 65536:
+            raise GatewayClientError("Invalid live talkback offer")
+        payload = await self._json(
+            f"/api/cameras/{quote(serial, safe='')}/live-talkback", method="POST",
+            payload={"sdp": sdp}, timeout=20,
+        )
+        session = payload.get("sessionId")
+        answer = payload.get("sdp")
+        valid_session = isinstance(session, str) and re.fullmatch(r"[a-f0-9]{32}", session) is not None
+        if (not valid_session or not isinstance(answer, str) or not answer.startswith("v=0")
+                or len(answer.encode()) > 65536):
+            if valid_session:
+                try:
+                    await self.close_live_talkback(serial, session)
+                except GatewayClientError:
+                    pass
+            raise GatewayClientError("Gateway returned invalid live talkback negotiation")
+        return {"sessionId": session, "sdp": answer}
+
+    async def live_talkback_candidate(self, serial: str, session: str, candidate: dict[str, Any] | None) -> None:
+        """Forward a bounded browser ICE candidate only to its returned peer ID."""
+        if not isinstance(session, str) or re.fullmatch(r"[a-f0-9]{32}", session) is None:
+            raise GatewayClientError("Invalid live talkback session")
+        await self._json(
+            f"/api/cameras/{quote(serial, safe='')}/live-talkback/{session}", method="PATCH",
+            payload={"candidate": candidate}, timeout=10,
+        )
+
+    async def close_live_talkback(self, serial: str, session: str) -> None:
+        """Wait for the exact peer's speaker, encoders and source consumer to retire."""
+        if not isinstance(session, str) or re.fullmatch(r"[a-f0-9]{32}", session) is None:
+            raise GatewayClientError("Invalid live talkback session")
+        try:
+            await self._json(
+                f"/api/cameras/{quote(serial, safe='')}/live-talkback/{session}", method="DELETE", timeout=15,
+            )
+        except GatewayClientError as error:
+            if error.status != 409:
+                raise
+
     async def set_camera_enabled(
         self, serial: str, enabled: bool
     ) -> dict[str, Any]:
@@ -795,10 +862,15 @@ class GatewayClient:
             raise GatewayClientError(str(error)) from error
 
     async def events(self) -> AsyncIterator[dict[str, Any]]:
-        """Yield normalized SSE events until the connection closes or fails."""
+        """Yield events without a total lifetime limit, failing a silent connection.
+
+        The gateway sends a heartbeat every fifteen seconds. Three silent
+        heartbeat intervals return control to the coordinator's reconnect loop.
+        """
         try:
             async with self._session.get(
-                self._url("/api/events"), headers=self._headers, timeout=None
+                self._url("/api/events"), headers=self._headers,
+                timeout=ClientTimeout(total=None, sock_read=45),
             ) as response:
                 self._raise_for_status(response)
                 data_lines: list[str] = []

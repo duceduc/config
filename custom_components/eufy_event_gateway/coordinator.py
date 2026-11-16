@@ -189,15 +189,15 @@ class EufyGatewayCoordinator(
         return (self.data or {}).get("locks", {})
 
     def async_set_lock(self, lock: dict[str, Any]) -> None:
-        """Publish a confirmed lock response while preserving every other family."""
+        """Publish normalized lock facts and separate event context, preserving other families."""
         updated = {"cameras": dict(self.cameras), "stations": dict(self.stations),
                    "sensors": dict(self.sensors), "locks": dict(self.locks)}
         updated["locks"][lock["serial"]] = lock
-        self._sync_device_name(lock["serial"], lock.get("name"))
+        self._sync_device_names(updated)
         self.async_set_updated_data(updated)
 
     def async_set_station(self, station: dict[str, Any]) -> None:
-        """Merge confirmed command state and notify all station entities."""
+        """Merge confirmed station state and refresh owned HA device metadata."""
         serial = station.get("serial")
         if not isinstance(serial, str):
             return
@@ -208,11 +208,11 @@ class EufyGatewayCoordinator(
             "locks": dict(self.locks),
         }
         updated["stations"][serial] = station
-        self._sync_device_name(serial, station.get("name"))
+        self._sync_device_names(updated)
         self.async_set_updated_data(updated)
 
     def async_set_camera(self, camera: dict[str, Any]) -> None:
-        """Merge confirmed command state and notify all camera entities."""
+        """Merge confirmed camera state and refresh owned HA device metadata."""
         serial = camera.get("serial")
         if not isinstance(serial, str):
             return
@@ -223,7 +223,7 @@ class EufyGatewayCoordinator(
             "locks": dict(self.locks),
         }
         updated["cameras"][serial] = camera
-        self._sync_device_name(serial, camera.get("name"))
+        self._sync_device_names(updated)
         self.async_set_updated_data(updated)
 
     def start_event_listener(self) -> None:
@@ -314,6 +314,7 @@ class EufyGatewayCoordinator(
                 "sensors": normalized,
                 "locks": dict(self.locks),
             }
+            self._sync_device_names(updated)
             self.async_set_updated_data(updated)
 
         sensor = event.get("sensor")
@@ -325,7 +326,7 @@ class EufyGatewayCoordinator(
                 "locks": dict(self.locks),
             }
             updated["sensors"][sensor["serial"]] = sensor
-            self._sync_device_name(sensor["serial"], sensor.get("name"))
+            self._sync_device_names(updated)
             self.async_set_updated_data(updated)
 
         locks = event.get("locks")
@@ -351,28 +352,50 @@ class EufyGatewayCoordinator(
     def _sync_device_names(
         self, data: dict[str, dict[str, dict[str, Any]]]
     ) -> None:
-        """Refresh vendor names without changing Home Assistant user overrides."""
+        """Refresh owned metadata and attach children only to reported HomeBases."""
+        stations = data.get("stations", {})
         for family in ("cameras", "stations", "sensors", "locks"):
             for serial, device in data.get(family, {}).items():
-                self._sync_device_name(serial, device.get("name"))
+                parent = device.get("stationSerial")
+                self._sync_device_name(
+                    serial, device.get("name"), firmware=device.get("firmware"),
+                    parent_serial=parent if family != "stations" and isinstance(parent, str) and parent in stations else None,
+                )
 
-    def _sync_device_name(self, serial: str, name: object) -> None:
-        """Update an existing registry device when Eufy reports a new name."""
-        if not isinstance(name, str) or not name.strip():
-            return
+    def _sync_device_name(
+        self, serial: str, name: object, *, firmware: object = None, parent_serial: object = None
+    ) -> None:
+        """Update reported metadata only on a device owned by this config entry.
+
+        Missing metadata never clears an existing version or parent. Parent lookup
+        uses the same config entry as the child and never creates a device.
+        """
+        updates = {}
+        if isinstance(name, str) and name.strip():
+            updates["name"] = name
+        if isinstance(firmware, str) and len(firmware) <= 100 and firmware.strip():
+            updates["sw_version"] = firmware.strip()
         registry = dr.async_get(self.hass)
-        scoped_lookup = getattr(registry, "async_get_device_by_identifier", None)
-        if scoped_lookup is not None:
-            device = scoped_lookup((DOMAIN, serial), self.config_entry.entry_id)
-        else:
-            device = registry.async_get_device(identifiers={(DOMAIN, serial)})
+
+        def lookup(identifier: str) -> Any:
+            """Resolve only registry devices belonging to this integration entry."""
+            scoped_lookup = getattr(registry, "async_get_device_by_identifier", None)
+            if scoped_lookup is not None:
+                return scoped_lookup((DOMAIN, identifier), self.config_entry.entry_id)
+            device = registry.async_get_device(identifiers={(DOMAIN, identifier)})
             if device is not None:
                 owner = getattr(device, "config_entry_id", None)
-                if owner is not None:
-                    owned = owner == self.config_entry.entry_id
-                else:
-                    owned = self.config_entry.entry_id in device.config_entries
-                if not owned:
-                    device = None
-        if device is not None and device.name != name:
-            registry.async_update_device(device.id, name=name)
+                owned = owner == self.config_entry.entry_id if owner is not None else self.config_entry.entry_id in device.config_entries
+                if owned:
+                    return device
+            return None
+
+        device = lookup(serial)
+        if device is not None and isinstance(parent_serial, str) and 0 < len(parent_serial) <= 128 and parent_serial != serial:
+            parent = lookup(parent_serial)
+            if parent is not None and parent.id != device.id and getattr(parent, "via_device_id", None) is None:
+                updates["via_device_id"] = parent.id
+        if device is not None:
+            updates = {key: value for key, value in updates.items() if getattr(device, key, None) != value}
+            if updates:
+                registry.async_update_device(device.id, **updates)

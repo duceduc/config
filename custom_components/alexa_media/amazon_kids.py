@@ -11,6 +11,7 @@ the child select all share a single set of API calls.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Awaitable, Callable
 from datetime import timedelta
 import logging
 
@@ -41,6 +42,11 @@ class AmazonKidsState:
         self._listeners: list = []
         self._refresh_lock = asyncio.Lock()
         self._unsub = None
+        self._refresh_tasks: set[asyncio.Task] = set()
+        # None until alexapy has looked up the marketplace's parent dashboard.
+        self.dashboard_available: bool | None = None
+        self._dashboard_waiters: list[Callable[[], Awaitable[bool]]] = []
+        self._stopped = False
 
     def track(self, serial: str, device_type: str) -> None:
         """Register a device to be polled."""
@@ -139,25 +145,56 @@ class AmazonKidsState:
                 return candidate
         return next(iter(self._options.values()), None)
 
+    async def async_add_when_dashboard(
+        self, add_entities: Callable[[], Awaitable[bool]]
+    ) -> bool:
+        """Run ``add_entities`` once a refresh has found the parent dashboard.
+
+        The switch and select need the dashboard, which some marketplaces such
+        as amazon.nl do not have; they never get these entities. A failed DNS
+        lookup at startup only delays them until a later refresh finds it.
+        ``add_entities`` returns whether it succeeded; a failed add is retried
+        on the next refresh. Returns False only if an immediate add failed.
+        """
+        self._dashboard_waiters.append(add_entities)
+        if not self.dashboard_available:
+            return True
+        return await self._async_add_waiting()
+
     async def async_start(self) -> None:
-        """Initialize unknown devices and schedule periodic updates."""
-        if self._unsub is not None:
-            await self.async_refresh(only_unknown=True)
-            return
-        self._unsub = async_track_time_interval(
-            self.hass, self._async_interval, KIDS_SCAN_INTERVAL
+        """Schedule initialization without holding up platform setup."""
+        only_unknown = self._unsub is not None
+        if not only_unknown:
+            self._unsub = async_track_time_interval(
+                self.hass, self._async_interval, KIDS_SCAN_INTERVAL
+            )
+        self._async_schedule_refresh(only_unknown=only_unknown)
+
+    @callback
+    def _async_schedule_refresh(self, *, only_unknown: bool = False) -> asyncio.Task:
+        """Track background refreshes so unload also cancels queued work."""
+        task = self.hass.async_create_background_task(
+            self.async_refresh(only_unknown=only_unknown),
+            "alexa_media Amazon Kids refresh",
         )
-        await self.async_refresh()
+        self._refresh_tasks.add(task)
+        task.add_done_callback(self._refresh_tasks.discard)
+        return task
 
     @callback
     def async_stop(self) -> None:
-        """Cancel the polling timer."""
+        """Cancel the polling timer and any pending background refreshes."""
         if self._unsub:
             self._unsub()
             self._unsub = None
+        for task in self._refresh_tasks:
+            task.cancel()
+        self._stopped = True
+        self._dashboard_waiters.clear()
 
     async def _async_interval(self, now) -> None:
-        await self.async_refresh()
+        if self._unsub is not None:
+            await self._async_schedule_refresh()
 
     async def async_refresh(self, *, only_unknown: bool = False) -> None:
         """Refresh child profiles and tracked device states.
@@ -183,6 +220,7 @@ class AmazonKidsState:
             await self._async_refresh(devices)
 
     async def _async_refresh(self, devices: dict[str, str] | None = None) -> None:
+        await self._async_check_dashboard()
         try:
             children = await AlexaAPI.get_child_profiles(self.login)
         except Exception as ex:  # noqa: BLE001  pylint: disable=broad-except
@@ -229,6 +267,52 @@ class AmazonKidsState:
                 "last_child": child or previous.get("last_child"),
             }
         self._async_notify()
+
+    async def _async_check_dashboard(self) -> None:
+        """Look up the parent dashboard and add the entities waiting for it."""
+        if not self.dashboard_available and not await self._async_find_dashboard():
+            return
+        if self._dashboard_waiters:
+            await self._async_add_waiting()
+
+    async def _async_find_dashboard(self) -> bool:
+        """Ask alexapy whether the marketplace has a parent dashboard."""
+        supports_child_profiles = getattr(AlexaAPI, "supports_child_profiles", None)
+        try:
+            if supports_child_profiles is None:
+                # An alexapy older than the pinned one, as left behind until
+                # Home Assistant restarts after installing the update, cannot
+                # check; keep the entities as before rather than hide them.
+                available = True
+            else:
+                # alexapy caches the DNS answer and retries a failed lookup.
+                available = await supports_child_profiles(self.login)
+        except Exception as ex:  # noqa: BLE001  pylint: disable=broad-except
+            _LOGGER.debug(
+                "%s: Unable to check for the Amazon Kids parent dashboard: %s",
+                hide_email(self.login.email),
+                ex,
+            )
+            return False
+        self.dashboard_available = available
+        return available
+
+    async def _async_add_waiting(self) -> bool:
+        """Add the waiting entities; keep any that fail for the next refresh."""
+        waiters, self._dashboard_waiters = self._dashboard_waiters, []
+        success = True
+        for add_entities in waiters:
+            try:
+                added = await add_entities()
+            except Exception:  # pylint: disable=broad-except
+                # One platform failing must not stop the poll or the others.
+                _LOGGER.exception("Unable to add Amazon Kids entities")
+                added = False
+            if not added:
+                success = False
+                if not self._stopped:
+                    self._dashboard_waiters.append(add_entities)
+        return success
 
 
 def async_get_state(hass, account_dict: dict, login) -> AmazonKidsState:

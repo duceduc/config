@@ -33,6 +33,12 @@ from .alexa_entity import parse_power_from_coordinator
 from .alexa_media import AlexaMedia
 from .amazon_kids import KIDS_CAPABLE_FAMILIES, async_get_state
 from .const import CONF_EXTENDED_ENTITY_DISCOVERY
+from .display import (
+    AlexaAdaptiveBrightnessSwitch,
+    AlexaDisplayPowerSwitch,
+    async_get_display_state,
+    supports_display,
+)
 from .helpers import _catch_login_errors, add_devices, safe_get
 
 try:
@@ -121,6 +127,34 @@ async def async_setup_platform(hass, config, add_devices_callback, discovery_inf
                     hide_email(account),
                     alexa_client,
                 )
+    display_devices: list[SwitchDevice] = []
+    login_obj = account_dict.get("login_obj")
+    for key, device in account_dict["devices"]["media_player"].items():
+        if not supports_display(device):
+            continue
+        client = account_dict["entities"]["media_player"].get(key)
+        if login_obj is None or client is None:
+            _LOGGER.debug(
+                "%s: Media player %s not loaded yet; delaying display setup",
+                hide_email(account),
+                hide_serial(key),
+            )
+            raise ConfigEntryNotReady
+
+        display_state = await async_get_display_state(
+            hass, account_dict, login_obj, device, client
+        )
+        switch_dict = account_dict["entities"]["switch"].setdefault(key, {})
+        for switch_key, class_ in (
+            ("display_power", AlexaDisplayPowerSwitch),
+            ("adaptive_brightness", AlexaAdaptiveBrightnessSwitch),
+        ):
+            if switch_key in switch_dict:
+                continue
+            display_switch = class_(display_state)
+            switch_dict[switch_key] = display_switch
+            display_devices.append(display_switch)
+
     # Add Amazon Smart Plug devices
     switch_entities = safe_get(account_dict, ["devices", "smart_switch"], [])
     hue_emulated_enabled = "emulated_hue" in hass.config.as_dict().get(
@@ -159,9 +193,9 @@ async def async_setup_platform(hass, config, add_devices_callback, discovery_inf
         if not device_type or client is None:
             continue
         kids_state.track(client.device_serial_number, device_type)
-        kids_switch = AmazonKidsSwitch(kids_state, login_obj, client, device_type)
-        account_dict["entities"]["amazon_kids_switch"].append(kids_switch)
-        kids_devices.append(kids_switch)
+        kids_devices.append(
+            AmazonKidsSwitch(kids_state, login_obj, client, device_type)
+        )
 
     result = await add_devices(
         hide_email(account),
@@ -170,13 +204,29 @@ async def async_setup_platform(hass, config, add_devices_callback, discovery_inf
         include_filter,
         exclude_filter,
     )
-    if kids_devices:
-        await kids_state.async_start()
-        # Already scoped via the media_player entities, so no extra name filter.
+    if display_devices:
+        # Do not apply include/exclude filters to these entities.
         result = (
-            await add_devices(hide_email(account), kids_devices, add_devices_callback)
+            await add_devices(
+                hide_email(account), display_devices, add_devices_callback
+            )
             and result
         )
+    if kids_devices:
+
+        async def _add_kids_switches() -> bool:
+            kids_switches = account_dict["entities"]["amazon_kids_switch"]
+            # A failed add is retried, so only list the switches once.
+            kids_switches.extend([s for s in kids_devices if s not in kids_switches])
+            # Already scoped via the media_player entities, so no name filter.
+            return await add_devices(
+                hide_email(account), kids_devices, add_devices_callback
+            )
+
+        result = (
+            await kids_state.async_add_when_dashboard(_add_kids_switches) and result
+        )
+        await kids_state.async_start()
     return result
 
 
@@ -379,11 +429,6 @@ class DNDSwitch(AlexaMediaSwitch):
         """Return the icon of the switch."""
         return super()._icon("mdi:minus-circle", "mdi:minus-circle-off")
 
-    @property
-    def entity_category(self):
-        """Return the entity category of the switch."""
-        return EntityCategory.CONFIG
-
     def _handle_event(self, event):
         """Handle events."""
         try:
@@ -422,11 +467,6 @@ class ShuffleSwitch(AlexaMediaSwitch):
         """Return the icon of the switch."""
         return super()._icon("mdi:shuffle", "mdi:shuffle-disabled")
 
-    @property
-    def entity_category(self):
-        """Return the entity category of the switch."""
-        return EntityCategory.CONFIG
-
 
 class RepeatSwitch(AlexaMediaSwitch):
     """Representation of a Alexa Media Repeat switch."""
@@ -442,11 +482,6 @@ class RepeatSwitch(AlexaMediaSwitch):
     def icon(self):
         """Return the icon of the switch."""
         return super()._icon("mdi:repeat", "mdi:repeat-off")
-
-    @property
-    def entity_category(self):
-        """Return the entity category of the switch."""
-        return EntityCategory.CONFIG
 
 
 class SmartSwitch(CoordinatorEntity, SwitchDevice):
@@ -544,6 +579,7 @@ class AmazonKidsSwitch(SwitchDevice):
 
     _attr_has_entity_name = True
     _attr_name = "Amazon Kids"
+    _attr_entity_category = EntityCategory.CONFIG
     _attr_icon = "mdi:account-child"
     _attr_should_poll = False
 
