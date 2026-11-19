@@ -1,0 +1,57 @@
+#MAC: --
+substitutions:
+  name: bt-proxy-shion
+  temp_offset: '0'
+  hum_offset: '0'
+
+packages:
+  aht10: !include components/aht10.yaml
+  ld2410B: !include components/ld2410b.yaml
+
+<<: !include .base.yaml
+
+esphome:
+  name: $name
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.f_cpu: 80000000L
+
+  project:
+    name: Screek.Human_Sensor
+    version: 1w
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: esp-idf # arduino  esp-idf Will need to convert to esp-idf with firmware 2026. +
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/screek-workshop/custom_components_support_for_screek_1u
+      ref: master
+#      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w # this used to worked.
+#      ref: main
+    components: [ ld2410 ] # Needs ,uart for sensor to work. Removed for now for updating
+
+
+bluetooth_proxy:
+  active: true
+esp32_ble_tracker:
+    scan_parameters:
+      window: 900ms
+      interval: 1000ms
+
+i2c: # for aht10
+  sda: GPIO21
+  scl: GPIO22
+  scan: true
+
+#uart:
+#  id: uart_ld2410
+#  tx_pin: GPIO3
+#  rx_pin: GPIO1
+#  baud_rate: 256000
+#  parity: NONE
+#  stop_bits: 1
+

@@ -4,7 +4,7 @@ sensor:
     pin: A0
     name: illuminance
     unit_of_measurement: lux
-    update_interval: 5s
+    update_interval: 4s
 #    filters:
 #      - lambda: |-
 #          return (x / 10000.0) * 2000000.0;
