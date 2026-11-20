@@ -1,0 +1,30 @@
+queue_history:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: life_dashboard
+    days:
+      required: false
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 90
+          unit_of_measurement: days
+          mode: box
+    types:
+      required: false
+      selector:
+        select:
+          multiple: true
+          translation_key: writeback_type
+          options:
+            - weight
+            - height
+            - body_fat
+            - lean_body_mass
+            - bone_mass
+            - body_water_mass
+            - blood_pressure

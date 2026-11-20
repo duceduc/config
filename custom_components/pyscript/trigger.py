@@ -21,6 +21,7 @@ from .const import LOGGER_PATH
 from .eval import AstEval, EvalFunc, EvalFuncVar
 from .event import Event
 from .function import Function
+from .logbook import RUNNING_EVENT_FUNC_ARGS
 from .mqtt import Mqtt
 from .state import STATE_VIRTUAL_ATTRS, State
 from .webhook import Webhook
@@ -1366,7 +1367,8 @@ class TrigInfo:
         ev_name = self.name.replace(".", "_")
         ev_entity_id = f"pyscript.{ev_name}"
 
-        event_data = {"name": ev_name, "entity_id": ev_entity_id, "func_args": func_args}
+        event_func_args = {key: func_args[key] for key in RUNNING_EVENT_FUNC_ARGS if key in func_args}
+        event_data = {"name": ev_name, "entity_id": ev_entity_id, "func_args": event_func_args}
         Function.hass.bus.async_fire("pyscript_running", event_data, context=hass_context)
 
         _LOGGER.debug(

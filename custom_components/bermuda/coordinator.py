@@ -6,9 +6,9 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-import aiofiles
 import voluptuous as vol
 import yaml
 from bluetooth_data_tools import monotonic_time_coarse
@@ -113,6 +113,15 @@ Cancellable = Callable[[], None]
 # so we're just disabling it for the whole file.
 # https://github.com/astral-sh/ruff/issues/4244
 # ruff: noqa: PLR1730
+
+
+def _load_manufacturer_yaml(file_path: str, key: str) -> list[dict]:
+    """Parse one of the bundled Bluetooth SIG yaml files. Blocking, so run it in the executor."""
+    # libyaml's CSafeLoader (present in Home Assistant's PyYAML) is about 8x faster
+    # than the pure-Python SafeLoader that yaml.safe_load() uses.
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    with Path(file_path).open(encoding="utf-8") as f:
+        return yaml.load(f, Loader=loader)[key]  # noqa: S506 - only SafeLoader or CSafeLoader
 
 
 class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
@@ -383,16 +392,14 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
             file_path = self.hass.config.path(
                 f"custom_components/{DOMAIN}/manufacturer_identification/member_uuids.yaml"
             )
-            async with aiofiles.open(file_path) as f:
-                mi_yaml = yaml.safe_load(await f.read())["uuids"]
+            mi_yaml = await self.hass.async_add_executor_job(_load_manufacturer_yaml, file_path, "uuids")
             self.member_uuids: dict[int, str] = {member["uuid"]: member["name"] for member in mi_yaml}
 
             # https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml
             file_path = self.hass.config.path(
                 f"custom_components/{DOMAIN}/manufacturer_identification/company_identifiers.yaml"
             )
-            async with aiofiles.open(file_path) as f:
-                ci_yaml = yaml.safe_load(await f.read())["company_identifiers"]
+            ci_yaml = await self.hass.async_add_executor_job(_load_manufacturer_yaml, file_path, "company_identifiers")
             self.company_uuids: dict[int, str] = {member["value"]: member["name"] for member in ci_yaml}
         finally:
             # Ensure that an issue reading these files (which are optional, really) doesn't stop the whole show.
@@ -908,10 +915,24 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
         # Prune_list is now ready to action. It contains no keepers, and is already
         # expanded if necessary to meet quota, as much as we can.
 
-        # Prune the source devices
-        for device_address in prune_list:
+        # Prune the source devices.
+        #
+        # Note that prune_list can legitimately contain the same address twice:
+        # it is appended to from three independent places (the metadevice-source
+        # sweep, the main device sweep, and the quota top-up), and those
+        # selections overlap. A stale IRK source older than PRUNE_TIME_KNOWN_IRK
+        # (960s) satisfies *both* the metadevice sweep's `last_seen >
+        # stamp_known_irk` test and the main sweep's `last_seen <
+        # stamp_unknown_irk` (240s) test, so it gets appended by each. Deleting
+        # it a second time used to raise KeyError, which propagated out of
+        # prune_devices and aborted the entire update cycle
+        # ("Unexpected error fetching bermuda data").
+        #
+        # Use pop() rather than del so a repeated address is a no-op, and
+        # de-duplicate for the debug log while preserving order.
+        for device_address in dict.fromkeys(prune_list):
             _LOGGER.debug("Acting on prune list for %s", device_address)
-            del self.devices[device_address]
+            self.devices.pop(device_address, None)
 
         # Clean out the scanners dicts in metadevices and scanners
         # (scanners will have entries if they are also beacons, although
@@ -1187,15 +1208,20 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
 
                 # anything that isn't already set to something interesting, overwrite
                 # it with the new device's data.
-                for key, val in source_device.items():
-                    if val is any(
-                        [
-                            source_device.name_bt_local_name,
-                            source_device.name_bt_serviceinfo,
-                            source_device.manufacturer,
-                        ]
-                    ) and metadevice[key] in [None, False]:
-                        metadevice[key] = val
+                #
+                # NOTE: This used to be written as a generic `for key, val in
+                # source_device.items(): ...` loop with `val is any([...])`, on the
+                # assumption that BermudaDevice's dict-subclassing made attribute
+                # access available via .items()/[key]. It doesn't - BermudaDevice
+                # stores everything as plain instance attributes, so .items() was
+                # always empty and this block was silently a no-op. `is any([...])`
+                # was also wrong (any() returns a bool; that's an identity check
+                # against True/False, not a membership test). Iterate the specific
+                # attributes we actually mean to copy instead.
+                for attr in ("name_bt_local_name", "name_bt_serviceinfo", "manufacturer"):
+                    val = getattr(source_device, attr)
+                    if val not in (None, False) and getattr(metadevice, attr) in (None, False):
+                        setattr(metadevice, attr, val)
                         _want_name_update = True
 
                 if _want_name_update:
@@ -1203,17 +1229,10 @@ class BermudaDataUpdateCoordinator(DataUpdateCoordinator):
 
                 # Anything that's VERY interesting, overwrite it regardless of what's already there:
                 # INTERESTING:
-                for key, val in source_device.items():
-                    if val is any(
-                        [
-                            source_device.beacon_major,
-                            source_device.beacon_minor,
-                            source_device.beacon_power,
-                            source_device.beacon_unique_id,
-                            source_device.beacon_uuid,
-                        ]
-                    ):
-                        metadevice[key] = val
+                for attr in ("beacon_major", "beacon_minor", "beacon_power", "beacon_unique_id", "beacon_uuid"):
+                    val = getattr(source_device, attr)
+                    if val not in (None, False):
+                        setattr(metadevice, attr, val)
                         # _want_name_update = True
             # Done iterating sources, remove any to be dropped
             for source in _sources_to_remove:

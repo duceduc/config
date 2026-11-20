@@ -25,6 +25,7 @@ from .decorator_abc import (
 )
 from .eval import AstEval, EvalFunc, EvalFuncVar
 from .function import Function
+from .logbook import RUNNING_EVENT_FUNC_ARGS
 from .state import State
 
 _LOGGER = logging.getLogger(__name__)
@@ -248,11 +249,21 @@ class FunctionDecoratorManager(DecoratorManager):
 
         self.logger = self.eval_func.logger
 
-        def on_func_var_deleted():
+        def stop_deleted_func():
             if self.status is DecoratorManagerStatus.RUNNING:
                 self.hass.async_create_task(self.safe_await(self.stop()))
 
-        weakref.finalize(eval_func_var, on_func_var_deleted)
+        def on_func_var_deleted():
+            # garbage collection can run this in any thread, so hand off to the loop
+            try:
+                self.hass.loop.call_soon_threadsafe(stop_deleted_func)
+            except RuntimeError:
+                # once HA has closed the loop at shutdown there is nothing left to stop
+                pass
+
+        # not at interpreter exit either, the loop is closed by then
+        self.func_var_finalizer = weakref.finalize(eval_func_var, on_func_var_deleted)
+        self.func_var_finalizer.atexit = False
 
     async def _call(self, data: DispatchData) -> None:
         handlers = self.get_decorators(CallHandlerDecorator)
@@ -269,7 +280,10 @@ class FunctionDecoratorManager(DecoratorManager):
         ev_name = self.name.replace(".", "_")
         ev_entity_id = f"pyscript.{ev_name}"
 
-        event_data = {"name": ev_name, "entity_id": ev_entity_id, "func_args": data.func_args}
+        event_func_args = {
+            key: data.func_args[key] for key in RUNNING_EVENT_FUNC_ARGS if key in data.func_args
+        }
+        event_data = {"name": ev_name, "entity_id": ev_entity_id, "func_args": event_func_args}
         self.hass.bus.async_fire("pyscript_running", event_data, context=data.hass_context)
         # Store HASS Context for this Task
         Function.store_hass_context(data.hass_context)

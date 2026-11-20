@@ -313,7 +313,8 @@ class EufyGatewayCamera(EufyGatewayEntity, Camera):
             try:
                 observer = getattr(self, "_hls_activity", None)
                 outputs = self.stream.outputs() if self.stream is not None else {}
-                if observer is not None and outputs.get("hls") is observer.output:
+                if observer is not None and (outputs.get("hls") is observer.output
+                        or self.stream is not None and self.stream is self._hls_idle_stream and not outputs):
                     activity = observer.diagnostic()
             except Exception:
                 pass
@@ -386,7 +387,8 @@ class EufyGatewayCamera(EufyGatewayEntity, Camera):
         # A native pane has its own call, which the main camera's stream state does not describe.
         if (cached is not None and not cached.dynamic_stream_settings.preload_stream
                 and "recorder" not in cached.outputs() and not getattr(self, "_own_nvr_call", False)
-                and (self.camera.get("stream", {}).get("state") in {"idle", "stopping", "error"}
+                and (self.camera.get("hlsIdleHandoverSupported") is True
+                     and self.camera.get("stream", {}).get("state") in {"idle", "stopping", "error"}
                      or getattr(getattr(self, "_hls_activity", None), "expiring", False))):
             await cached.stop()
             self.stream = cached = None
@@ -408,7 +410,13 @@ class EufyGatewayCamera(EufyGatewayEntity, Camera):
                 )
                 if self.hass is not None and self.stream is stream:
                     if stream.outputs():
-                        stream.update_source(_view_for(self, source))
+                        if self.camera.get("hlsIdleHandoverSupported") is True:
+                            stream.update_source(_view_for(self, source))
+                        else:
+
+                            # Ordinary reconnects retain the output and view mark.
+                            # Restarting here would invalidate its browser playlist.
+                            stream.source = _with_view(source, _view_of(stream.source))
                     else:
                         stream.source = _view_for(self, source)
             except (GatewayClientError, asyncio.TimeoutError):
