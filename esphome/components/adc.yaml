@@ -8,3 +8,4 @@ sensor:
 #    filters:
 #      - lambda: |-
 #          return (x / 10000.0) * 2000000.0;
+

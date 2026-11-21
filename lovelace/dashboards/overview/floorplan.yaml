@@ -289,7 +289,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.duc_bermuda_area
-            state: 'Computer'
+            state: 'Computer Room'
         elements:
           - type: image
             image: /local/img/people/avatar-duc.png
@@ -302,7 +302,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.eri_bermuda_area
-            state: 'Computer'
+            state: 'Computer Room'
         elements:
           - type: image
             image: /local/img/people/avatar-eri.png
@@ -315,7 +315,7 @@ cards:
       - type: conditional
         conditions:
           - entity: sensor.shion_tms_bermuda_area
-            state: 'Computer'
+            state: 'Computer Room'
         elements:
           - type: image
             image: /local/img/people/avatar-shion.png
@@ -350,7 +350,7 @@ cards:
           bottom: 42.5%
           right: 48%
       - type: state-label
-        entity: sensor.sr_radar_temperature
+        entity: sensor.bt_proxy_shion_temperature
         style:
           bottom: 42.5%
           left: 31%

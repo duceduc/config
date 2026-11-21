@@ -108,7 +108,7 @@
   mode: single
   triggers:
     - trigger: state
-      entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.shionroom_occupied
+      entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.bt_proxy_shion_moving_target, binary_sensor.shionroom_occupied
       to: 'on'
     - trigger: state
       entity_id: binary_sensor.sr_occupancy_lights
@@ -125,7 +125,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.shionroom_occupied, binary_sensor.sr_occupancy_lights
+              entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.bt_proxy_shion_moving_target, binary_sensor.shionroom_occupied, binary_sensor.sr_occupancy_lights
               state: "on"
           sequence:
             - action: script.tradfri_transition

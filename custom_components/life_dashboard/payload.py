@@ -51,6 +51,14 @@ APP_PACKAGE: Final = "com.owen282000.lifedashboard"
 RESPONSE_PROTOCOL: Final = 1
 RESPONSE_KEY_LABEL: Final = b"life-dashboard-response-v1"
 
+# The signed body: the answer and its signature together in the body, for a route that
+# drops the header. Home Assistant Cloud hands the phone only the status, the body and
+# the Content-Type of what a webhook answers. A request asks for it with
+# writeback.answer, and the announcement carries the form's version.
+ANSWER_IN_BODY: Final = "body"
+SIGNED_BODY: Final = 1
+SIGNED_BODY_KEY: Final = "life_dashboard_signed"
+
 # Payload sources the app can send. healthkit_ios is the iOS companion app.
 SOURCE_HEALTH_CONNECT: Final = "health_connect"
 SOURCE_HEALTHKIT_IOS: Final = "healthkit_ios"
@@ -200,7 +208,11 @@ def response_body(
         writeback["pending"] = pending
         writeback["more"] = bool(more)
     return {
-        "life_dashboard": {"version": version, "writeback": RESPONSE_PROTOCOL},
+        "life_dashboard": {
+            "version": version,
+            "writeback": RESPONSE_PROTOCOL,
+            "signed_body": SIGNED_BODY,
+        },
         "writeback": writeback,
     }
 
@@ -232,10 +244,43 @@ def is_heartbeat(data: dict[str, Any]) -> bool:
     return not any(name in HEALTH_ARRAYS for name in data)
 
 
-def frame_answer(secret: str, answer: dict[str, Any]) -> tuple[bytes, str]:
-    """The answer as the exact bytes to send, and the signature over those bytes."""
+def wants_signed_body(data: dict[str, Any]) -> bool:
+    """Whether the request asked for the answer's signature inside the body.
+
+    Read from the writeback block of any payload, a test ping and a screen time payload
+    included: it is about the form of the answer, not about readings, so the rule that
+    only a health payload can ask for those does not apply.
+    """
+    block = data.get("writeback")
+    return isinstance(block, dict) and block.get("answer") == ANSWER_IN_BODY
+
+
+def signed_body(raw: bytes, signature: str) -> bytes:
+    """The answer and its signature as one JSON body.
+
+    The answer travels as text, byte for byte the JSON that was signed, so nothing on
+    the way can reorder or respace it, and the phone checks the signature over that text
+    before it parses it. json.dumps escapes everything outside ASCII, here and in the
+    answer itself, so the body is plain ASCII.
+    """
+    envelope = {SIGNED_BODY_KEY: SIGNED_BODY, "answer": raw.decode("utf-8"), "signature": signature}
+    return json.dumps(envelope, separators=(",", ":")).encode("utf-8")
+
+
+def frame_answer(
+    secret: str, answer: dict[str, Any], *, in_body: bool = False
+) -> tuple[bytes, str]:
+    """The answer as the exact bytes to send, and the X-Signature header for them.
+
+    With in_body the bytes are the signed body around the answer. The header signs what
+    is sent in both forms, so on a route that keeps it, it still covers the whole body.
+    """
     raw = json.dumps(answer, separators=(",", ":"), allow_nan=False).encode("utf-8")
-    return raw, response_signature_for(secret, raw)
+    signature = response_signature_for(secret, raw)
+    if not in_body:
+        return raw, signature
+    body = signed_body(raw, signature)
+    return body, response_signature_for(secret, body)
 
 
 # Java's Instant.toString() and Swift's ISO8601DateFormatter both emit UTC with a Z,

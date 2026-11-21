@@ -8,7 +8,7 @@
 default_config:
 python_script:
 wake_on_lan:
-lovelace_gen:
+lovelace_gen: # still using
 momentary:
   yaml_config: True
   
@@ -39,7 +39,6 @@ tts:
     cache_dir: /config/www/tts
     time_memory: 300
     cache: true
-
 
 notify_events:
   token: !secret notify_token

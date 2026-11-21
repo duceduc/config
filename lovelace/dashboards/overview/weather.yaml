@@ -94,6 +94,25 @@ cards:
         hide_background: true
         custom_background: /api/image/serve/37e5649ba58033402674d62bf78bcd5e/original
 
+      - type: vertical-stack
+        cards:
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: person.duc
+                state: home
+            card:
+              type: weather-forecast
+              entity: weather.my_weather
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: person.duc
+                state_not: home
+            card:
+              type: weather-forecast
+              entity: weather.weather_here_duc
+
 
       - type: entities
         entities:

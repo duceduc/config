@@ -32,8 +32,9 @@ cards:
           filter:
             include:
               - entity_id: '/sensor\..*battery/'
-                state: "< 15"
+                state: "< 11"
             exclude:
+              - entity_id: '/sensor\..*_battery_temperature/'
               - entity_id: '/sensor\..*phone/'
               - entity_id: '/sensor\.device*/'
               - entity_id: '/sensor\..*_watch*/'
@@ -199,7 +200,7 @@ cards:
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
               - sensor.aio_human_sensor_entrance_humidity
-              - sensor.sr_radar_temperature
+              - sensor.bt_proxy_shion_temperature
               - sensor.aio_human_sensor_master_temperature
               - sensor.wc_airfreshener_temperature
               - sensor.lr_radar_temperature
@@ -216,7 +217,7 @@ cards:
               - sensor.bt_proxy_computer_temperature
               - sensor.kt_human_sensor_temperature
               - sensor.aio_human_sensor_entrance_temperature
-              - sensor.sr_radar_temperature
+              - sensor.bt_proxy_shion_temperature
               - sensor.aio_human_sensor_master_temperature
               - sensor.wc_airfreshener_temperature
               - sensor.lr_radar_temperature

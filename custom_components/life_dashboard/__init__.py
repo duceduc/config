@@ -1,6 +1,6 @@
 """The Life Dashboard integration.
 
-Receives webhook payloads from the Life Dashboard Companion apps, verifies the
+Receives webhook payloads from the Life Dashboard apps, verifies the
 signature, and dispatches the sensor updates a payload justifies.
 
 The one rule worth knowing: an update is applied only when it is not older than the
@@ -61,6 +61,7 @@ from .payload import (
     parse_payload,
     response_body,
     verify_signature,
+    wants_signed_body,
     writeback_request,
 )
 from .sleep import LAST_NIGHT_KEYS, sleep_updates
@@ -401,7 +402,8 @@ def _make_handler(entry: LifeDashboardConfigEntry):
 
     An accepted POST is answered with a signed JSON body: what this integration is,
     and, for a phone that asked, the measurements waiting for it (writeback.py). The
-    refusals carry no body at all.
+    signature is in the X-Signature header, and for a phone that asked, in the body
+    too (payload.signed_body). The refusals carry no body at all.
     """
 
     async def handle(hass: HomeAssistant, webhook_id: str, request: web.Request) -> web.Response:
@@ -497,7 +499,11 @@ def _make_handler(entry: LifeDashboardConfigEntry):
                     issued_at=now,
                     configured=runtime.writeback.configured,
                 )
-            raw, answer_signature = frame_answer(entry.data[CONF_SECRET], answer)
+            # In the body as well when the phone asked for that: Home Assistant Cloud
+            # passes on the status, the body and the Content-Type, never the header.
+            raw, answer_signature = frame_answer(
+                entry.data[CONF_SECRET], answer, in_body=wants_signed_body(data)
+            )
         except Exception:
             _LOGGER.exception("Could not read a payload for %s", entry.title)
             return web.Response(status=400)

@@ -42,7 +42,7 @@
         - sensor.shion_dimmer_battery
         - sensor.shower_room_battery
 
-      below: 16
+      below: 11
   actions:
     - action: script.text_notify
       data:

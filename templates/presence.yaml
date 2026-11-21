@@ -130,7 +130,7 @@
       - name: sr occupancy lights
         state: >
           {% if is_state('binary_sensor.shion_airfreshener_still_target', 'on') or
-                   is_state('binary_sensor.sr_radar_still_target', 'on') and
+                   is_state('binary_sensor.bt_proxy_shion_still_target', 'on') and
                    is_state('input_boolean.shionroom_mcl', 'off') %} on
           {% elif is_state('input_boolean.shionroom_mcl', 'on') %} on
           {% elif is_state('binary_sensor.sr_study_occupancy', 'on') %} on

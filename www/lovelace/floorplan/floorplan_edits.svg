@@ -528,7 +528,7 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:20px;font-family:Arial;-inkscape-font-specification:'Arial Condensed';letter-spacing:1px;opacity:0.5;fill:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.8"
        x="1358.4141"
        y="-562.01862"
-       id="sensor.sr_radar_temperature"
+       id="sensor.bt_proxy_shion_temperature"
        transform="skewY(37.867964)"
        sodipodi:insensitive="true"><tspan
          sodipodi:role="line"
