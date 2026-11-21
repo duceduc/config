@@ -187,14 +187,14 @@ uart:
   - id: uart_0
     tx_pin: GPIO16 #17
     rx_pin: GPIO17 #21
-    baud_rate: 256000
+    baud_rate: 256000 # 115200
     parity: NONE
     stop_bits: 1
 # Entry HLK
   - id: uart_1
     tx_pin: GPIO21
     rx_pin: GPIO22
-    baud_rate: 256000
+    baud_rate: 256000 # 115200
     parity: NONE
     stop_bits: 1
 
