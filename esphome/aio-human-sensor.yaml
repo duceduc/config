@@ -37,6 +37,7 @@ esp32:
   framework:
     type: esp-idf
     advanced:
+      sram1_as_iram: true # reclaim space
       minimum_chip_revision: 3.1 # shrink firmware size
 
 improv_serial:
