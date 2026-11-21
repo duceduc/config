@@ -36,6 +36,8 @@ esp32:
   board: wemos_d1_mini32
   framework:
     type: esp-idf
+    advanced:
+      minimum_chip_revision: "3.1" # shrink your firmware size
 
 improv_serial:
 
