@@ -41,12 +41,30 @@ def extract_coordinates(state: Any) -> tuple[float, float] | None:
     return None
 
 
-def extract_locality(state: Any) -> str | None:
-    """Return the locality name if the entity provides one."""
+def _attr_ci(attrs: Any, *names: str) -> Any:
+    """Case-insensitive attribute lookup ("Administrative Area" == administrative_area)."""
+    wanted = {n.lower().replace(" ", "_") for n in names}
+    for key, value in attrs.items():
+        if str(key).lower().replace(" ", "_") in wanted and value not in (None, ""):
+            return value
+    return None
+
+
+def extract_place(state: Any) -> dict[str, Any] | None:
+    """Return the place provided by the entity (Companion app geocoded sensor), if any."""
     if state is None:
         return None
     attrs = state.attributes
-    return attrs.get("locality") or attrs.get("Locality")
+    name = _attr_ci(attrs, "locality")
+    if not name:
+        return None
+    return {
+        "name": str(name),
+        "region": _attr_ci(attrs, "administrative_area"),
+        "country": _attr_ci(attrs, "country"),
+        "country_code": _attr_ci(attrs, "iso_country_code", "country_code"),
+        "source": "companion",
+    }
 
 
 def distance_km(a: tuple[float, float], b: tuple[float, float]) -> float:

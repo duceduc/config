@@ -3,7 +3,7 @@
 from ...global_variables    import GlobalVariables as Gb
 from ...const               import (DOMAIN,
                                     IPHONE, MAC, ICLOUD, WATCH, IPAD, AIRPODS,
-                                    DEVICE_TYPE_DN, DEVICE_TYPE_DNS, DEVICE_TYPE_TRACKING_MODE,
+                                    DEVICE_TYPE_NAME, DEVICE_TYPE_NAMES, DEVICE_TYPE_TRACKING_MODE,
                                     MOBAPP, NO_MOBAPP,
                                     TRACK, MONITOR, INACTIVE, OTHER,
                                     DEVICE_TRACKER, )
@@ -256,7 +256,7 @@ class OptionsFlow_iCloud3Device_Steps:
             devicename = self.conf_device[CONF_IC3_DEVICENAME]
             event_msg = (f"Configuration Changed > DeleteDevice-{devicename}, "
                         f"{self.conf_device[CONF_FNAME]}/"
-                        f"{DEVICE_TYPE_DN(self.conf_device[CONF_DEVICE_TYPE])}")
+                        f"{DEVICE_TYPE_NAME(self.conf_device[CONF_DEVICE_TYPE])}")
             post_event(event_msg)
 
             # if deleting last device, use _delete all to simplifying table resetting
@@ -272,7 +272,7 @@ class OptionsFlow_iCloud3Device_Steps:
             if devicename in Gb.log_level_devices:
                 list_del(Gb.log_level_devices, devicename)
                 if is_empty(Gb.log_level_devices):
-                    Gb.log_level_devices = ['all']
+                    Gb.log_level_devices = [TRACK]
                 self._update_config_file_general(user_input={CONF_LOG_LEVEL_DEVICES: Gb.log_level_devices})
 
             # The lists may have not been built if deleting a device when deleting an Apple acct
@@ -462,7 +462,7 @@ class OptionsFlow_iCloud3Device_Steps:
         add_change_msg = 'Add' if self.add_device_flag else 'Change'
         post_event( f"Configuration Changed > {add_change_msg}Device-{ui_devicename}, "
                     f"{self.conf_device[CONF_FNAME]}/"
-                    f"{DEVICE_TYPE_DN(self.conf_device[CONF_DEVICE_TYPE])}")
+                    f"{DEVICE_TYPE_NAME(self.conf_device[CONF_DEVICE_TYPE])}")
 
         self.dev_page_last_selected_devicename[self.dev_page_no] = ui_devicename
         self.update_config_file_tracking(force_config_update=True)
@@ -514,7 +514,7 @@ class OptionsFlow_iCloud3Device_Steps:
                 AppleAcct = Gb.AppleAcct_by_apple_id[apple_id]
                 device_id = AppleAcct.device_id_by_aadev_dname.get(aadev_name, '')
                 AADev = AppleAcct.AADev_by_device_id.get(device_id)
-                if AADev and AADev.device_type in DEVICE_TYPE_DNS:
+                if AADev and AADev.device_type in DEVICE_TYPE_NAMES:
                     device_type = AADev.device_type
 
         # Get device_type from mobapp info
@@ -523,7 +523,7 @@ class OptionsFlow_iCloud3Device_Steps:
             mobapp_dname = user_input[CONF_MOBILE_APP_DEVICE]
             if mobapp_dname in Gb.device_info_by_mobapp_dname:
                 _device_type = Gb.device_info_by_mobapp_dname[mobapp_dname][2].lower() # ipad6,3 --> ipad
-                for dev_type in DEVICE_TYPE_DNS:
+                for dev_type in DEVICE_TYPE_NAMES:
                     if _device_type.startswith(dev_type):
                         device_type = dev_type
                         break
@@ -532,7 +532,7 @@ class OptionsFlow_iCloud3Device_Steps:
         if device_type == '':
             ic3_devicename = user_input[CONF_IC3_DEVICENAME].lower()
             ic3_fname = user_input[CONF_FNAME].lower()
-            for dev_type in DEVICE_TYPE_DNS:
+            for dev_type in DEVICE_TYPE_NAMES:
                 if dev_type == MAC:
                     continue
                 if instr(ic3_devicename, dev_type) or instr(ic3_fname, dev_type):
@@ -794,6 +794,26 @@ class OptionsFlow_iCloud3Device_Steps:
                 and instr(Gb.conf_tracking[CONF_DATA_SOURCE], MOBAPP)):
             self.errors[CONF_MOBILE_APP_DEVICE] = 'unknown_mobapp'
 
+        # A Monitored device uses the data refreshed by a Tracked device in the same Apple
+        # Acct. It can not be the last Tracked device or be in an Apple Acct with no Tracked
+        # devices. Reset it to Tracked and do not save the update. Inactive is ok.
+        # Not done when the form is displayed (user_input is the conf_device), only on an update.
+        if (user_input is not self.conf_device
+                and user_input.get(CONF_TRACKING_MODE) == MONITOR
+                and user_input[CONF_APPLE_ACCT] != ''
+                and user_input[CONF_AADEV_NAME] != 'None'
+                and CONF_AADEV_NAME not in self.errors):
+            devicename = self.conf_device.get(CONF_IC3_DEVICENAME)
+            other_tracked_devices = [conf_device
+                            for conf_device in Gb.conf_devices
+                            if (conf_device.get(CONF_IC3_DEVICENAME) != devicename
+                                and conf_device.get(CONF_APPLE_ACCT) == user_input[CONF_APPLE_ACCT]
+                                and conf_device.get(CONF_TRACKING_MODE) == TRACK)]
+            if other_tracked_devices == []:
+                self.errors[CONF_TRACKING_MODE]           = 'monitored_device_needs_tracked'
+                self.errors_user_input[CONF_TRACKING_MODE] = TRACK
+                user_input[CONF_TRACKING_MODE]            = TRACK
+
         return user_input
 
 #-------------------------------------------------------------------------------------------
@@ -930,7 +950,7 @@ class OptionsFlow_iCloud3Device_Steps:
 
         user_input = utils_cf.strip_special_text_from_user_input(user_input, CONF_FNAME)
         user_input = utils_cf.option_text_to_parm(user_input,
-                                CONF_DEVICE_TYPE, DEVICE_TYPE_DNS)
+                                CONF_DEVICE_TYPE, DEVICE_TYPE_NAMES)
         user_input = utils_cf.option_text_to_parm(user_input,
                                 CONF_TRACK_FROM_BASE_ZONE, self.zone_name_key_text)
 

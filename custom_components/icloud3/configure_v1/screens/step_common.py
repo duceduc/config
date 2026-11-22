@@ -3,9 +3,10 @@
 from ...global_variables    import GlobalVariables as Gb
 from ...const_config        import (CONF_APPLE_ACCT, CONF_PASSWORD, CONF_VERSION, CONF_LOG_LEVEL,
                                     CONF_APPLE_ACCOUNTS, CONF_DEVICES, CONF_PARAMETER_FLOAT,
-                                    CF_GENERAL, )
+                                    CF_GENERAL, CONF_IC3_DEVICENAME, )
+from ...const               import (EVLOG_NOTICE, )
 from ...utils.utils         import (isnot_empty, list_add, encode_password, decode_password, )
-from ...utils.messaging     import (log_exception, post_event, _log, )
+from ...utils.messaging     import (log_exception, post_event, log_warning_msg, _log, )
 from ...utils.time_util     import (time_now_secs, )
 
 from ...startup             import config_file
@@ -162,10 +163,24 @@ class OptionsFlow_Common_Steps:
         if self.config_file_commit_updates is False and force_write is False:
             return
 
+        # Every Apple Acct must have a tracked device. A device update, delete, import
+        # or Apple Acct change may have left one without any. Change one to Tracked.
+        changed_devicename = (self.conf_device.get(CONF_IC3_DEVICENAME)
+                                    if isinstance(getattr(self, 'conf_device', None), dict)
+                                    else None)
+        tracked_device_msgs = config_file.verify_apple_accts_have_tracked_device(
+                                            changed_devicename=changed_devicename or '')
+        for tracked_device_msg in tracked_device_msgs:
+            post_event(f"{EVLOG_NOTICE}{tracked_device_msg}")
+            log_warning_msg(tracked_device_msg)
+
         await config_file.async_write_icloud3_configuration_file()
 
         self.config_file_commit_updates = False
-        if self.errors == {}:
+        if tracked_device_msgs:
+            self.header_msg = 'apple_acct_tracked_device_set'
+            self.errors['base'] = 'apple_acct_tracked_device_set'
+        elif self.errors == {}:
             self.header_msg = 'conf_updated'
             self.errors['base'] = 'conf_updated'
 
@@ -324,6 +339,34 @@ class OptionsFlow_Common_Steps:
             Device.pause_tracking()
 
         list_add(self.config_parms_update_control, ['tracking', 'restart'])
+
+#-------------------------------------------------------------------------------------------
+    def _pause_replaced_apple_acct_devices(self, apple_id):
+        '''
+        Configure logged into the Apple Acct (Update Apple Acct) and a new AppleAcct replaced
+        the one the Devices use (AppleAcct.is_replaced). Pause those Devices until iCloud3
+        restarts when Configure is exited. The restart sets them up with the new AppleAcct
+        and resumes tracking (Device.__init__ resets tracking_status).
+        '''
+        try:
+            paused_Devices = [Device
+                                for Device in Gb.Devices
+                                if (Device.AppleAcct is not None
+                                    and Device.AppleAcct.is_replaced
+                                    and Device.is_tracking_paused is False)]
+            if not paused_Devices:
+                return
+
+            for Device in paused_Devices:
+                Device.pause_tracking()
+
+            list_add(self.config_parms_update_control, 'restart')
+            post_event( f"Apple Acct > {apple_id}, Logged into in Configure, "
+                        f"Tracking paused until iCloud3 restarts, Devices-"
+                        f"{', '.join(Device.fname for Device in paused_Devices)}")
+
+        except Exception as err:
+            log_exception(err)
 
 
 #                        SUPPORT FUNCTIONS

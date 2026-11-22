@@ -23,7 +23,7 @@ Important =✔️❗❌✨➰⚠️☢❓⚽⛔🛑⚡⭐◌\⭕🔶🔸ⓘ• �
 🟥🟦🟩🟨🟧🟪🟫⬛⬜🔲🔳
 🔶🔷🔸🔹🔺🔻🔸
 🔸🔹🔶🔷🔺🔻💠
-⚠️🚫🛑✅❌❤️🧡💛💚💙💜🤎🖤🤍
+⚠️🚫🛑✅❌❤️🧡💛💚💙💜🤎🖤🤍🔋🪫
 ✅❎☑️🅰️🍏⛅☁🌤
 🔁🔄➡️🔃⬇️🔗▶️⏩⏪⏫⏬⏭⏮⏯⏰⏱⏸⏹⏺
 ☖☗⌂
@@ -56,6 +56,8 @@ RLINK             = ''
 LINK               = '…'
 AASEP              = '…'
 CLOCK_FACE        = '🕓'
+BATTERY_ICON_LOW  = '🪫'
+BATTERY_ICON      = '🔋'
 HOME_ICON         = '🏠'
 GEAR_ICON         = '⚙️'
 SNOW_FLAKE        = '❄️'
@@ -79,8 +81,9 @@ MONITOR_SYMB      = 'Ⓜ'
 INACTIVE_SYMB     = '🔸'
 # INACTIVE_SYMB     = '❗'
 SMALL_DOT         = '﹒'
-SMALL_DOT2         = '․'
+SMALL_DOT2        = '․'
 DOT               = '• '
+ITEM_SEP          = ' • '
 PDOT              = '•'
 SQUARE_DOT        = '▪'
 HDOT              = '◦ '

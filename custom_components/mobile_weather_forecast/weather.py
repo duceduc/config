@@ -113,7 +113,9 @@ class MobileWeatherForecastWeather(CoordinatorEntity[MobileWeatherForecastCoordi
             "tracked_latitude": data["latitude"],
             "tracked_longitude": data["longitude"],
             "tracked_source": data["source"],
-            "locality": data["locality"],
+            "locality": (data.get("place") or {}).get("name"),
+            "timezone": data.get("timezone"),
+            "elevation": data.get("elevation"),
         }
 
     # --- forecasts ---------------------------------------------------

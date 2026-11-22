@@ -57,11 +57,11 @@
 # Aircon Shion Room Controls
       - name: sr ac heat required
         state: >
-          {{ states('sensor.sr_radar_temperature') | float(default=19) < states('input_number.sr_heater_heat_temp_set') | float(default=18) }}
+          {{ states('sensor.bt_proxy_shion_temperature') | float(default=19) < states('input_number.sr_heater_heat_temp_set') | float(default=18) }}
 
       - name: sr ac cool required
         state: >
-          {{ states('sensor.sr_radar_temperature') | float(default=24) > states('input_number.sr_ac_cool_temp_set') | float(default=25) }}
+          {{ states('sensor.bt_proxy_shion_temperature') | float(default=24) > states('input_number.sr_ac_cool_temp_set') | float(default=25) }}
 
       - name: sr ac am automation time active
         state: >

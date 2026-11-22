@@ -5,10 +5,11 @@ DOMAIN = "mobile_weather_forecast"
 
 # Build identifier: date of the build + increment (YYYYMMDD-N).
 # The version number itself lives in manifest.json (single source of truth).
-BUILD = "20261119-1"
+BUILD = "20261121-1"
 
 CONF_ENTITY_ID = "tracked_entity"
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_REVERSE_GEOCODING = "reverse_geocoding"
 
 DEFAULT_SCAN_INTERVAL = 15  # minutes
 MIN_SCAN_INTERVAL = 5
@@ -19,6 +20,14 @@ MAX_SCAN_INTERVAL = 180
 MOVE_THRESHOLD_KM = 5.0
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
+
+# Optional reverse geocoding (coordinates -> place name) through Nominatim / OpenStreetMap.
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse"
+# Nominatim usage policy: at most one request per second, with an identifying User-Agent.
+NOMINATIM_MIN_INTERVAL = 1.1  # seconds
+# The place name is only looked up again after a move of at least this distance.
+PLACE_REFRESH_KM = 2.0
+REPO_URL = "https://github.com/jfvole-gif/mobile_weather_forecast"
 
 # WMO weather codes -> Home Assistant conditions
 CONDITION_BY_CODE: dict[int, str] = {

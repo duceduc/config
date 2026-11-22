@@ -1,9 +1,10 @@
 from ..global_variables import GlobalVariables as Gb
-from ..const            import (AIRPODS_DN, NONE_FNAME,
+from ..const            import (AIRPODS_DN, NONE_FNAME, HHMMSS_ZERO,
                                 EVLOG_NOTICE, EVLOG_ALERT,
-                                HHMMSS_ZERO,
-                                ICLOUD, NAME, ID, LOCATION, ICLOUD_DEVICE_STATUS, DEVICE_TYPES,
-                                MISSING_DEVICE_RESTART_IN_SECS, MISSING_DEVICE_INTERVAL_SECS, )
+                                ICLOUD, NAME, ID, LOCATION, ICLOUD_DEVICE_STATUS, DEVICE_TYPES, DEVICE_STATUS_CODES,
+                                LONGITUDE, LATITUDE, DEVICE_TYPE_NAME,
+                                MISSING_DEVICE_RESTART_IN_SECS, MISSING_DEVICE_INTERVAL_SECS,
+                                FMLY_MEMBER_MISSING_CNT, FMLY_MEMBER_MISSING_RETRY_SECS, )
 from ..const_config     import (CONF_IC3_DEVICENAME, CONF_FNAME, CONF_AADEV_NAME,
                                 CONF_AADEV_DEVICE_ID, CONF_DEVICE_TYPE, CONF_APPLE_ACCT,
                                 CONF_RAW_MODEL, CONF_MODEL, CONF_MODEL_DISPLAY_NAME,
@@ -14,10 +15,10 @@ from ..utils.utils      import (instr, is_empty, isnot_empty, list_add, list_del
                                 dict_sort,
                                 apple_user, apple_id_dev, apple_user_dev, )
 from ..utils.time_util  import (time_now, time_now_secs, secs_to_time, s2t, apple_server_time,
-                                secs_since, format_secs_since, format_age, format_time_age,
+                                secs_since, mins_since, format_secs_since, format_age, format_time_age,
                                 format_timer, )
-from ..utils.messaging  import (post_event, post_alert, post_monitor_msg, post_error_msg,
-                                post_greenbar_msg, _evlog, _log,
+from ..utils.messaging  import (post_event, post_alert, post_error_msg,
+                                post_greenbar_msg, _evlog, _log, post_rawdata,
                                 log_info_msg, log_error_msg, log_debug_msg, log_warning_msg,
                                 log_exception, update_alert_sensor, )
 from ..utils.rawdata_logging import (log_data, )
@@ -309,7 +310,6 @@ class iCloud_AppleAcctDevices():
         try:
             self.AppleAcct.last_refresh_secs = time_now_secs()
             self.AppleAcct.update_requested_by = requested_by_devicename
-            monitor_msg = f"UPDATED iCloud Data > RequestedBy-{requested_by_devicename}"
 
             for device_data in devices_data:
                 device_data[NAME] = device_data_name = self._remove_special_chars(device_data[NAME])
@@ -338,14 +338,6 @@ class iCloud_AppleAcctDevices():
                         aadevdata_hdr_msg = 'NO LOCATION'
                         if device_data[ICLOUD_DEVICE_STATUS] == 201:
                             aadevdata_hdr_msg += ', OFFLINE'
-                            monitor_msg += f"{CRLF_STAR}OFFLINE > "
-                        else:
-                            monitor_msg += f"{CRLF_STAR}NO LOCATION > "
-                        monitor_msg += (f"{self.AppleAcct.account_owner}, "
-                                        f"{device_data_name}/"
-                                        f"{device_id[:8]}, "
-                                        f"{device_data['modelDisplayName']} "
-                                        f"({device_data['rawDeviceModel']})")
 
                 if Device is None or Device.is_inactive:
                     continue
@@ -362,21 +354,20 @@ class iCloud_AppleAcctDevices():
                 if AADev.location_secs == 0:
                     continue
 
-                if ('all' in Gb.conf_general[CONF_LOG_LEVEL_DEVICES]
-                        or AADev.ic3_devicename in Gb.conf_general[CONF_LOG_LEVEL_DEVICES]):
+                if AADev.ic3_devicename in Gb.log_level_devices:
                     log_hdr = ( f"{apple_user_dev(self.AppleAcct.apple_user, device_data_name)}/"
                                 f"{Device.devicename}, "
                                 f"{aadevdata_hdr_msg}, iCloud Data ")
 
-                    if Gb.is_log_level_debug:
+                    if Gb.is_log_level_rawdata:
+                        log_data(log_hdr, AADev.device_data,
+                                    data_source='icloud', filter_id=self.AppleAcct.apple_id)
+
+                    elif Gb.is_log_level_debug:
                         debug_msg =(f"{Device.devicename}, "
                                     f"LocationData-{AADev.device_data[LOCATION]}, "
                                     f"Battery-{AADev.battery_level}/{AADev.battery_status}")
                         log_debug_msg(debug_msg)
-
-                    elif Gb.is_log_level_rawdata:
-                        log_data(log_hdr, AADev.device_data,
-                                    data_source='icloud', filter_id=self.AppleAcct.apple_id)
 
                 if AADev.last_loc_time_gps == AADev.loc_time_gps:
                     last_loc_time_gps_msg = last_loc_time_msg = ''
@@ -409,15 +400,51 @@ class iCloud_AppleAcctDevices():
                         post_event(Device.devicename, event_msg)
 
                 elif Device.isin_zone:
-                    post_monitor_msg(Device.devicename, event_msg)
+                    pass
 
                 elif AADev.location_secs > 0:
                     post_event(Device.devicename, event_msg)
 
+                self.post_device_rawdata_msg(AADev, requested_by_devicename)
+
         except Exception as err:
             log_exception(err)
 
-#
+#----------------------------------------------------------------------------
+    def post_device_rawdata_msg(self, AADev, requested_by_devicename=None):
+        try:
+            requested_by_star = '*' if requested_by_devicename == AADev.ic3_devicename else ''
+            location_data = AADev.device_data[LOCATION]
+            fname         = AADev.Device.fname if AADev.Device else AADev.dname
+
+            dev_type_name = DEVICE_TYPE_NAME(AADev.device_type).split('-')[0][:6]
+            dev_type_name = '' if instr(fname, dev_type_name) else f", {dev_type_name}"
+
+            if is_empty(location_data) or location_data['timestamp'] == 0:
+                loc_msg = f"⚠️ No Location Data, "
+            else:
+                loc_msg = ( f"{AADev.loc_time_gps} "
+                            f"({format_age(AADev.location_secs, smh_abbrev=True)})")
+                if location_data.get('isOld'):
+                    loc_msg += " ⚠️ "
+                else:
+                    loc_msg += f", {AADev.battery_level}%"
+
+            if AADev.device_status_code == 200:
+                status_msg = ''
+            else:
+                status_msg = DEVICE_STATUS_CODES.get(
+                                AADev.device_status_code, AADev.device_status_code)
+
+            post_rawdata(AADev.ic3_devicename,
+                        f"{fname}{requested_by_star}{dev_type_name} > iCloud, "
+                        f"{loc_msg} "
+                        f"{status_msg}")
+
+        except Exception as err:
+            log_exception(err)
+            pass
+
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #   Create Apple Device Data Objects
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -700,11 +727,23 @@ class iCloud_AppleAcctDevices():
         A refresh is not used if it did not return any devices or if it was for the
         acct owner's devices only (locate_all_devices=False), the Family Sharing
         devices are not in it.
+
+        A refresh is also not used for a Family Sharing device when none of that
+        member's devices are in it. Apple returns only the acct owner's devices on
+        the first refresh after a reauthentication (450 → TrustToken login) even
+        though fmly=True (membersInfo isHSA/useAuthWidget=False). The device is not
+        marked missing so the normal error retry (15-secs) relocates it instead of
+        waiting 15-mins. If the member's devices are still not returned after
+        FMLY_MEMBER_MISSING_CNT refreshes, no refresh is requested for them for
+        15-mins (_update_fmly_member_missing_cnt).
         '''
         if is_empty(devices_data):
             return
 
         device_ids = [device_data[ID] for device_data in devices_data]
+        prs_ids    = {device_data.get('prsId') for device_data in devices_data}
+        fmly_fnames_by_missing_prs_id = {}
+        fmly_returned_prs_ids         = set()
 
         restart_reasons = []
         for conf_device in Gb.conf_devices:
@@ -718,16 +757,29 @@ class iCloud_AppleAcctDevices():
                 continue
 
             if device_id in device_ids:
+                if AADev.prs_id:
+                    fmly_returned_prs_ids.add(AADev.prs_id)
                 if AADev.missing_since_secs > 0:
                     post_event(Device,
                                 f"Apple Device Found > {AADev.dname}, "
                                 f"Missing-{format_age(AADev.missing_since_secs)}")
+                    update_alert_sensor(Source=Device, error='missing_aadevice', clear=True)
                 AADev.missing_since_secs = 0
                 Device.set_button_prefix_icon('')
                 continue
 
             if (locate_all_devices is False
                     and AADev.device_data.get('fmlyShare', False)):
+                continue
+
+            # Partial refresh, none of the Family Sharing member's devices were returned
+            if AADev.prs_id and AADev.prs_id not in prs_ids:
+                log_debug_msg(  f"{self.AppleAcct.apple_user}, {Device.devicename}, "
+                                f"Missing check skipped > {AADev.dname}, "
+                                f"No devices returned for Family Sharing member "
+                                f"({AADev.owner_first_name})")
+                fmly_fnames_by_missing_prs_id.setdefault(
+                                AADev.prs_id, [AADev.owner_first_name]).append(Device.fname)
                 continue
 
             if AADev.missing_since_secs == 0:
@@ -760,6 +812,51 @@ class iCloud_AppleAcctDevices():
                         f"{CRLF_DOT}{CRLF_DOT.join(restart_reasons)}")
             Gb.was_icloud3_restart_requested = True
 
+        self._update_fmly_member_missing_cnt(fmly_fnames_by_missing_prs_id, fmly_returned_prs_ids)
+
+#----------------------------------------------------------------------------
+    def _update_fmly_member_missing_cnt(self, fmly_fnames_by_missing_prs_id, fmly_returned_prs_ids):
+        '''
+        Apple can keep returning only the acct owner's devices (membersInfo=None), e.g.
+        after another host signed into the same Apple Acct with the password. The
+        member's Device's next update time stays reached and a refresh was requested
+        every 5-secs. After FMLY_MEMBER_MISSING_CNT refreshes in a row without the
+        member's devices, do not request a refresh for them for 15-mins
+        (icloud_data_handler.update_AADev_data). The Device's update times are not
+        changed, the iCloud error handling would replace them.
+
+        fmly_fnames_by_missing_prs_id - {prs_id: [member first name, Device fnames...]}
+            of the tracked members whose devices were not returned in this refresh
+        fmly_returned_prs_ids - prs_ids with tracked devices in this refresh
+        '''
+        AppleAcct = self.AppleAcct
+        if hasattr(AppleAcct, 'fmly_missing_cnt_by_prs_id') is False:
+            AppleAcct.fmly_missing_cnt_by_prs_id        = {}
+            AppleAcct.fmly_missing_retry_secs_by_prs_id = {}
+
+        for prs_id in fmly_returned_prs_ids:
+            if AppleAcct.fmly_missing_cnt_by_prs_id.pop(prs_id, 0) >= FMLY_MEMBER_MISSING_CNT:
+                AppleAcct.fmly_missing_retry_secs_by_prs_id.pop(prs_id, None)
+                post_event( f"Apple Acct > {AppleAcct.apple_user}, "
+                            f"Family Sharing devices are being returned again")
+
+        now_secs = time_now_secs()
+        for prs_id, fnames in fmly_fnames_by_missing_prs_id.items():
+            missing_cnt = AppleAcct.fmly_missing_cnt_by_prs_id.get(prs_id, 0) + 1
+            AppleAcct.fmly_missing_cnt_by_prs_id[prs_id] = missing_cnt
+
+            if (missing_cnt < FMLY_MEMBER_MISSING_CNT
+                    or now_secs < AppleAcct.fmly_missing_retry_secs_by_prs_id.get(prs_id, 0)):
+                continue
+
+            retry_secs = now_secs + FMLY_MEMBER_MISSING_RETRY_SECS
+            AppleAcct.fmly_missing_retry_secs_by_prs_id[prs_id] = retry_secs
+            member_name, device_fnames = fnames[0], list(dict.fromkeys(fnames[1:]))
+            post_event( f"{EVLOG_NOTICE}Apple Acct > {AppleAcct.apple_user}, "
+                        f"Apple did not return {member_name}'s Family Sharing devices "
+                        f"({missing_cnt} refreshes), Retry at {secs_to_time(retry_secs)}"
+                        f"{CRLF_DOT}{list_to_str(device_fnames)}")
+
 #----------------------------------------------------------------------------
     def _create_AADeviceData_object(self, device_id, device_data):
 
@@ -783,6 +880,7 @@ class iCloud_AppleAcctDevices():
         log_data(log_hdr, AADev.device_data,
                     data_source='icloud', filter_id=self.AppleAcct.apple_id)
 
+        self.post_device_rawdata_msg(AADev)
 
 
 #----------------------------------------------------------------------------

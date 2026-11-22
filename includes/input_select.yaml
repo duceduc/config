@@ -40,8 +40,8 @@
      - group.bed_sensors #5
      - sensor.aio_human_sensor_entrance_humidity
      - sensor.lr_radar_humidity
-     - sensor.sr_radar_temperature
-     - sensor.sr_radar_humidity
+     - sensor.bt_proxy_shion_temperature
+     - sensor.bt_proxy_shion_humidity
      - sensor.aio_human_sensor_master_temperature #10
      - sensor.aio_human_sensor_master_humidity
      - sensor.entry_human_sensor_temperature # need to remove and change order

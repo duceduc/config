@@ -17,12 +17,15 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import (
     API_URL,
     CONF_ENTITY_ID,
+    CONF_REVERSE_GEOCODING,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     MOVE_THRESHOLD_KM,
+    PLACE_REFRESH_KM,
 )
-from .util import distance_km, extract_coordinates, extract_locality
+from .geocoding import async_reverse_geocode
+from .util import distance_km, extract_coordinates, extract_place
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -90,6 +93,9 @@ class MobileWeatherForecastCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.entity_id_tracked: str = entry.data[CONF_ENTITY_ID]
         self._last_coords: tuple[float, float] | None = None
+        self._reverse_enabled: bool = bool(entry.options.get(CONF_REVERSE_GEOCODING, False))
+        self._place_coords: tuple[float, float] | None = None
+        self._place_cache: dict[str, Any] | None = None
         # Filled in at setup: "<version> (build <build>)", shown on the device page.
         self.sw_version: str | None = None
 
@@ -120,12 +126,12 @@ class MobileWeatherForecastCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     # ------------------------------------------------------------------
     # Data retrieval
     # ------------------------------------------------------------------
-    def _resolve_position(self) -> tuple[tuple[float, float], str, str | None]:
-        """Return (coordinates, source, locality)."""
+    def _resolve_position(self) -> tuple[tuple[float, float], str, dict[str, Any] | None]:
+        """Return (coordinates, source, place provided by the entity itself)."""
         state = self.hass.states.get(self.entity_id_tracked)
         coords = extract_coordinates(state)
         if coords is not None:
-            return coords, "entity", extract_locality(state)
+            return coords, "entity", extract_place(state)
         _LOGGER.debug(
             "No coordinates for %s, falling back to the home position",
             self.entity_id_tracked,
@@ -134,7 +140,7 @@ class MobileWeatherForecastCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return home, "home", None
 
     async def _async_update_data(self) -> dict[str, Any]:
-        coords, source, locality = self._resolve_position()
+        coords, source, place = self._resolve_position()
         params = {
             "latitude": round(coords[0], 2),
             "longitude": round(coords[1], 2),
@@ -159,6 +165,11 @@ class MobileWeatherForecastCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             raise UpdateFailed(f"Unexpected Open-Meteo response: {raw.get('reason', raw)}")
 
         self._last_coords = coords
+
+        # Place name: the entity's own (Companion app) first, then the optional lookup.
+        if place is None and self._reverse_enabled:
+            place = await self._async_get_reverse_place(coords)
+
         _LOGGER.debug("Weather updated for %s (source %s)", coords, source)
         return {
             "current": raw["current"],
@@ -167,5 +178,27 @@ class MobileWeatherForecastCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "latitude": coords[0],
             "longitude": coords[1],
             "source": source,
-            "locality": locality,
+            "place": place,
+            "timezone": raw.get("timezone"),
+            "elevation": raw.get("elevation"),
         }
+
+    async def _async_get_reverse_place(self, coords: tuple[float, float]) -> dict[str, Any] | None:
+        """Place name through reverse geocoding, cached until the position moves."""
+        if (
+            self._place_cache is not None
+            and self._place_coords is not None
+            and distance_km(self._place_coords, coords) < PLACE_REFRESH_KM
+        ):
+            return self._place_cache
+        try:
+            place = await async_reverse_geocode(
+                self.hass, coords[0], coords[1], self.hass.config.language, self.sw_version
+            )
+        except (aiohttp.ClientError, TimeoutError, ValueError) as err:
+            _LOGGER.debug("Reverse geocoding failed: %s", err)
+            return None
+        if place is not None:
+            self._place_cache = place
+            self._place_coords = coords
+        return place

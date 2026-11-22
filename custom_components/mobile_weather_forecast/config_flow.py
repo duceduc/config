@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFl
 from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
     NumberSelector,
@@ -18,6 +19,7 @@ from homeassistant.helpers.selector import (
 
 from .const import (
     CONF_ENTITY_ID,
+    CONF_REVERSE_GEOCODING,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
@@ -58,7 +60,10 @@ class MobileWeatherForecastConfigFlow(ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(
                     title=user_input[CONF_NAME],
                     data={CONF_ENTITY_ID: entity_id},
-                    options={CONF_SCAN_INTERVAL: int(user_input[CONF_SCAN_INTERVAL])},
+                    options={
+                        CONF_SCAN_INTERVAL: int(user_input[CONF_SCAN_INTERVAL]),
+                        CONF_REVERSE_GEOCODING: bool(user_input.get(CONF_REVERSE_GEOCODING, False)),
+                    },
                 )
 
         default_name = "Météo" if self.hass.config.language.startswith("fr") else "Weather"
@@ -69,6 +74,7 @@ class MobileWeatherForecastConfigFlow(ConfigFlow, domain=DOMAIN):
                     EntitySelectorConfig(domain=["person", "device_tracker", "sensor"])
                 ),
                 vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): _interval_selector(),
+                vol.Optional(CONF_REVERSE_GEOCODING, default=False): BooleanSelector(),
             }
         )
         return self.async_show_form(
@@ -84,16 +90,28 @@ class MobileWeatherForecastConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class MobileWeatherForecastOptionsFlow(OptionsFlow):
-    """Options: update interval."""
+    """Options: update interval and optional place name lookup."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             return self.async_create_entry(
-                data={CONF_SCAN_INTERVAL: int(user_input[CONF_SCAN_INTERVAL])}
+                data={
+                    CONF_SCAN_INTERVAL: int(user_input[CONF_SCAN_INTERVAL]),
+                    CONF_REVERSE_GEOCODING: bool(user_input.get(CONF_REVERSE_GEOCODING, False)),
+                }
             )
 
-        current = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+        options = self.config_entry.options
         schema = vol.Schema(
-            {vol.Required(CONF_SCAN_INTERVAL, default=current): _interval_selector()}
+            {
+                vol.Required(
+                    CONF_SCAN_INTERVAL,
+                    default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                ): _interval_selector(),
+                vol.Optional(
+                    CONF_REVERSE_GEOCODING,
+                    default=options.get(CONF_REVERSE_GEOCODING, False),
+                ): BooleanSelector(),
+            }
         )
         return self.async_show_form(step_id="init", data_schema=schema)

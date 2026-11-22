@@ -13,7 +13,7 @@ import logging
 import sys
 import time
 import traceback
-from types import ModuleType, TracebackType
+from types import MethodType, TracebackType
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -93,6 +93,22 @@ WEBHOOK_METHODS = {
     "POST",
     "PUT",
 }
+
+#
+# AstEval attributes that hold the scope a generator expression's elements are evaluated in
+#
+GENEXP_SCOPE_ATTRS = (
+    "global_ctx",
+    "global_sym_table",
+    "sym_table",
+    "sym_table_stack",
+    "curr_func",
+    "genexp_iter",
+    "code_str",
+    "code_list",
+    "class_sym_table",
+    "class_global_names",
+)
 
 
 def ast_eval_exec_factory(ast_ctx, mode):
@@ -278,9 +294,31 @@ class EvalLocalVar:
         return f"EvalLocalVar @{hex(id(self))} = {self.value if self.defined else 'undefined'}"
 
 
-def unwrap_defined(value):
-    """Return the value held by a defined EvalLocalVar, otherwise value unchanged."""
-    return value.get() if isinstance(value, EvalLocalVar) and value.is_defined() else value
+def is_pyscript_func(func):
+    """Return True if func is a pyscript (async) function."""
+    return isinstance(func, (EvalFunc, EvalFuncVar))
+
+
+def pyscript_property(obj, attr, hook):
+    """
+    Return the property for obj.attr if Python would use one, otherwise None.
+
+    Python calls a property's getter, setter and deleter itself, which doesn't work for
+    pyscript functions since they are async, so pyscript calls them instead. A subclass of
+    property is left to Python, since it can override __get__, __set__ and __delete__. hook
+    is the name of the attribute method (__getattribute__, __setattr__ or __delattr__) that
+    Python would call first; if the class overrides it, the property isn't used here, so
+    that the override still runs.
+    """
+    for klass in type(obj).__mro__:
+        if attr in klass.__dict__:
+            value = klass.__dict__[attr]
+            if type(value) is not property:  # pylint: disable=unidiomatic-typecheck
+                return None
+            if getattr(type(obj), hook) not in (getattr(object, hook), getattr(type, hook)):
+                return None
+            return value
+    return None
 
 
 class EvalName:
@@ -303,17 +341,33 @@ class EvalAttrSet:
         self.obj = obj
         self.attr = attr
 
+    async def setattr_async(self, ast_ctx, value):
+        """Set the attribute value, calling a pyscript property setter ourselves."""
+        prop = pyscript_property(self.obj, self.attr, "__setattr__")
+        if prop is not None and is_pyscript_func(prop.fset):
+            await prop.fset.call(ast_ctx, self.obj, value)
+        else:
+            self.setattr(value)
+
     def setattr(self, value):
         """Set the attribute value."""
-        # update a pyscript module's EvalLocalVar in place, so its own functions see the change
-        if isinstance(self.obj, ModuleType) and isinstance(vars(self.obj).get(self.attr), EvalLocalVar):
-            vars(self.obj)[self.attr].set(unwrap_defined(value))
-        else:
-            setattr(self.obj, self.attr, value)
+        setattr(self.obj, self.attr, value)
 
     def getattr(self):
         """Get the attribute value."""
-        return unwrap_defined(getattr(self.obj, self.attr))
+        return getattr(self.obj, self.attr)
+
+    async def delattr_async(self, ast_ctx):
+        """Delete the attribute, calling a pyscript property deleter ourselves."""
+        prop = pyscript_property(self.obj, self.attr, "__delattr__")
+        if prop is not None and is_pyscript_func(prop.fdel):
+            await prop.fdel.call(ast_ctx, self.obj)
+        else:
+            self.delattr()
+
+    def delattr(self):
+        """Delete the attribute."""
+        delattr(self.obj, self.attr)
 
 
 class EvalFunc:
@@ -344,6 +398,8 @@ class EvalFunc:
         self.doc_string = ast.get_docstring(func_def)
         self.num_posonly_arg = len(self.func_def.args.posonlyargs)
         self.num_posn_arg = self.num_posonly_arg + len(self.func_def.args.args) - len(self.defaults)
+        # like Python's __class__ cell: holds the class whose body defined this method, for super()
+        self.class_cell: list[type | None] | None = None
         self.code_list = code_list
         self.code_str = code_str
         self.trigger = []
@@ -801,6 +857,8 @@ class EvalFunc:
         code_str, code_list = ast_ctx.code_str, ast_ctx.code_list
         ast_ctx.code_str, ast_ctx.code_list = self.code_str, self.code_list
         prev_func = ast_ctx.curr_func
+        prev_genexp_iter = ast_ctx.genexp_iter
+        ast_ctx.genexp_iter = None
         save_user_locals = ast_ctx.user_locals
         ast_ctx.user_locals = {}
         ast_ctx.curr_func = self
@@ -814,6 +872,7 @@ class EvalFunc:
             return None
         finally:
             ast_ctx.curr_func = prev_func
+            ast_ctx.genexp_iter = prev_genexp_iter
             ast_ctx.user_locals = save_user_locals
             ast_ctx.code_str, ast_ctx.code_list = code_str, code_list
             if prev_sym_table is not None:
@@ -839,20 +898,37 @@ class EvalFunc:
 class EvalFuncVar:
     """Class for a callable pyscript function."""
 
+    # keep our own fields out of __dict__, so functools.wraps() can't copy them onto a wrapper
+    __slots__ = ("__dict__", "__weakref__", "ast_ctx", "func")
+
     def __init__(self, func: EvalFunc) -> None:
         """Initialize instance with given EvalFunc function."""
         self.func = func
         self.ast_ctx: AstEval | None = None
 
+    @property
+    def __name__(self):
+        """Return the function name, like a Python function."""
+        return self.func.get_name()
+
+    @__name__.setter
+    def __name__(self, name):
+        """Set the function name, eg by functools.wraps()."""
+        self.func.set_name(name)
+
+    @property
+    def __doc__(self):
+        """Return the function doc string, like a Python function."""
+        return self.func.get_doc_string()
+
+    @__doc__.setter
+    def __doc__(self, doc_string):
+        """Set the function doc string, eg by functools.wraps()."""
+        self.func.doc_string = doc_string
+
     def get_func(self) -> EvalFunc:
         """Return the EvalFunc function."""
         return self.func
-
-    def remove_func(self):
-        """Remove and return the EvalFunc function."""
-        func = self.func
-        self.func = None
-        return func
 
     async def call(self, ast_ctx, *args, **kwargs):
         """Call the EvalFunc function."""
@@ -896,6 +972,10 @@ class EvalFuncVar:
 class EvalFuncVarClassInst(EvalFuncVar):
     """Class for a callable pyscript class instance function."""
 
+    __slots__ = ("class_inst",)
+    # our class doc string would otherwise hide the __doc__ property, which returns the method's
+    __doc__ = EvalFuncVar.__doc__
+
     def __init__(self, func: EvalFunc, ast_ctx: "AstEval", class_inst: Any) -> None:
         """Initialize instance with given EvalFunc function."""
         super().__init__(func)
@@ -926,6 +1006,7 @@ class AstEval:
         self.local_sym_table: SymTable = {}
         self.user_locals: SymTable = {}
         self.curr_func: EvalFunc | None = None
+        self.genexp_iter = None  # the outermost iterator of the generator expression being evaluated
         self.filename = name
         self.code_str: str | None = None
         self.code_list: list[str] | None = None
@@ -935,7 +1016,9 @@ class AstEval:
         self.config_entry = Function.hass.data.get(DOMAIN, {}).get(CONFIG_ENTRY, {})
         self.dec_eval_depth = 0
         self.class_sym_table: SymTable | None = None
+        self.class_cell: list[type | None] | None = None
         self.class_global_names: set[str] = set()
+        self.class_pending_annotations: list[tuple[str, ast.expr]] = []
 
     async def ast_not_implemented(self, arg, *args):
         """Raise NotImplementedError exception for unimplemented AST types."""
@@ -1010,16 +1093,15 @@ class AstEval:
         for imp in arg.names:
             if imp.name == "*":
                 for name, value in mod.__dict__.items():
-                    # skip a module-level EvalLocalVar whose name was deleted
-                    if name[0] != "_" and not (isinstance(value, EvalLocalVar) and not value.is_defined()):
+                    if name[0] != "_":
                         self.assign_name(name, value)
             else:
-                value = getattr(mod, imp.name)
-                if isinstance(value, EvalLocalVar) and not value.is_defined():
+                if not hasattr(mod, imp.name):
                     raise ImportError(
-                        f"cannot import name '{imp.name}' from '{mod.__name__}' (unknown location)"
+                        f"cannot import name '{imp.name}' from '{mod.__name__}' "
+                        f"({getattr(mod, '__file__', None) or 'unknown location'})"
                     )
-                # assign_name takes the value out of the module's EvalLocalVar
+                value = getattr(mod, imp.name)
                 self.assign_name(imp.name if imp.asname is None else imp.asname, value)
 
     async def ast_if(self, arg):
@@ -1084,16 +1166,6 @@ class AstEval:
         keywords = {kw.arg: await self.aeval(kw.value) for kw in arg.keywords}
         metaclass = keywords.pop("metaclass", type(bases[0]) if bases else type)
 
-        if self.binds_global(arg.name):
-            sym_table_assign = self.global_sym_table
-        else:
-            sym_table_assign = self.sym_table
-        #
-        # reuse an existing EvalLocalVar, so functions defined earlier see the new class;
-        # it keeps the old class until the new one is set below, as in Python
-        #
-        if not (arg.name in sym_table_assign and isinstance(sym_table_assign[arg.name], EvalLocalVar)):
-            sym_table_assign[arg.name] = EvalLocalVar(arg.name)
         if hasattr(metaclass, "__prepare__"):
             sym_table = metaclass.__prepare__(arg.name, tuple(bases), **keywords)
         else:
@@ -1101,7 +1173,10 @@ class AstEval:
         self.sym_table_stack.append(self.sym_table)
         self.sym_table = sym_table
         prev_class_sym_table, self.class_sym_table = self.class_sym_table, sym_table
+        class_cell: list[type | None] = [None]
+        prev_class_cell, self.class_cell = self.class_cell, class_cell
         prev_class_global_names, self.class_global_names = self.class_global_names, set()
+        prev_pending, self.class_pending_annotations = self.class_pending_annotations, []
         try:
             for arg1 in arg.body:
                 val = await self.aeval(arg1)
@@ -1112,20 +1187,50 @@ class AstEval:
         finally:
             # restore the enclosing scope even if the class body raises and the exception is caught
             self.class_sym_table = prev_class_sym_table
+            self.class_cell = prev_class_cell
             self.class_global_names = prev_class_global_names
+            pending, self.class_pending_annotations = self.class_pending_annotations, prev_pending
             self.sym_table = self.sym_table_stack.pop()
 
         decorators = [await self.aeval(dec) for dec in arg.decorator_list]
-        sym_table["__init__evalfunc_wrap__"] = None
-        if "__init__" in sym_table:
+        init_func = sym_table["__init__"] if "__init__" in sym_table else None
+        if isinstance(init_func, staticmethod):
+            init_func = init_func.__func__
+        if isinstance(init_func, (EvalFunc, EvalFuncVar)):
+            #
+            # Python can't call our async __init__, so rename it; call_func() calls
+            # it when it creates an instance (a compiled __init__ is left to Python)
+            #
             sym_table["__init__evalfunc_wrap__"] = sym_table["__init__"]
             del sym_table["__init__"]
-        cls = metaclass(arg.name, tuple(bases), sym_table, **keywords)
+        # create the class like any other instance, so a pyscript metaclass __new__ or __init__ is called
+        cls = await self.call_func(metaclass, None, arg.name, tuple(bases), sym_table, **keywords)
         if inspect.iscoroutine(cls):
             cls = await cls
+        class_cell[0] = cls
+        if pending:
+            await self.eval_pending_annotations(cls, arg.name, pending)
         for dec_func in reversed(decorators):
             cls = await self.call_func(dec_func, None, cls)
-        sym_table_assign[arg.name].set(cls)
+        # as in Python, the name is bound only once the class has been created
+        self.assign_name(arg.name, cls)
+
+    async def eval_pending_annotations(self, cls, cls_name, pending):
+        """Evaluate class annotations that named the class itself, now that it exists."""
+        annotations = cls.__dict__.get("__annotations__")
+        if not isinstance(annotations, dict):
+            return
+        self.sym_table_stack.append(self.sym_table)
+        # as in Python, an annotation sees the class's own names first, eg a type alias
+        self.sym_table = {cls_name: cls, **cls.__dict__}
+        try:
+            for name, annotation in pending:
+                try:
+                    annotations[name] = await self.aeval(annotation)
+                except NameError:
+                    pass
+        finally:
+            self.sym_table = self.sym_table_stack.pop()
 
     async def ast_functiondef(self, arg, async_func=False):
         """Evaluate function definition."""
@@ -1184,23 +1289,41 @@ class AstEval:
             return
 
         func = EvalFunc(arg, self.code_list, self.code_str, self.global_ctx, async_func)
+        if self.sym_table is self.class_sym_table:
+            func.class_cell = self.class_cell
+        elif self.curr_func:
+            # as in Python, a function inside a method shares that method's __class__
+            func.class_cell = self.curr_func.class_cell
         await func.eval_defaults(self)
         await func.resolve_nonlocals(self)
         name = func.get_name()
         dec_trig, dec_other, dec_dm = await func.eval_decorators(self)
         self.dec_eval_depth += 1
         for dec_func in dec_other:
-            func = await self.call_func(dec_func, None, func)
+            if isinstance(func, EvalFunc):
+                # pass decorators an EvalFuncVar, like a Python function object; functools.wraps()
+                # then only updates its __dict__, not the fields of the wrapper's EvalFunc
+                func = EvalFuncVar(func)
+                func.set_ast_ctx(self)
+            func_arg = func
+            func = await self.call_func(dec_func, None, func_arg)
             if isinstance(func, EvalFuncVar):
                 # set the function name back to its original instead of the decorator function we just called
                 func.set_name(name)
-                func = func.remove_func()
-                dec_trig += func.decorators
-                dec_dm += func.dm_decorators
+                if func is not func_arg:
+                    dec_trig += func.get_func().decorators
+                    dec_dm += func.get_func().dm_decorators
             elif isinstance(func, EvalFunc):
                 func.set_name(name)
         self.dec_eval_depth -= 1
         if isinstance(func, EvalFunc):
+            func = EvalFuncVar(func)
+        if isinstance(func, EvalFuncVar):
+            # keep the EvalFuncVar a decorator returned, since the decorator may hold
+            # references to it and may have set attributes like __wrapped__ on it
+            func_var = func
+            func_var.set_ast_ctx(self)
+            func = func_var.get_func()
             func.decorators = dec_trig
             func.dm_decorators = dec_dm
             if self.dec_eval_depth == 0:
@@ -1209,14 +1332,9 @@ class AstEval:
                     await func.trigger_init(self.global_ctx, name)
                 except Exception as e:
                     self.log_exception(e)
-                func_var = EvalFuncVar(func)
-                func_var.set_ast_ctx(self)
 
                 if len(dec_dm) > 0:
                     await self.get_global_ctx().create_decorator_manager(dec_dm, self, func_var)
-            else:
-                func_var = EvalFuncVar(func)
-                func_var.set_ast_ctx(self)
         else:
             func_var = func
 
@@ -1305,6 +1423,9 @@ class AstEval:
         """Execute raise statement."""
         if arg.exc:
             exc = await self.aeval(arg.exc)
+            if inspect.isclass(exc) and issubclass(exc, BaseException):
+                # create the instance here, so a pyscript __init__ is called
+                exc = await self.call_func(exc, None)
             if arg.cause:
                 cause = await self.aeval(arg.cause)
                 raise exc from cause
@@ -1430,7 +1551,7 @@ class AstEval:
         else:
             var_name = await self.aeval(lhs)
             if isinstance(var_name, EvalAttrSet):
-                var_name.setattr(val)
+                await var_name.setattr_async(self, val)
                 return
             if not isinstance(var_name, str):
                 raise NotImplementedError(f"unknown lhs type {lhs} (got {var_name}) in assign")
@@ -1456,17 +1577,8 @@ class AstEval:
 
     def assign_name(self, var_name, val):
         """Bind a plain variable name to val, updating an existing EvalLocalVar in place."""
-        #
-        # store the value rather than another binding's EvalLocalVar (eg, from mod.Foo),
-        # so a later update of this name doesn't change that other binding
-        #
-        val = unwrap_defined(val)
         if self.binds_global(var_name):
-            # update a module-level EvalLocalVar in place, so functions defined earlier see it
-            if isinstance(self.global_sym_table.get(var_name), EvalLocalVar):
-                self.global_sym_table[var_name].set(val)
-            else:
-                self.global_sym_table[var_name] = val
+            self.global_sym_table[var_name] = val
             return
         if self.sym_table is self.class_sym_table:
             # a class body binds plainly in the class namespace (see binds_global)
@@ -1495,7 +1607,14 @@ class AstEval:
         if isinstance(arg.target, ast.Name):
             annotations = self.sym_table.setdefault("__annotations__", {})
             if arg.annotation:
-                annotations[arg.target.id] = await self.aeval(arg.annotation)
+                try:
+                    annotations[arg.target.id] = await self.aeval(arg.annotation)
+                except NameError:
+                    # it can name something not defined yet (eg, the class being defined), so
+                    # keep its source, as with "from __future__ import annotations"
+                    annotations[arg.target.id] = ast.unparse(arg.annotation)
+                    if self.sym_table is self.class_sym_table:
+                        self.class_pending_annotations.append((arg.target.id, arg.annotation))
         if arg.value is not None:
             rhs = await self.aeval(arg.value)
             await self.recurse_assign(arg.target, rhs)
@@ -1514,14 +1633,9 @@ class AstEval:
                 del var[await self.aeval(arg1.slice)]
             elif isinstance(arg1, ast.Name):
                 if self.binds_global(arg1.id):
-                    # as with assignment, mark a module-level EvalLocalVar undefined in place
-                    if isinstance(self.global_sym_table.get(arg1.id), EvalLocalVar):
-                        if self.global_sym_table[arg1.id].is_defined():
-                            self.global_sym_table[arg1.id].set_undefined()
-                        else:
-                            raise NameError(f"name '{arg1.id}' is not defined")
-                    elif arg1.id in self.global_sym_table:
-                        del self.global_sym_table[arg1.id]
+                    if arg1.id not in self.global_sym_table:
+                        raise NameError(f"name '{arg1.id}' is not defined")
+                    del self.global_sym_table[arg1.id]
                 elif arg1.id in self.sym_table:
                     if isinstance(self.sym_table[arg1.id], EvalLocalVar):
                         if self.sym_table[arg1.id].is_defined():
@@ -1533,10 +1647,12 @@ class AstEval:
                 else:
                     raise NameError(f"name '{arg1.id}' is not defined")
             elif isinstance(arg1, ast.Attribute):
-                var_name = await self.ast_attribute_collapse(arg1, check_undef=False)
-                if not isinstance(var_name, str):
-                    raise NameError("state name should be 'domain.entity' or 'domain.entity.attr'")
-                State.delete(var_name)
+                # as with assignment, a dotted name is a state only if its first part isn't defined
+                var_name = await self.ast_attribute_collapse(arg1)
+                if var_name is not None:
+                    State.delete(var_name)
+                else:
+                    await EvalAttrSet(await self.aeval(arg1.value), arg1.attr).delattr_async(self)
             else:
                 raise NotImplementedError(f"unknown target type {arg1} in del")
 
@@ -1578,12 +1694,20 @@ class AstEval:
         val = await self.aeval(arg.value)
         if isinstance(arg.ctx, ast.Store):
             return EvalAttrSet(val, arg.attr)
-        if isinstance(val, ModuleType):
-            # a pyscript module keeps module-level classes in EvalLocalVars, so unwrap them
-            value = getattr(val, arg.attr)
-            if isinstance(value, EvalLocalVar) and not value.is_defined():
-                raise AttributeError(f"module '{val.__name__}' has no attribute '{arg.attr}'")
-            return unwrap_defined(value)
+        if arg.attr == "__init__" and (init_func := self.init_attr(val)) is not None:
+            return init_func
+        prop = pyscript_property(val, arg.attr, "__getattribute__")
+        if prop is not None and is_pyscript_func(prop.fget):
+            try:
+                return await prop.fget.call(self, val)
+            except AttributeError:
+                # as in Python, an AttributeError from the getter falls back to __getattr__
+                getattr_func = inspect.getattr_static(type(val), "__getattr__", None)
+                if getattr_func is None:
+                    raise
+                if hasattr(getattr_func, "__get__"):
+                    getattr_func = getattr_func.__get__(val, type(val))  # pylint: disable=unnecessary-dunder-call
+                return await self.call_func(getattr_func, "__getattr__", arg.attr)
         return getattr(val, arg.attr)
 
     async def ast_name(self, arg):
@@ -1601,7 +1725,7 @@ class AstEval:
                     val = self.sym_table[arg.id]
                     return val.get() if isinstance(val, EvalLocalVar) else val
                 if arg.id in self.global_sym_table:
-                    return unwrap_defined(self.global_sym_table[arg.id])
+                    return self.global_sym_table[arg.id]
                 raise NameError(f"global name '{arg.id}' is not defined")
             #
             # now check in our current symbol table, and then some other places
@@ -1621,12 +1745,7 @@ class AstEval:
             if arg.id in self.global_sym_table:
                 if self.curr_func and arg.id in self.curr_func.local_names:
                     raise UnboundLocalError(f"local variable '{arg.id}' referenced before assignment")
-                #
-                # a class defined at module level is stored as an EvalLocalVar, so unwrap
-                # it here too (eg, when it's used inside another class's body); while the
-                # class body is still running it isn't defined yet, so leave it wrapped
-                #
-                return unwrap_defined(self.global_sym_table[arg.id])
+                return self.global_sym_table[arg.id]
             if arg.id in BUILTIN_AST_FUNCS_FACTORY:
                 return BUILTIN_AST_FUNCS_FACTORY[arg.id](self)
             if hasattr(builtins, arg.id) and arg.id not in BUILTIN_EXCLUDE and arg.id[0] != "_":
@@ -1925,6 +2044,90 @@ class AstEval:
         await self.loopvar_scope_restore(target_vars, save_values)
         return result
 
+    async def genexp_next(self, arg, iters):
+        """Evaluate the next element of a generator expression, returning it in a tuple, or () at the end."""
+        generators = arg.generators
+        while iters:
+            level = len(iters) - 1
+            try:
+                loop_var = next(iters[level])
+            except StopIteration:
+                iters.pop()
+                continue
+            gen = generators[level]
+            await self.recurse_assign(gen.target, loop_var)
+            for cond in gen.ifs:
+                if not await self.aeval(cond):
+                    break
+            else:
+                if level + 1 == len(generators):
+                    return (await self.aeval(arg.elt),)
+                iters.append(iter(await self.aeval(generators[level + 1].iter)))
+        return ()
+
+    def genexp_loop(self, arg, iters, loop_vars, scope, loop):
+        """Yield the elements of a generator expression, evaluating each one only when it's asked for."""
+        #
+        # native code (eg, sum(), any() or "".join()) iterates synchronously, so each element is
+        # evaluated by running our async code to completion without returning to the event loop,
+        # in the scope where the generator expression was created
+        #
+        gen_vars = {}
+        while True:
+            try:
+                running_loop = asyncio.get_running_loop()
+            except RuntimeError:
+                running_loop = None
+            if running_loop is not loop:
+                # pyscript code isn't thread safe, so it can't run in another thread (eg, task.executor)
+                raise RuntimeError("a generator expression can only be iterated in the event loop")
+            save_scope = {attr: getattr(self, attr) for attr in scope}
+            for attr, value in scope.items():
+                setattr(self, attr, value)
+            self.sym_table_stack = scope["sym_table_stack"].copy()
+            sym_table = self.sym_table
+            # the loop variables are in their own scope, so hide any with the same names in this one
+            outer_vars = {var: sym_table.pop(var) for var in loop_vars if var in sym_table}
+            sym_table.update(gen_vars)
+            coro = self.genexp_next(arg, iters)
+            try:
+                coro.send(None)  # pylint: disable=no-member
+            except StopIteration as exc:
+                elt = exc.value
+            else:
+                #
+                # the element has to wait, which can't be done here, so stop it; whatever
+                # it was waiting for (eg, a task or a service call) carries on by itself
+                #
+                try:
+                    coro.close()  # pylint: disable=no-member
+                finally:
+                    # raise this even if the element's cleanup (eg, a finally block) tries to wait too
+                    raise RuntimeError(
+                        "a generator expression element can't wait (eg, for task.sleep());"
+                        " use a list comprehension instead"
+                    )
+            finally:
+                gen_vars = {var: sym_table.pop(var) for var in loop_vars if var in sym_table}
+                sym_table.update(outer_vars)
+                for attr, value in save_scope.items():
+                    setattr(self, attr, value)
+            if not elt:
+                return
+            yield elt[0]
+
+    async def ast_generatorexp(self, arg):
+        """Evaluate generator expression, returning a generator that evaluates each element lazily."""
+        # as in Python, the outermost iterable is evaluated right away
+        iters = [iter(await self.aeval(arg.generators[0].iter))]
+        loop_vars, _ = await self.loopvar_scope_save(arg.generators)
+        scope = {attr: getattr(self, attr) for attr in GENEXP_SCOPE_ATTRS}
+        scope["sym_table_stack"] = self.sym_table_stack.copy()
+        scope["genexp_iter"] = iters[0]  # what Python passes to the generator as its first argument
+        gen = self.genexp_loop(arg, iters, loop_vars, scope, asyncio.get_running_loop())
+        gen.__name__ = gen.__qualname__ = "<genexpr>"
+        return gen
+
     async def ast_subscript(self, arg):
         """Evaluate subscript."""
         var = await self.aeval(arg.value)
@@ -1966,6 +2169,67 @@ class AstEval:
             func = func.get()
         return await self.call_func(func, func_name, *args, **kwargs)
 
+    @staticmethod
+    def class_init(mro):
+        """Return the renamed pyscript __init__ Python would find first in mro, or None if it's native."""
+        for klass in mro:
+            if "__init__evalfunc_wrap__" in klass.__dict__:
+                return klass.__dict__["__init__evalfunc_wrap__"]
+            if "__init__" in klass.__dict__:
+                return None
+        return None
+
+    @staticmethod
+    def bind_init(init_func, obj, cls):
+        """Bind a renamed __init__ to obj like Python's attribute lookup does; a static one stays unbound."""
+        return init_func.__get__(obj, cls)  # pylint: disable=unnecessary-dunder-call
+
+    def init_attr(self, val):
+        """Return the pyscript __init__ for val.__init__, or None to use Python's attribute lookup."""
+        if isinstance(val, super):
+            #
+            # super(cls, obj).__init__ searches the mro of obj (or of its type) after cls
+            #
+            mro = val.__self_class__.__mro__ if val.__self_class__ is not None else ()
+            init_func = self.class_init(mro[mro.index(val.__thisclass__) + 1 :] if mro else ())
+            if init_func is None:
+                return None
+            obj = None if val.__self__ is val.__self_class__ else val.__self__
+            return self.bind_init(init_func, obj, val.__self_class__)
+        if inspect.isclass(val):
+            init_func = self.class_init(val.__mro__)
+            return None if init_func is None else self.bind_init(init_func, None, val)
+        if "__init__" in getattr(val, "__dict__", {}):
+            # as in Python, an __init__ set on the instance comes before the class's
+            return None
+        init_func = self.class_init(type(val).__mro__)
+        return None if init_func is None else self.bind_init(init_func, val, type(val))
+
+    def super_args(self):
+        """Return the arguments of a zero-argument super(), which Python finds in the calling method."""
+        func = self.curr_func
+        if self.genexp_iter is not None:
+            # in a generator expression's element, Python's first argument is the outermost iterator
+            if not func or func.class_cell is None:
+                raise RuntimeError("super(): __class__ cell not found")
+            if func.class_cell[0] is None:
+                raise RuntimeError("super(): empty __class__ cell")
+            return func.class_cell[0], self.genexp_iter
+        func_args = func.func_def.args.posonlyargs + func.func_def.args.args if func else []
+        if not func or not func_args:
+            raise RuntimeError("super(): no arguments")
+        if func.class_cell is None:
+            raise RuntimeError("super(): __class__ cell not found")
+        if func.class_cell[0] is None:
+            raise RuntimeError("super(): empty __class__ cell")
+        first_arg = self.sym_table.get(func_args[0].arg, EvalLocalVar(func_args[0].arg))
+        if isinstance(first_arg, EvalLocalVar):
+            # a method that defines a function keeps its local variables in EvalLocalVars
+            if not first_arg.is_defined():
+                raise RuntimeError("super(): arg[0] deleted")
+            first_arg = first_arg.get()
+        return func.class_cell[0], first_arg
+
     async def call_func(self, func, func_name, *args, **kwargs):
         """Call a function with the given arguments."""
         if func_name is None:
@@ -1976,19 +2240,57 @@ class AstEval:
                     func_name = func.__name__
             except Exception:
                 func_name = "<function>"
-        arg_str = ", ".join(['"' + elt + '"' if isinstance(elt, str) else str(elt) for elt in args])
-        _LOGGER.debug("%s: calling %s(%s, %s)", self.name, func_name, arg_str, kwargs)
+        if _LOGGER.isEnabledFor(logging.DEBUG):
+            try:
+                arg_str = ", ".join(['"' + elt + '"' if isinstance(elt, str) else str(elt) for elt in args])
+                kwargs_str = str(kwargs)
+            except Exception:
+                # eg, an instance whose __init__ hasn't run yet, or whose __str__ is a pyscript method
+                arg_str = kwargs_str = "..."
+            _LOGGER.debug("%s: calling %s(%s, %s)", self.name, func_name, arg_str, kwargs_str)
         if isinstance(func, (EvalFunc, EvalFuncVar)):
             return await func.call(self, *args, **kwargs)
-        if inspect.isclass(func) and hasattr(func, "__init__evalfunc_wrap__"):
-            has_init_wrapper = getattr(func, "__init__evalfunc_wrap__") is not None
-            inst = func(*args, **kwargs) if not has_init_wrapper else func()
-            if has_init_wrapper:
+        if isinstance(func, MethodType) and is_pyscript_func(func.__func__):
+            # eg, a pyscript function wrapped by classmethod(), bound to the class
+            return await func.__func__.call(self, func.__self__, *args, **kwargs)
+        if func is super and not args and not kwargs:
+            return super(*self.super_args())
+        if inspect.isclass(func):
+            init_func = self.class_init(func.__mro__)
+            new_func = func.__new__
+            if type(func).__call__ is not type.__call__:
                 #
-                # since our __init__ function is async, call the renamed one
+                # the metaclass has its own __call__, so let it create the instance,
+                # and then call our __init__, which Python doesn't see
                 #
-                await inst.__init__evalfunc_wrap__.call(self, *args, **kwargs)
-            return inst
+                if init_func is not None:
+                    inst = func()
+                    await self.bind_init(init_func, inst, type(inst)).call(self, *args, **kwargs)
+                    return inst
+            elif init_func is not None or isinstance(new_func, (EvalFunc, EvalFuncVar)):
+                #
+                # Python can't call our async __init__ or __new__, so create the instance
+                # like type.__call__ does: call __new__, and then __init__ if __new__
+                # returned an instance of the class
+                #
+                if isinstance(new_func, (EvalFunc, EvalFuncVar)):
+                    inst = await new_func.call(self, func, *args, **kwargs)
+                elif new_func is object.__new__:
+                    # object.__new__ rejects extra arguments, since our __init__ is renamed
+                    inst = object.__new__(func)
+                else:
+                    # a native __new__ (eg, of str, tuple or Exception) needs the arguments
+                    inst = new_func(func, *args, **kwargs)
+                if not isinstance(inst, func):
+                    return inst
+                init_func = self.class_init(type(inst).__mro__)
+                if init_func is None:
+                    type(inst).__init__(inst, *args, **kwargs)  # pylint: disable=unnecessary-dunder-call
+                    return inst
+                ret = await self.bind_init(init_func, inst, type(inst)).call(self, *args, **kwargs)
+                if ret is not None:
+                    raise TypeError(f"__init__() should return None, not '{type(ret).__name__}'")
+                return inst
         if inspect.iscoroutinefunction(func):
             return await func(*args, **kwargs)
         if callable(func):

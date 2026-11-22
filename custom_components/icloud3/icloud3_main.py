@@ -35,10 +35,11 @@ from .const             import (HOME, NOT_HOME, HOME_FNAME,
                                 EVLOG_UPDATE_START, EVLOG_UPDATE_END, EVLOG_ERROR, EVLOG_ALERT, EVLOG_NOTICE,
                                 ICLOUD, MOBAPP, TRUST_TOKEN_EXPIRE_WARNING_DAYS,
                                 ENTER_ZONE, EXIT_ZONE, NOTIFY,
-                                STATZONE_RADIUS_1M,)
+                                STATZONE_RADIUS_1M, )
 from .const_config      import (CONF_USERNAME, CONF_PASSWORD, ARRIVAL_TIME, INTERVAL, NEXT_UPDATE,
                                 CONF_LOG_LEVEL, )
-from .const_char        import (RARROW, LT, NBSP3, CLOCK_FACE, LINK, CRLF, DOT, LDOT2, CRLF_DOT,
+from .const_char        import (RARROW, LT, NBSP3, CLOCK_FACE, RED_STOP, BATTERY_ICON, BATTERY_ICON_LOW,
+                                LINK, CRLF, DOT, LDOT2, CRLF_DOT,
                                 CRLF_LDOT, CRLF_LBDOT, CRLF_LHDOT, CRLF_HDOT2, CRLF_LX,
                                 CRLF_LRED_ALERT, CRLF_LDIAMOND, CRLF_LASTERISK, NBSP, RED_ALERT, )
 from .const_sensor      import (SENSOR_LIST_DISTANCE, )
@@ -63,7 +64,7 @@ from .utils.utils       import (instr, is_empty, isnot_empty, is_zone, is_statzo
                                 list_to_str, is_between, apple_user, zone_dname, is_running_in_event_loop,
                                 list_add, list_sort, )
 from .utils.file_io     import (file_exists, directory_exists, make_directory, extract_filename, )
-from .utils.messaging   import (post_event, post_alert, post_error_msg, post_monitor_msg, post_internal_error,
+from .utils.messaging   import (post_event, post_alert, post_error_msg, post_internal_error,
                                 post_greenbar_msg, clear_greenbar_msg, update_alert_sensor,
                                 open_repair_issue_alert_keys, alert_key_source, all_alerts_by_alert_key,
                                 log_info_msg, log_exception, log_start_finish_update_banner,
@@ -658,7 +659,6 @@ class iCloud3:
         Gb.icloud_acct_error_cnt = 0
 
         self._validate_new_icloud_data(Device)
-        self._post_before_update_monitor_msg(Device)
         # self.process_updated_location_data(Device, ICLOUD)
         self.location_updated_by_Device[Device] = ICLOUD
 
@@ -682,7 +682,6 @@ class iCloud3:
 
         Device.FromZone_NextToUpdate = Device.FromZone_Home
         Device.FromZone_TrackFrom    = Device.FromZone_Home
-        Device.last_track_from_zone  = HOME
 
         mobapp_trigger_flag = False
         if Device.is_mobapp_monitored and Gb.conf_data_source_MOBAPP:
@@ -700,12 +699,15 @@ class iCloud3:
             post_event(Device, f"MobApp Trigger > {Device.mobapp_data_change_reason}")
         elif Device.is_tracking_resumed:
             Device.tracking_status = TRACKING_NORMAL
+        elif Device.loc_data_latitude == 0.0:
+            # No location yet (initial locate, device Pending/offline). Every Apple Acct has
+            # a tracked device (config_file._verify_apple_accts_have_tracked_device), its
+            # refreshes update this device
+            return
         elif Device.is_next_update_time_reached is False:
             Device.calculate_distance_moved()
             if Device.loc_data_dist_moved_km < .05:
                 return
-        elif Device.loc_data_latitude == 0.0:
-            return
 
         Device.can_update_sensors  = True
         Device.was_icloud_initial_locate_done = True
@@ -734,7 +736,6 @@ class iCloud3:
 
             Gb.trace_prefix = 'GETLOC'
             log_start_finish_update_banner('start', Device.devicename, 'icloud prefetch', '')
-            post_monitor_msg(Device.devicename, "iCloud Location Requested (prefetch)")
 
             Device.is_aadevdata_useable = \
                 icloud_data_handler.update_AADev_data(Device,
@@ -788,6 +789,9 @@ class iCloud3:
 
             if isnot_empty(Gb.AppleAcct_error_by_apple_id):
                 aas.retry_apple_acct_login_after_error()
+
+            # Refresh idle Apple Accts so the token stays valid, retry a failed signin
+            aas.keep_apple_accts_alive()
 
         # Every 15-minutes:
         #   - Refresh a device's distance to the other devices
@@ -1171,16 +1175,12 @@ class iCloud3:
         else:
             post_event(devicename, EVLOG_UPDATE_START)
 
-            self._post_before_update_monitor_msg(Device)
-
             self._determine_interval_and_next_update(Device)
 
             update_requested_by = 'Tracking' if Device.is_tracked else 'Monitor'
             from_zone = Device.FromZone_TrackFrom.from_zone
 
             self.post_tracking_results_header_bar(Device)
-
-        self._post_after_update_monitor_msg(Device)
 
         if Device.dev_data_source == ICLOUD and Device.AppleAcct:
             acct_name = Device.AppleAcct.account_owner_link
@@ -1462,6 +1462,14 @@ class iCloud3:
                 elif is_between(Device.dev_data_battery_level, 1, 19):
                     device_alert_msg = f"{Device.fname} > Low Battery ({Device.dev_data_battery_level}%)"
 
+            # Set Device prefix icons for paused and low battery
+            if Device.is_tracking_paused:
+                Device.set_button_prefix_icon(RED_STOP)
+            elif is_between(Device.dev_data_battery_level, 1, 20):
+                Device.set_button_prefix_icon(BATTERY_ICON)
+            elif Device.evlog_button_prefix_icon in [RED_STOP, BATTERY_ICON]:
+                Device.set_button_prefix_icon('')
+
             if device_alert_msg:
                 general_alert_msg += f"{GB_ITEM}{device_alert_msg}"
 
@@ -1528,30 +1536,6 @@ class iCloud3:
     #             Device.write_ha_sensor_state(INTERVAL, (f"WAIT-{wait_cnt}"))
 
     #         time.sleep(2)
-
-#--------------------------------------------------------------------
-    def _post_before_update_monitor_msg(self, Device):
-        """ Post a monitor msg for all other devices with this device's update reason """
-        return
-
-#--------------------------------------------------------------------
-    def _post_after_update_monitor_msg(self, Device):
-        """ Post a monitor event after the update with the result """
-        device_monitor_msg = (f"Device Monitor > {Device.dev_data_source}, "
-                            f"{Device.icloud_update_reason}, "
-                            f"AttrsZone-{Device.sensor_zone}, "
-                            f"LocDataZone-{Device.loc_data_zone}, "
-                            f"Located-%tage, "
-                            f"MobAppGPS-{Device.mobapp_data_fgps}, "
-                            f"MobAppState-{Device.mobapp_data_state}), "
-                            f"GPS-{Device.loc_data_fgps}")
-
-        if Device.last_device_monitor_msg != device_monitor_msg:
-            Device.last_device_monitor_msg = device_monitor_msg
-            device_monitor_msg = device_monitor_msg.\
-                        replace('%tage', Device.loc_data_time_age)
-            post_monitor_msg(Device.devicename, device_monitor_msg)
-
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #

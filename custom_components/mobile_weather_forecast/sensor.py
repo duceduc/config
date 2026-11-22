@@ -13,6 +13,8 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     PERCENTAGE,
+    EntityCategory,
+    UnitOfLength,
     UnitOfPrecipitationDepth,
     UnitOfPressure,
     UnitOfSpeed,
@@ -31,7 +33,10 @@ from .coordinator import MobileWeatherForecastConfigEntry, MobileWeatherForecast
 class MobileWeatherForecastSensorDescription(SensorEntityDescription):
     """Sensor description with its value reader."""
 
-    value_fn: Callable[[dict[str, Any]], Any]
+    value_fn: Callable[[dict[str, Any]], Any] | None = None
+    # Alternative readers working on the whole coordinator data (not only "current").
+    data_fn: Callable[[dict[str, Any]], Any] | None = None
+    attrs_fn: Callable[[dict[str, Any]], dict[str, Any]] | None = None
     icon_fn: Callable[[dict[str, Any]], str] | None = None
 
 
@@ -105,6 +110,31 @@ SENSORS: tuple[MobileWeatherForecastSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda c: c.get("pressure_msl"),
     ),
+    MobileWeatherForecastSensorDescription(
+        key="place",
+        translation_key="place",
+        icon="mdi:map-marker",
+        data_fn=lambda d: (d.get("place") or {}).get("name"),
+        attrs_fn=lambda d: {
+            k: v for k, v in (d.get("place") or {}).items() if k != "name" and v is not None
+        },
+    ),
+    MobileWeatherForecastSensorDescription(
+        key="elevation",
+        translation_key="elevation",
+        device_class=SensorDeviceClass.DISTANCE,
+        native_unit_of_measurement=UnitOfLength.METERS,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        data_fn=lambda d: d.get("elevation"),
+    ),
+    MobileWeatherForecastSensorDescription(
+        key="timezone",
+        translation_key="timezone",
+        icon="mdi:clock-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        data_fn=lambda d: d.get("timezone"),
+    ),
 )
 
 
@@ -142,7 +172,25 @@ class MobileWeatherForecastSensor(CoordinatorEntity[MobileWeatherForecastCoordin
 
     @property
     def native_value(self) -> Any:
-        return self.entity_description.value_fn(self.coordinator.data["current"])
+        description = self.entity_description
+        if description.data_fn is not None:
+            return description.data_fn(self.coordinator.data)
+        if description.value_fn is not None:
+            return description.value_fn(self.coordinator.data["current"])
+        return None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        if self.entity_description.attrs_fn is not None:
+            return self.entity_description.attrs_fn(self.coordinator.data)
+        return None
+
+    @property
+    def attribution(self) -> str | None:
+        place = self.coordinator.data.get("place") or {}
+        if self.entity_description.key == "place" and place.get("source") == "nominatim":
+            return "Place name \u00a9 OpenStreetMap contributors"
+        return super().attribution
 
     @property
     def icon(self) -> str | None:

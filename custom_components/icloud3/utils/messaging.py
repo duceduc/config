@@ -33,7 +33,7 @@ from ..const_char       import (GEAR_ICON, YELLOW_WARNING, SNOW_FLAKE, CRLF, CRL
                                 RARROW, NL, NL3, NL4, NLSP4, NL3U, NL3D, NL3_DATA, NL4_DATA, NBSP,
                                 NBSP2, NBSP3, NBSP4, NBSP5, NBSP6, DOT, HDOT, CRLF_INDENT, LINK,
                                 DASH_50, DASH_DOTTED_50, TAB_11, RED_ALERT, RED_STOP, RED_CIRCLE,
-                                GREEN_ALERT, )
+                                GREEN_ALERT, CIRCLE_STAR, )
 from ..const_more_info      import more_info_text
 from .utils                 import (obscure_field, instr, is_empty, isnot_empty, apple_user, dict_sort, list_to_str, )
 #from .time_util             import (format_day_date_time_now, )
@@ -342,14 +342,21 @@ def post_error_msg(devicename_or_Device, event_msg="+"):
     log_error_msg(log_msg)
 
 #--------------------------------------------------------------------
-def post_monitor_msg(devicename_or_Device, event_msg='+'):
+def post_rawdata(source, event_msg):
     '''
-    Post the event message and display it in Event Log and HA log
-    when the config parameter "log_level: eventlog" is specified or
-    the Show Tracking Monitors was selected in Event Log > Actions
+    Post the device data location traffic message and display it in Event Log
+
+    Source: Apple id or devicename
     '''
-    devicename, event_msg = _resolve_devicename_log_msg(devicename_or_Device, event_msg)
-    post_event(devicename, f"{EVLOG_MONITOR}{event_msg}")
+    if (source in Gb. Devices_by_devicename
+            and source not in Gb.log_level_devices):
+            return
+
+    # dot = '— ' if instr(event_msg, '@') else HDOT
+    # dot = '~ ' if instr(event_msg, '@') else HDOT
+    dot = RARROW if instr(event_msg, '@') else HDOT
+    # dot = DOT if instr(event_msg, '@') else HDOT
+    post_event(f"{EVLOG_MONITOR}{dot}{event_msg}")
 
 #-------------------------------------------------------------------------------------------
 def refresh_event_log(devicename='', show_one_screen=False):
@@ -364,7 +371,7 @@ def post_greenbar_msg(Device_or_greenbar_msg, greenbar_msg='+'):
         Device:
             If specified, display msg on this Device's EvLog screen only
             If not specified, display on all screens
-        greenbar_msg:
+        greenbar_msg
             Message to display -
     '''
     # See if the message is really in the Device parameter
@@ -477,7 +484,9 @@ def alert_source(Source=None, name=None):
     '''
     if Source in Gb.Devices:
         return Source, Source.devicename
-    if Source in Gb.AppleAccts:
+    # Gb.AppleAccts is rebuilt during startup, an existing AppleAcct is only in
+    # Gb.AppleAcct_by_apple_id until log_into_apple_accounts adds it back
+    if Source in Gb.AppleAccts or Source in Gb.AppleAcct_by_apple_id.values():
         return Source, Source.apple_id
 
     if isinstance(Source, str):
@@ -1180,12 +1189,21 @@ def log_exception_HA(err):
     Gb.HALogger.exception(err)
 
 #--------------------------------------------------------------------
-def log_info_msg(module_name, log_msg='+'):
+# def log_info_msg(module_name, log_msg='+'):
 
-    if module_name and log_msg == '': return
-    log_msg = _resolve_module_name_log_msg(module_name, log_msg)
+#     if module_name and log_msg == '': return
 
+#     log_msg = _resolve_module_name_log_msg(module_name, log_msg)
+def log_info_msg(devicename_or_Device, log_msg='+'):
+
+    if devicename_or_Device and log_msg == '': return
+
+    devicename, log_msg = _resolve_devicename_log_msg(devicename_or_Device, log_msg)
+
+    if devicename: devicename = f"{devicename} > "
+    log_msg = f"{devicename}{str(log_msg)}"
     log_msg = format_msg_line(log_msg)
+
     write_ic3log_recd(log_msg)
 
 #--------------------------------------------------------------------

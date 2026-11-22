@@ -75,7 +75,7 @@ cards:
               entity: climate.sr_ac_mode
               temperature_unit:
               input_select: input_select.sr_ac_mode
-              room_temp_target: sensor.sr_radar_temperature
+              room_temp_target: sensor.bt_proxy_shion_temperature
               battery:
               name: Shion
               expand_to:

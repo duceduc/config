@@ -118,14 +118,14 @@
 
   motion_shion_occupancy:
     entities:
-#      - binary_sensor.sr_radar_moving_target
+      - binary_sensor.bt_proxy_shion_moving_target
       - binary_sensor.shion_airfreshener_moving_target
 
   occupancy:
     - binary_sensor.aio_human_sensor_master_moving_target
     - binary_sensor.wc_airfreshener_moving_target
     - binary_sensor.shion_airfreshener_moving_target
-    - binary_sensor.sr_radar_moving_target
+    - binary_sensor.bt_proxy_shion_moving_target
     - binary_sensor.mr_human_sensor_moving_target
     - binary_sensor.hallway_moving_target
     - binary_sensor.genkan_moving_target

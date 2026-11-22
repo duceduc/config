@@ -50,8 +50,10 @@
         type: module
       - url: /local/custom_ui/honeycomb-menu.js?v=8
         type: module
-      - url: /local/custom_ui/simple-inventory-card.js?v2
-        type: module
+        
+#      - url: /local/custom_ui/simple-inventory-card.js?v2
+#        type: module
+
       - url: /local/custom_ui/ha-lcars-panel.js?v=4 # has css aswell
         type: module
 
