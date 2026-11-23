@@ -156,7 +156,7 @@ template:
             | count >= 1 )
             or
             (states.binary_sensor |
-                selectattr('entity_id', 'in', area_entities('Computer Room')) |
+                selectattr('entity_id', 'in', area_entities('Computer')) |
                 rejectattr('attributes.device_class', 'undefined') |
                 selectattr('attributes.device_class', 'search', '(occupancy|motion)') |
                 selectattr('state', 'eq', 'on') |

@@ -249,14 +249,6 @@ automation:
                       {{ (brightness_from + fade_speed * (wait.trigger.to_state.last_changed - trigger.to_state.last_changed).total_seconds()) | round(0) }}
       default: []
 
-
-
-
-
-
-
-
-
 ## Master Room Dimmer
 - alias: master room dimmer
   id: master_room_dimmer
@@ -341,3 +333,89 @@ automation:
                       {{ (brightness_from + fade_speed * (wait.trigger.to_state.last_changed - trigger.to_state.last_changed).total_seconds()) | round(0) }}
 
       default: []
+
+## Shower Room Dimmer
+- alias: shower room dimmer
+  id: shower_room_dimmer
+  mode: single
+  max_exceeded: silent
+
+  variables:
+    interval: 1
+    input_light: light.shower
+    fade_speed: 60
+    fade_off: 3
+    default_brightness: 255
+
+  triggers:
+    - trigger: state
+      entity_id: event.shower_room_action
+      not_from: 'unavailable'
+
+  conditions: []
+
+  actions:
+    - variables:
+        event: "{{ trigger.to_state.attributes.event_type }}"
+    - choose:
+        - conditions: "{{ event == 'on' }}"
+          sequence:
+            - wait_for_trigger:
+                - platform: state
+                  entity_id: event.shower_room_action
+                  not_from: 'unavailable'
+              timeout: '{{ interval }}'
+
+            - action: light.turn_on
+              target:
+                entity_id: '{{ input_light }}'
+              data:
+                brightness: "{{ 255 if wait.completed and wait.trigger.to_state.attributes.event_type == 'on' else default_brightness }}"
+
+        - conditions: "{{ event == 'off' }}"
+          sequence:
+            - wait_for_trigger:
+                - platform: state
+                  entity_id: event.shower_room_action
+                  not_from: 'unavailable'
+              timeout: '{{ interval }}'
+            - action: light.turn_off
+              target:
+                entity_id: '{{ input_light }}'
+              data:
+                transition: "{{ 0 if wait.completed and wait.trigger.to_state.attributes.event_type == 'off' else fade_off }}"
+
+        - conditions: "{{ event in ['brightness_move_down', 'brightness_move_up'] }}"
+          sequence:
+            - variables:
+                brightness_from: "{{ state_attr(input_light, 'brightness') | int(0)}}"
+                brightness_target: "{{ iif(event == 'brightness_move_down', 5, 255) }}"
+                brightness_delta: "{{ (brightness_from - brightness_target) | abs }}"
+                transition_time: "{{ brightness_delta / fade_speed }}"
+                fade_speed: "{{ fade_speed * iif(event == 'brightness_move_down', -1, 1) }}"
+
+            - action: light.turn_on
+              target:
+                entity_id: '{{ input_light }}'
+              data:
+                transition: '{{ transition_time }}'
+                brightness: '{{ brightness_target }}'
+
+            - wait_for_trigger:
+                - trigger: state
+                  entity_id: event.shower_room_action
+                  not_from: 'unavailable'
+              timeout: '{{ transition_time }}'
+              continue_on_timeout: false
+
+            - if: "{{ wait.trigger.to_state.attributes.event_type == 'brightness_stop' }}"
+              then:
+                - action: light.turn_on
+                  target:
+                    entity_id: '{{ input_light }}'
+                  data:
+                    brightness: >
+                      {{ (brightness_from + fade_speed * (wait.trigger.to_state.last_changed - trigger.to_state.last_changed).total_seconds()) | round(0) }}
+
+      default: []
+
