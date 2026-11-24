@@ -56,9 +56,9 @@ class SolsticeHubCoordinator(DataUpdateCoordinator[SeasonData]):
             hass,
             _LOGGER,
             name=DOMAIN,
+            config_entry=config_entry,
             update_interval=_calculate_time_until_midnight(),
         )
-        self.config_entry = config_entry
         self.hemisphere: str = config_entry.data[CONF_HEMISPHERE]
         self.mode: str = config_entry.data[CONF_MODE]
         self._unsub_event: Callable[[], None] | None = None

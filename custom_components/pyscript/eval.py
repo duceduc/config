@@ -13,7 +13,7 @@ import logging
 import sys
 import time
 import traceback
-from types import MethodType, TracebackType
+from types import CellType, CodeType, FunctionType, MethodType, TracebackType
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -95,6 +95,11 @@ WEBHOOK_METHODS = {
 }
 
 #
+# the message of the RuntimeError that Python raises when a StopIteration leaves a coroutine
+#
+STOP_ITERATION_REPLACED = "coroutine raised StopIteration"
+
+#
 # AstEval attributes that hold the scope a generator expression's elements are evaluated in
 #
 GENEXP_SCOPE_ATTRS = (
@@ -104,10 +109,12 @@ GENEXP_SCOPE_ATTRS = (
     "sym_table_stack",
     "curr_func",
     "genexp_iter",
+    "genexp_id",
     "code_str",
     "code_list",
     "class_sym_table",
     "class_global_names",
+    "loop_scopes",
 )
 
 
@@ -249,22 +256,83 @@ class EvalContinue(EvalStopFlow):
     _name = "continue"
 
 
+class LoopScope:
+    """The bindings a comprehension's loop variables replaced in a function's symbol table."""
+
+    MISSING = object()
+
+    def __init__(self, sym_table, var_names):
+        """Save the current bindings of var_names in sym_table."""
+        self.sym_table = sym_table
+        self.var_names = var_names
+        # the replaced bindings; a name that isn't here wasn't bound
+        self.saved = {name: sym_table[name] for name in var_names if name in sym_table}
+
+    def bindings(self):
+        """Return the current bindings of our names."""
+        return {name: self.sym_table.get(name, self.MISSING) for name in self.var_names}
+
+    def set_bindings(self, bindings):
+        """Bind each of our names to its entry in bindings, or remove it if it has none."""
+        for name in self.var_names:
+            entry = bindings.get(name, self.MISSING)
+            if entry is self.MISSING:
+                self.sym_table.pop(name, None)
+            else:
+                self.sym_table[name] = entry
+
+    def restore(self):
+        """Put back the saved bindings, returning the ones they replaced."""
+        current = self.bindings()
+        self.set_bindings(self.saved)
+        return current
+
+
+def lambda_param_names(lambda_ast):
+    """Return the parameter names of a lambda."""
+    args = lambda_ast.args
+    params = [arg.arg for arg in args.posonlyargs + args.args + args.kwonlyargs]
+    for arg in (args.vararg, args.kwarg):
+        if arg is not None:
+            params.append(arg.arg)
+    return set(params)
+
+
+def lambda_body_names(lambda_ast):
+    """Return the names used anywhere in a lambda's body, a superset of the ones it reads from outside."""
+    return {node.id for node in ast.walk(lambda_ast.body) if isinstance(node, ast.Name)}
+
+
+def strip_qualname_prefix(code, prefix):
+    """Return code, and the code nested in it (eg, an inner lambda), without prefix on their qualified names."""
+    consts = tuple(
+        strip_qualname_prefix(const, prefix) if isinstance(const, CodeType) else const
+        for const in code.co_consts
+    )
+    return code.replace(co_qualname=code.co_qualname.removeprefix(prefix), co_consts=consts)
+
+
 class EvalLocalVar:
     """Wrapper for local variable symtable entry."""
 
-    def __init__(self, name, **kwargs):
-        """Initialize value of local symbol."""
+    __slots__ = ("cell", "name")
+
+    def __init__(self, name, *value):
+        """Initialize local symbol, with the optional value; without one, it's undefined."""
         self.name = name
-        self.defined = False
-        if "value" in kwargs:
-            self.value = kwargs["value"]
-            self.defined = True
+        # the value is kept in a Python cell, so a lambda compiled to native code can share it
+        self.cell = CellType(*value)
 
     def get(self):
         """Get value of local symbol."""
-        if not self.defined:
-            raise NameError(f"name '{self.name}' is not defined")
-        return self.value
+        try:
+            return self.cell.cell_contents
+        except ValueError:
+            raise NameError(f"name '{self.name}' is not defined") from None
+
+    def get_cell(self):
+        """Get the Python cell that holds the value of local symbol."""
+        return self.cell
 
     def get_name(self):
         """Get name of local symbol."""
@@ -272,26 +340,42 @@ class EvalLocalVar:
 
     def set(self, value):
         """Set value of local symbol."""
-        self.value = value
-        self.defined = True
+        self.cell.cell_contents = value
 
     def is_defined(self):
         """Return whether value is defined."""
-        return self.defined
+        try:
+            _ = self.cell.cell_contents
+        except ValueError:
+            return False
+        return True
 
     def set_undefined(self):
         """Set local symbol to undefined."""
-        self.defined = False
+        if self.is_defined():
+            del self.cell.cell_contents
 
     def __getattr__(self, attr):
         """Get attribute of local variable."""
-        if not self.defined:
-            raise NameError(f"name '{self.name}' is not defined")
-        return getattr(self.value, attr)
+        if attr == "cell":
+            # not set yet (eg, while copying an instance), so don't recurse
+            raise AttributeError(attr)
+        return getattr(self.get(), attr)
 
     def __repr__(self):
         """Generate string with address and value."""
-        return f"EvalLocalVar @{hex(id(self))} = {self.value if self.defined else 'undefined'}"
+        return f"EvalLocalVar @{hex(id(self))} = {self.get() if self.is_defined() else 'undefined'}"
+
+
+class EvalLoopVar(EvalLocalVar):
+    """A comprehension's or generator expression's own loop variable."""
+
+    __slots__ = ("genexp_id",)
+
+    def __init__(self, name, genexp_id):
+        """Initialize loop variable, local to the generator expression with genexp_id (or None)."""
+        super().__init__(name)
+        self.genexp_id = genexp_id
 
 
 def is_pyscript_func(func):
@@ -319,6 +403,56 @@ def pyscript_property(obj, attr, hook):
                 return None
             return value
     return None
+
+
+# a super object forwards attribute reads to the classes it searches, and a metaclass can
+# intercept a class's, so these read the built-in members directly, as Python does
+SUPER_SELF = super.__dict__["__self__"].__get__
+SUPER_SELF_CLASS = super.__dict__["__self_class__"].__get__
+SUPER_THISCLASS = super.__dict__["__thisclass__"].__get__
+TYPE_MRO = type.__dict__["__mro__"].__get__
+TYPE_DICT = type.__dict__["__dict__"].__get__
+# an exception subclass can override these, which Python doesn't use when it raises or converts one
+EXC_TRACEBACK = BaseException.__dict__["__traceback__"].__get__
+EXC_WITH_TRACEBACK = BaseException.with_traceback
+
+
+def super_property(sup, attr):
+    """
+    Return the property whose getter Python would call for sup.attr, otherwise None.
+
+    Like Python, this searches the mro of sup.__self_class__ after sup.__thisclass__, and
+    stops at the first class that has attr. Python's super doesn't use the class's own
+    __getattribute__ or __getattr__, never searches for __class__, and returns the property
+    itself rather than calling its getter when sup.__self__ is sup.__self_class__, as for
+    super(C, cls) on a class.
+    """
+    self_class = SUPER_SELF_CLASS(sup)
+    if self_class is None or SUPER_SELF(sup) is self_class or attr == "__class__":
+        return None
+    mro = TYPE_MRO(self_class)
+    thisclass = SUPER_THISCLASS(sup)
+    for start, klass in enumerate(mro):
+        if klass is thisclass:
+            break
+    else:
+        # __thisclass__ is no longer in the mro (e.g. __bases__ changed); Python raises its own error
+        return None
+    for klass in mro[start + 1 :]:
+        klass_dict = TYPE_DICT(klass)
+        if attr in klass_dict:
+            value = klass_dict[attr]
+            return value if type(value) is property else None  # pylint: disable=unidiomatic-typecheck
+    return None
+
+
+def unwrap_stop_iteration(exc):
+    """Return the StopIteration that Python replaced when it left one of our coroutines, else exc."""
+    # pylint: disable=unidiomatic-typecheck
+    if type(exc) is RuntimeError and issubclass(type(exc.__cause__), StopIteration) and len(exc.args) == 1:
+        if type(exc.args[0]) is str and exc.args[0] == STOP_ITERATION_REPLACED:
+            return exc.__cause__
+    return exc
 
 
 class EvalName:
@@ -404,7 +538,6 @@ class EvalFunc:
         self.code_str = code_str
         self.trigger = []
         self.trigger_service = set()
-        self.has_closure = False
         self.async_func = async_func
 
     def get_name(self):
@@ -718,7 +851,6 @@ class EvalFunc:
         var_names = set(args)
         self.local_names = set(args)
         for stmt in self.func_def.body:
-            self.has_closure = self.has_closure or await self.check_for_closure(stmt)
             var_names = var_names.union(
                 await ast_ctx.get_names(
                     stmt,
@@ -736,8 +868,8 @@ class EvalFunc:
                 continue
 
             if var_name in self.local_names and var_name not in nonlocal_names:
-                if self.has_closure:
-                    self.local_sym_table[var_name] = EvalLocalVar(var_name)
+                # our own variable, which gets a new EvalLocalVar for each call
+                self.local_sym_table[var_name] = None
                 continue
 
             if var_name in nonlocal_names:
@@ -831,8 +963,8 @@ class EvalFunc:
             raise TypeError(f"{self.name}() called with too many positional arguments")
         for name, value in self.local_sym_table.items():
             if name in sym_table:
-                sym_table[name] = EvalLocalVar(name, value=sym_table[name])
-            elif value.is_defined():
+                sym_table[name] = EvalLocalVar(name, sym_table[name])
+            elif value is not None and value.is_defined():
                 sym_table[name] = value
             else:
                 sym_table[name] = EvalLocalVar(name)
@@ -857,8 +989,8 @@ class EvalFunc:
         code_str, code_list = ast_ctx.code_str, ast_ctx.code_list
         ast_ctx.code_str, ast_ctx.code_list = self.code_str, self.code_list
         prev_func = ast_ctx.curr_func
-        prev_genexp_iter = ast_ctx.genexp_iter
-        ast_ctx.genexp_iter = None
+        prev_genexp = ast_ctx.genexp_iter, ast_ctx.genexp_id
+        ast_ctx.genexp_iter = ast_ctx.genexp_id = None
         save_user_locals = ast_ctx.user_locals
         ast_ctx.user_locals = {}
         ast_ctx.curr_func = self
@@ -872,7 +1004,7 @@ class EvalFunc:
             return None
         finally:
             ast_ctx.curr_func = prev_func
-            ast_ctx.genexp_iter = prev_genexp_iter
+            ast_ctx.genexp_iter, ast_ctx.genexp_id = prev_genexp
             ast_ctx.user_locals = save_user_locals
             ast_ctx.code_str, ast_ctx.code_list = code_str, code_list
             if prev_sym_table is not None:
@@ -884,15 +1016,6 @@ class EvalFunc:
                 ) = prev_sym_table
             else:
                 ast_ctx.sym_table = ast_ctx.sym_table_stack.pop()
-
-    async def check_for_closure(self, arg):
-        """Recursively check ast tree arg and return True if there is an inner function or class."""
-        if isinstance(arg, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
-            return True
-        for child in ast.iter_child_nodes(arg):
-            if await self.check_for_closure(child):
-                return True
-        return False
 
 
 class EvalFuncVar:
@@ -1007,6 +1130,7 @@ class AstEval:
         self.user_locals: SymTable = {}
         self.curr_func: EvalFunc | None = None
         self.genexp_iter = None  # the outermost iterator of the generator expression being evaluated
+        self.genexp_id = None  # an object that identifies that generator expression
         self.filename = name
         self.code_str: str | None = None
         self.code_list: list[str] | None = None
@@ -1018,6 +1142,7 @@ class AstEval:
         self.class_sym_table: SymTable | None = None
         self.class_cell: list[type | None] | None = None
         self.class_global_names: set[str] = set()
+        self.loop_scopes: tuple[LoopScope, ...] = ()
         self.class_pending_annotations: list[tuple[str, ast.expr]] = []
 
     async def ast_not_implemented(self, arg, *args):
@@ -1348,21 +1473,92 @@ class AstEval:
             sym_table[name] = func_var
 
     async def ast_lambda(self, arg):
-        """Evaluate lambda definition by compiling a regular function."""
-        name = "__lambda_defn_temp__"
-        await self.aeval(
-            ast.FunctionDef(
-                args=arg.args,
-                body=[ast.Return(value=arg.body, lineno=arg.body.lineno, col_offset=arg.body.col_offset)],
-                name=name,
-                decorator_list=[ast.Name(id="pyscript_compile", ctx=ast.Load())],
-                lineno=arg.lineno,
-                col_offset=arg.col_offset,
+        """Evaluate lambda definition by compiling it to a native Python function."""
+        lambda_args = arg.args
+        # as in Python, the defaults are evaluated now, in this scope
+        defaults = [await self.aeval(default) for default in lambda_args.defaults]
+        kw_defaults = {}
+        for kwonlyarg, default in zip(lambda_args.kwonlyargs, lambda_args.kw_defaults, strict=True):
+            if default is not None:
+                kw_defaults[kwonlyarg.arg] = await self.aeval(default)
+        #
+        # In a function, the lambda can read the function's variables (and the ones it shares
+        # with enclosing functions). Compile the lambda inside a native function that has those
+        # names as its parameters, so Python's compiler works out which of them the lambda reads,
+        # exactly as Python would; they become the lambda's free variables, which we bind to the
+        # cells of our EvalLocalVar variables, so the lambda reads their current values.
+        #
+        enclosing_names = []
+        if self.in_local_scope():
+            enclosing_names = sorted(
+                name
+                for name in lambda_body_names(arg) - lambda_param_names(arg)
+                if isinstance(self.sym_table.get(name), EvalLocalVar)
             )
-        )
-        func = self.sym_table[name]
-        del self.sym_table[name]
+        lambda_code = self.cached_lambda_code(arg, enclosing_names)
+        closure = tuple(self.sym_table[name].get_cell() for name in lambda_code.co_freevars)
+        # as in Python, a lambda without defaults has __defaults__ None
+        func = FunctionType(lambda_code, self.global_sym_table, None, tuple(defaults) or None, closure)
+        if kw_defaults:
+            func.__kwdefaults__ = kw_defaults
         return func
+
+    def lambda_free_names(self, arg):
+        """Return the names a lambda reads from the scope it's in, exactly as Python works them out."""
+        candidates = sorted(lambda_body_names(arg))
+        try:
+            return set(self.cached_lambda_code(arg, candidates).co_freevars)
+        except SyntaxError:
+            # its body isn't native Python, so it fails when it's evaluated; until then, assume any name
+            return set(candidates) - lambda_param_names(arg)
+
+    def cached_lambda_code(self, arg, enclosing_names):
+        """Return the compiled code of a lambda that can read enclosing_names, compiling it once."""
+        # the compiled code depends only on the lambda and the names it might read from here
+        cache_key = (tuple(enclosing_names), self.filename)
+        code_cache = arg.__dict__.setdefault("pyscript_lambda_code", {})
+        lambda_code = code_cache.get(cache_key)
+        if lambda_code is None:
+            lambda_code = code_cache[cache_key] = self.compile_lambda(arg, enclosing_names)
+        return lambda_code
+
+    def compile_lambda(self, arg, enclosing_names):
+        """Compile a lambda to native code, inside a function whose parameters are enclosing_names."""
+        lambda_args = arg.args
+        native_lambda = ast.Lambda(
+            args=ast.arguments(
+                posonlyargs=lambda_args.posonlyargs,
+                args=lambda_args.args,
+                vararg=lambda_args.vararg,
+                kwonlyargs=lambda_args.kwonlyargs,
+                kw_defaults=[None] * len(lambda_args.kwonlyargs),
+                kwarg=lambda_args.kwarg,
+                defaults=[],
+            ),
+            body=arg.body,
+        )
+        scope_func = ast.FunctionDef(
+            name="__lambda_scope__",
+            args=ast.arguments(
+                posonlyargs=[],
+                args=[ast.arg(arg=name) for name in enclosing_names],
+                kwonlyargs=[],
+                kw_defaults=[],
+                defaults=[],
+            ),
+            body=[ast.Return(value=native_lambda)],
+            decorator_list=[],
+        )
+        for node in (native_lambda, native_lambda.args, scope_func, scope_func.args, *scope_func.args.args):
+            ast.copy_location(node, arg)
+        ast.fix_missing_locations(scope_func)
+        module_code = compile(
+            ast.Module(body=[scope_func], type_ignores=[]), filename=self.filename, mode="exec"
+        )
+        scope_code = next(const for const in module_code.co_consts if isinstance(const, CodeType))
+        lambda_code = next(const for const in scope_code.co_consts if isinstance(const, CodeType))
+        lambda_code = strip_qualname_prefix(lambda_code, f"{scope_func.name}.<locals>.")
+        return lambda_code
 
     async def ast_asyncfunctiondef(self, arg):
         """Evaluate async function definition."""
@@ -1376,6 +1572,8 @@ class AstEval:
                 if isinstance(val, EvalStopFlow):
                     return val
         except Exception as err:
+            # match and bind the StopIteration Python replaced; if nothing matches, raise err unchanged
+            visible_err = unwrap_stop_iteration(err)
             for handler in arg.handlers:
                 match = False
                 if handler.type:
@@ -1383,7 +1581,7 @@ class AstEval:
                     if not isinstance(exc_list, tuple):
                         exc_list = [exc_list]
                     for exc in exc_list:
-                        if isinstance(err, exc):
+                        if isinstance(visible_err, exc):
                             match = True
                             break
                 else:
@@ -1393,9 +1591,9 @@ class AstEval:
                         if handler.name in self.sym_table and isinstance(
                             self.sym_table[handler.name], EvalLocalVar
                         ):
-                            self.sym_table[handler.name].set(err)
+                            self.sym_table[handler.name].set(visible_err)
                         else:
-                            self.sym_table[handler.name] = err
+                            self.sym_table[handler.name] = visible_err
                     try:
                         for arg1 in handler.body:
                             val = await self.aeval(arg1)
@@ -1403,7 +1601,11 @@ class AstEval:
                                 return val
                     finally:
                         if handler.name is not None:
-                            del self.sym_table[handler.name]
+                            if isinstance(self.sym_table.get(handler.name), EvalLocalVar):
+                                # like del, so a lambda or inner function sharing it sees it's unbound
+                                self.sym_table[handler.name].set_undefined()
+                            else:
+                                self.sym_table.pop(handler.name, None)
                     break
             else:
                 raise err
@@ -1460,8 +1662,10 @@ class AstEval:
             # unlike Python, the exit can't suppress these, so tasks can always be stopped
             await self.call_func(exit_func, exit_attr, manager, *sys.exc_info())
             raise
-        except Exception:  # pylint: disable=broad-exception-caught
-            if not await self.call_func(exit_func, exit_attr, manager, *sys.exc_info()):
+        except Exception as err:  # pylint: disable=broad-exception-caught
+            # pass __exit__ the StopIteration Python replaced; if it isn't suppressed, raise err unchanged
+            exc = unwrap_stop_iteration(err)
+            if not await self.call_func(exit_func, exit_attr, manager, type(exc), exc, EXC_TRACEBACK(exc)):
                 raise
             return None
         await self.call_func(exit_func, exit_attr, manager, None, None, None)
@@ -1568,6 +1772,10 @@ class AstEval:
                 )
             self.assign_name(var_name, val)
 
+    def in_local_scope(self):
+        """Return whether names are bound in a function's local scope, not at module level or in a class body."""
+        return self.sym_table is not self.global_sym_table and self.sym_table is not self.class_sym_table
+
     def binds_global(self, var_name):
         """Return whether var_name is bound in the global symbol table by a global declaration."""
         if self.sym_table is self.class_sym_table:
@@ -1606,6 +1814,11 @@ class AstEval:
         """Execute type hint assignment statement and track __annotations__."""
         if isinstance(arg.target, ast.Name):
             annotations = self.sym_table.setdefault("__annotations__", {})
+            if isinstance(annotations, EvalLocalVar):
+                # a function's own __annotations__ variable
+                if not annotations.is_defined():
+                    annotations.set({})
+                annotations = annotations.get()
             if arg.annotation:
                 try:
                     annotations[arg.target.id] = await self.aeval(arg.annotation)
@@ -1696,6 +1909,12 @@ class AstEval:
             return EvalAttrSet(val, arg.attr)
         if arg.attr == "__init__" and (init_func := self.init_attr(val)) is not None:
             return init_func
+        if type(val) is super:  # pylint: disable=unidiomatic-typecheck
+            prop = super_property(val, arg.attr)
+            # check the getter's real type, since isinstance() would read a native getter's __class__
+            if prop is not None and issubclass(type(prop.fget), (EvalFunc, EvalFuncVar)):
+                # as in Python, an AttributeError from the getter isn't passed to __getattr__
+                return await prop.fget.call(self, SUPER_SELF(val))
         prop = pyscript_property(val, arg.attr, "__getattribute__")
         if prop is not None and is_pyscript_func(prop.fget):
             try:
@@ -1731,15 +1950,26 @@ class AstEval:
             # now check in our current symbol table, and then some other places
             #
             if arg.id in self.sym_table:
-                if isinstance(self.sym_table[arg.id], EvalLocalVar):
-                    if (
-                        self.curr_func
-                        and arg.id in self.curr_func.local_names
-                        and not self.sym_table[arg.id].is_defined()
-                    ):
+                val = self.sym_table[arg.id]
+                if isinstance(val, EvalLocalVar):
+                    try:
+                        return val.cell.cell_contents
+                    except ValueError:
+                        pass
+                    # in a generator expression, the function's variables and an enclosing generator
+                    # expression's loop variables are free variables, so an empty one gives NameError
+                    if isinstance(val, EvalLoopVar):
+                        is_local = val.genexp_id is self.genexp_id
+                    else:
+                        is_local = (
+                            self.curr_func
+                            and self.genexp_id is None
+                            and arg.id in self.curr_func.local_names
+                        )
+                    if is_local:
                         raise UnboundLocalError(f"local variable '{arg.id}' referenced before assignment")
-                    return self.sym_table[arg.id].get()
-                return self.sym_table[arg.id]
+                    return val.get()
+                return val
             if arg.id in self.local_sym_table:
                 return self.local_sym_table[arg.id]
             if arg.id in self.global_sym_table:
@@ -1936,24 +2166,46 @@ class AstEval:
             )
         return lvars, {var: self.sym_table[var] for var in lvars if var in self.sym_table}
 
-    async def loopvar_scope_restore(self, var_names, save_vars):
-        """Restore current scope variables that match looping target vars."""
-        for var_name in var_names:
-            if var_name in save_vars:
-                self.sym_table[var_name] = save_vars[var_name]
-            else:
-                try:
-                    del self.sym_table[var_name]
-                except KeyError:
-                    # If the iterator was empty, the loop variables were never
-                    # assigned to, so deleting them will fail.
-                    pass
+    def shares_locals(self):
+        """Return whether we're running a function, whose variables inner functions and lambdas can share."""
+        return self.in_local_scope() and self.curr_func is not None
 
-    async def listcomp_loop(self, generators, elt):
+    def new_loop_vars(self, var_names, genexp_id):
+        """Return new local variables for a comprehension's loop vars, which a lambda in it can share."""
+        if not self.shares_locals():
+            return {}
+        # loop variables bound by a global declaration stay global
+        return {
+            var_name: EvalLoopVar(var_name, genexp_id)
+            for var_name in var_names
+            if var_name.isidentifier() and not self.binds_global(var_name)
+        }
+
+    async def loopvar_scope_enter(self, generators):
+        """Save current scope variables that match looping target vars, and give the loop vars their own."""
+        var_names, _ = await self.loopvar_scope_save(generators)
+        loop_scope = LoopScope(self.sym_table, var_names)
+        prev_loop_scopes = self.loop_scopes
+        if self.shares_locals():
+            #
+            # in a function, the loop variables are new locals, so the function's own variables
+            # with these names aren't changed; a generator expression made before this
+            # comprehension sees the bindings they replace (see genexp_loop)
+            #
+            self.loop_scopes = (*prev_loop_scopes, loop_scope)
+            self.sym_table.update(self.new_loop_vars(var_names, self.genexp_id))
+        return loop_scope, prev_loop_scopes
+
+    async def loopvar_scope_exit(self, loop_scope, prev_loop_scopes):
+        """Restore current scope variables that match looping target vars."""
+        loop_scope.restore()
+        self.loop_scopes = prev_loop_scopes
+
+    async def listcomp_loop(self, generators, elt, loop_iter):
         """Recursive list comprehension."""
         out = []
         gen = generators[0]
-        for loop_var in await self.aeval(gen.iter):
+        for loop_var in loop_iter:
             await self.recurse_assign(gen.target, loop_var)
             for cond in gen.ifs:
                 if not await self.aeval(cond):
@@ -1962,15 +2214,20 @@ class AstEval:
                 if len(generators) == 1:
                     out.append(await self.aeval(elt))
                 else:
-                    out += await self.listcomp_loop(generators[1:], elt)
+                    out += await self.listcomp_loop(
+                        generators[1:], elt, await self.aeval(generators[1].iter)
+                    )
         return out
 
     async def ast_listcomp(self, arg):
         """Evaluate list comprehension."""
-        target_vars, save_values = await self.loopvar_scope_save(arg.generators)
-        result = await self.listcomp_loop(arg.generators, arg.elt)
-        await self.loopvar_scope_restore(target_vars, save_values)
-        return result
+        # as in Python, the outermost iterable is evaluated in the enclosing scope
+        loop_iter = await self.aeval(arg.generators[0].iter)
+        loop_scope, prev_loop_scopes = await self.loopvar_scope_enter(arg.generators)
+        try:
+            return await self.listcomp_loop(arg.generators, arg.elt, loop_iter)
+        finally:
+            await self.loopvar_scope_exit(loop_scope, prev_loop_scopes)
 
     async def ast_tuple(self, arg):
         """Evaluate Tuple."""
@@ -1987,11 +2244,11 @@ class AstEval:
                 val[await self.aeval(key_ast)] = this_val
         return val
 
-    async def dictcomp_loop(self, generators, key, value):
+    async def dictcomp_loop(self, generators, key, value, loop_iter):
         """Recursive dict comprehension."""
         out = {}
         gen = generators[0]
-        for loop_var in await self.aeval(gen.iter):
+        for loop_var in loop_iter:
             await self.recurse_assign(gen.target, loop_var)
             for cond in gen.ifs:
                 if not await self.aeval(cond):
@@ -2004,15 +2261,21 @@ class AstEval:
                     key_val = await self.aeval(key)
                     out[key_val] = await self.aeval(value)
                 else:
-                    out.update(await self.dictcomp_loop(generators[1:], key, value))
+                    out.update(
+                        await self.dictcomp_loop(
+                            generators[1:], key, value, await self.aeval(generators[1].iter)
+                        )
+                    )
         return out
 
     async def ast_dictcomp(self, arg):
         """Evaluate dict comprehension."""
-        target_vars, save_values = await self.loopvar_scope_save(arg.generators)
-        result = await self.dictcomp_loop(arg.generators, arg.key, arg.value)
-        await self.loopvar_scope_restore(target_vars, save_values)
-        return result
+        loop_iter = await self.aeval(arg.generators[0].iter)
+        loop_scope, prev_loop_scopes = await self.loopvar_scope_enter(arg.generators)
+        try:
+            return await self.dictcomp_loop(arg.generators, arg.key, arg.value, loop_iter)
+        finally:
+            await self.loopvar_scope_exit(loop_scope, prev_loop_scopes)
 
     async def ast_set(self, arg):
         """Evaluate set."""
@@ -2021,11 +2284,11 @@ class AstEval:
             ret.add(elt)
         return ret
 
-    async def setcomp_loop(self, generators, elt):
+    async def setcomp_loop(self, generators, elt, loop_iter):
         """Recursive list comprehension."""
         out = set()
         gen = generators[0]
-        for loop_var in await self.aeval(gen.iter):
+        for loop_var in loop_iter:
             await self.recurse_assign(gen.target, loop_var)
             for cond in gen.ifs:
                 if not await self.aeval(cond):
@@ -2034,15 +2297,19 @@ class AstEval:
                 if len(generators) == 1:
                     out.add(await self.aeval(elt))
                 else:
-                    out.update(await self.setcomp_loop(generators[1:], elt))
+                    out.update(
+                        await self.setcomp_loop(generators[1:], elt, await self.aeval(generators[1].iter))
+                    )
         return out
 
     async def ast_setcomp(self, arg):
         """Evaluate set comprehension."""
-        target_vars, save_values = await self.loopvar_scope_save(arg.generators)
-        result = await self.setcomp_loop(arg.generators, arg.elt)
-        await self.loopvar_scope_restore(target_vars, save_values)
-        return result
+        loop_iter = await self.aeval(arg.generators[0].iter)
+        loop_scope, prev_loop_scopes = await self.loopvar_scope_enter(arg.generators)
+        try:
+            return await self.setcomp_loop(arg.generators, arg.elt, loop_iter)
+        finally:
+            await self.loopvar_scope_exit(loop_scope, prev_loop_scopes)
 
     async def genexp_next(self, arg, iters):
         """Evaluate the next element of a generator expression, returning it in a tuple, or () at the end."""
@@ -2065,14 +2332,14 @@ class AstEval:
                 iters.append(iter(await self.aeval(generators[level + 1].iter)))
         return ()
 
-    def genexp_loop(self, arg, iters, loop_vars, scope, loop):
+    def genexp_loop(self, arg, iters, loop_vars, gen_vars, gen_scope, scope, loop):
         """Yield the elements of a generator expression, evaluating each one only when it's asked for."""
         #
         # native code (eg, sum(), any() or "".join()) iterates synchronously, so each element is
         # evaluated by running our async code to completion without returning to the event loop,
         # in the scope where the generator expression was created
         #
-        gen_vars = {}
+        gen_loop_scopes = (*scope["loop_scopes"], gen_scope)
         while True:
             try:
                 running_loop = asyncio.get_running_loop()
@@ -2086,14 +2353,42 @@ class AstEval:
                 setattr(self, attr, value)
             self.sym_table_stack = scope["sym_table_stack"].copy()
             sym_table = self.sym_table
+            #
+            # a comprehension started after we were made (eg, the one iterating over us) has
+            # its own loop variables in this scope; put back the bindings it replaced, newest first
+            #
+            hidden = []
+            if save_scope["loop_scopes"] is not scope["loop_scopes"]:
+                hidden = [
+                    (loop_scope, loop_scope.restore())
+                    for loop_scope in reversed(save_scope["loop_scopes"])
+                    if loop_scope.sym_table is sym_table and loop_scope not in scope["loop_scopes"]
+                ]
             # the loop variables are in their own scope, so hide any with the same names in this one
             outer_vars = {var: sym_table.pop(var) for var in loop_vars if var in sym_table}
             sym_table.update(gen_vars)
+            if gen_scope is not None:
+                # they replace bindings too, for any generator expression an element uses
+                gen_scope.saved = outer_vars
+                self.loop_scopes = gen_loop_scopes
             coro = self.genexp_next(arg, iters)
+            stop = None
             try:
                 coro.send(None)  # pylint: disable=no-member
             except StopIteration as exc:
                 elt = exc.value
+            except RuntimeError as exc:
+                # an element, a condition or an inner iterable raised StopIteration
+                stop = unwrap_stop_iteration(exc)
+                if stop is exc:
+                    raise
+                # keep the script frames, which are on the RuntimeError's traceback, before its own
+                stop_tb, frames, tb = EXC_TRACEBACK(stop), [], exc.__traceback__
+                while tb:
+                    frames.append(tb)
+                    tb = tb.tb_next
+                for tb in reversed(frames):
+                    stop_tb = TracebackType(stop_tb, tb.tb_frame, tb.tb_lasti, tb.tb_lineno)
             else:
                 #
                 # the element has to wait, which can't be done here, so stop it; whatever
@@ -2110,8 +2405,15 @@ class AstEval:
             finally:
                 gen_vars = {var: sym_table.pop(var) for var in loop_vars if var in sym_table}
                 sym_table.update(outer_vars)
+                # an assignment in the element (eg, with :=) sets the value of a binding we put back
+                # but doesn't replace the binding, so swapping the bindings again keeps the value
+                for loop_scope, bindings in reversed(hidden):
+                    loop_scope.set_bindings(bindings)
                 for attr, value in save_scope.items():
                     setattr(self, attr, value)
+            if stop is not None:
+                # raised outside the handler, so Python gives RuntimeError("generator raised StopIteration")
+                raise EXC_WITH_TRACEBACK(stop, stop_tb)
             if not elt:
                 return
             yield elt[0]
@@ -2121,10 +2423,14 @@ class AstEval:
         # as in Python, the outermost iterable is evaluated right away
         iters = [iter(await self.aeval(arg.generators[0].iter))]
         loop_vars, _ = await self.loopvar_scope_save(arg.generators)
+        genexp_id = object()
+        gen_vars = self.new_loop_vars(loop_vars, genexp_id)
+        gen_scope = LoopScope(self.sym_table, loop_vars) if self.shares_locals() else None
         scope = {attr: getattr(self, attr) for attr in GENEXP_SCOPE_ATTRS}
         scope["sym_table_stack"] = self.sym_table_stack.copy()
         scope["genexp_iter"] = iters[0]  # what Python passes to the generator as its first argument
-        gen = self.genexp_loop(arg, iters, loop_vars, scope, asyncio.get_running_loop())
+        scope["genexp_id"] = genexp_id
+        gen = self.genexp_loop(arg, iters, loop_vars, gen_vars, gen_scope, scope, asyncio.get_running_loop())
         gen.__name__ = gen.__qualname__ = "<genexpr>"
         return gen
 
@@ -2224,7 +2530,7 @@ class AstEval:
             raise RuntimeError("super(): empty __class__ cell")
         first_arg = self.sym_table.get(func_args[0].arg, EvalLocalVar(func_args[0].arg))
         if isinstance(first_arg, EvalLocalVar):
-            # a method that defines a function keeps its local variables in EvalLocalVars
+            # a method keeps its local variables in EvalLocalVars
             if not first_arg.is_defined():
                 raise RuntimeError("super(): arg[0] deleted")
             first_arg = first_arg.get()
@@ -2394,7 +2700,7 @@ class AstEval:
                     for name in await self.get_target_names(target):
                         local_names.add(name)
                         names.add(name)
-            elif cls_name in {"AugAssign", "For", "AsyncFor", "NamedExpr"}:
+            elif cls_name in {"AnnAssign", "AugAssign", "For", "AsyncFor", "NamedExpr"}:
                 for name in await self.get_target_names(arg.target):
                     local_names.add(name)
                     names.add(name)
@@ -2404,10 +2710,6 @@ class AstEval:
                         for name in await self.get_target_names(item.optional_vars):
                             local_names.add(name)
                             names.add(name)
-            elif cls_name in {"ListComp", "DictComp", "SetComp"}:
-                target_vars, _ = await self.loopvar_scope_save(arg.generators)
-                for name in target_vars:
-                    local_names.add(name)
             elif cls_name in {"Import", "ImportFrom"}:
                 # imported names are local too, so nested functions can share their binding
                 for alias in arg.names:
@@ -2442,6 +2744,12 @@ class AstEval:
                     if name not in inner_local and name not in inner_global:
                         names.add(name)
                 return
+            elif cls_name == "Lambda":
+                # the defaults are in this scope; nothing in the body binds a name here
+                for default in arg.args.defaults + [kwd for kwd in arg.args.kw_defaults if kwd is not None]:
+                    await self.get_names_set(default, names, nonlocal_names, global_names, local_names)
+                names.update(self.lambda_free_names(arg))
+                return
             elif cls_name == "Delete":
                 for arg1 in arg.targets:
                     if isinstance(arg1, ast.Name):
@@ -2472,6 +2780,88 @@ class AstEval:
             self.code_str = code_str
             self.code_list = []
         self.ast = ast.parse(self.code_str, filename=self.filename, mode=mode)
+
+    def parse_trigger_expr(self, expr: str) -> None:
+        r"""
+        Parse a trigger expression.
+
+        Blanks around it are stripped. If it still has a line break, it is parsed unstripped as
+        "(" + expr + "\n)", so it needs no brackets of its own and keeps its line numbers; positions
+        on its first line move back by the added "(". Nothing that is valid only because of the
+        added brackets is accepted; what parsed before (stripped) still parses as before.
+        """
+        stripped = expr.strip(" \t\r\n") if isinstance(expr, str) else expr
+        if not isinstance(stripped, str) or ("\n" not in stripped and "\r" not in stripped):
+            self.parse(stripped, mode="eval")
+            return
+        self.ast = None
+        self.code_str = expr
+        # Python reads "\r\n" and "\r" as "\n"; joining with "\n" keeps the added ")" on a line of its own
+        self.code_list = expr.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+        source = "\n".join(self.code_list)
+        try:
+            tree = ast.parse("(" + source + "\n)", filename=self.filename, mode="eval")
+        except SyntaxError as exc:
+            raise self._trigger_syntax_error(
+                exc.msg, exc.lineno, exc.offset, exc.end_lineno, exc.end_offset
+            ) from None
+        top, msg = tree.body, None
+        if (top.lineno, top.col_offset) == (1, 0):
+            # Python's parser says it starts at the added "(", so it needs that bracket
+            if isinstance(top, ast.Tuple):
+                msg = "tuple must be inside brackets" if top.elts else "expression is empty"
+            elif isinstance(top, ast.GeneratorExp):
+                msg = "generator expression must be inside brackets"
+            else:
+                msg = "unmatched ')'"
+        elif isinstance(top, (ast.NamedExpr, ast.Yield, ast.YieldFrom)):
+            # a bare ":=" or yield is an error as a keyword value, a bracketed one isn't
+            try:
+                ast.parse("f(value=" + source + "\n)", mode="eval")
+            except SyntaxError:
+                msg = ("':='" if isinstance(top, ast.NamedExpr) else "'yield'") + " must be inside brackets"
+        if msg:
+            try:
+                ast.parse(stripped, mode="eval")
+            except SyntaxError:
+                # point at the first part of it that the user wrote
+                starts = [
+                    (node.lineno, node.col_offset) for node in ast.walk(top) if hasattr(node, "lineno")
+                ]
+                lineno, col = min((start for start in starts if start != (1, 0)), default=(1, 1))
+                raise self._trigger_syntax_error(msg, lineno, col + 1) from None
+            # valid without the added brackets, like "a, b" then a "# comment" line: parse it as before
+            self.parse(stripped, mode="eval")
+            return
+        for node in ast.walk(tree):
+            if getattr(node, "lineno", None) == 1:
+                node.col_offset -= 1
+            if getattr(node, "end_lineno", None) == 1:
+                node.end_col_offset -= 1
+        self.ast = tree
+
+    def _trigger_syntax_error(
+        self,
+        msg: str,
+        lineno: int | None,
+        offset: int | None,
+        end_lineno: int | None = None,
+        end_offset: int | None = None,
+    ) -> SyntaxError:
+        r"""Return a SyntaxError, its position in "(" + expr + "\n)" moved onto the expression as written."""
+
+        def move(lineno: int, offset: int) -> tuple[int, int]:
+            if lineno > len(self.code_list):
+                # on the added ")": point at the end of the last line that isn't blank
+                lineno = max((idx for idx, line in enumerate(self.code_list, 1) if line.strip()), default=1)
+                return lineno, len(self.code_list[lineno - 1].rstrip())
+            return lineno, max(offset - (lineno == 1), 1)
+
+        start = move(lineno or 1, offset or 1)
+        end = move(end_lineno, end_offset or 1) if end_lineno else start
+        if end <= start:
+            end = (start[0], start[1] + 1)
+        return SyntaxError(msg, (self.filename, start[0], start[1], self.code_list[start[0] - 1], *end))
 
     def log_exception(self, exc: Exception) -> None:
         """Log eval exception."""
@@ -2587,9 +2977,10 @@ class AstEval:
 class EvalExceptionFormatter:
     """Format exceptions using pyscript-aware traceback frames."""
 
-    def __init__(self, exc: BaseException) -> None:
+    def __init__(self, exc: BaseException, seen: set[int] | None = None) -> None:
         """Initialize exception formatter state."""
-        self.exc = exc
+        # show the StopIteration Python replaced, with the script frames from the replacement's traceback
+        self.exc = unwrap_stop_iteration(exc)
 
         self.current_func: str | None = None
         self.current_code_list: list[str] | None = None
@@ -2600,15 +2991,29 @@ class EvalExceptionFormatter:
         self.end_col_offset: int = 0
 
         self.stack = traceback.StackSummary()
-        self._build_stack()
+        self._build_stack(exc.__traceback__)
+        if self.exc is not exc:
+            self._build_stack(self.exc.__traceback__)
         self.chained_msg: str | None = None
         self.chained_exc: EvalExceptionFormatter | None = None
-        if exc.__cause__ is not None:
-            self.chained_msg = traceback._cause_message
-            self.chained_exc = EvalExceptionFormatter(exc.__cause__)
-        elif exc.__context__ is not None and not exc.__suppress_context__:
-            self.chained_msg = traceback._context_message
-            self.chained_exc = EvalExceptionFormatter(exc.__context__)
+        # stop if the chain loops back, eg, after "raise exc" in "except StopIteration as exc"
+        seen = set() if seen is None else seen
+        seen.update((id(exc), id(self.exc)))
+        chained, chained_msg = self.exc.__cause__, traceback._cause_message
+        if chained is None and not self.exc.__suppress_context__:
+            chained, chained_msg = self.exc.__context__, traceback._context_message
+        elif chained is not None:
+            # eg, "raise ValueError() from exc": the script frames are on what replaced exc, in the context
+            context, walked = self.exc.__context__, set()
+            while context is not None and id(context) not in walked:
+                if unwrap_stop_iteration(context) is chained:
+                    chained = context
+                    break
+                walked.add(id(context))
+                context = context.__context__
+        if chained is not None and not seen.intersection((id(chained), id(unwrap_stop_iteration(chained)))):
+            self.chained_msg = chained_msg
+            self.chained_exc = EvalExceptionFormatter(chained, seen)
 
     def format(self) -> list[str]:
         """Return formatted traceback lines for this exception."""
@@ -2627,10 +3032,8 @@ class EvalExceptionFormatter:
 
         return result
 
-    def _build_stack(self) -> None:
+    def _build_stack(self, current_tb: TracebackType | None) -> None:
         """Build stack summary from traceback frames."""
-        current_tb = self.exc.__traceback__
-
         while current_tb:
             frame = current_tb.tb_frame
             code = frame.f_code
@@ -2644,7 +3047,10 @@ class EvalExceptionFormatter:
                         self.current_filename = eval_func.global_ctx.get_file_path()
                 elif code.co_qualname == AstEval.call_func.__qualname__ and self.current_func is None:
                     self.current_func = frame.f_locals.get("func_name", None)
-                elif code.co_qualname == AstEval.parse.__qualname__ and isinstance(self.exc, SyntaxError):
+                elif code.co_qualname in (
+                    AstEval.parse.__qualname__,
+                    AstEval.parse_trigger_expr.__qualname__,
+                ) and isinstance(self.exc, SyntaxError):
                     ctx = frame.f_locals.get("self")
                     self.current_code_list = ctx.code_list
                     self.current_filename = ctx.global_ctx.get_file_path() or ctx.filename

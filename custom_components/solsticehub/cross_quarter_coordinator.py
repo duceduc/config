@@ -55,9 +55,9 @@ class CrossQuarterCoordinator(DataUpdateCoordinator[CrossQuarterData]):
             hass,
             _LOGGER,
             name=f"{DOMAIN}_cross_quarter",
+            config_entry=config_entry,
             update_interval=_calculate_time_until_midnight(),
         )
-        self.config_entry = config_entry
         self.mode: str = config_entry.data[CONF_MODE]
         self.hemisphere: str = config_entry.data.get(
             CONF_HEMISPHERE, HEMISPHERE_NORTHERN

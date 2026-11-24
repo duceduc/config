@@ -49,9 +49,10 @@ STORAGE_VERSION = 1
 # 1.2 added the workouts, 1.3 what a prune carries (kept_from and carried, written only
 # once something was pruned), 1.4 the records of the workouts' details (activity, and
 # source, laps and sets in a workout), 1.5 the sleep stages (sleep, written once there are
-# nights). Minor versions, because each change only adds keys: an older ledger reads as it
+# nights), 1.6 the workouts from before yesterday (past_workouts, written once there is
+# one). Minor versions, because each change only adds keys: an older ledger reads as it
 # is, and a downgrade to an earlier release still reads a newer one.
-STORAGE_MINOR_VERSION = 5
+STORAGE_MINOR_VERSION = 6
 SAVE_DELAY_SECONDS = 5
 
 # Units and names for the day sums, which have no sensor to borrow from.
@@ -136,12 +137,15 @@ class _LedgerStore(Store[dict[str, Any]]):
             # ledger that was never pruned has nothing carried, which is what 1.3 says too.
             # The records for the details start empty as well: the workouts kept so far
             # read without details until their records come again. So do the nights: the
-            # sessions kept so far hold no stages, and Send history brings them in.
+            # sessions kept so far hold no stages, and Send history brings them in. And the
+            # past workouts: the ones that left the two days before this were not kept, and
+            # Send history brings those in too.
             return {
                 **old_data,
                 "workouts": old_data.get("workouts") or {},
                 "activity": old_data.get("activity") or {},
                 "sleep": old_data.get("sleep") or {},
+                "past_workouts": old_data.get("past_workouts") or {},
             }
         raise NotImplementedError
 

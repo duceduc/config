@@ -56,7 +56,11 @@ def make_base_sensor_descriptions(
             key=SENSOR_SOLAR_LONGITUDE,
             translation_key=SENSOR_SOLAR_LONGITUDE,
             native_unit_of_measurement=DEGREE,
-            state_class=SensorStateClass.MEASUREMENT,
+            # An angle: long-term statistics use a circular mean, so the yearly
+            # wrap from 359.9° to 0° does not produce a bogus hourly mean.
+            # Needs Home Assistant 2025.4 (see hacs.json).
+            state_class=SensorStateClass.MEASUREMENT_ANGLE,
+            suggested_display_precision=1,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
             icon=ICON_SOLAR_LONGITUDE,

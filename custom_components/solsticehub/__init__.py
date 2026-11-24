@@ -27,7 +27,6 @@ from .const import (
     DEVICE_CHINESE,
     DEVICE_CROSS_QUARTER,
     DEVICE_FOUR_SEASONS,
-    DOMAIN,
 )
 from .coordinator import SolsticeHubCoordinator
 from .cross_quarter_coordinator import CrossQuarterCoordinator
@@ -36,8 +35,13 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
+type SolsticeHubCoordinatorType = (
+    SolsticeHubCoordinator | CrossQuarterCoordinator | ChineseSolarTermsCoordinator
+)
+type SolsticeHubConfigEntry = ConfigEntry[SolsticeHubCoordinatorType]
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+
+async def async_setup_entry(hass: HomeAssistant, entry: SolsticeHubConfigEntry) -> bool:
     """Set up SolsticeHub from a config entry.
 
     Each config entry creates one device with its own coordinator.
@@ -57,6 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.debug("Device type: %s", device_type)
 
     # Create coordinator based on device type
+    coordinator: SolsticeHubCoordinatorType
     if device_type == DEVICE_CROSS_QUARTER:
         coordinator = CrossQuarterCoordinator(hass, entry)
     elif device_type == DEVICE_CHINESE:
@@ -68,12 +73,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Fetch initial data
     await coordinator.async_config_entry_first_refresh()
 
-    # Store coordinator in hass.data with device type info
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {
-        "coordinator": coordinator,
-        "device_type": device_type,
-    }
+    # The entry owns its coordinator; HA drops it when the entry unloads
+    entry.runtime_data = coordinator
 
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -81,7 +82,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: SolsticeHubConfigEntry) -> bool:
     """Unload a config entry.
 
     Args:
@@ -93,16 +94,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """
     _LOGGER.debug("Unloading SolsticeHub integration: %s", entry.title)
 
-    # Unload platforms
+    # Unload platforms, then stop the coordinator's scheduled event update
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        # Clean up coordinator event listeners
-        if entry.entry_id in hass.data[DOMAIN]:
-            coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-            coordinator.async_unload()
-            hass.data[DOMAIN].pop(entry.entry_id)
-
-        # Clean up domain data if empty
-        if not hass.data[DOMAIN]:
-            hass.data.pop(DOMAIN)
+        entry.runtime_data.async_unload()
 
     return unload_ok

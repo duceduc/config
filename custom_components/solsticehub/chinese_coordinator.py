@@ -55,9 +55,9 @@ class ChineseSolarTermsCoordinator(DataUpdateCoordinator[ChineseSolarTermsData])
             hass,
             _LOGGER,
             name=f"{DOMAIN}_chinese_solar_terms",
+            config_entry=config_entry,
             update_interval=_calculate_time_until_midnight(),
         )
-        self.config_entry = config_entry
         self.scope: str = config_entry.data.get(CONF_SCOPE, "all_24")
         self.hemisphere: str = config_entry.data.get(
             CONF_HEMISPHERE, HEMISPHERE_NORTHERN

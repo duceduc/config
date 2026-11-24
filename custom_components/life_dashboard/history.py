@@ -34,7 +34,14 @@ from .sleep import (
     session_identity,
 )
 from .workout_details import apply_records, clean_pool, prune_pool, windows_of
-from .workouts import cutoff, keep_sessions, stored_workouts
+from .workouts import (
+    clean_past,
+    cutoff,
+    keep_sessions,
+    prune_past,
+    stored_workouts,
+    waiting_workouts,
+)
 
 # Day sums that come from Health Connect's own aggregate. Never summed from raw records:
 # a phone and a watch both record the same walk, and only the aggregate deduplicates that.
@@ -181,6 +188,9 @@ class Ledger:
     workouts: uuid -> type, start, end and length of each exercise session of yesterday
     and today, for the exercise sensors. Not the statistics' business: `exercise_minutes`
     is built from `sessions`, which keeps no type and no start.
+    past_workouts: uuid -> the exercise sessions from before those two days, each with the
+    details it left them with (workouts.py), under the same retention as the sessions. One
+    that arrived already older waits a few hours for its records first.
     activity: the records a workout's details are read from (workout_details.py): those
     that overlap a kept workout, and those of the last hours that may still get one.
     sleep: the stages of the sleep sessions (sleep.py). `sessions` holds a night's total,
@@ -194,6 +204,7 @@ class Ledger:
     sessions: dict[str, dict[str, list]] = field(default_factory=dict)
     hours: dict[str, dict[str, HourBucket]] = field(default_factory=dict)
     workouts: dict[str, dict[str, Any]] = field(default_factory=dict)
+    past_workouts: dict[str, dict[str, Any]] = field(default_factory=dict)
     activity: dict[str, Any] = field(default_factory=dict)
     sleep: dict[str, Any] = field(default_factory=dict)
     kept_from: str | None = None
@@ -214,6 +225,9 @@ class Ledger:
             "workouts": self.workouts,
             "units": self.units,
         }
+        # Only once a workout is older than yesterday: until then the file is as it was.
+        if self.past_workouts:
+            data["past_workouts"] = self.past_workouts
         # Only once there are records: a phone that sends nothing a workout reads, and a
         # test ping, leave the file as it was.
         if any(self.activity.values()):
@@ -243,6 +257,8 @@ class Ledger:
             },
             # Absent in a ledger written before the exercise sensors.
             workouts={u: dict(row) for u, row in (data.get("workouts") or {}).items()},
+            # Absent in a ledger written before the past workouts.
+            past_workouts=clean_past(data.get("past_workouts")),
             # Absent in a ledger written before the workout details.
             activity=clean_pool(data.get("activity")),
             # Absent in a ledger written before the sleep stages.
@@ -270,8 +286,9 @@ class HistoryChange:
     day_keys: dict[str, date] = field(default_factory=dict)
     #: key -> the earliest hour whose bucket changed.
     hour_keys: dict[str, datetime] = field(default_factory=dict)
-    #: Whether the kept workouts or the records of their details changed. Nothing for the
-    #: statistics, so it is not part of is_empty; the exercise sensors are read from them.
+    #: Whether the kept workouts, the past ones or the records of their details changed.
+    #: Nothing for the statistics, so it is not part of is_empty; the exercise sensors are
+    #: read from them.
     workouts: bool = False
     #: Days from before what the ledger keeps (kept_from): key -> day -> amount. The
     #: ledger cannot tell whether they were counted before, the recorder can: a day
@@ -334,8 +351,9 @@ def apply_payload(
 ) -> HistoryChange:
     """Fold one payload into the ledger, and report what it changed.
 
-    `now` decides which workouts are recent enough to keep; it is the moment the payload
-    arrives, which only a test has a reason to set.
+    `now` decides which workouts are recent enough to keep, and how long a past one has
+    waited for its records; it is the moment the payload arrives, which only a test has a
+    reason to set.
 
     Never raises on a JSON object: a record it cannot read is skipped, exactly as the
     sensor parsing does, because one bad record must not cost a whole backfill window.
@@ -363,10 +381,17 @@ def apply_payload(
         _hold_emptied_day(ledger, SLEEP_SESSIONS, iso)
     _apply_measured(ledger, data, _first_hour(ledger, tz), hour_changes, old_hours)
     now = now or datetime.now(UTC)
-    workouts = keep_sessions(ledger.workouts, data, now=now, tz=tz)
+    # The records first: a workout that leaves the two days takes its details along as
+    # they are with this payload in.
     records = apply_records(ledger.activity, data, now=now)
-    windows = windows_of(stored_workouts(ledger.workouts))
-    dropped = prune_pool(ledger.activity, windows, now=now, cutoff=cutoff(now, tz))
+    workouts = keep_sessions(
+        ledger.workouts, data, now=now, tz=tz, past=ledger.past_workouts, pool=ledger.activity
+    )
+    # A past workout that waits for its records keeps them like a stored session.
+    held = [*stored_workouts(ledger.workouts), *waiting_workouts(ledger.past_workouts)]
+    dropped = prune_pool(
+        ledger.activity, windows_of(held), now=now, cutoff=_waiting_from(data, now, tz)
+    )
     workouts = workouts or records or dropped
 
     return HistoryChange(
@@ -378,6 +403,24 @@ def apply_payload(
         night_rows=nights.rows(),
         nights=nights.changed,
     )
+
+
+def _waiting_from(data: dict[str, Any], now: datetime, tz: tzinfo) -> datetime:
+    """From when on a record without a workout may wait for one (`prune_pool`).
+
+    The start of yesterday: a session of the two days can still come. In a backfill, the
+    start of the window it sends, however old: the window's workouts come in the same
+    payload as their records, in a later one or in an earlier one, and are kept as past
+    workouts. The next window lets the records from before it go, so the pool holds one
+    window of them at most.
+    """
+    oldest = cutoff(now, tz)
+    if data.get("backfill") is not True:
+        return oldest
+    try:
+        return min(oldest, parse_instant(data.get("window_start")))
+    except ValueError:
+        return oldest
 
 
 def _apply_daily_totals(
@@ -872,16 +915,17 @@ def prune(ledger: Ledger, *, before: date, tz: tzinfo) -> bool:
     sum it had, and nothing before `before` is taken in again: a repeat of a pruned day
     would otherwise count once in the carried sum and once more as a day of its own.
 
-    The kept workouts are left alone; they hold yesterday and today only. The nights are
-    pruned on their own: a phone that took over a history has a kept_from that says
-    nothing about them, and being no sum they have nothing to carry. Returns whether
-    anything was dropped, so the ledger is written only then.
+    The kept workouts are left alone; they hold yesterday and today only. The nights and
+    the past workouts are pruned on their own: a phone that took over a history has a
+    kept_from that says nothing about them, and being no sum they have nothing to carry.
+    Returns whether anything was dropped, so the ledger is written only then.
     """
     cutoff = before.isoformat()
     nights_dropped = prune_nights(ledger.sleep, before=before)
+    workouts_dropped = prune_past(ledger.past_workouts, before=before, tz=tz)
     if ledger.kept_from is not None and cutoff <= ledger.kept_from:
         # Nothing older than kept_from is taken in, so there is nothing to drop.
-        return nights_dropped
+        return nights_dropped or workouts_dropped
 
     dropped = False
     for key, days in ledger.days.items():
@@ -902,7 +946,7 @@ def prune(ledger: Ledger, *, before: date, tz: tzinfo) -> bool:
     # never kept, so taking it in later counts it once.
     if dropped:
         ledger.kept_from = cutoff
-    return dropped or nights_dropped
+    return dropped or nights_dropped or workouts_dropped
 
 
 def earliest_day(change: HistoryChange) -> date | None:

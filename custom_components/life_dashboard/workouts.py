@@ -17,11 +17,18 @@ when a session is stored, so changing it takes effect at once and loses nothing.
 Every workout also carries its details, such as calories, distance and heart rate, read
 from the other records of its time when a sensor is published (workout_details.py).
 
+A session that is no longer of those two days stays as a past workout, for as long as the
+ledger keeps days. The records its details are read from go as they always did, so it
+takes the details along as they are when it leaves. One that arrives already older, as a
+backfill sends them, first waits a few hours for its records, which can come in other
+payloads. `kept_workouts` returns them all, for the action `life_dashboard.get_workouts`.
+
 Nothing here imports from Home Assistant.
 """
 
 from __future__ import annotations
 
+import copy
 import math
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -36,11 +43,21 @@ from .payload import (
     is_own_record,
     parse_instant,
 )
-from .workout_details import DETAIL_KEYS, apply_records, summarize_exercise, workout_details
+from .workout_details import (
+    DETAIL_KEYS,
+    PENDING_SECONDS,
+    apply_records,
+    summarize_exercise,
+    workout_details,
+)
 from .workout_types import type_code, workout_type
 
 #: How many days back a session is kept: yesterday and today.
 KEPT_DAYS: Final = 2
+
+#: How many past workouts wait for their records at once. A backfill sends its windows
+#: oldest first, so by the time this many newer ones came, the oldest has had its records.
+MAX_WAITING: Final = 50
 
 
 @dataclass(frozen=True)
@@ -179,7 +196,13 @@ def cutoff(now: datetime, tz: tzinfo) -> datetime:
 
 
 def keep_sessions(
-    sessions: dict[str, dict[str, Any]], data: dict[str, Any], *, now: datetime, tz: tzinfo
+    sessions: dict[str, dict[str, Any]],
+    data: dict[str, Any],
+    *,
+    now: datetime,
+    tz: tzinfo,
+    past: dict[str, dict[str, Any]] | None = None,
+    pool: dict[str, Any] | None = None,
 ) -> bool:
     """Fold the exercise records of a payload into the stored sessions, by uuid.
 
@@ -191,10 +214,20 @@ def keep_sessions(
     Sessions that ended before the start of yesterday are dropped, and never stored when
     a backfill brings them; an edit that moves a kept session to before yesterday drops it
     too. Returns whether anything changed.
+
+    With `past`, the past workouts by the same uuid, such a session goes there instead of
+    being lost. One that leaves the two days takes its details along as the records in
+    `pool` say at that moment, the last one they can. One that arrives already older waits
+    there for its records, and gets its details once it waited long enough
+    (`_finish_waiting`). A deletion takes a past workout away as well, and a record that
+    arrives again changes nothing, so a workout is in one of the two places and never in
+    both. A past workout that is deleted and written again as it was, in one payload,
+    stays as it is: its records are gone, and it would come back without its details.
     """
     records = data.get("exercise")
     changed = False
     oldest = cutoff(now, tz)
+    removed: dict[str, dict[str, Any]] = {}
 
     deleted = data.get("deleted_records")
     if isinstance(deleted, list):
@@ -202,7 +235,12 @@ def keep_sessions(
             if not isinstance(entry, dict) or entry.get("type") != "exercise":
                 continue
             uuid = entry.get("uuid")
-            if isinstance(uuid, str) and sessions.pop(uuid, None) is not None:
+            if not isinstance(uuid, str):
+                continue
+            if sessions.pop(uuid, None) is not None:
+                changed = True
+            if past is not None and uuid in past:
+                removed[uuid] = past.pop(uuid)
                 changed = True
 
     if isinstance(records, list):
@@ -210,24 +248,81 @@ def keep_sessions(
             workout = parse_workout(record)
             if workout is None:
                 continue
-            if workout.end <= oldest:
-                if sessions.pop(identity(workout), None) is not None:
-                    changed = True
-                continue
             row = _row(workout)
             key = identity(workout)
+            if workout.end <= oldest:
+                if sessions.pop(key, None) is not None:
+                    changed = True
+                if past is not None:
+                    known = past.get(key, removed.get(key))
+                    if known is not None and _bare(known) == row:
+                        past[key] = known
+                    else:
+                        # New, or edited: its records get their few hours from now.
+                        past[key] = {**row, "received": math.floor(now.timestamp())}
+                        changed = True
+                continue
+            if past is not None and past.pop(key, None) is not None:
+                changed = True
             if sessions.get(key) != row:
                 sessions[key] = row
                 changed = True
 
     for key, row in list(sessions.items()):
         try:
-            expired = _from_row(row).end <= oldest
+            workout = _from_row(row, key)
         except (KeyError, TypeError, ValueError):
-            expired = True
-        if expired:
+            workout = None
+        if workout is None or workout.end <= oldest:
             del sessions[key]
             changed = True
+            if workout is not None and past is not None:
+                past[key] = _finished(row, workout, pool)
+
+    if past and _finish_waiting(past, pool, now=now):
+        changed = True
+    return changed
+
+
+def _bare(row: dict[str, Any]) -> dict[str, Any]:
+    """A past workout's row without what was added to the session it was kept from."""
+    return {key: value for key, value in row.items() if key not in ("received", "details")}
+
+
+def _finished(row: dict[str, Any], workout: Workout, pool: dict[str, Any] | None) -> dict[str, Any]:
+    """A past workout's row once nothing more is waited for: the session, and its details
+    as the records say now. Always with `details`, which is empty when there were none."""
+    return {**_bare(row), "details": workout_details(pool, workout)}
+
+
+def _finish_waiting(
+    past: dict[str, dict[str, Any]], pool: dict[str, Any] | None, *, now: datetime
+) -> bool:
+    """Give the past workouts that waited long enough their details, and stop waiting.
+
+    Long enough is PENDING_SECONDS, as long as a record waits for a workout. With more
+    than MAX_WAITING waiting, the ones that waited longest go too, the oldest session
+    first: every one of them holds its records in the pool. A row that cannot be read is
+    dropped. Returns whether anything changed.
+    """
+    waiting = []
+    changed = False
+    for key, row in list(past.items()):
+        if "received" not in row:
+            continue
+        try:
+            waiting.append((row["received"], _from_row(row, key), key))
+        except (KeyError, TypeError, ValueError):
+            del past[key]
+            changed = True
+    waiting.sort(key=lambda item: (item[0], item[1].end, item[2]))
+    due = math.floor(now.timestamp()) - PENDING_SECONDS
+    surplus = len(waiting) - MAX_WAITING
+    for index, (received, workout, key) in enumerate(waiting):
+        if received > due and index >= surplus:
+            break
+        past[key] = _finished(past[key], workout, pool)
+        changed = True
     return changed
 
 
@@ -257,8 +352,63 @@ def stored_workouts(sessions: dict[str, dict[str, Any]]) -> list[Workout]:
     return sorted(workouts, key=lambda workout: workout.start)
 
 
+def waiting_workouts(past: dict[str, dict[str, Any]]) -> list[Workout]:
+    """The past workouts that still wait for their records, which the pool keeps for them
+    as it does for the stored sessions."""
+    return stored_workouts({key: row for key, row in past.items() if "received" in row})
+
+
+def clean_past(raw: Any) -> dict[str, dict[str, Any]]:
+    """The past workouts as a ledger holds them, without the rows that cannot be read: one
+    bad row in the file must not make every later payload fail."""
+    past: dict[str, dict[str, Any]] = {}
+    for key, row in raw.items() if isinstance(raw, dict) else ():
+        try:
+            _from_row(row, key)
+        except (KeyError, TypeError, ValueError):
+            continue
+        # It waits since a moment, or it has its details; a row that says neither is no row.
+        if "received" in row:
+            readable = _finite_number(row["received"]) is not None
+        else:
+            readable = isinstance(row.get("details"), dict)
+        if readable:
+            past[key] = dict(row)
+    return past
+
+
+def prune_past(past: dict[str, dict[str, Any]], *, before: date, tz: tzinfo) -> bool:
+    """Let the past workouts that ended before a local day go, as the ledger lets the
+    sessions of its day sums go. Returns whether anything went."""
+    boundary = _local_midnight(before, tz)
+    dropped = False
+    for key, row in list(past.items()):
+        try:
+            old = _from_row(row).end < boundary
+        except (KeyError, TypeError, ValueError):
+            old = True
+        if old:
+            del past[key]
+            dropped = True
+    return dropped
+
+
 def _local(moment: datetime, tz: tzinfo) -> str:
     return moment.astimezone(tz).isoformat()
+
+
+def _session_row(
+    workout: Workout, tz: tzinfo, minutes: int, details: dict[str, Any]
+) -> dict[str, Any]:
+    """An entry of the `sessions` attribute: a workout, the minutes of it that count and
+    its details."""
+    return {
+        "type": workout.kind,
+        "start": _local(workout.start, tz),
+        "end": _local(workout.end, tz),
+        "minutes": minutes,
+        **details,
+    }
 
 
 def day_sessions(
@@ -286,16 +436,52 @@ def day_sessions(
         if overlap <= 0:
             continue
         rows.append(
-            {
-                "type": workout.kind,
-                "start": _local(workout.start, tz),
-                "end": _local(workout.end, tz),
+            _session_row(
+                workout,
+                tz,
                 # The length it was sent with, shared out by the time that fell on the day.
-                "minutes": round(workout.minutes * min(overlap / span, 1)),
-                **workout_details(pool, workout),
-            }
+                round(workout.minutes * min(overlap / span, 1)),
+                workout_details(pool, workout),
+            )
         )
     return sorted(rows, key=lambda row: row["start"])
+
+
+def kept_workouts(
+    sessions: dict[str, dict[str, Any]],
+    past: dict[str, dict[str, Any]],
+    *,
+    tz: tzinfo,
+    pool: dict[str, Any] | None = None,
+    start: date | None = None,
+    end: date | None = None,
+) -> list[dict[str, Any]]:
+    """The kept workouts as data, each in the format of an entry of the `sessions` attribute.
+
+    The sessions of yesterday and today and the past ones as one list, oldest first. Each
+    is in it once and whole, so one that crosses midnight has all its minutes, and
+    whatever its length: the shortest workout is an option of the sensors, and whoever
+    reads the list picks. Every workout that ended on a local day in the window, both ends
+    included: the day the statistic `exercise_minutes` books it on. A past workout has the
+    details it left the two days with; a session of those days, and a past one that still
+    waits for its records, reads them from the pool.
+    """
+    listed = []
+    for key, row in {**past, **sessions}.items():
+        try:
+            workout = _from_row(row, key)
+        except (KeyError, TypeError, ValueError):
+            continue
+        day = workout.end.astimezone(tz).date()
+        if (start is not None and day < start) or (end is not None and day > end):
+            continue
+        # A copy, so whoever gets the list cannot change what the ledger keeps.
+        details = (
+            copy.deepcopy(row["details"]) if "details" in row else workout_details(pool, workout)
+        )
+        entry = _session_row(workout, tz, round(workout.minutes), details)
+        listed.append((workout.start, workout.end, key, entry))
+    return [entry for *_, entry in sorted(listed, key=lambda item: item[:3])]
 
 
 def day_minutes(

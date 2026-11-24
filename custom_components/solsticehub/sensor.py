@@ -31,10 +31,12 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from . import SolsticeHubConfigEntry
 from .base_sensor import make_base_sensor_descriptions
 from .calculations import SeasonData
 from .chinese_sensor import ChineseSolarTermsSensor, get_chinese_sensor_descriptions
 from .const import (
+    CONF_DEVICE_TYPE,
     CONF_HEMISPHERE,
     CONF_MODE,
     CONF_NAME,
@@ -59,6 +61,9 @@ from .const import (
 from .coordinator import SolsticeHubCoordinator
 from .cross_quarter_sensor import CROSS_QUARTER_SENSOR_DESCRIPTIONS, CrossQuarterSensor
 from .device import device_model, english_object_id
+
+# Entities only read coordinator data; nothing to throttle.
+PARALLEL_UPDATES = 0
 
 # Load version from manifest.json
 MANIFEST = json.loads((Path(__file__).parent / "manifest.json").read_text())
@@ -153,7 +158,7 @@ FOUR_SEASONS_SENSOR_DESCRIPTIONS: tuple[SolsticeHubSensorEntityDescription, ...]
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: SolsticeHubConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up SolsticeHub sensors from a config entry.
@@ -166,9 +171,8 @@ async def async_setup_entry(
         config_entry: The config entry for this integration instance.
         async_add_entities: Callback to add entities.
     """
-    entry_data = hass.data[DOMAIN][config_entry.entry_id]
-    coordinator = entry_data["coordinator"]
-    device_type = entry_data["device_type"]
+    coordinator = config_entry.runtime_data
+    device_type = config_entry.data.get(CONF_DEVICE_TYPE, DEVICE_FOUR_SEASONS)
 
     entities: list[SensorEntity] = []
 

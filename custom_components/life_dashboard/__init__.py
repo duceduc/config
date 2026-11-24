@@ -23,7 +23,13 @@ from aiohttp import web
 from homeassistant.components import webhook
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall, callback
+from homeassistant.core import (
+    HomeAssistant,
+    ServiceCall,
+    ServiceResponse,
+    SupportsResponse,
+    callback,
+)
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
@@ -64,12 +70,13 @@ from .payload import (
     wants_signed_body,
     writeback_request,
 )
-from .sleep import LAST_NIGHT_KEYS, sleep_updates
+from .sleep import LAST_NIGHT_KEYS, sleep_nights, sleep_updates
 from .statistics import HistoryWriter
 from .statistics import async_remove_store as async_remove_history
 from .workouts import (
     day_updates,
     identity,
+    kept_workouts,
     newest_workout,
     payload_pool,
     refresh_last_workout,
@@ -97,6 +104,26 @@ QUEUE_HISTORY_SCHEMA = vol.Schema(
             vol.Coerce(int), vol.Range(min=1, max=BACKFILL_MAX_DAYS)
         ),
         vol.Optional(ATTR_TYPES): vol.All(cv.ensure_list, [vol.In(WRITEBACK_TYPES)]),
+    }
+)
+
+SERVICE_GET_SLEEP_NIGHTS = "get_sleep_nights"
+ATTR_START = "start"
+ATTR_END = "end"
+GET_SLEEP_NIGHTS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_CONFIG_ENTRY): cv.string,
+        vol.Optional(ATTR_START): cv.date,
+        vol.Optional(ATTR_END): cv.date,
+    }
+)
+
+SERVICE_GET_WORKOUTS = "get_workouts"
+GET_WORKOUTS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_CONFIG_ENTRY): cv.string,
+        vol.Optional(ATTR_START): cv.date,
+        vol.Optional(ATTR_END): cv.date,
     }
 )
 
@@ -142,7 +169,7 @@ type LifeDashboardConfigEntry = ConfigEntry[LifeDashboardData]
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Register the service; it is one per integration, not one per phone."""
+    """Register the services; each is one per integration, not one per phone."""
 
     async def _queue_history(call: ServiceCall) -> None:
         entry = _entry_for_service(hass, call.data.get(ATTR_CONFIG_ENTRY))
@@ -156,8 +183,61 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             days=call.data[ATTR_DAYS], types=call.data.get(ATTR_TYPES)
         )
 
+    async def _get_sleep_nights(call: ServiceCall) -> ServiceResponse:
+        """The kept sleep sessions of a phone, for whoever builds on them."""
+        entry = _entry_for_service(hass, call.data.get(ATTR_CONFIG_ENTRY))
+        start = call.data.get(ATTR_START)
+        end = call.data.get(ATTR_END)
+        if start is not None and end is not None and end < start:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN, translation_key="end_before_start"
+            )
+        return {
+            "nights": sleep_nights(
+                entry.runtime_data.history.ledger.sleep,
+                tz=dt_util.get_default_time_zone(),
+                start=start,
+                end=end,
+            )
+        }
+
+    async def _get_workouts(call: ServiceCall) -> ServiceResponse:
+        """The kept workouts of a phone, for whoever builds on them."""
+        entry = _entry_for_service(hass, call.data.get(ATTR_CONFIG_ENTRY))
+        start = call.data.get(ATTR_START)
+        end = call.data.get(ATTR_END)
+        if start is not None and end is not None and end < start:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN, translation_key="end_before_start"
+            )
+        ledger = entry.runtime_data.history.ledger
+        return {
+            "workouts": kept_workouts(
+                ledger.workouts,
+                ledger.past_workouts,
+                tz=dt_util.get_default_time_zone(),
+                pool=ledger.activity,
+                start=start,
+                end=end,
+            )
+        }
+
     hass.services.async_register(
         DOMAIN, SERVICE_QUEUE_HISTORY, _queue_history, schema=QUEUE_HISTORY_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_GET_SLEEP_NIGHTS,
+        _get_sleep_nights,
+        schema=GET_SLEEP_NIGHTS_SCHEMA,
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_GET_WORKOUTS,
+        _get_workouts,
+        schema=GET_WORKOUTS_SCHEMA,
+        supports_response=SupportsResponse.ONLY,
     )
     return True
 

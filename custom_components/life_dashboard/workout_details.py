@@ -23,8 +23,9 @@ it, the way the app's docs say buckets combine. A bucket marked `complete` repla
 earlier one for its window.
 
 Nothing is kept longer than it can matter: records that overlap a kept workout (yesterday
-and today, see workouts.py), and records received in the last few hours, which may still
-turn out to belong to a workout that arrives later.
+and today, see workouts.py) or a past one that still waits for its records, and records
+received in the last few hours, which may still turn out to belong to a workout that
+arrives later.
 
 Calories, distance and steps are never added up across apps: a phone and a watch often
 both record the same walk. The workout's own app counts; when it wrote none, the one app
@@ -52,7 +53,8 @@ ADDITIVE_SERIES: Final[dict[str, str]] = {
 }
 HEART_RATE: Final = "heart_rate"
 
-#: How long a record that overlaps no kept workout stays, waiting for one to arrive.
+#: How long a record that overlaps no kept workout stays, waiting for one to arrive, and
+#: how long a workout that arrived older than yesterday waits for its records.
 PENDING_SECONDS: Final = 6 * 3600
 
 #: The kinds a pace per kilometre and a cadence make sense for.
@@ -387,9 +389,11 @@ def prune_pool(
 ) -> bool:
     """Keep what overlaps a kept workout, and what came in lately and is still recent.
 
-    `windows` are the kept workouts as (start, end) in epoch seconds; `cutoff` the start
-    of the oldest day a workout is kept for. A heart rate record kept only for a workout
-    keeps only its minutes during workouts. Returns whether anything was dropped.
+    `windows` are the kept workouts, and the past ones that wait for their records, as
+    (start, end) in epoch seconds; `cutoff` the moment from which a record can still get a
+    workout: the start of yesterday, or of the window a backfill sends. A heart rate record
+    kept only for a workout keeps only its minutes during workouts. Returns whether
+    anything was dropped.
     """
     recent = _epoch(now) - PENDING_SECONDS
     oldest = _epoch(cutoff)

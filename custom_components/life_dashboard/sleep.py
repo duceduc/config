@@ -118,7 +118,7 @@ class Segment(NamedTuple):
 
 @dataclass(frozen=True)
 class Night:
-    """The newest main session, as the sensors read it."""
+    """A kept session, as the sensors read the newest main one."""
 
     day: str
     start: datetime
@@ -699,16 +699,61 @@ def last_night(store: dict[str, Any], *, today: date | None = None) -> Night | N
     main = main_session(store, day)
     if main is None:
         return None
-    identity, row = main
+    return _night(store, *main)
+
+
+def _night(store: dict[str, Any], identity: str, row: dict[str, Any]) -> Night:
+    """A kept session as the sensors read it; no segments once its samples are let go."""
     samples = _samples(store.get("stages", {}).get(identity, []))
     return Night(
-        day=day,
+        day=row["day"],
         start=datetime.fromtimestamp(row["start"], UTC),
         end=datetime.fromtimestamp(row["end"], UTC),
         source=row.get("source"),
         minutes={name: row[name] for name in NIGHT_STATISTICS.values() if name in row},
         segments=timeline(samples, row.get("source")),
     )
+
+
+def night_attributes(night: Night, tz: tzinfo) -> dict[str, Any]:
+    """A night as the `last_sleep_asleep` attributes have it, in the local time zone."""
+    attributes: dict[str, Any] = {
+        "night": night.day,
+        "start": night.start.astimezone(tz).isoformat(timespec="seconds"),
+        "end": night.end.astimezone(tz).isoformat(timespec="seconds"),
+    }
+    if night.source:
+        attributes["source"] = night.source
+    attributes |= {f"{name}_minutes": round(value, 1) for name, value in night.minutes.items()}
+    attributes["stages"] = stages_attribute(night, tz)
+    return attributes
+
+
+def sleep_nights(
+    store: dict[str, Any],
+    *,
+    tz: tzinfo,
+    start: date | None = None,
+    end: date | None = None,
+) -> list[dict[str, Any]]:
+    """The kept sessions as data, each in the format of the `last_sleep_asleep` attributes.
+
+    Every session whose wake date lies in the window, both ends included: the main night,
+    naps and a second app's copy alike, so whoever reads them picks. Oldest first. A
+    session keeps only the minutes its stages could say, and `stages` is empty for a
+    session without stages and for one older than the last KEPT_NIGHTS wake dates.
+    """
+    first = start.isoformat() if start is not None else None
+    last = end.isoformat() if end is not None else None
+    sessions = sorted(
+        (
+            (identity, row)
+            for identity, row in store.get("nights", {}).items()
+            if (first is None or row["day"] >= first) and (last is None or row["day"] <= last)
+        ),
+        key=lambda item: (item[1]["day"], item[1]["start"], item[1]["end"], item[0]),
+    )
+    return [night_attributes(_night(store, identity, row), tz) for identity, row in sessions]
 
 
 def stages_attribute(night: Night, tz: tzinfo) -> list[dict[str, str]]:
@@ -734,15 +779,7 @@ def sleep_updates(
     night = last_night(store, today=today)
     if night is None:
         return []
-    attributes: dict[str, Any] = {
-        "night": night.day,
-        "start": night.start.astimezone(tz).isoformat(timespec="seconds"),
-        "end": night.end.astimezone(tz).isoformat(timespec="seconds"),
-    }
-    if night.source:
-        attributes["source"] = night.source
-    attributes |= {f"{name}_minutes": round(value, 1) for name, value in night.minutes.items()}
-    attributes["stages"] = stages_attribute(night, tz)
+    attributes = night_attributes(night, tz)
     updates = [
         SensorUpdate(
             key=KEY_LAST_SLEEP_ASLEEP,
@@ -777,6 +814,7 @@ __all__ = [
     "clean_store",
     "last_night",
     "main_session",
+    "night_attributes",
     "night_rows",
     "night_values",
     "noon",
@@ -784,6 +822,7 @@ __all__ = [
     "payload_moment",
     "prune_nights",
     "session_identity",
+    "sleep_nights",
     "sleep_updates",
     "stages_attribute",
     "summarize",

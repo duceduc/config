@@ -28,3 +28,35 @@ queue_history:
             - bone_mass
             - body_water_mass
             - blood_pressure
+
+get_sleep_nights:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: life_dashboard
+    start:
+      required: false
+      selector:
+        date:
+    end:
+      required: false
+      selector:
+        date:
+
+get_workouts:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: life_dashboard
+    start:
+      required: false
+      selector:
+        date:
+    end:
+      required: false
+      selector:
+        date:
