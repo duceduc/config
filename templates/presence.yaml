@@ -138,6 +138,17 @@
           {% endif %}
 
 
+# remove mcl
+#          {% if is_state('binary_sensor.shion_airfreshener_still_target', 'on') or
+#                   is_state('binary_sensor.bt_proxy_shion_still_target', 'on') %} on
+#          {% elif is_state('binary_sensor.sr_study_occupancy', 'on') %} on
+#          {% else %} off
+#          {% endif %}
+
+
+
+
+
       - name: motion sr auto on
         state: >
           {% set w = states('sensor.date_weekday') %}

@@ -5,14 +5,11 @@ from __future__ import annotations
 import ast
 import asyncio
 import logging
-import os
 from typing import Any, ClassVar
 import weakref
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Context, HomeAssistant
 
-from .const import CONF_LEGACY_DECORATORS
 from .decorator_abc import (
     CallHandlerDecorator,
     CallResultHandlerDecorator,
@@ -53,20 +50,10 @@ class DecoratorRegistry:
     hass: ClassVar[HomeAssistant]
 
     @classmethod
-    def init(cls, hass: HomeAssistant, config_entry: ConfigEntry = None) -> None:
+    def init(cls, hass: HomeAssistant) -> None:
         """Initialize the decorator registry."""
         cls.hass = hass
         cls._decorators = {}
-        disabled = False
-        if config_entry is not None and config_entry.data.get(CONF_LEGACY_DECORATORS, False):
-            disabled = True
-        elif "PYTEST_CURRENT_TEST" in os.environ and "NODM" in os.environ:
-            disabled = True
-
-        if disabled:
-            _LOGGER.warning("Using legacy decorators")
-            return
-
         DecoratorManager.hass = hass
 
         Function.register_ast({"task.wait_until": DecoratorRegistry.wait_until_factory})
@@ -298,6 +285,12 @@ class FunctionDecoratorManager(DecoratorManager):
                 accepted = {a.arg for a in func_args.args + func_args.kwonlyargs}
                 call_kwargs = {k: v for k, v in data.func_args.items() if k in accepted}
             result = await data.call_ast_ctx.call_func(self.eval_func, None, **call_kwargs)
+        except asyncio.CancelledError:
+            # the call was killed while running; let result handlers answer their callers
+            self.logger.debug("Call cancelled for %s", self.name)
+            for result_handler_dec in result_handlers:
+                await self.safe_await(result_handler_dec.handle_call_canceled(data))
+            raise
         except Exception as e:
             for result_handler_dec in result_handlers:
                 await self.safe_await(result_handler_dec.handle_call_exception(data, e))
@@ -308,7 +301,7 @@ class FunctionDecoratorManager(DecoratorManager):
             await self.safe_await(result_handler_dec.handle_call_result(data, result))
 
     async def dispatch(self, data: DispatchData) -> None:
-        """Handle a trigger dispatch: run guards, create a context, and invoke the function."""
+        """Handle a trigger dispatch: run the trigger handlers, then start the call."""
         _LOGGER.debug("Dispatching for %s: %s", self.name, data)
 
         decorators = self.get_decorators(TriggerHandlerDecorator)
@@ -319,6 +312,10 @@ class FunctionDecoratorManager(DecoratorManager):
                     await self.safe_await(result_handler_dec.handle_call_canceled(data))
                 return
 
+        await self.start_call(data)
+
+    async def start_call(self, data: DispatchData) -> None:
+        """Create a context and invoke the function; an explicit call starts here, without the trigger handlers."""
         action_ast_ctx = AstEval(
             f"{self.eval_func.global_ctx_name}.{self.eval_func.name}", self.eval_func.global_ctx
         )
@@ -339,4 +336,5 @@ class FunctionDecoratorManager(DecoratorManager):
         )
 
         task = Function.create_task(self._call(data), ast_ctx=action_ast_ctx)
+        data.call_task = task
         Function.task_done_callback_ctx(task, action_ast_ctx)

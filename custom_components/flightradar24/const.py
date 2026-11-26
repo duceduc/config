@@ -53,6 +53,26 @@ TRACKER_NAME_OPTIONS = [
     TRACKER_NAME_REG_ROUTE,
 ]
 
+# Airport weather sensor units (stored on the config entry).
+CONF_TEMPERATURE_UNIT = "temperature_unit"
+CONF_DISTANCE_UNIT = "distance_unit"
+CONF_SPEED_UNIT = "speed_unit"
+
+TEMP_UNIT_C = "c"
+TEMP_UNIT_F = "f"
+CONF_TEMPERATURE_UNIT_DEFAULT = TEMP_UNIT_C
+
+DISTANCE_UNIT_KM = "km"
+DISTANCE_UNIT_MI = "mi"
+DISTANCE_UNIT_NMI = "nmi"
+DISTANCE_UNIT_M = "m"
+CONF_DISTANCE_UNIT_DEFAULT = DISTANCE_UNIT_KM
+
+SPEED_UNIT_KMH = "km/h"
+SPEED_UNIT_KTS = "kts"
+SPEED_UNIT_MPH = "mph"
+CONF_SPEED_UNIT_DEFAULT = SPEED_UNIT_KMH
+
 EVENT_ENTRY = f"{DOMAIN}_entry"
 EVENT_EXIT = f"{DOMAIN}_exit"
 EVENT_AREA_LANDED = f"{DOMAIN}_area_landed"
@@ -123,6 +143,10 @@ AIRPORT_REFRESH_INTERVAL = 90
 # ([[lat, lon], ...]). Capped so sensor attributes stay bounded.
 COORDINATES_MAX_POINTS = 50
 
+# FR24 search rounds a live position to 0.1°. The exact point therefore lies
+# within half that step (0.05°) of the rounded answer (#151).
+SEARCH_POSITION_ROUNDING_DEG = 0.05
+
 # After landing, a brief ADS-B gap mid-taxi must not mean arrived_gate (BA304 /
 # #317). Require this many consecutive feed misses (after live_attempt grace)
 # before treating absence as gate arrival. Default scan is 20s → ~1 min.
@@ -151,6 +175,15 @@ STABLE_ENTITY_OBJECT_IDS: dict[str, str] = {
     "airport_departures_delay_average": "flightradar24_departures_delay_average",
     "airport_departures_delay_index": "flightradar24_departures_delay_index",
     "airport_departures_canceled": "flightradar24_departures_canceled",
+    "airport_wind_direction": "flightradar24_airport_wind_direction",
+    "airport_wind_direction_text": "flightradar24_airport_wind_direction_text",
+    "airport_wind_speed": "flightradar24_airport_wind_speed",
+    "airport_temperature": "flightradar24_airport_temperature",
+    "airport_humidity": "flightradar24_airport_humidity",
+    "airport_pressure": "flightradar24_airport_pressure",
+    "airport_dewpoint": "flightradar24_airport_dewpoint",
+    "airport_sky_condition": "flightradar24_airport_sky_condition",
+    "airport_visibility": "flightradar24_airport_visibility",
     "scanning": "flightradar24_api_data_fetching",
     "most_tracked": "flightradar24_most_tracked",
     "add_track": "flightradar24_add_to_track",

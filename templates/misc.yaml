@@ -211,8 +211,8 @@
 
       - name: LR Radar Illuminance Actual
         state: >
-          {% if is_state('sensor.four_seasons_astronomical_daylight_trend', 'days_getting_shorter') %} 0.21
-          {% elif is_state('sensor.four_seasons_astronomical_daylight_trend', 'days_getting_longer') %} 0.26
+          {% if is_state('sensor.four_seasons_astronomical_daylight_trend', 'days_getting_shorter') %} 0.25
+          {% elif is_state('sensor.four_seasons_astronomical_daylight_trend', 'days_getting_longer') %} 0.28
           {% else %} 0.21
           {% endif %}
 

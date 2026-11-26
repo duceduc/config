@@ -63,7 +63,9 @@ from .payload import (
     SIGNATURE_HEADER,
     SOURCE_HEALTHKIT_IOS,
     SensorUpdate,
+    day_total_zeros,
     frame_answer,
+    newest_totals_day,
     parse_payload,
     response_body,
     verify_signature,
@@ -313,6 +315,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: LifeDashboardConfigEntry
     def _new_day(_now: datetime) -> None:
         async_publish_exercise(hass, entry)
         async_publish_nutrition(hass, entry)
+        async_publish_day_totals(hass, entry)
 
     entry.async_on_unload(async_track_time_change(hass, _new_day, hour=0, minute=0, second=5))
     return True
@@ -352,6 +355,20 @@ def async_publish_exercise(hass: HomeAssistant, entry: LifeDashboardConfigEntry)
     if refreshed is not None:
         updates.append(refreshed)
     for update in updates:
+        if runtime.apply(update):
+            async_dispatcher_send(hass, signal_update(entry.entry_id), update)
+
+
+@callback
+def async_publish_day_totals(hass: HomeAssistant, entry: LifeDashboardConfigEntry) -> None:
+    """Start the day totals the phone sent before at 0 on a new day.
+
+    Like the exercise sensors: at midnight they move on to the new day rather than
+    showing yesterday until the phone syncs, which can be hours with a quiet period.
+    """
+    runtime = entry.runtime_data
+    tz = dt_util.get_default_time_zone()
+    for update in day_total_zeros(runtime.latest, dt_util.utcnow().astimezone(tz).date(), tz=tz):
         if runtime.apply(update):
             async_dispatcher_send(hass, signal_update(entry.entry_id), update)
 
@@ -542,6 +559,15 @@ def _make_handler(entry: LifeDashboardConfigEntry):
                     else payload_pool(data, now=now)
                 )
                 updates.append(workout_update(newest, tz=tz, pool=pool))
+            # A day total the newest day has no data for yet starts at 0 rather than
+            # keeping the day before (app discussion #257).
+            if (day := newest_totals_day(data)) is not None and data.get("test") is not True:
+                sent = {update.key for update in updates}
+                updates.extend(
+                    zero
+                    for zero in day_total_zeros(runtime.latest, day, tz=tz)
+                    if zero.key not in sent
+                )
             accepted = [update for update in updates if runtime.apply(update)]
 
             _note_platform(hass, entry, data)

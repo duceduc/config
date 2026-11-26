@@ -30,6 +30,7 @@ import hmac
 import json
 import math
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta, tzinfo
 from typing import Any, Final
@@ -616,46 +617,82 @@ def _is_bucketed(records: list[Any]) -> bool:
     return bool(records) and isinstance(records[0], dict) and "bucket_start" in records[0]
 
 
+def _newest_totals(data: dict[str, Any]) -> tuple[date, dict[str, Any]] | None:
+    """The newest day of a payload's daily_totals, with its entry, or None."""
+    totals = data.get("daily_totals")
+    if not isinstance(totals, list):
+        return None
+    newest: tuple[date, dict[str, Any]] | None = None
+    for entry in totals:
+        if not isinstance(entry, dict):
+            continue
+        try:
+            day = _parse_date(entry.get("date"))
+        except ValueError:
+            continue
+        if newest is None or day > newest[0]:
+            newest = (day, entry)
+    return newest
+
+
+def newest_totals_day(data: dict[str, Any]) -> date | None:
+    """The newest day a payload sends day totals for, or None."""
+    newest = _newest_totals(data)
+    return newest[0] if newest is not None else None
+
+
+def day_total_zeros(
+    known: Mapping[str, SensorUpdate], day: date, *, tz: tzinfo
+) -> list[SensorUpdate]:
+    """A 0 for every day total that still shows a day before `day`.
+
+    Health Connect leaves a metric out of a day that has no data for it yet, so
+    without this the sensor kept yesterday's active energy until the first record
+    of the new day (app discussion #257). Only for sensors that exist: a metric the
+    phone never sent gets no sensor from this.
+    """
+    midnight = _midnight(day, tz)
+    return [
+        SensorUpdate(
+            key=key,
+            value=0 if key == "steps_today" else 0.0,
+            measured_at=midnight,
+            attributes={"date": day.isoformat()},
+            last_reset=midnight,
+        )
+        for key, _ in _TODAY
+        if (current := known.get(key)) is not None and current.measured_at < midnight
+    ]
+
+
 def _parse_health(data: dict[str, Any], tz: tzinfo) -> list[SensorUpdate]:
     """Sensor updates from a health payload, Android or iOS."""
     updates: list[SensorUpdate] = []
 
     # Day totals. An iOS app before 1.4.0 sends no daily_totals, so these stay absent
     # for that iPhone, exactly as with its MQTT sensors.
-    totals = data.get("daily_totals")
-    if isinstance(totals, list):
-        newest: tuple[date, dict[str, Any]] | None = None
-        for entry in totals:
-            if not isinstance(entry, dict):
-                continue
+    if (newest := _newest_totals(data)) is not None:
+        day, entry = newest
+        midnight = _midnight(day, tz)
+        for key, field_name in _TODAY:
             try:
-                day = _parse_date(entry.get("date"))
+                value = _number(entry.get(field_name))
             except ValueError:
                 continue
-            if newest is None or day > newest[0]:
-                newest = (day, entry)
-        if newest is not None:
-            day, entry = newest
-            midnight = _midnight(day, tz)
-            for key, field_name in _TODAY:
-                try:
-                    value = _number(entry.get(field_name))
-                except ValueError:
-                    continue
-                updates.append(
-                    SensorUpdate(
-                        key=key,
-                        # Distance in km, as its statistic and the graphs have it.
-                        value=int(value)
-                        if key == "steps_today"
-                        else float(value) / 1000
-                        if key == "distance_today"
-                        else float(value),
-                        measured_at=midnight,
-                        attributes={"date": day.isoformat()},
-                        last_reset=midnight,
-                    )
+            updates.append(
+                SensorUpdate(
+                    key=key,
+                    # Distance in km, as its statistic and the graphs have it.
+                    value=int(value)
+                    if key == "steps_today"
+                    else float(value) / 1000
+                    if key == "distance_today"
+                    else float(value),
+                    measured_at=midnight,
+                    attributes={"date": day.isoformat()},
+                    last_reset=midnight,
                 )
+            )
 
     # Latest values, raw or bucketed.
     for spec in _LATEST:

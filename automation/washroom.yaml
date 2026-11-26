@@ -54,6 +54,28 @@
           entity_id: light.sink, light.vanity
 
 
+- alias: 'Turn on manual shower lights default params'
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: light.shower
+      to: 'on'
+  actions:
+    - action: script.tradfri_transition
+      data:
+        entity_id: light.shower
+        color_temp: 143
+        transition: 2
+        brightness: 255
+
+
+
+
+
+
+
+
+
 
 #########################################################
 #

@@ -108,12 +108,12 @@
   mode: single
   triggers:
     - trigger: state
-      entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.bt_proxy_shion_moving_target, binary_sensor.shionroom_occupied
+      entity_id:  binary_sensor.shion_airfreshener_moving_target,binary_sensor.bt_proxy_shion_moving_target,binary_sensor.shionroom_occupied
       to: 'on'
+      id: 'on'
     - trigger: state
       entity_id: binary_sensor.sr_occupancy_lights # in template->presence.yaml
       to: 'off'
-
   conditions:
     - condition: template # disable motion light
       value_template: "{{ not is_state('input_boolean.disable_motion_lights', 'on') }}"
@@ -124,9 +124,8 @@
   actions:
     - choose:
         - conditions:
-            - condition: state
-              entity_id: binary_sensor.shion_airfreshener_moving_target, binary_sensor.bt_proxy_shion_moving_target, binary_sensor.shionroom_occupied
-              state: "on"
+            - condition: trigger
+              id: 'on'
           sequence:
             - action: script.tradfri_transition
               data:
