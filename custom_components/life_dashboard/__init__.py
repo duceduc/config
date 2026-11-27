@@ -283,7 +283,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: LifeDashboardConfigEntry
     if apps.latest is not None:
         entry.runtime_data.latest[KEY_SCREEN_TIME_APPS] = apps.latest
 
-    if history.available and (entry.data.get(CONF_TAKE_OVER) or history.needs_unit_migration):
+    if history.available and (
+        entry.data.get(CONF_TAKE_OVER)
+        or history.needs_unit_migration
+        or history.needs_night_settling
+    ):
         # The recorder works its queue only once Home Assistant has started, and waiting
         # for it here would hold the start up for good. Until then the webhook stays closed,
         # and the phone keeps what it sends in its outbox for a little while.
@@ -427,7 +431,8 @@ def async_publish_sleep(
 
 
 async def _async_prepare_history(hass: HomeAssistant, entry: LifeDashboardConfigEntry) -> None:
-    """Take over a removed phone's history and bring 0.12's units over, then take payloads.
+    """Take over a removed phone's history, bring 0.12's units over and count a night sent
+    in several versions once, then take payloads.
 
     Both before the webhook is up, so no row of this phone lands in between.
     """
@@ -437,6 +442,7 @@ async def _async_prepare_history(hass: HomeAssistant, entry: LifeDashboardConfig
         await history.async_take_over(owner)
         _drop_take_over(hass, entry)
     await history.async_migrate_units()
+    await history.async_settle_nights()
     _open_webhook(hass, entry)
 
 

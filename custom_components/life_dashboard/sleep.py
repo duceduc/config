@@ -1,7 +1,8 @@
 """Sleep stages: what a night was made of, per session, read by its wake date.
 
 The running sum `sleep_minutes` books every session whole on the day it ended, naps and a
-second app included. The stage statistics answer another question: how the night went. So
+second app included, but one night that one app wrote in several versions only once
+(`other_versions`). The stage statistics answer another question: how the night went. So
 they are read from one session per wake date, the main one, and a late or backfilled
 night only ever touches the row of its own date.
 
@@ -323,19 +324,93 @@ def _readable_sample(row: Any) -> bool:
     )
 
 
-def main_session(store: dict[str, Any], day: str) -> tuple[str, dict[str, Any]] | None:
-    """The session that speaks for a wake date: most time asleep, then the longest span,
-    then the uuid, so the choice does not depend on the order of arrival."""
-    candidates = [
+def _versions(
+    sessions: list[tuple[str, dict[str, Any]]],
+) -> list[list[tuple[str, dict[str, Any]]]]:
+    """The sessions of one wake date, grouped into nights.
+
+    Sessions of one source that overlap are versions of one night: nobody sleeps twice
+    at once. Samsung Health writes a night up to three times, a part of it, the night
+    with its stages and a rougher estimate next to it, all from the same start (ha#87).
+    A session without a source (iOS before 1.5.0) is a night of its own, and so is
+    another app's copy of the same night.
+    """
+    groups: list[list[tuple[str, dict[str, Any]]]] = []
+    for item in sorted(sessions, key=lambda item: (item[1]["start"], item[0])):
+        source = item[1].get("source")
+        overlapping = [
+            group
+            for group in groups
+            if source is not None
+            and group[0][1].get("source") == source
+            and any(
+                item[1]["start"] < row["end"] and row["start"] < item[1]["end"] for _, row in group
+            )
+        ]
+        merged = [item]
+        for group in overlapping:
+            groups.remove(group)
+            merged.extend(group)
+        groups.append(merged)
+    return groups
+
+
+def _version_key(item: tuple[str, dict[str, Any]]) -> tuple[float, float, float, str]:
+    """The version that speaks for a night: the most detailed stages, as deep and REM,
+    then the most time asleep, then the longest span, then the uuid."""
+    identity, row = item
+    detail = row.get("deep", 0.0) + row.get("rem", 0.0)
+    return detail, row["asleep"], row["end"] - row["start"], identity
+
+
+def _night_key(item: tuple[str, dict[str, Any]]) -> tuple[float, float, str]:
+    """The night that speaks for a wake date: the most time asleep, then the longest
+    span, then the uuid, so the choice does not depend on the order of arrival."""
+    identity, row = item
+    return row["asleep"], row["end"] - row["start"], identity
+
+
+def _nights_of(store: dict[str, Any], day: str) -> list[tuple[str, dict[str, Any]]]:
+    """The version that speaks for each night of a wake date."""
+    sessions = [
         (identity, row)
         for identity, row in store.get("nights", {}).items()
         if row["day"] == day and row.get("asleep")
     ]
-    return max(
-        candidates,
-        key=lambda item: (item[1]["asleep"], item[1]["end"] - item[1]["start"], item[0]),
-        default=None,
-    )
+    return [max(group, key=_version_key) for group in _versions(sessions)]
+
+
+def main_session(store: dict[str, Any], day: str) -> tuple[str, dict[str, Any]] | None:
+    """The session that speaks for a wake date: of each night the version with the most
+    detailed stages (`_versions`), and of those nights the one with the most time asleep."""
+    return max(_nights_of(store, day), key=_night_key, default=None)
+
+
+def other_versions(store: dict[str, Any]) -> set[str]:
+    """The sessions that are another version of a night a kept session speaks for.
+
+    The running sum `sleep_minutes` leaves them out, so a night Samsung writes three
+    times counts once. Naps, a second app and a night without a source still count.
+    """
+    others: set[str] = set()
+    for group in _versioned(store):
+        keep = max(group, key=_version_key)[0]
+        others.update(identity for identity, _ in group if identity != keep)
+    return others
+
+
+def version_days(store: dict[str, Any]) -> set[str]:
+    """The wake dates that hold more than one version of a night."""
+    return {group[0][1]["day"] for group in _versioned(store)}
+
+
+def _versioned(store: dict[str, Any]) -> list[list[tuple[str, dict[str, Any]]]]:
+    """Every night of the kept sessions that has more than one version."""
+    days: dict[str, list[tuple[str, dict[str, Any]]]] = {}
+    for identity, row in store.get("nights", {}).items():
+        if row.get("asleep"):
+            days.setdefault(row["day"], []).append((identity, row))
+    return [group for sessions in days.values() for group in _versions(sessions) if len(group) > 1]
 
 
 def night_values(store: dict[str, Any], day: str) -> dict[str, float]:
@@ -818,6 +893,7 @@ __all__ = [
     "night_rows",
     "night_values",
     "noon",
+    "other_versions",
     "parse_samples",
     "payload_moment",
     "prune_nights",
@@ -827,4 +903,5 @@ __all__ = [
     "stages_attribute",
     "summarize",
     "timeline",
+    "version_days",
 ]

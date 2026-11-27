@@ -26,12 +26,16 @@ from typing import Any, Final
 
 from .payload import is_own_record, parse_instant
 from .sleep import (
+    NIGHT_STATISTICS,
     SLEEP_SESSIONS,
     NightFold,
     clean_store,
+    night_values,
+    other_versions,
     payload_moment,
     prune_nights,
     session_identity,
+    version_days,
 )
 from .workout_details import apply_records, clean_pool, prune_pool, windows_of
 from .workouts import (
@@ -213,6 +217,10 @@ class Ledger:
     #: 3 since 1.0.0 (km and h, and a closing row at 23:00; 2 was a build in between). A new
     #: ledger starts at 3: it has written nothing the old way.
     units: int = 3
+    #: Whether a night that one app wrote in several versions was written as one (1.5.2):
+    #: its main session and its place in `sleep_minutes`. A ledger with nights from before
+    #: is not, until `settle_versions`; a new one has written nothing the old way.
+    nights_settled: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = {
@@ -235,6 +243,7 @@ class Ledger:
         # Likewise: a phone that sends no sleep leaves the file as it was.
         if any(self.sleep.values()):
             data["sleep"] = self.sleep
+            data["nights_settled"] = self.nights_settled
         # Only once something was pruned: until then the file is what it always was.
         if self.kept_from is not None:
             data["kept_from"] = self.kept_from
@@ -268,13 +277,20 @@ class Ledger:
             carried={k: float(v) for k, v in (data.get("carried") or {}).items()},
             # Absent in a ledger of 0.12 and earlier, whose statistics are in m and min.
             units=int(data.get("units") or 1),
+            # Absent in a ledger of 1.5.1 and earlier; one without nights has none to settle.
+            nights_settled=bool(data.get("nights_settled")) or not data.get("sleep"),
         )
 
     def day_totals(self, key: str) -> dict[str, float]:
-        """Every day this key has an amount for, sessions folded into the day sums."""
+        """Every day this key has an amount for, sessions folded into the day sums.
+
+        A night one app wrote in several versions counts once (`other_versions`).
+        """
         totals = dict(self.days.get(key, {}))
-        for day, amount in self.sessions.get(key, {}).values():
-            totals[day] = totals.get(day, 0.0) + amount
+        others = other_versions(self.sleep) if key == SLEEP_SESSIONS else set()
+        for identity, (day, amount) in self.sessions.get(key, {}).items():
+            if identity not in others:
+                totals[day] = totals.get(day, 0.0) + amount
         return totals
 
 
@@ -402,6 +418,33 @@ def apply_payload(
         old_hours=old_hours,
         night_rows=nights.rows(),
         nights=nights.changed,
+    )
+
+
+def settle_versions(ledger: Ledger) -> HistoryChange:
+    """Write the nights with several versions once more, now as one, and mark it done.
+
+    Up to 1.5.1 every version of a night counted in `sleep_minutes`, and the one with the
+    most time asleep spoke for its stage statistics (ha#87). Only the dates that hold such
+    a night change, and only rows of the kept nights: an older row stays as it was.
+    """
+    ledger.nights_settled = True
+    days = sorted(version_days(ledger.sleep))
+    if not days:
+        return HistoryChange()
+    nights = ledger.sleep.get("nights", {})
+    rows: dict[str, dict[str, float | None]] = {}
+    for day in days:
+        values = night_values(ledger.sleep, day)
+        had = {
+            key
+            for key, name in NIGHT_STATISTICS.items()
+            for row in nights.values()
+            if row["day"] == day and name in row
+        }
+        rows[day] = {key: values.get(key) for key in had | values.keys()}
+    return HistoryChange(
+        day_keys={SLEEP_SESSIONS: date.fromisoformat(days[0])}, night_rows=rows, nights=True
     )
 
 
@@ -975,4 +1018,5 @@ __all__ = [
     "hour_rows",
     "keep_from",
     "prune",
+    "settle_versions",
 ]

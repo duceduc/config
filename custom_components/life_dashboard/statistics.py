@@ -39,6 +39,7 @@ from .history import (
     keep_from,
     prune,
     seed_taken_over,
+    settle_versions,
 )
 from .payload import SENSOR_SPECS
 from .sleep import NIGHT_STATISTICS, night_rows
@@ -50,9 +51,10 @@ STORAGE_VERSION = 1
 # once something was pruned), 1.4 the records of the workouts' details (activity, and
 # source, laps and sets in a workout), 1.5 the sleep stages (sleep, written once there are
 # nights), 1.6 the workouts from before yesterday (past_workouts, written once there is
-# one). Minor versions, because each change only adds keys: an older ledger reads as it
-# is, and a downgrade to an earlier release still reads a newer one.
-STORAGE_MINOR_VERSION = 6
+# one), 1.7 whether a night sent in several versions was written as one (nights_settled,
+# written with the nights). Minor versions, because each change only adds keys: an older
+# ledger reads as it is, and a downgrade to an earlier release still reads a newer one.
+STORAGE_MINOR_VERSION = 7
 SAVE_DELAY_SECONDS = 5
 
 # Units and names for the day sums, which have no sensor to borrow from.
@@ -444,6 +446,27 @@ class HistoryWriter:
                 "Statistics of %s brought up to 1.0.0: %s", self._entry.title, ", ".join(moved)
             )
         self.ledger.units = 3
+        await self.async_flush()
+
+    @property
+    def needs_night_settling(self) -> bool:
+        """Whether nights from before 1.5.2 may have counted every version of themselves."""
+        return self.available and not self.ledger.nights_settled
+
+    async def async_settle_nights(self) -> None:
+        """Write the nights one app sent in several versions once more, as one (1.5.2),
+        once. Before the webhook is up, like the unit migration."""
+        if not self.needs_night_settling:
+            return
+        change = settle_versions(self.ledger)
+        if not change.is_empty:
+            tz = dt_util.get_default_time_zone()
+            self._import(change, {}, tz)
+            _LOGGER.info(
+                "Nights of %s with several versions counted once: %s",
+                self._entry.title,
+                ", ".join(sorted(change.night_rows)),
+            )
         await self.async_flush()
 
     async def async_take_over(self, owner: str) -> bool:

@@ -49,10 +49,9 @@
       - url: /local/custom_ui/weather-card.js?v=2
         type: module
       - url: /local/custom_ui/honeycomb-menu.js?v=8
+        type: module 
+      - url: /local/custom_ui/life-dashboard-sleep-card.js?v1
         type: module
-        
-#      - url: /local/custom_ui/simple-inventory-card.js?v2
-#        type: module
 
       - url: /local/custom_ui/ha-lcars-panel.js?v=4 # has css aswell
         type: module

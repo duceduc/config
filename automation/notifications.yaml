@@ -10,6 +10,7 @@
       entity_id:
         - sensor.az_switchbot_sensor
         - sensor.az_withings_sleep
+        - sensor.az_eufy_s3
         - sensor.az_eufy_s4
       not_to:
         - unknown
