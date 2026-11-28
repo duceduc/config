@@ -1,0 +1,294 @@
+# Life Dashboard: two phones side by side, each its own device, and both in one graph.
+#
+# Needs Home Assistant 2026.3 or newer. No custom cards.
+# Needs the "Life Dashboard" theme from examples/themes/life_dashboard.yaml in a folder
+# "themes" next to configuration.yaml (the File editor add-on under Settings > Add-ons
+# gets you there), and in configuration.yaml:
+#
+#   frontend:
+#     themes: !include_dir_merge_named themes
+#
+# then restart Home Assistant once. The file also holds "Life Dashboard heart", which
+# only turns the icons of the heart rate statistic cards red. No theme? Delete the
+# "theme:" lines and the cards fall back to your own.
+#
+# Paste it as a dashboard of its own in the raw configuration editor, or copy the view
+# under "views:" into the Health dashboard.
+#
+# Replace, with find and replace:
+# - "first_phone" and "second_phone" in the entity ids with each phone's part of them:
+#   open the phone under Settings > Devices & services > Life Dashboard, click its steps
+#   sensor, then the cog. sensor.alex_s_pixel_steps_today means alex_s_pixel.
+# - "<first_entry>" and "<second_entry>" in the statistic ids with each phone's config
+#   entry ID. Developer tools > Statistics, search for the phone's name and "steps": the
+#   ID reads life_dashboard:01j..._steps, and the part between "life_dashboard:" and
+#   "_steps" is the entry.
+# - The headings "First phone" and "Second phone", the legend names in the graphs, and
+#   the android and apple icons, to match your phones.
+#
+# An iPhone sends no skin temperature or screen time, and its HRV is SDNN where an
+# Android phone's is RMSSD, so this view compares no HRV across the two.
+title: Two phones
+views:
+  # Two phones: each is its own device, side by side, and in one graph.
+  - title: Two phones
+    path: two-phones
+    icon: mdi:cellphone-link
+    type: sections
+    max_columns: 3
+    theme: Life Dashboard
+    header:
+      layout: start
+      card:
+        type: markdown
+        text_only: true
+        content: |-
+          # Two phones
+          Each phone is a device of its own, with its own sensors and statistics.
+    sections:
+      # One section per phone: side by side on a wide screen, one after the other on a phone.
+      - type: grid
+        cards:
+          - type: heading
+            heading: First phone
+            heading_style: title
+            icon: mdi:android
+          - type: tile
+            entity: sensor.first_phone_steps_today
+            name: Steps
+            icon: mdi:shoe-print
+            color: green
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.first_phone_active_calories_today
+            name: Active
+            icon: mdi:fire
+            color: green
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.first_phone_last_sleep_duration
+            name: Last sleep
+            icon: mdi:power-sleep
+            color: green
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.first_phone_resting_heart_rate
+            name: Resting
+            icon: mdi:heart
+            color: green
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.first_phone_weight
+            name: Weight
+            icon: mdi:scale-bathroom
+            color: green
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.first_phone_last_workout
+            name: Last workout
+            icon: mdi:run-fast
+            color: green
+            grid_options:
+              columns: 6
+          - type: entities
+            entities:
+              - entity: sensor.first_phone_last_health_sync
+                name: Last sync
+                icon: mdi:cloud-check-outline
+              - type: attribute
+                entity: sensor.first_phone_last_health_sync
+                attribute: app_version
+                name: Android app
+                icon: mdi:cellphone
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Second phone
+            heading_style: title
+            icon: mdi:apple
+          - type: tile
+            entity: sensor.second_phone_steps_today
+            name: Steps
+            icon: mdi:shoe-print
+            color: blue
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.second_phone_active_calories_today
+            name: Active
+            icon: mdi:fire
+            color: blue
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.second_phone_last_sleep_duration
+            name: Last sleep
+            icon: mdi:power-sleep
+            color: blue
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.second_phone_resting_heart_rate
+            name: Resting
+            icon: mdi:heart
+            color: blue
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.second_phone_weight
+            name: Weight
+            icon: mdi:scale-bathroom
+            color: blue
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.second_phone_last_workout
+            name: Last workout
+            icon: mdi:bike
+            color: blue
+            grid_options:
+              columns: 6
+          - type: entities
+            entities:
+              - entity: sensor.second_phone_last_health_sync
+                name: Last sync
+                icon: mdi:cloud-check-outline
+              - type: attribute
+                entity: sensor.second_phone_last_health_sync
+                attribute: app_version
+                name: iPhone app
+                icon: mdi:cellphone
+
+      # Both phones in one graph: the statistics of each entry side by side.
+      - type: grid
+        cards:
+          - type: heading
+            heading: Over time
+            heading_style: title
+            icon: mdi:chart-line
+          - type: statistics-graph
+            title: Resting heart rate per week
+            chart_type: line
+            period: week
+            days_to_show: 365
+            stat_types:
+              - mean
+            fit_y_data: true
+            entities:
+              - entity: life_dashboard:<first_entry>_resting_heart_rate
+                name: First phone
+                color: green
+              - entity: life_dashboard:<second_entry>_resting_heart_rate
+                name: Second phone
+                color: blue
+
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Last two weeks
+            heading_style: title
+            icon: mdi:calendar-range
+          - type: statistics-graph
+            title: Steps per day
+            chart_type: bar
+            period: day
+            days_to_show: 14
+            stat_types:
+              - change
+            grid_options:
+              columns: 12
+            entities:
+              - entity: life_dashboard:<first_entry>_steps
+                name: First phone
+                color: green
+              - entity: life_dashboard:<second_entry>_steps
+                name: Second phone
+                color: blue
+          - type: statistics-graph
+            title: Sleep per night
+            chart_type: bar
+            period: day
+            days_to_show: 14
+            stat_types:
+              - change
+            grid_options:
+              columns: 12
+            entities:
+              - entity: life_dashboard:<first_entry>_sleep_minutes
+                name: First phone
+                color: green
+              - entity: life_dashboard:<second_entry>_sleep_minutes
+                name: Second phone
+                color: blue
+          - type: statistics-graph
+            title: First phone sleep stages
+            chart_type: bar-stack
+            period: day
+            days_to_show: 14
+            stat_types:
+              - mean
+            grid_options:
+              columns: 6
+            entities:
+              - entity: life_dashboard:<first_entry>_sleep_deep
+                name: Deep
+                color: indigo
+              - entity: life_dashboard:<first_entry>_sleep_light
+                name: Light
+                color: blue
+              - entity: life_dashboard:<first_entry>_sleep_rem
+                name: REM
+                color: pink
+              - entity: life_dashboard:<first_entry>_sleep_awake
+                name: Awake
+                color: amber
+          - type: statistics-graph
+            title: Second phone sleep stages
+            chart_type: bar-stack
+            period: day
+            days_to_show: 14
+            stat_types:
+              - mean
+            grid_options:
+              columns: 6
+            entities:
+              - entity: life_dashboard:<second_entry>_sleep_deep
+                name: Deep
+                color: indigo
+              - entity: life_dashboard:<second_entry>_sleep_light
+                name: Light
+                color: blue
+              - entity: life_dashboard:<second_entry>_sleep_rem
+                name: REM
+                color: pink
+              - entity: life_dashboard:<second_entry>_sleep_awake
+                name: Awake
+                color: amber
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Per month
+            heading_style: title
+            icon: mdi:calendar-month
+          - type: statistics-graph
+            title: Distance per month
+            chart_type: bar
+            period: month
+            days_to_show: 365
+            stat_types:
+              - change
+            entities:
+              - entity: life_dashboard:<first_entry>_distance
+                name: First phone
+                color: green
+              - entity: life_dashboard:<second_entry>_distance
+                name: Second phone
+                color: blue

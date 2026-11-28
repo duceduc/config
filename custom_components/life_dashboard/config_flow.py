@@ -65,6 +65,7 @@ from .const import (
     URL_CHOICE_CLOUD,
     URL_CHOICE_EXTERNAL,
     URL_CHOICE_URL,
+    store_links,
 )
 from .pairing import by_hand_markup, layout_markup, pairing_url, qr_markup
 from .statistics import async_orphaned_histories
@@ -310,6 +311,7 @@ class LifeDashboardConfigFlow(ConfigFlow, domain=DOMAIN):
                 self.hass, base_url=base_url, use_cloud=use_cloud, reconfigure=False
             ),
             errors=errors,
+            description_placeholders=store_links("ha-config-flow"),
         )
 
     async def async_step_history(

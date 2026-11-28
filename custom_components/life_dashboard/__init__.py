@@ -40,6 +40,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 
+from . import first_sync
 from .apps import AppRoster
 from .apps import async_remove_store as async_remove_apps
 from .const import (
@@ -307,6 +308,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: LifeDashboardConfigEntry
         _open_webhook(hass, entry)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # A phone that sends nothing within a day of being added gets a repair (first_sync.py).
+    first_sync.async_watch(hass, entry)
 
     # The exercise sensors are read from the workouts the ledger kept, so they are right
     # after a restart and with the option just changed, and they move on to the new day at
@@ -486,6 +489,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """
     for remove in (async_remove_history, async_remove_writeback, async_remove_apps):
         await remove(hass, entry)
+    first_sync.async_synced(hass, entry)
     if not entry.data.get(CONF_CLOUDHOOK_URL) or "cloud" not in hass.config.components:
         return
     with contextlib.suppress(ImportError):
@@ -584,6 +588,8 @@ def _make_handler(entry: LifeDashboardConfigEntry):
 
             for update in accepted:
                 async_dispatcher_send(hass, signal_update(entry.entry_id), update)
+            if accepted:
+                first_sync.async_synced(hass, entry)
 
             # The day sums, and Last workout when records for it came later.
             if change is not None and change.workouts:

@@ -1,0 +1,204 @@
+# Life Dashboard theme for Home Assistant.
+#
+# The colors of the Life Dashboard apps, the same on Android and iPhone. Dark is
+# the designed look; light is the same on a pale background. Plain YAML, no fonts to
+# download. "Life Dashboard heart" only colors the icons of the heart cards red.
+#
+# Put this file in a themes folder next to configuration.yaml, with this in
+# configuration.yaml, and restart Home Assistant once:
+#
+#   frontend:
+#     themes: !include_dir_merge_named themes
+#
+# The example dashboards set the theme themselves, so your other dashboards keep theirs.
+# After a change to this file, the action "frontend.reload_themes" picks it up.
+Life Dashboard:
+  # Shape, the same in both modes: the apps' card radius and rounded-square icons.
+  ha-card-border-radius: "18px"
+  ha-card-border-width: "1px"
+  ha-card-box-shadow: "none"
+  ha-tile-icon-border-radius: "12px"
+  ha-badge-border-radius: "12px"
+
+  modes:
+    dark:
+      # Accent: brand green, with a scale for buttons, chips and focus rings.
+      primary-color: "#30B77E"
+      accent-color: "#30B77E"
+      dark-primary-color: "#1F7A55"
+      light-primary-color: "#8FDDB8"
+      text-primary-color: "#06130D"
+      text-accent-color: "#06130D"
+      ha-color-primary-05: "#06130D"
+      ha-color-primary-10: "#0D2419"
+      ha-color-primary-20: "#143B2A"
+      ha-color-primary-30: "#1F7A55"
+      ha-color-primary-40: "#30B77E"
+      ha-color-primary-50: "#30B77E"
+      ha-color-primary-60: "#4FD19A"
+      ha-color-primary-70: "#6FE0AE"
+      ha-color-primary-80: "#8FDDB8"
+      ha-color-primary-90: "#C9EEDC"
+      ha-color-primary-95: "#E6F7EE"
+
+      # Grounds and surfaces.
+      primary-background-color: "#0A0F0D"
+      secondary-background-color: "#0E1512"
+      lovelace-background: "radial-gradient(120% 70% at 50% 0%, #141C18 0%, #0A0F0D 70%) fixed"
+      card-background-color: "#141C18"
+      ha-card-background: "#141C18"
+      ha-card-border-color: "#27332D"
+      ha-dialog-surface-background: "#0E1512"
+      mdc-theme-surface: "#0E1512"
+      divider-color: "#222C27"
+      outline-color: "#27332D"
+      outline-hover-color: "#33423B"
+      input-fill-color: "#141C18"
+      code-editor-background-color: "#0E1512"
+      markdown-code-background-color: "#0E1512"
+
+      # Text.
+      primary-text-color: "#EEF4F0"
+      secondary-text-color: "#A7B5AE"
+      disabled-text-color: "#5A6C63"
+      ha-card-header-color: "#EEF4F0"
+
+      # Header and sidebar.
+      app-header-background-color: "#0A0F0D"
+      app-header-text-color: "#EEF4F0"
+      app-header-border-bottom: "1px solid #1E2A25"
+      sidebar-background-color: "#0E1512"
+      sidebar-text-color: "#B9C4BE"
+      sidebar-icon-color: "#A7B5AE"
+      sidebar-selected-icon-color: "#4FD19A"
+      sidebar-selected-text-color: "#6FE0AE"
+
+      # Icons and controls.
+      state-icon-color: "#4FD19A"
+      paper-item-icon-color: "#4FD19A"
+      switch-checked-color: "#30B77E"
+      switch-checked-button-color: "#30B77E"
+      switch-checked-track-color: "#1F7A55"
+      switch-unchecked-track-color: "#26332D"
+
+      # One colour per kind of data, from the apps' accents and inks.
+      green-color: "#30B77E"
+      teal-color: "#4FD19A"
+      purple-color: "#9B7BF7"
+      deep-purple-color: "#9B7BF7"
+      red-color: "#F87171"
+      pink-color: "#FCA5A5"
+      amber-color: "#F7C56C"
+      orange-color: "#F59E0B"
+      yellow-color: "#F7C56C"
+      blue-color: "#60A5FA"
+      light-blue-color: "#60A5FA"
+      indigo-color: "#9B7BF7"
+      grey-color: "#7C8C84"
+      blue-grey-color: "#7C8C84"
+
+      # Charts: green first, then the same accents.
+      graph-color-1: "#30B77E"
+      graph-color-2: "#9B7BF7"
+      graph-color-3: "#F87171"
+      graph-color-4: "#F7C56C"
+      graph-color-5: "#60A5FA"
+      graph-color-6: "#8FDDB8"
+
+      # Status.
+      success-color: "#30B77E"
+      warning-color: "#F7C56C"
+      error-color: "#F87171"
+      info-color: "#60A5FA"
+
+    light:
+      primary-color: "#1E9665"
+      accent-color: "#1E9665"
+      dark-primary-color: "#176B49"
+      light-primary-color: "#63B797"
+      text-primary-color: "#FFFFFF"
+      text-accent-color: "#FFFFFF"
+      ha-color-primary-05: "#06130D"
+      ha-color-primary-10: "#0D2419"
+      ha-color-primary-20: "#143B2A"
+      ha-color-primary-30: "#176B49"
+      ha-color-primary-40: "#1E9665"
+      ha-color-primary-50: "#30B77E"
+      ha-color-primary-60: "#4FD19A"
+      ha-color-primary-70: "#63B797"
+      ha-color-primary-80: "#A7DCC4"
+      ha-color-primary-90: "#D1FAE5"
+      ha-color-primary-95: "#ECF8F2"
+
+      primary-background-color: "#F3F6F4"
+      secondary-background-color: "#F8FAF9"
+      lovelace-background: "#F3F6F4"
+      card-background-color: "#FFFFFF"
+      ha-card-background: "#FFFFFF"
+      ha-card-border-color: "#D5DED9"
+      ha-dialog-surface-background: "#F8FAF9"
+      mdc-theme-surface: "#F8FAF9"
+      divider-color: "#E1E7E3"
+      outline-color: "#D5DED9"
+      outline-hover-color: "#A9B8B0"
+      input-fill-color: "#F8FAF9"
+      code-editor-background-color: "#F8FAF9"
+      markdown-code-background-color: "#E2E9E5"
+
+      primary-text-color: "#101A15"
+      secondary-text-color: "#56645D"
+      disabled-text-color: "#7C8C84"
+      ha-card-header-color: "#101A15"
+
+      app-header-background-color: "#F3F6F4"
+      app-header-text-color: "#101A15"
+      app-header-border-bottom: "1px solid #D5DED9"
+      sidebar-background-color: "#F8FAF9"
+      sidebar-text-color: "#46534C"
+      sidebar-icon-color: "#56645D"
+      sidebar-selected-icon-color: "#1B7A54"
+      sidebar-selected-text-color: "#176B49"
+
+      state-icon-color: "#1B7A54"
+      paper-item-icon-color: "#1B7A54"
+      switch-checked-color: "#1E9665"
+      switch-checked-button-color: "#1E9665"
+      switch-checked-track-color: "#63B797"
+      switch-unchecked-track-color: "#D5DED9"
+
+      green-color: "#1E9665"
+      teal-color: "#1B7A54"
+      purple-color: "#9470F7"
+      deep-purple-color: "#9470F7"
+      red-color: "#EF4444"
+      pink-color: "#B91C1C"
+      amber-color: "#F59E0B"
+      orange-color: "#F59E0B"
+      yellow-color: "#F59E0B"
+      blue-color: "#2F80ED"
+      light-blue-color: "#2F80ED"
+      indigo-color: "#9470F7"
+      grey-color: "#7C8C84"
+      blue-grey-color: "#7C8C84"
+
+      graph-color-1: "#1E9665"
+      graph-color-2: "#9470F7"
+      graph-color-3: "#EF4444"
+      graph-color-4: "#F59E0B"
+      graph-color-5: "#2F80ED"
+      graph-color-6: "#63B797"
+
+      success-color: "#1E9665"
+      warning-color: "#955A00"
+      error-color: "#B91C1C"
+      info-color: "#1D64C8"
+
+# A helper for single cards, not one to pick in your profile: the statistic cards for
+# heart rate, resting heart rate and HRV set it as their theme, so their icon is red
+# rather than the theme's green. It only sets that one colour.
+Life Dashboard heart:
+  modes:
+    dark:
+      state-icon-color: "#F87171"
+    light:
+      state-icon-color: "#EF4444"

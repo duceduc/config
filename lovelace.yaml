@@ -11,8 +11,8 @@
         type: css
       - url: /local/lovelace/css/fontstyle.css
         type: css
-      - url: /local/lovelace/css/ha-lcars-panel.css?v=4
-        type: css
+#      - url: /local/lovelace/css/ha-lcars-panel.css?v=4 # can delete
+#        type: css
 
       - url: /local/custom_ui/card-mod.js?v=4
         type: module
@@ -49,12 +49,17 @@
       - url: /local/custom_ui/weather-card.js?v=2
         type: module
       - url: /local/custom_ui/honeycomb-menu.js?v=8
-        type: module 
+        type: module
       - url: /local/custom_ui/life-dashboard-sleep-card.js?v1
         type: module
 
-      - url: /local/custom_ui/ha-lcars-panel.js?v=4 # has css aswell
-        type: module
+#      - url: /local/custom_ui/apexcharts-card.js?v1
+#        type: module
+#      - url: /local/custom_ui/hypnogram-card.js?v1
+#        type: module
+
+#      - url: /local/custom_ui/ha-lcars-panel.js?v=4 # can delete. has css aswell.
+#        type: module
 
       - url: /local/custom_ui/vertical-stack-in-card.js?v=2
         type: js
@@ -92,13 +97,6 @@
         show_in_sidebar: true
         filename: lovelace/dashboards/floorplan/ui-floorplan.yaml
 
-      ui-lcars:
-        mode: yaml
-        title: Lcars
-        icon: mdi:biohazard
-        show_in_sidebar: true
-        filename: lovelace/dashboards/lcars/ui-lcars.yaml
-
       quick-look-mobile-dashboard:
         mode: yaml
         title: Quick Look Mobile
@@ -106,3 +104,16 @@
         show_in_sidebar: true
         filename: lovelace/dashboards/quick_look_mobile/qlm.yaml
 
+      life-dashboard:
+        mode: yaml
+        title: Life Dashboard
+        icon: mdi:heart-pulse
+        show_in_sidebar: true
+        filename: lovelace/dashboards/life_dashboard/ui-lifedashboard.yaml
+
+#      ui-lcars:
+#        mode: yaml
+#        title: Lcars
+#        icon: mdi:biohazard
+#        show_in_sidebar: true
+#        filename: lovelace/dashboards/lcars/ui-lcars.yaml

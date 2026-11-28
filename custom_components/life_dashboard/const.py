@@ -37,3 +37,20 @@ MODEL: Final = "Life Dashboard"
 # Config entry options.
 CONF_MIN_WORKOUT_MINUTES: Final = "min_workout_minutes"
 DEFAULT_MIN_WORKOUT_MINUTES: Final = 0
+
+# Where to get the app, linked from the pairing dialog and from the repair for a phone that
+# has not sent anything yet. The place goes into the store links' campaign, so the stores'
+# statistics show where installs come from.
+PLAY_URL: Final = (
+    "https://play.google.com/store/apps/details?id=com.owen282000.lifedashboard"
+    "&referrer=utm_source%3D{place}%26utm_medium%3Dintegration"
+)
+APP_STORE_URL: Final = (
+    "https://apps.apple.com/app/apple-store/id6824075761?pt=128699800&ct={place}&mt=8"
+)
+TROUBLESHOOTING_URL: Final = "https://owen282000.com/life-dashboard/troubleshooting/"
+
+
+def store_links(place: str) -> dict[str, str]:
+    """The two store links as translation placeholders, with the place as campaign."""
+    return {"play": PLAY_URL.format(place=place), "app_store": APP_STORE_URL.format(place=place)}

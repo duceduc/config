@@ -1,0 +1,608 @@
+# Life Dashboard: a Health dashboard for one phone, built from Home Assistant's own cards.
+#
+# Needs Home Assistant 2026.3 or newer. No custom cards.
+# Needs the "Life Dashboard" theme from examples/themes/life_dashboard.yaml in a folder
+# "themes" next to configuration.yaml (the File editor add-on under Settings > Add-ons
+# gets you there), and in configuration.yaml:
+#
+#   frontend:
+#     themes: !include_dir_merge_named themes
+#
+# then restart Home Assistant once. The file also holds "Life Dashboard heart", which
+# only turns the icons of the heart rate statistic cards red. No theme? Delete the
+# "theme:" lines and the cards fall back to your own.
+#
+# Settings > Dashboards > Add dashboard > New dashboard from scratch, open it, three
+# dots > Edit dashboard > three dots > Raw configuration editor, replace everything in
+# it with this file, save.
+#
+# Replace two things, with find and replace:
+# - "your_phone" in the entity ids with the phone's part of them: open the phone under
+#   Settings > Devices & services > Life Dashboard, click its steps sensor, then the
+#   cog. sensor.alex_s_pixel_steps_today means alex_s_pixel.
+# - "<entry->" in the statistic ids, such as life_dashboard:<entry->_steps, with the
+#   phone's config entry ID. Developer tools > Statistics, search for the phone's name
+#   and "steps": the ID reads life_dashboard:01j..._steps, and the part between
+#   "life_dashboard:" and "_steps" is <entry->.
+#
+# Remove the tiles and graphs for what your phone does not send (its device page lists
+# its sensors): Home Assistant shows a missing entity as an error.
+# - An iPhone sends no skin temperature: remove that tile. Its HRV is SDNN, where an
+#   Android phone's is RMSSD, so the numbers can't be compared across the two kinds.
+# - A Samsung Galaxy Watch through Samsung Health shares no HRV, resting heart rate,
+#   skin temperature or breathing with Health Connect: remove Recovery, the three night
+#   tiles under Sleep, the HRV badge and the resting heart rate cards under Heart.
+# Screen time (Android only) is in dashboard-screen-time.yaml, two phones in
+# dashboard-two-phones.yaml.
+#
+# This view uses Home Assistant's own cards only. The cards made for the job (Sleep,
+# Activity, Year, Before bed) are separate installs, with a YAML example each in
+# docs/dashboard.md.
+
+title: Health
+path: health
+icon: mdi:heart-pulse
+type: sections
+max_columns: 3
+#theme: Life Dashboard
+header:
+  layout: start
+  badges_position: bottom
+  badges_wrap: wrap
+  card:
+    type: markdown
+    text_only: true
+    content: |-
+      # Health
+      {%- set sync = 'sensor.life_dashboard_last_health_sync' %}
+      {%- set store = 'Apple Health' if 'healthkit' in (state_attr(sync, 'source') or '') else 'Health Connect' %}
+      {%- set dev = device_id(sync) %}
+      {{ (device_attr(dev, 'name_by_user') or device_attr(dev, 'name')) if dev else 'Your phone' }}, from {{ store }}, sent by the Life Dashboard app {{ state_attr(sync, 'app_version') }}.
+badges:
+  - type: entity
+    entity: sensor.life_dashboard_last_health_sync
+    name: Synced
+    show_name: false
+    icon: mdi:cloud-check-outline
+    color: green
+  - type: entity
+    entity: sensor.life_dashboard_last_sleep_duration
+    name: Sleep
+    show_name: false
+    icon: mdi:power-sleep
+    color: purple
+  - type: entity
+    entity: sensor.life_dashboard_heart_rate_variability
+    name: HRV
+    show_name: false
+    icon: mdi:heart-flash
+    color: red
+sections:
+  # Today: what the sensors hold right now, and the last workout.
+  - type: grid
+    cards:
+      - type: heading
+        heading: Today
+        heading_style: title
+        icon: mdi:calendar-today
+      - type: tile
+        entity: sensor.life_dashboard_steps_today
+        name: Steps
+        icon: mdi:shoe-print
+        color: green
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_distance_today
+        name: Distance
+        icon: mdi:map-marker-distance
+        color: green
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_active_calories_today
+        name: Active
+        icon: mdi:fire
+        color: amber
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_exercise_today
+        name: Workouts
+        icon: mdi:timer-outline
+        color: orange
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_heart_rate
+        name: Heart rate
+        icon: mdi:heart-pulse
+        color: red
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_total_calories_today
+        name: Total burned
+        icon: mdi:lightning-bolt
+        color: amber
+        grid_options:
+          columns: 6
+      - type: markdown
+        title: Last workout
+        grid_options:
+          columns: 12
+        content: |-
+          {%- set w = 'sensor.life_dashboard_last_workout' %}
+          {%- set a = states[w].attributes if states[w] else {} %}
+          {%- set icons = {'running': 'mdi:run-fast', 'biking': 'mdi:bike', 'hiking': 'mdi:hiking', 'walking': 'mdi:walk', 'strength_training': 'mdi:dumbbell'} %}
+          {%- if a.start is defined %}
+          | <ha-icon icon="{{ icons.get(states(w), 'mdi:heart-pulse') }}"></ha-icon> **{{ state_translated(w) }}** | {{ as_timestamp(a.start) | timestamp_custom('%-d %B, %H:%M') }} |
+          |:--|--:|
+          | Time | {{ a.duration_minutes }} min |
+          {%- if a.distance_km is defined %}
+          | Distance | {{ a.distance_km }} km |
+          {%- endif %}
+          {%- if a.pace is defined %}
+          | Pace | {{ a.pace }} /km |
+          {%- elif a.speed_kmh is defined %}
+          | Speed | {{ a.speed_kmh }} km/h |
+          {%- endif %}
+          {%- if a.heart_rate_avg is defined %}
+          | Heart rate | {{ a.heart_rate_avg }} bpm{% if a.heart_rate_max is defined %}, max {{ a.heart_rate_max }}{% endif %} |
+          {%- endif %}
+          {%- if a.active_calories is defined %}
+          | Calories | {{ a.active_calories }} kcal |
+          {%- endif %}
+          {%- if a.steps is defined %}
+          | Steps | {{ '{:,}'.format(a.steps) }}{% if a.cadence_spm is defined %} at {{ a.cadence_spm }} per min{% endif %} |
+          {%- endif %}
+          {%- if a.laps is defined %}
+          | Laps | {{ a.laps }} |
+          {%- endif %}
+          {%- else %}
+          No workout yet.
+          {%- endif %}
+
+
+
+  # Recovery: heart rate variability against its own baseline, resting heart rate
+  # against last week, and VO2 max.
+  - type: grid
+    cards:
+      - type: heading
+        heading: Recovery
+        heading_style: title
+        icon: mdi:heart-flash
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_heart_rate_variability
+        name: HRV, 7 days
+        icon: mdi:heart-flash
+        stat_type: mean
+        theme: Life Dashboard heart
+        period:
+          rolling_window:
+            duration:
+              days: 7
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_heart_rate_variability
+        name: HRV, 60 days
+        icon: mdi:chart-bell-curve
+        stat_type: mean
+        theme: Life Dashboard heart
+        period:
+          rolling_window:
+            duration:
+              days: 60
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_resting_heart_rate
+        name: Resting, this week
+        icon: mdi:heart
+        stat_type: mean
+        theme: Life Dashboard heart
+        period:
+          rolling_window:
+            duration:
+              days: 7
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_resting_heart_rate
+        name: Resting, last week
+        icon: mdi:heart-outline
+        stat_type: mean
+        theme: Life Dashboard heart
+        period:
+          rolling_window:
+            duration:
+              days: 7
+            offset:
+              days: -7
+        grid_options:
+          columns: 6
+      - type: statistics-graph
+        title: HRV per week
+        chart_type: line
+        period: week
+        days_to_show: 365
+        stat_types:
+          - mean
+        fit_y_data: true
+        hide_legend: true
+        grid_options:
+          columns: 12
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_heart_rate_variability
+            name: HRV
+            color: red
+      - type: tile
+        entity: sensor.life_dashboard_vo2_max
+        name: VO2 max
+        icon: mdi:lungs
+        color: blue
+        grid_options:
+          columns: 12
+
+  # life-dashboard-sleep-card
+  - type: grid
+    cards:
+      - type: heading
+        heading: Sleep
+        heading_style: title
+        icon: mdi:moon-waning-crescent
+      - type: custom:life-dashboard-sleep-card
+        entity: sensor.life_dashboard_last_sleep_asleep
+        title: Last night
+
+  # Sleep: last night against a target, the night's vitals, and the nights before.
+  - type: grid
+    cards:
+      - type: heading
+        heading: Sleep
+        heading_style: title
+        icon: mdi:power-sleep
+      - type: gauge
+        entity: sensor.life_dashboard_last_sleep_duration
+        name: Last night
+        min: 0
+        max: 10
+        needle: true
+        segments:
+          - from: 0
+            color: var(--red-color)
+          - from: 6
+            color: var(--amber-color)
+          - from: 7
+            color: var(--purple-color)
+      - type: tile
+        entity: sensor.life_dashboard_respiratory_rate
+        name: Breathing
+        icon: mdi:weather-windy
+        color: teal
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_oxygen_saturation
+        name: Oxygen
+        icon: mdi:water-percent
+        color: blue
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_skin_temperature_delta
+        name: Skin temp vs normal
+        icon: mdi:thermometer
+        color: amber
+        grid_options:
+          columns: 12
+      - type: statistics-graph
+        title: Sleep per night
+        chart_type: bar
+        period: day
+        days_to_show: 30
+        stat_types:
+          - change
+        hide_legend: true
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_sleep_minutes
+            name: Sleep
+            color: purple
+      - type: statistics-graph
+        title: Sleep stages per night
+        chart_type: bar-stack
+        period: day
+        days_to_show: 30
+        stat_types:
+          - mean
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_sleep_deep
+            name: Deep
+            color: indigo
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_sleep_light
+            name: Light
+            color: blue
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_sleep_rem
+            name: REM
+            color: pink
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_sleep_awake
+            name: Awake
+            color: amber
+
+  # Training: workout time per week, and today's sessions.
+  - type: grid
+    column_span: 2
+    cards:
+      - type: heading
+        heading: Training
+        heading_style: title
+        icon: mdi:run-fast
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_exercise_minutes
+        name: This week
+        icon: mdi:timer-outline
+        stat_type: change
+        period:
+          calendar:
+            period: week
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_exercise_minutes
+        name: Last week
+        icon: mdi:timer-outline
+        stat_type: change
+        period:
+          calendar:
+            period: week
+            offset: -1
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_exercise_minutes
+        name: This month
+        icon: mdi:calendar-month
+        stat_type: change
+        period:
+          calendar:
+            period: month
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_exercise_minutes
+        name: Last 4 weeks
+        icon: mdi:calendar-range
+        stat_type: change
+        period:
+          rolling_window:
+            duration:
+              days: 28
+        grid_options:
+          columns: 6
+      - type: markdown
+        title: Today's workouts
+        grid_options:
+          columns: full
+        content: |-
+          {%- set s = state_attr('sensor.life_dashboard_exercise_today', 'sessions') or [] %}
+          {%- set icons = {'running': 'mdi:run-fast', 'biking': 'mdi:bike', 'hiking': 'mdi:hiking', 'walking': 'mdi:walk', 'strength_training': 'mdi:dumbbell'} %}
+          {%- if s %}
+          | | Start | Time | Distance | Heart rate | Calories |
+          |:--|:--|--:|--:|--:|--:|
+          {%- for x in s %}
+          | <ha-icon icon="{{ icons.get(x.type, 'mdi:heart-pulse') }}"></ha-icon> **{{ x.type | replace('_', ' ') | capitalize }}** | {{ as_timestamp(x.start) | timestamp_custom('%H:%M') }} | {{ x.minutes }} min | {{ x.distance_km ~ ' km' if x.distance_km is defined else '' }} | {{ x.heart_rate_avg ~ ' bpm' if x.heart_rate_avg is defined else '' }} | {{ x.active_calories ~ ' kcal' if x.active_calories is defined else '' }} |
+          {%- endfor %}
+          {%- else %}
+          No workout yet today.
+          {%- endif %}
+      - type: statistics-graph
+        title: Workout time per week
+        chart_type: bar
+        period: week
+        days_to_show: 182
+        stat_types:
+          - change
+        hide_legend: true
+        grid_options:
+          columns: 12
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_exercise_minutes
+            name: Workouts
+            color: orange
+      - type: statistics-graph
+        title: VO2 max per month
+        chart_type: line
+        period: month
+        days_to_show: 365
+        stat_types:
+          - mean
+        fit_y_data: true
+        hide_legend: true
+        grid_options:
+          columns: 12
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_vo2_max
+            name: VO2 max
+            color: blue
+
+  # Heart: the resting rate on average and per day, and the last 48 hours.
+  - type: grid
+    cards:
+      - type: heading
+        heading: Heart
+        heading_style: title
+        icon: mdi:heart-pulse
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_resting_heart_rate
+        name: Resting, 30-day average
+        icon: mdi:heart
+        stat_type: mean
+        theme: Life Dashboard heart
+        period:
+          rolling_window:
+            duration:
+              days: 30
+        grid_options:
+          columns: 12
+      - type: statistics-graph
+        title: Resting heart rate per day
+        chart_type: line
+        period: day
+        days_to_show: 90
+        stat_types:
+          - mean
+        fit_y_data: true
+        hide_legend: true
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_resting_heart_rate
+            name: Resting
+            color: red
+      - type: statistics-graph
+        title: Heart rate, last 48 hours
+        chart_type: line
+        period: hour
+        days_to_show: 2
+        stat_types:
+          - min
+          - mean
+          - max
+        hide_legend: true
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_heart_rate
+            name: Heart rate
+            color: red
+
+  # Activity: the day totals as long-term statistics.
+  - type: grid
+    column_span: 2
+    cards:
+      - type: heading
+        heading: Activity
+        heading_style: title
+        icon: mdi:walk
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_steps
+        name: Steps this week
+        icon: mdi:shoe-print
+        stat_type: change
+        period:
+          calendar:
+            period: week
+        grid_options:
+          columns: 12
+      - type: statistic
+        entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_steps
+        name: Steps this month
+        icon: mdi:shoe-print
+        stat_type: change
+        period:
+          calendar:
+            period: month
+        grid_options:
+          columns: 12
+      - type: statistics-graph
+        title: Steps per day
+        chart_type: bar
+        period: day
+        days_to_show: 30
+        stat_types:
+          - change
+        hide_legend: true
+        grid_options:
+          columns: full
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_steps
+            name: Steps
+            color: green
+      - type: statistics-graph
+        title: Distance per week (all)
+        chart_type: bar
+        period: week
+        days_to_show: 182
+        stat_types:
+          - change
+        hide_legend: true
+        grid_options:
+          columns: 12
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_distance
+            name: Distance
+            color: teal
+      - type: statistics-graph
+        title: Active calories per day
+        chart_type: bar
+        period: day
+        days_to_show: 30
+        stat_types:
+          - change
+        hide_legend: true
+        grid_options:
+          columns: 12
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_active_calories
+            name: Active
+            color: amber
+
+  # Body and sync in one column.
+  - type: grid
+    cards:
+      - type: heading
+        heading: Body
+        heading_style: title
+        icon: mdi:human
+      - type: tile
+        entity: sensor.life_dashboard_weight
+        name: Weight
+        icon: mdi:scale-bathroom
+        color: blue
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.life_dashboard_body_fat
+        name: Body fat
+        icon: mdi:percent-circle-outline
+        color: purple
+        grid_options:
+          columns: 6
+      - type: statistics-graph
+        title: Weight per week
+        chart_type: line
+        period: week
+        days_to_show: 365
+        stat_types:
+          - mean
+        fit_y_data: true
+        hide_legend: true
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_weight
+            name: Weight
+            color: blue
+      - type: statistics-graph
+        title: Body fat per week
+        chart_type: line
+        period: week
+        days_to_show: 365
+        stat_types:
+          - mean
+        fit_y_data: true
+        hide_legend: true
+        entities:
+          - entity: life_dashboard:01m8cyx367nf5tspw0whkpgg0q_body_fat
+            name: Body fat
+            color: purple
+      - type: heading
+        heading: Sync
+        heading_style: title
+        icon: mdi:cloud-sync-outline
+      - type: entities
+        entities:
+          - entity: sensor.life_dashboard_last_health_sync
+            name: Last health sync
+            icon: mdi:cloud-check-outline
+          - type: attribute
+            entity: sensor.life_dashboard_last_health_sync
+            attribute: app_version
+            name: App version
+            icon: mdi:cellphone

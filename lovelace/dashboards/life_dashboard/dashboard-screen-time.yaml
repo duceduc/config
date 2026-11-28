@@ -1,0 +1,227 @@
+# Life Dashboard: screen time for one Android phone, built from Home Assistant's own cards.
+#
+# Android only: an iPhone has no screen time, since iOS has no API that lets an app read
+# it. Needs Home Assistant 2026.3 or newer.
+# Needs the "Life Dashboard" theme from examples/themes/life_dashboard.yaml in a folder
+# "themes" next to configuration.yaml (the File editor add-on under Settings > Add-ons
+# gets you there), and in configuration.yaml:
+#
+#   frontend:
+#     themes: !include_dir_merge_named themes
+#
+# then restart Home Assistant once. The file also holds "Life Dashboard heart", which
+# only turns the icons of the heart rate statistic cards red. No theme? Delete the
+# "theme:" lines and the cards fall back to your own.
+#
+# Paste it as a dashboard of its own in the raw configuration editor (Settings >
+# Dashboards > Add dashboard > New dashboard from scratch, three dots > Edit dashboard >
+# three dots > Raw configuration editor), or copy the view under "views:" into the
+# Health dashboard.
+#
+# Replace two things, with find and replace:
+# - "your_phone" in the entity ids with the phone's part of them: open the phone under
+#   Settings > Devices & services > Life Dashboard, click its steps sensor, then the
+#   cog. sensor.alex_s_pixel_steps_today means alex_s_pixel.
+# - "<entry>" in the statistic ids, such as life_dashboard:<entry>_steps, with the
+#   phone's config entry ID. Developer tools > Statistics, search for the phone's name
+#   and "steps": the ID reads life_dashboard:01j..._steps, and the part between
+#   "life_dashboard:" and "_steps" is <entry>.
+#
+# The six app tiles and the "Apps per day" graph are examples. Each app sensor starts
+# disabled: open the phone's device page, show the disabled entities and enable the apps
+# you want. Its statistic, life_dashboard:<entry>_app_<package> with the dots of the
+# package name as underscores, starts with the next sync. Swap in the apps you use.
+#
+# This view uses Home Assistant's own cards only. For cards made for screen time (today
+# against a daily limit, the week, the whole family), install Life Dashboard Screen Time
+# from the Marketplace: https://github.com/owen282000/life-dashboard-screen-time-card
+# With integration 1.2.0 or newer they show every app of the day without app sensors:
+#
+#   type: custom:life-dashboard-screen-time-card
+#   entity: sensor.your_phone_screen_time_today
+#   limit: "3:30"
+title: Screen time
+views:
+  # Screen time: Android only. Today, the apps that have a sensor, and the days before.
+  - title: Screen time
+    path: screen-time
+    icon: mdi:cellphone
+    type: sections
+    max_columns: 3
+    theme: Life Dashboard
+    header:
+      layout: start
+      card:
+        type: markdown
+        text_only: true
+        content: |-
+          # Screen time
+          {%- set sync = 'sensor.your_phone_last_screen_time_sync' %}
+          {%- set dev = device_id(sync) %}
+          {{ (device_attr(dev, 'name_by_user') or device_attr(dev, 'name')) if dev else 'Your phone' }}, from Android's usage statistics, like Digital Wellbeing.
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Today
+            heading_style: title
+            icon: mdi:cellphone
+          - type: tile
+            entity: sensor.your_phone_screen_time_today
+            name: Today
+            icon: mdi:cellphone
+            color: purple
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_screen_time_yesterday
+            name: Yesterday
+            icon: mdi:cellphone-arrow-down
+            color: purple
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_most_used_app_today
+            name: Most used
+            icon: mdi:star-outline
+            color: amber
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_screen_time_today
+            name: Apps used
+            icon: mdi:apps
+            color: teal
+            state_content: app_count
+            grid_options:
+              columns: 6
+          - type: heading
+            heading: Apps today
+            heading_style: subtitle
+          - type: tile
+            entity: sensor.your_phone_youtube_screen_time
+            name: YouTube
+            icon: mdi:youtube
+            color: red
+            features_position: inline
+            features:
+              - type: bar-gauge
+                min: 0
+                max: 1
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_chrome_screen_time
+            name: Chrome
+            icon: mdi:google-chrome
+            color: amber
+            features_position: inline
+            features:
+              - type: bar-gauge
+                min: 0
+                max: 1
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_whatsapp_screen_time
+            name: WhatsApp
+            icon: mdi:whatsapp
+            color: green
+            features_position: inline
+            features:
+              - type: bar-gauge
+                min: 0
+                max: 1
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_instagram_screen_time
+            name: Instagram
+            icon: mdi:instagram
+            color: "#E879F9"
+            features_position: inline
+            features:
+              - type: bar-gauge
+                min: 0
+                max: 1
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_spotify_screen_time
+            name: Spotify
+            icon: mdi:spotify
+            color: cyan
+            features_position: inline
+            features:
+              - type: bar-gauge
+                min: 0
+                max: 1
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.your_phone_maps_screen_time
+            name: Maps
+            icon: mdi:google-maps
+            color: blue
+            features_position: inline
+            features:
+              - type: bar-gauge
+                min: 0
+                max: 1
+            grid_options:
+              columns: 6
+          - type: entities
+            entities:
+              - entity: sensor.your_phone_last_screen_time_sync
+                name: Last screen time sync
+                icon: mdi:cellphone-check
+
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Per day
+            heading_style: title
+            icon: mdi:calendar-range
+          - type: statistics-graph
+            title: Screen time per day
+            chart_type: bar
+            period: day
+            days_to_show: 30
+            stat_types:
+              - change
+            hide_legend: true
+            grid_options:
+              columns: full
+            entities:
+              - entity: life_dashboard:<entry>_screen_time
+                name: Screen time
+                color: purple
+          - type: statistics-graph
+            title: Apps per day
+            chart_type: bar-stack
+            period: day
+            days_to_show: 30
+            stat_types:
+              - change
+            grid_options:
+              columns: full
+            entities:
+              - entity: life_dashboard:<entry>_app_com_google_android_youtube
+                name: YouTube
+                color: red
+              - entity: life_dashboard:<entry>_app_com_android_chrome
+                name: Chrome
+                color: amber
+              - entity: life_dashboard:<entry>_app_com_whatsapp
+                name: WhatsApp
+                color: green
+              - entity: life_dashboard:<entry>_app_com_instagram_android
+                name: Instagram
+                color: "#E879F9"
+              - entity: life_dashboard:<entry>_app_com_spotify_music
+                name: Spotify
+                color: cyan
+              - entity: life_dashboard:<entry>_app_com_google_android_apps_maps
+                name: Maps
+                color: blue
